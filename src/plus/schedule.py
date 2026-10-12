@@ -44,7 +44,7 @@ from packaging.version import Version
 
 from PyQt6.QtCore import (Qt, QMimeData, QSettings, pyqtSlot, pyqtSignal, QPoint, QPointF, QLocale, QDate, QDateTime, QSemaphore, QTimer, QUrl, QSize)
 from PyQt6.QtGui import (QDrag, QPixmap, QPainter, QTextLayout, QTextLine, QColor, QFontMetrics, QCursor, QAction, QDesktopServices, QIcon)
-from PyQt6.QtWidgets import (QDialogButtonBox, QMessageBox, QStackedWidget, QApplication, QWidget, QVBoxLayout, QHBoxLayout, QFrame, QTabWidget,
+from PyQt6.QtWidgets import (QDialogButtonBox, QStackedWidget, QApplication, QWidget, QVBoxLayout, QHBoxLayout, QFrame,
         QCheckBox, QGroupBox, QScrollArea, QLabel, QSizePolicy, QPushButton,
         QGraphicsDropShadowEffect, QLineEdit, QMenu, QStatusBar, QToolButton)
 
@@ -72,11 +72,11 @@ import plus.sync
 import plus.util
 from plus.util import datetime2epoch, epoch2datetime, schedulerLink, epoch2ISO8601, ISO86012epoch
 from plus.weight import Display, GreenDisplay, RoastedDisplay, PROCESS_STATE, WeightManager, GreenWeightItem, RoastedWeightItem
-from artisanlib.widgets import ClickableQLabel, ClickableQLineEdit, Splitter, ArtisanPlainTextEdit
-from artisanlib.dialogs import ArtisanResizeablDialog
+from artisanlib.widgets import ClickableQLabel, ClickableQLineEdit, Splitter, ArtisanPlainTextEdit, ArtisanQTabWidget
+from artisanlib.dialogs import ArtisanResizeablDialog, artisan_question
 from artisanlib.util import (float2float, float2str, convertWeight, weight_units, render_weight, comma2dot, float2floatWeightVolume, getDirectory,
     deserialize, roast_time, get_total_roast_time_from_profile, stringfromseconds, getTaskURL, getStyleIconPath, open_link)
-from artisanlib.styles import tool_button_icon_style, artisan_push_button_style, line_edit_style
+from artisanlib.styles import tool_button_icon_style, artisan_push_button_style, line_edit_style, scroller_style
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -1537,24 +1537,30 @@ class DragItem(StandardItem):
         self.aw.updateScheduleSignal.emit()
 
     def addLoadedProfileToSelectedScheduleItem(self) -> None:
-        string = QApplication.translate('Message','Register the currently loaded roast profile<br>in the selected entry.<br>This will overwrite some roast properties.')
-        # native dialog
-        if platform.system() == 'Darwin':
-            mbox = QMessageBox() # only without super this one shows the native dialog on macOS under Qt 6.6.2
-            # for native dialogs, text and informativetext need to be plain strings, no RTF incl. HTML instructions like <br>
-            mbox.setText(QApplication.translate('Message','Register Roast'))
-            mbox.setInformativeText(string.replace('<br>',' '))
-            mbox.setWindowModality(Qt.WindowModality.ApplicationModal) # for native dialog it has to be ApplicationModal
-            mbox.setStandardButtons(QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
-            mbox.setDefaultButton(QMessageBox.StandardButton.Cancel)
-            reply = mbox.exec()
-        else:
-            # non-native dialog
-            reply = QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
-                            QApplication.translate('Message','Register Roast'),string,
-                            QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok, QMessageBox.StandardButton.Cancel)
-
-        if reply == int(QMessageBox.StandardButton.Ok):
+#        string = QApplication.translate('Message','Register the currently loaded roast profile<br>in the selected entry.<br>This will overwrite some roast properties.')
+#        # native dialog
+#        if platform.system() == 'Darwin':
+#            mbox = QMessageBox() # only without super this one shows the native dialog on macOS under Qt 6.6.2
+#            # for native dialogs, text and informativetext need to be plain strings, no RTF incl. HTML instructions like <br>
+#            mbox.setText(QApplication.translate('Message','Register Roast'))
+#            mbox.setInformativeText(string.replace('<br>',' '))
+#            mbox.setWindowModality(Qt.WindowModality.ApplicationModal) # for native dialog it has to be ApplicationModal
+#            mbox.setStandardButtons(QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
+#            mbox.setDefaultButton(QMessageBox.StandardButton.Cancel)
+#            reply = mbox.exec()
+#        else:
+#            # non-native dialog
+#            reply = QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+#                            QApplication.translate('Message','Register Roast'),string,
+#                            QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok, QMessageBox.StandardButton.Cancel)
+#
+#        if reply == int(QMessageBox.StandardButton.Ok):
+#            self.registerRoast.emit()
+#
+        res = artisan_question(self, self.aw,
+            QApplication.translate('Message','Register the currently loaded roast profile in the selected entry.\nThis will overwrite some roast properties.'),
+            QApplication.translate('Message','Register Roast'))
+        if res:
             self.registerRoast.emit()
 
 
@@ -1997,6 +2003,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.remaining_scrollarea.setWidgetResizable(True)
         self.remaining_scrollarea.setWidget(remaining_widget)
         self.remaining_scrollarea.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop)
+        self.remaining_scrollarea.setStyleSheet(scroller_style(self.aw.app.darkmode))
 
         self.remaining_filter_group.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
 
@@ -2072,6 +2079,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
 #        self.completed_scrollarea.setFrameShadow(QFrame.Shadow.Sunken)
 #        self.completed_scrollarea.setFrameShape(QFrame.Shape.Panel)
         self.completed_scrollarea.setMinimumWidth(roasted_widget.minimumSizeHint().width())
+        self.completed_scrollarea.setStyleSheet(scroller_style(self.aw.app.darkmode))
 
         weight_unit_str:str = self.aw.qmc.weight[2].lower()
         density_unit_str:Final[str] = 'g/l'
@@ -2270,6 +2278,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.completed_details_scrollarea.setWidgetResizable(True)
         self.completed_details_scrollarea.setWidget(self.completed_details_group)
         self.completed_details_scrollarea.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum) # horizontal/vertical
+        self.completed_details_scrollarea.setStyleSheet(scroller_style(self.aw.app.darkmode))
 
         completed_details_layout2 =  QVBoxLayout()
         completed_details_layout2.addSpacing(1) # ensures a minimum height to keep the handle movable
@@ -2380,7 +2389,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
 
 #####
 
-        self.TabWidget = QTabWidget()
+        self.TabWidget = ArtisanQTabWidget()
         self.TabWidget.addTab(self.open_stacked_widget, QApplication.translate('Tab', 'To-Do'))
         self.TabWidget.addTab(self.completed_stacked_widget, QApplication.translate('Tab', 'Completed'))
         self.TabWidget.setStyleSheet(tooltip_style)
@@ -2876,24 +2885,34 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
     @override
     def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
         if self.aw.scheduler_auto_open and len(self.scheduled_items) > 0 and self.aw.plus_account is not None:
-            self.aw.scheduler_auto_open = False
-            string = QApplication.translate('Message','Roasts will not adjust the schedule<br>while the schedule window is closed')
-            # native dialog
-            if platform.system() == 'Darwin':
-                mbox = QMessageBox() # only without super this one shows the native dialog on macOS under Qt 6.6.2
-                # for native dialogs, text and informativetext need to be plain strings, no RTF incl. HTML instructions like <br>
-                mbox.setText(QApplication.translate('Message','Close Scheduler'))
-                mbox.setInformativeText(string.replace('<br>',' '))
-                mbox.setWindowModality(Qt.WindowModality.ApplicationModal) # for native dialog it has to be ApplicationModal
-                mbox.setStandardButtons(QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Close)
-                mbox.setDefaultButton(QMessageBox.StandardButton.Cancel)
-                reply = mbox.exec()
-            else:
-                # non-native dialog
-                reply = QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
-                                QApplication.translate('Message','Close Scheduler'),string,
-                                QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Close, QMessageBox.StandardButton.Cancel)
-            if reply == int(QMessageBox.StandardButton.Close):
+
+#            string = QApplication.translate('Message','Roasts will not adjust the schedule<br>while the schedule window is closed')
+#            # native dialog
+#            if platform.system() == 'Darwin':
+#                mbox = QMessageBox() # only without super this one shows the native dialog on macOS under Qt 6.6.2
+#                # for native dialogs, text and informativetext need to be plain strings, no RTF incl. HTML instructions like <br>
+#                mbox.setText(QApplication.translate('Message','Close Scheduler'))
+#                mbox.setInformativeText(string.replace('<br>',' '))
+#                mbox.setWindowModality(Qt.WindowModality.ApplicationModal) # for native dialog it has to be ApplicationModal
+#                mbox.setStandardButtons(QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Close)
+#                mbox.setDefaultButton(QMessageBox.StandardButton.Cancel)
+#                reply = mbox.exec()
+#            else:
+#                # non-native dialog
+#                reply = QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+#                                QApplication.translate('Message','Close Scheduler?'),string,
+#                                QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Close, QMessageBox.StandardButton.Cancel)
+#            if reply == int(QMessageBox.StandardButton.Close):
+#                self.aw.scheduler_auto_open = False
+#                self.closeScheduler()
+#            elif a0 is not None:
+#                a0.ignore()
+
+            if artisan_question(self, self.aw,
+                    QApplication.translate('Message','Roasts will not adjust the schedule while the schedule window is closed'),
+                    QApplication.translate('Message','Close Scheduler'),
+                    True):
+                self.aw.scheduler_auto_open = False
                 self.closeScheduler()
             elif a0 is not None:
                 a0.ignore()

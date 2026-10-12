@@ -228,6 +228,14 @@ class WheelDlg(ArtisanDialog):
 #            viewModeButton.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
 #            viewModeButton.setIcon(QIcon(getStyleIconPath('cancel-square-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'cancel-square-stroke-rounded-white.svg')))
 
+
+        closeButton = self.main_buttons.button(QDialogButtonBox.StandardButton.Close)
+        if closeButton is not None:
+            closeButton.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
+            closeButton.setIconSize(QSize(14,14))
+            closeButton.setIcon(QIcon(getStyleIconPath(
+                'cancel-square-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'cancel-square-stroke-rounded-white.svg')))
+
         self.setButtonTranslations(self.main_buttons.button(QDialogButtonBox.StandardButton.Close),'Close', QApplication.translate('Button','Close'))
         self.setButtonTranslations(self.main_buttons.button(QDialogButtonBox.StandardButton.Open),'Open', QApplication.translate('Button','Open'))
 

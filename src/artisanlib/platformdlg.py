@@ -88,7 +88,7 @@ class platformDlg(ArtisanDialog):
         platformdic['Python version'] = str(platform.python_version())
         platformdic['============'] = ''
         from PyQt6.QtCore import qVersion
-        platformdic['Qt'] = qVersion()
+        platformdic['Qt'] = (qVersion() or '??')
         platformdic['PyQt'] = PYQT_VERSION_STR
         platformdic['numpy'] = numpy.__version__
         platformdic['scipy'] = SCIPY_VERSION_STR

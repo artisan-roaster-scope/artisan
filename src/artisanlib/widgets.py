@@ -38,9 +38,10 @@ if TYPE_CHECKING:
 
 from PyQt6.QtCore import (Qt, pyqtSignal, pyqtSlot, QLine, QEvent,
     QByteArray, QPropertyAnimation, QEasingCurve, QLocale)
-from PyQt6.QtCore import pyqtProperty, QSize # type:ignore[attr-defined]
+from PyQt6.QtCore import pyqtProperty, QSize
 from PyQt6.QtWidgets import (QApplication, QSplitter, QSplitterHandle, QLabel, QComboBox, QLineEdit, QTextEdit, QPlainTextEdit, QDoubleSpinBox, QPushButton,
-    QTableWidget, QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame, QSlider, QStyle, QStyleOptionSlider, QListView, QToolButton, QSpinBox)
+    QTableWidget, QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame, QSlider, QStyle, QStyleOptionSlider, QListView, QToolButton, QSpinBox,
+    QTabWidget, QTabBar)
 from PyQt6.QtGui import QPen, QPainter, QFontMetrics, QColor, QCursor, QEnterEvent, QPaintEvent, QIcon
 
 from artisanlib.util import stringtoseconds, createGradient,getStyleIconPath
@@ -177,6 +178,58 @@ class MyQDoubleSpinBox(QDoubleSpinBox):
         super().mouseReleaseEvent(a0)
         super().mouseDoubleClickEvent(a0)
         super().mouseReleaseEvent(a0)
+
+
+
+#class TabBarDescenderFixStyle(QProxyStyle):
+#    def sizeFromContents(self, contents_type: QStyle.ContentsType,
+#                         option: QStyleOption, size: QSize,
+#                         widget: QWidget) -> QSize:
+#
+#        # Get the standard size calculated by the Fusion style
+#        s = super().sizeFromContents(contents_type, option, size, widget)
+#
+#        # Check if the requested content type is a TabBar Tab
+#        if contents_type == QStyle.ContentsType.CT_TabBarTab and widget:
+#            fm = QFontMetrics(widget.font())
+#            # Explicitly add the descent (and a safety buffer) to the height
+#            s.setHeight(s.height() + fm.descent() + 2)
+#
+#        return s
+
+# adds extra vertical spacing to avoid clipping of tab labels
+class SpaciousTabBar(QTabBar):
+    def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[Any,Any]) -> None:
+        super().__init__(parent, **kwargs)
+        self.currentChanged.connect(self.handle_tab_change)
+
+    def handle_tab_change(self, index:int) -> None:
+        del index
+        # Clears internal caches and tells the layout engine to poll hints again
+        self.updateGeometry()
+
+    @override
+    def tabSizeHint(self, index: int) -> QSize:
+        size = super().tabSizeHint(index)
+        size.setHeight(size.height() + 5)  # Example padding adjustment
+        return size
+
+    @override
+    def minimumTabSizeHint(self, index: int) -> QSize:
+        return self.tabSizeHint(index)
+
+# fixes clipping of decenders of tab labels in Fusion style by adding some vertical padding
+class ArtisanQTabWidget(QTabWidget):
+    def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[Any,Any]) -> None:
+        super().__init__(parent, **kwargs)
+        app = QApplication.instance()
+        if app is not None and app.style().name().lower() in {'fusion', 'windows', 'windowsvista'}:
+            # increase tab height to prevent vertical clipping of descenders observed on Windows/Fusion-style
+            self.setTabBar(SpaciousTabBar())
+# alternative fix, which alters tab height to font size + safety buffer (somewhat smaller than original design)
+#            self.fix_style = TabBarDescenderFixStyle()
+#            self.tabBar().setStyle(self.fix_style)
+
 
 class MyQTableWidget(QTableWidget):
     def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[Any,Any]) -> None:
@@ -728,7 +781,7 @@ class SplitterHandle(QSplitterHandle):
     def enterEvent(self, event:QEnterEvent|None) -> None:
         if event is not None:
             app:QCoreApplication|None = QApplication.instance()
-            if app is not None and app.darkmode: # type:ignore[attr-defined]
+            if app is not None and app.darkmode:
                 self.pen_color = self.pen_color_hover_darkmode
             else:
                 self.pen_color = self.pen_color_hover_lightmode

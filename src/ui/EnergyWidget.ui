@@ -413,7 +413,7 @@
     </spacer>
    </item>
    <item>
-    <widget class="QTabWidget" name="tabWidget">
+    <widget class="ArtisanQTabWidget" name="tabWidget">
      <property name="maximumSize">
       <size>
        <width>16777215</width>
@@ -3183,7 +3183,13 @@
   <customwidget>
    <class>ClickableQGroupBox</class>
    <extends>QGroupBox</extends>
-   <header>artisanlib/widgets.h</header>
+   <header>artisanlib.widgets.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ArtisanQTabWidget</class>
+   <extends>QTabWidget</extends>
+   <header>artisanlib.widgets.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

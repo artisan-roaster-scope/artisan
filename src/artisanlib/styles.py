@@ -99,11 +99,9 @@ def artisan_push_button_style(dark:bool=False) -> str:
         }}
         QPushButton#plus_button {{
             border-radius: 13px;
-            padding: 3px 9px 5px 9px;
         }}
         QPushButton#minus_button {{
             border-radius: 13px;
-            padding: 3px 9px 5px 9px;
         }}
         QPushButton:hover {{
             background-color: #43a7cf;

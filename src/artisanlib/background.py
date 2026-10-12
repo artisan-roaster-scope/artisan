@@ -39,12 +39,12 @@ from PyQt6.QtCore import (Qt, pyqtSlot, QSettings, QTimer)
 from PyQt6.QtGui import QColor, QKeySequence
 from PyQt6.QtWidgets import (QApplication, QCheckBox, QGridLayout, QHBoxLayout, QVBoxLayout, QToolButton,
                              QLabel, QLineEdit,QPushButton, QComboBox, QDialogButtonBox, QHeaderView,
-                             QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QWidget, QGroupBox)
+                             QSpinBox, QTableWidget, QTableWidgetItem, QWidget, QGroupBox)
 
 from artisanlib.main import UI_MODE
 from artisanlib.util import deltaLabelUTF8, deltaLabelPrefix, stringfromseconds
 from artisanlib.dialogs import ArtisanResizeablDialog
-from artisanlib.widgets import MyTableWidgetItemNumber, ArtisanMinorPushButton
+from artisanlib.widgets import MyTableWidgetItemNumber, ArtisanMinorPushButton, ArtisanQTabWidget
 from artisanlib.styles import horizontal_header_style, vertical_header_style, line_edit_style, tool_button_icon_style, table_style, spin_box_style
 
 
@@ -587,7 +587,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         tab3layout.addLayout(databuttonLayout)
         tab3layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom
         #tab layout
-        self.TabWidget = QTabWidget()
+        self.TabWidget = ArtisanQTabWidget()
         C1Widget = QWidget()
         C1Widget.setLayout(tab1layout)
         self.TabWidget.addTab(C1Widget,QApplication.translate('Tab','Config'))

@@ -111,7 +111,7 @@ class batchDlg(ArtisanDialog):
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(batchlayout)
         mainLayout.addStretch()
-        mainLayout.addSpacing(10)
+        mainLayout.addSpacing(15)
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
         ok_button = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)

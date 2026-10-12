@@ -39,13 +39,13 @@ from PyQt6.QtCore import Qt, pyqtSlot, QRegularExpression, QSettings, QTimer
 from PyQt6.QtGui import QIntValidator, QRegularExpressionValidator
 from PyQt6.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton,
     QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QGroupBox, QLineEdit,
-    QMessageBox, QRadioButton, QSpinBox, QStatusBar, QTabWidget, QDoubleSpinBox,
+    QRadioButton, QSpinBox, QStatusBar, QDoubleSpinBox,
     QTimeEdit, QLayout, QSizePolicy, QHeaderView, QButtonGroup, QFrame)
 
 
 from artisanlib.util import stringfromseconds, stringtoseconds, comma2dot, toInt, toFloat, float2float
-from artisanlib.dialogs import ArtisanDialog
-from artisanlib.widgets import MyQComboBox, MyQDoubleSpinBox, ArtisanMinorPushButton
+from artisanlib.dialogs import ArtisanDialog, artisan_question
+from artisanlib.widgets import MyQComboBox, MyQDoubleSpinBox, ArtisanMinorPushButton, ArtisanQTabWidget
 from artisanlib.styles import line_edit_style, spin_box_style, table_style, horizontal_header_style, vertical_header_style
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -1017,7 +1017,7 @@ class PID_DlgControl(ArtisanDialog):
         tab1Layout.setSpacing(5)
         tab2Layout.setContentsMargins(10,10,10,10)
         tab2Layout.setSpacing(5)
-        self.tabWidget = QTabWidget()
+        self.tabWidget = ArtisanQTabWidget()
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
         self.tabWidget.addTab(C1Widget,QApplication.translate('Tab','PID'))
@@ -2255,7 +2255,7 @@ class PXRpidDlgControl(PXpidDlgControl):
         tab5Layout.addWidget(PointButtonBT)
         tab5Layout.addStretch()
         ###################################
-        TabWidget = QTabWidget()
+        TabWidget = ArtisanQTabWidget()
         C1Widget = QWidget()
         C1Widget.setLayout(buttonMasterLayout)
         TabWidget.addTab(C1Widget,QApplication.translate('Tab','RS'))
@@ -2571,19 +2571,24 @@ class PXRpidDlgControl(PXpidDlgControl):
         string =  QApplication.translate('Message','The rampsoak-mode tells how to start and end the ramp/soak') + '\n\n'
         string += QApplication.translate('Message','Your rampsoak mode in this pid is:') + '\n\n'
         string += QApplication.translate('Message','Mode = {0}').format(mode[0]) + '\n'
-        string += '-----------------------------------------------------------------------\n'
+        string += '-----------------------------------------------------------------\n'
         string += QApplication.translate('Message','Start to run from PV value: {0}').format(mode[1]) + '\n'
         string += QApplication.translate('Message','End output status at the end of ramp/soak: {0}').format(mode[2]) + '\n'
         string += QApplication.translate('Message','Output status while ramp/soak operation set to OFF: {0}').format(mode[3]) + '\n'
         string += QApplication.translate('Message','\nRepeat Operation at the end: {0}').format(mode[4]) + '\n'
-        string += '-----------------------------------------------------------------------\n'
+        string += '-----------------------------------------------------------------\n'
         string += QApplication.translate('Message','Recommended Mode = 0') + '\n\n'
         string += QApplication.translate('Message','If you need to change it, change it now and come back later') + '\n'
-        string += QApplication.translate('Message','Use the Parameter Loader Software by Fuji if you need to\n\n') + '\n\n\n'
+        string += QApplication.translate('Message','Use the Parameter Loader Software by Fuji if you need to\n\n')
         string += QApplication.translate('Message','Continue?')
-        reply = QMessageBox.question(self.aw,QApplication.translate('Message','Ramp Soak start-end mode'),string,
-                            QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
-        if reply == QMessageBox.StandardButton.Yes:
+#        reply = QMessageBox.question(self.aw,QApplication.translate('Message','Ramp Soak start-end mode'),string,
+#                            QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
+#        if reply == QMessageBox.StandardButton.Yes:
+#            return 1
+#        return 0
+        if artisan_question(self, self.aw,
+                string,
+                QApplication.translate('Message','Ramp Soak start-end mode')):
             return 1
         return 0
 
@@ -3411,7 +3416,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
         buttonLayout.addStretch()
         buttonLayout.addWidget(button_exit)
         ############################
-        TabWidget = QTabWidget()
+        TabWidget = ArtisanQTabWidget()
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
         TabWidget.addTab(C1Widget,QApplication.translate('Tab','RS'))
@@ -3769,10 +3774,13 @@ class PXG4pidDlgControl(PXpidDlgControl):
         # if current svN is different than requested svN
         if N is not None and N != -1:
             if svn != N:
-                string = QApplication.translate('Message','Current sv = {0}. Change now to sv = {1}?').format(str(N),str(svn))
-                reply = QMessageBox.question(self.aw,QApplication.translate('Message','Change svN'),string,
-                                    QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
-                if reply == QMessageBox.StandardButton.Yes:
+#                string = QApplication.translate('Message','Current sv = {0}. Change now to sv = {1}?').format(str(N),str(svn))
+#                reply = QMessageBox.question(self.aw,QApplication.translate('Message','Change svN'),string,
+#                                    QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
+#                if reply == QMessageBox.StandardButton.Yes:
+                if artisan_question(self, self.aw,
+                        QApplication.translate('Message','Current sv = {0}. Change now to sv = {1}?').format(str(N),str(svn)),
+                        QApplication.translate('Message','Change svN')):
                     #change variable svN
                     if self.aw.ser.useModbusPort:
                         reg = self.aw.modbus.address2register(reg_dict['selectsv'][1],6)
@@ -3791,7 +3799,8 @@ class PXG4pidDlgControl(PXpidDlgControl):
                             self.status.showMessage(message, 5000)
                     else:
                         self.status.showMessage(QApplication.translate('StatusBar','Problem setting SV'),5000)
-                elif reply == QMessageBox.StandardButton.Cancel:
+#                elif reply == QMessageBox.StandardButton.Cancel:
+                else:
                     self.status.showMessage(QApplication.translate('StatusBar','Cancelled svN change'),5000)
                     #set radio button
                     if N == 1:
@@ -3851,10 +3860,13 @@ class PXG4pidDlgControl(PXpidDlgControl):
             reg_dict['selectedpid'][0] = N
             # if current svN is different than requested svN
             if pidn != N:
-                string = QApplication.translate('Message','Current pid = {0}. Change now to pid ={1}?').format(str(N),str(pidn))
-                reply = QMessageBox.question(self.aw,QApplication.translate('Message','Change svN'),string,
-                                    QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
-                if reply == QMessageBox.StandardButton.Yes:
+#                string = QApplication.translate('Message','Current pid = {0}. Change now to pid ={1}?').format(str(N),str(pidn))
+#                reply = QMessageBox.question(self.aw,QApplication.translate('Message','Change svN'),string,
+#                                    QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
+#                if reply == QMessageBox.StandardButton.Yes:
+                if artisan_question(self, self.aw,
+                        QApplication.translate('Message','Current pid = {0}. Change now to pid ={1}?').format(str(N),str(pidn)),
+                        QApplication.translate('Message','Change svN')):
                     #change variable svN
                     if self.aw.ser.useModbusPort:
                         reg = self.aw.modbus.address2register(reg_dict['selectedpid'][1],6)
@@ -3873,7 +3885,8 @@ class PXG4pidDlgControl(PXpidDlgControl):
                         mssg = QApplication.translate('StatusBar','setNpid(): bad confirmation')
                         self.status.showMessage(mssg,1000)
                         self.aw.qmc.adderror(mssg)
-                elif reply == QMessageBox.StandardButton.Cancel:
+#                elif reply == QMessageBox.StandardButton.Cancel:
+                else:
                     self.status.showMessage(QApplication.translate('StatusBar','Cancelled pid change'),5000)
                     #put back radio button
                     if N == 1:
@@ -4502,10 +4515,15 @@ class PXG4pidDlgControl(PXpidDlgControl):
         string += '\n\nRecomended Mode = 0\n'
         string += '\nIf you need to change it, change it now and come back later'
         string += '\nUse the Parameter Loader Software by Fuji if you need to\n\n'
-        string += '\n\n\nContinue?'
-        reply = QMessageBox.question(self.aw,QApplication.translate('Message','Ramp Soak start-end mode'),string,
-                            QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
-        if reply == QMessageBox.StandardButton.Yes:
+        string += 'Continue?'
+#        reply = QMessageBox.question(self.aw,QApplication.translate('Message','Ramp Soak start-end mode'),string,
+#                            QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
+#        if reply == QMessageBox.StandardButton.Yes:
+#            return 1
+#        return 0
+        if artisan_question(self, self.aw,
+                string,
+                QApplication.translate('Message','Ramp Soak start-end mode')):
             return 1
         return 0
 
@@ -4666,12 +4684,16 @@ class PXG4pidDlgControl(PXpidDlgControl):
             return
         reg_dict['selectedpid'][0] = N
         string = QApplication.translate('StatusBar','Current pid = {0}. Proceed with autotune command?').format(str(N))
-        reply = QMessageBox.question(self.aw,QApplication.translate('Message','Ramp Soak start-end mode'),string,
-                            QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
-        if reply == QMessageBox.StandardButton.Cancel:
-            self.status.showMessage(QApplication.translate('StatusBar','Autotune cancelled'),5000)
-            return
-        if reply == QMessageBox.StandardButton.Yes:
+#        reply = QMessageBox.question(self.aw,QApplication.translate('Message','Ramp Soak start-end mode'),string,
+#                            QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
+#        if reply == QMessageBox.StandardButton.Cancel:
+#            self.status.showMessage(QApplication.translate('StatusBar','Autotune cancelled'),5000)
+#            return
+#        if reply == QMessageBox.StandardButton.Yes:
+
+        if artisan_question(self, self.aw,
+                string,
+                QApplication.translate('Message','Ramp Soak start-end mode')):
             if self.aw.ser.useModbusPort:
                 reg = self.aw.modbus.address2register(reg_dict['autotuning'][1],6)
                 self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,flag)
@@ -4870,7 +4892,7 @@ class DTApidDlgControl(ArtisanDialog):
         tab1Layout.addWidget(readsvbutton,0,2)
         tab1Layout.addWidget(writesvbutton,0,3)
         ############################
-        TabWidget = QTabWidget()
+        TabWidget = ArtisanQTabWidget()
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
         TabWidget.addTab(C1Widget,QApplication.translate('Tab','General'))

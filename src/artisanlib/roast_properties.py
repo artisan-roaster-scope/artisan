@@ -47,7 +47,8 @@ from artisanlib.util import (deltaLabelUTF8, stringfromseconds,stringtoseconds, 
         scaleFloat2String, comma2dot, weight_units, render_weight, weight_units_lower, volume_units, float2floatWeightVolume, float2float,
         convertWeight, convertVolume, float2str, getStyleIconPath)
 from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog, tareDlg
-from artisanlib.widgets import MyQComboBox, ClickableQLabel, ClickableTextEdit, MyTableWidgetItemNumber, ArtisanPlainTextEdit, RoastsComboBox, ArtisanMinorPushButton
+from artisanlib.widgets import (MyQComboBox, ClickableQLabel, ClickableTextEdit, MyTableWidgetItemNumber,
+    ArtisanPlainTextEdit, RoastsComboBox, ArtisanMinorPushButton, ArtisanQTabWidget)
 from artisanlib.styles import (artisan_push_button_style, tool_button_icon_style, combobox_style, line_edit_style, artisan_dialog_button_style,
     artisan_minor_push_button_style, spin_box_style, table_style, horizontal_header_style, vertical_header_style)
 
@@ -70,7 +71,7 @@ from PyQt6.QtCore import Qt, pyqtSignal, pyqtSlot, QRegularExpression, QSettings
 from PyQt6.QtGui import QColor, QIntValidator, QRegularExpressionValidator, QKeySequence, QPalette, QFont, QIcon
 from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QComboBox, QDialogButtonBox, QGridLayout,
                              QHBoxLayout, QVBoxLayout, QHeaderView, QLabel, QLineEdit,
-                             QPushButton, QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QSizePolicy,
+                             QPushButton, QSpinBox, QTableWidget, QTableWidgetItem, QSizePolicy,
                              QGroupBox, QToolButton, QFrame)
 
 
@@ -133,7 +134,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         unitvolumeUnit = QLabel(QApplication.translate('Label','ml'))
 
         # unit button
-        unitButton = QPushButton(QApplication.translate('Button', 'unit'))
+        unitButton = ArtisanMinorPushButton(QApplication.translate('Button', 'unit'), dark=self.aw.app.darkmode)
         unitButton.clicked.connect(self.unitWeight)
         unitButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
@@ -173,7 +174,7 @@ class volumeCalculatorDlg(ArtisanDialog):
             pass
         else:
             self.coffeeinweight.setStyleSheet("background-color:'lightgrey'")
-        coffeeinweightUnit = QLabel(weight_units[weightunit])
+        coffeeinweightUnit = QLabel(weight_units[weightunit].lower())
 
         coffeeinvolumeLabel = QLabel('<b>' + QApplication.translate('Label','Volume') + '</b>')
         self.coffeeinvolume = QLineEdit()
@@ -191,7 +192,10 @@ class volumeCalculatorDlg(ArtisanDialog):
         coffeeinvolumeUnit = QLabel(volume_units[volumeunit])
 
         # in button
-        inButton = QPushButton(QApplication.translate('Button', 'in'))
+        inButton = ArtisanMinorPushButton(QApplication.translate('Button', 'in'),
+            'coffee_white.svg',
+            'coffee_dark.svg',
+            self.aw.app.darkmode)
         inButton.clicked.connect(self.inWeight)
         inButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
@@ -250,7 +254,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         else:
             self.coffeeoutweight.setStyleSheet("background-color:'lightgrey'")
         self.coffeeoutweight.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        coffeeoutweightUnit = QLabel(weight_units[weightunit])
+        coffeeoutweightUnit = QLabel(weight_units[weightunit].lower())
 
         coffeeoutvolumeLabel = QLabel('<b>' + QApplication.translate('Label','Volume') + '</b>')
         self.coffeeoutvolume = QLineEdit()
@@ -268,7 +272,10 @@ class volumeCalculatorDlg(ArtisanDialog):
         coffeeoutvolumeUnit = QLabel(volume_units[volumeunit])
 
         # out button
-        outButton = QPushButton(QApplication.translate('Button', 'out'))
+        outButton = ArtisanMinorPushButton(QApplication.translate('Button', 'out'),
+            'roast_white.svg',
+            'roast_dark.svg',
+            self.aw.app.darkmode)
         outButton.clicked.connect(self.outWeight)
         outButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
@@ -490,6 +497,7 @@ class volumeCalculatorDlg(ArtisanDialog):
 
 ########################################################################################
 #####################  Roast Properties Dialog  ########################################
+
 
 
 class editGraphDlg(ArtisanResizeablDialog):
@@ -1052,9 +1060,11 @@ class editGraphDlg(ArtisanResizeablDialog):
         font = QFont()
         font.setPointSize(15)
         font.setBold(True)
-        self.addRecentButton = QPushButton('+')
+        self.addRecentButton = QPushButton('')
         self.addRecentButton.setFont(font)
         self.addRecentButton.setObjectName('plus_button')
+        self.addRecentButton.setIconSize(QSize(20,20))
+        self.addRecentButton.setIcon(QIcon(getStyleIconPath('add-01-stroke-rounded-white.svg')))
         self.addRecentButton.clicked.connect(self.addRecentRoast)
         self.addRecentButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.addRecentButton.setToolTip(QApplication.translate('Tooltip','Add roast properties to list of recent roasts'))
@@ -1062,9 +1072,11 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.addRecentButton.setFixedSize(QSize(26,26))
 
         # delete from recent
-        self.delRecentButton = QPushButton('–')
+        self.delRecentButton = QPushButton('')
         self.delRecentButton.setFont(font)
         self.delRecentButton.setObjectName('minus_button')
+        self.delRecentButton.setIconSize(QSize(20,20))
+        self.delRecentButton.setIcon(QIcon(getStyleIconPath('remove-01-stroke-rounded-white.svg')))
         self.delRecentButton.clicked.connect(self.delRecentRoast)
         self.delRecentButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.delRecentButton.setToolTip(QApplication.translate('Tooltip','Remove roast properties from list of recent roasts'))
@@ -1267,12 +1279,18 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.tareComboBox.setCurrentIndex(self.aw.container1_idx + 3)
         self.tareComboBox.currentIndexChanged.connect(self.tareChanged)
 
-        self.scale1TareButton = QPushButton(QApplication.translate('Button', 'Tare'))
+        self.scale1TareButton = ArtisanMinorPushButton(QApplication.translate('Button', 'Tare'),
+            'seesaw-stroke-rounded-white.svg',
+            'seesaw-stroke-rounded-dark.svg',
+            self.aw.app.darkmode)
         self.scale1TareButton.clicked.connect(self.tareScale1)
         self.scale1TareButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         # in button
-        inButton = QPushButton(QApplication.translate('Button', 'in'))
+        inButton = ArtisanMinorPushButton(QApplication.translate('Button', 'in'),
+            'coffee_white.svg',
+            'coffee_dark.svg',
+            self.aw.app.darkmode)
         inButton.setToolTip(QApplication.translate('Tooltip', 'set scale weight as batch size'))
         inButton.clicked.connect(self.inWeight)
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
@@ -1283,7 +1301,10 @@ class editGraphDlg(ArtisanResizeablDialog):
         inButtonLayout.addWidget(inButton)
         inButtonLayout.addStretch()
         # out button
-        outButton = QPushButton(QApplication.translate('Button', 'out'))
+        outButton = ArtisanMinorPushButton(QApplication.translate('Button', 'out'),
+            'roast_white.svg',
+            'roast_dark.svg',
+            self.aw.app.darkmode)
         outButton.setToolTip(QApplication.translate('Tooltip', 'set scale weight as weight of roasted coffee'))
         outButton.clicked.connect(self.outWeight)
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
@@ -1295,9 +1316,11 @@ class editGraphDlg(ArtisanResizeablDialog):
         outButtonLayout.addStretch()
 
         # defects button
-        self.defectsButton = QPushButton()
+        self.defectsButton = ArtisanMinorPushButton(QApplication.translate('Button', 'defects') if self.aw.qmc.roasted_defects_mode else QApplication.translate('Button', 'yield'),
+            'bug-01-stroke-rounded-white.svg',
+            'bug-01-stroke-rounded-dark.svg',
+            self.aw.app.darkmode)
         self.defectsButton.setToolTip(QApplication.translate('Tooltip', 'set scale weight as weight of defects or yield'))
-        self.defectsButton.setText(QApplication.translate('Button', 'defects') if self.aw.qmc.roasted_defects_mode else QApplication.translate('Button', 'yield'))
         self.defectsButton.clicked.connect(self.defectsWeight)
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
         self.defectsButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -1503,7 +1526,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         propGrid = QGridLayout()
         propGrid.setContentsMargins(0,0,0,0)
         propGrid.setHorizontalSpacing(3)
-        propGrid.setVerticalSpacing(0)
+        propGrid.setVerticalSpacing(3)
         propGrid.addWidget(green_label,0,1,Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignBottom)
         propGrid.addWidget(roasted_label,0,2,Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignBottom)
         propGrid.addWidget(self.organicpercentlabel,0,4,Qt.AlignmentFlag.AlignRight)
@@ -1709,8 +1732,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         tab4Layout.addLayout(databuttonLayout)
         tab4Layout.setContentsMargins(5, 5, 5, 5) # left, top, right, bottom
         #tabwidget
-        self.TabWidget = QTabWidget()
-        self.TabWidget.setContentsMargins(0,0,0,0)
+        self.TabWidget = ArtisanQTabWidget()
+        self.TabWidget.setContentsMargins(5,5,5,5)
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
         self.TabWidget.addTab(C1Widget,QApplication.translate('Tab', 'Roast'))
@@ -1738,7 +1761,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         totallayout.addWidget(self.TabWidget)
         totallayout.addLayout(okLayout)
         totallayout.setContentsMargins(10,10,10,0) # left, top, right, bottom
-        totallayout.setSpacing(0)
+        totallayout.setSpacing(4)
         self.volume_percent()
 
         if start_recording_on_exit:
@@ -2614,8 +2637,13 @@ class editGraphDlg(ArtisanResizeablDialog):
             if title != QApplication.translate('Scope Title', 'Roaster Scope') and weightIn != 0:
                 # enable "+" addRecentRoast button
                 self.addRecentButton.setEnabled(True)
+                self.addRecentButton.setIcon(QIcon(getStyleIconPath('add-01-stroke-rounded-white.svg')))
                 self.delRecentButton.setEnabled(True)
+                self.delRecentButton.setIcon(QIcon(getStyleIconPath('remove-01-stroke-rounded-white.svg')))
             else:
+                darkmode = self.aw.dark_canvas_p()
+                self.addRecentButton.setIcon(QIcon(getStyleIconPath('add-01-stroke-rounded-white.svg' if darkmode else 'add-01-stroke-rounded.svg')))
+                self.delRecentButton.setIcon(QIcon(getStyleIconPath('remove-01-stroke-rounded-white.svg' if darkmode else 'remove-01-stroke-rounded.svg')))
                 self.addRecentButton.setEnabled(False)
                 self.delRecentButton.setEnabled(False)
         except Exception as e: # pylint: disable=broad-except
@@ -6127,10 +6155,8 @@ class EnergyMeasuringDialog(ArtisanDialog):
                 self.applyButton.setStyleSheet(artisan_dialog_style)
         artisan_cancel_button: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel)
         if artisan_cancel_button is not None:
-            _log.debug('PRINT artisan cancel button exists')
             defaultCancelButton = self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Cancel)
             if defaultCancelButton is not None:
-                _log.debug('PRINT default cancel button exists')
                 self.ui.buttonBox.removeButton(defaultCancelButton)
                 artisan_cancel_button.setStyleSheet(artisan_dialog_style)
                 self.ui.buttonBox.addButton(artisan_cancel_button, QDialogButtonBox.ButtonRole.RejectRole)

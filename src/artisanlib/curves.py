@@ -42,17 +42,17 @@ if TYPE_CHECKING:
     from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
 
 from PyQt6.QtCore import (Qt, pyqtSlot, QSettings, QRegularExpression, QTimer, QSize)
-from PyQt6.QtGui import (QColor, QIntValidator, QRegularExpressionValidator, QPixmap, QIcon)
+from PyQt6.QtGui import (QColor, QIntValidator, QRegularExpressionValidator, QPixmap, QIcon, QPalette)
 from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
-                             QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,
-                             QGroupBox, QLayout, QMessageBox, QRadioButton, QStyleFactory, QHeaderView,
+                             QPushButton, QSpinBox, QComboBox, QDialogButtonBox, QGridLayout,
+                             QGroupBox, QLayout, QRadioButton, QStyleFactory, QHeaderView,
                              QTableWidget, QTableWidgetItem, QFrame, QButtonGroup)
 
 from help import symbolic_help # pyright:ignore [attr-defined] # pylint: disable=no-name-in-module
 from artisanlib.util import (deltaLabelBigPrefix, deltaLabelPrefix, deltaLabelUTF8, getStyleIconPath,
                              stringtoseconds, stringfromseconds, toFloat, float2float)
-from artisanlib.dialogs import ArtisanDialog
-from artisanlib.widgets import MyQDoubleSpinBox, ArtisanMinorPushButton
+from artisanlib.dialogs import ArtisanDialog, artisan_warning
+from artisanlib.widgets import MyQDoubleSpinBox, ArtisanMinorPushButton, ArtisanQTabWidget
 from artisanlib.styles import horizontal_header_style, vertical_header_style, line_edit_style, spin_box_style, artisan_minor_push_button_style, table_style
 from artisanlib.canvas import Interp1dKind
 
@@ -1311,7 +1311,7 @@ class CurvesDlg(ArtisanDialog):
             'tick-01-stroke-rounded-dark.svg',
             self.aw.app.darkmode)
         resButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        resButton.clicked.connect(lambda _:self.changedpi())
+        resButton.clicked.connect(self.changedpi_slot)
         self.soundCheck = QCheckBox(QApplication.translate('CheckBox', 'Beep'))
         self.soundCheck.setChecked(bool(self.aw.soundflag))
         self.soundCheck.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -1523,7 +1523,7 @@ class CurvesDlg(ArtisanDialog):
         tab5Layout.addLayout(webrenlogLayout)
 
         ############################  TABS LAYOUT
-        self.TabWidget = QTabWidget()
+        self.TabWidget = ArtisanQTabWidget()
         # RoR
         C0Widget = QWidget()
         C0Widget.setLayout(tab0Layout)
@@ -1777,6 +1777,9 @@ class CurvesDlg(ArtisanDialog):
             self.WebLCDsURL.setText('')
             self.QRpic.setPixmap(QPixmap())
 
+    @pyqtSlot(bool)
+    def changedpi_slot(self, _:bool) -> None:
+        self.changedpi()
 
     def changedpi(self) -> None:
         try:
@@ -1878,9 +1881,12 @@ class CurvesDlg(ArtisanDialog):
                     error = f'P2: \n-{iv}\n\n[{EQU[1]}]'
 
             if error:
-                string = QApplication.translate('Message','Incompatible variables found in %s')%error
-                QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
-                    QApplication.translate('Message','Assignment problem'),string)
+#                string = QApplication.translate('Message','Incompatible variables found in %s')%error
+#                QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+#                    QApplication.translate('Message','Assignment problem'),string)
+                artisan_warning(self, self.aw,
+                    QApplication.translate('Message','Incompatible variables found in {}').format(error),
+                    QApplication.translate('Message','Assignment problem'))
 
             else:
                 extratemp1:list[float] = []
@@ -2103,6 +2109,11 @@ class CurvesDlg(ArtisanDialog):
         try:
             self.app.setStyle(str(self.styleComboBox.currentText()))
             self.aw.appearance = str(self.styleComboBox.currentText()).lower()
+            if not sys.platform.startswith('darwin'):
+                # set artisan accent color (but on macOS where it does not has any effect)
+                palette = self.app.palette()
+                palette.setColor(QPalette.ColorRole.Accent,  QColor('#3979ae'))
+                self.app.setPalette(palette)
         except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' setappearance(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
@@ -2797,23 +2808,26 @@ class CurvesDlg(ArtisanDialog):
 
         self.aw.qt_scale_factor = self.scalefactorSpinBox.value()
         if self.aw.qt_scale_factor != self.org_qt_scale_factor:
-            msg:str = QApplication.translate('Tooltip','Scaling factor changed')
-            text:str = QApplication.translate('Tooltip','Restart the app for the change to take effect')
-            # native dialog
-            if platform.system() == 'Darwin':
-                mbox = QMessageBox() # only without super this one shows the native dialog on macOS under Qt 6.6.2
-                # for native dialogs, text and informativetext need to be plain strings, no RTF incl. HTML instructions like <br>
-                mbox.setText(msg)
-                mbox.setInformativeText(text)
-                mbox.setWindowModality(Qt.WindowModality.ApplicationModal) # for native dialog it has to be ApplicationModal
-                mbox.setStandardButtons(QMessageBox.StandardButton.Ok)
-                mbox.setDefaultButton(QMessageBox.StandardButton.Ok)
-                mbox.exec()
-            else:
-                # non-native dialog
-                QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
-                                msg,text,
-                                QMessageBox.StandardButton.Ok, QMessageBox.StandardButton.Ok)
+#            msg:str = QApplication.translate('Tooltip','Scaling factor changed')
+#            text:str = QApplication.translate('Tooltip','Restart the app for the change to take effect')
+#            # native dialog
+#            if platform.system() == 'Darwin':
+#                mbox = QMessageBox() # only without super this one shows the native dialog on macOS under Qt 6.6.2
+#                # for native dialogs, text and informativetext need to be plain strings, no RTF incl. HTML instructions like <br>
+#                mbox.setText(msg)
+#                mbox.setInformativeText(text)
+#                mbox.setWindowModality(Qt.WindowModality.ApplicationModal) # for native dialog it has to be ApplicationModal
+#                mbox.setStandardButtons(QMessageBox.StandardButton.Ok)
+#                mbox.setDefaultButton(QMessageBox.StandardButton.Ok)
+#                mbox.exec()
+#            else:
+#                # non-native dialog
+#                QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+#                                msg,text,
+#                                QMessageBox.StandardButton.Ok, QMessageBox.StandardButton.Ok)
+            artisan_warning(self, self.aw,
+                QApplication.translate('Tooltip','Restart the app for the change to take effect'),
+                QApplication.translate('Tooltip','Scaling factor changed'))
 
 
 #        self.aw.closeEventSettings()

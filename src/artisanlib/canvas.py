@@ -75,7 +75,7 @@ from artisanlib.util import (to_ascii, uchr, fill_gaps, deltaLabelPrefix, deltaL
 from artisanlib import pid
 from artisanlib.time import ArtisanTime
 #from artisanlib.filters import LiveMedian
-from artisanlib.dialogs import ArtisanMessageBox
+from artisanlib.dialogs import DesignerSplineNodesDlg, ArtisanMessageBox, artisan_information, artisan_question, artisan_confirm_save_dialog
 from artisanlib.atypes import SerialSettings, BTBreakParams, BbpCache, AlarmSet, EnergyMetrics
 from artisanlib.styles import push_button_style
 from artisanlib.device_registry import is_special_device, is_non_temp_device, is_non_temp_device_chan, is_phidget_device, is_binary_device
@@ -2205,7 +2205,7 @@ class tgraphcanvas(QObject):
         self.profile_upload_limit:float = 1 # maximum upload frequency in seconds
         self.last_profile_upload_times:float = 0
 
-        self.updategraphicsSignal.connect(self.updategraphics, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
+        self.updategraphicsSignal.connect(self.updategraphics, type=Qt.ConnectionType.QueuedConnection)
         self.updateLargeLCDsSignal.connect(self.updateLargeLCDs)
         self.updateLargeLCDsReadingsSignal.connect(self.updateLargeLCDsReadings)
         self.setTimerLargeLCDcolorSignal.connect(self.setTimerLargeLCDcolor)
@@ -2214,32 +2214,32 @@ class tgraphcanvas(QObject):
         self.fileDirtySignal.connect(self.fileDirty)
         self.fileCleanSignal.connect(self.fileClean)
         self.markChargeDelaySignal.connect(self.markChargeDelay)
-        self.markChargeSignal.connect(self.markCharge, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
-        self.markTPSignal.connect(self.markTPTrigger, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
-        self.markDRYSignal.connect(self.markDryEnd, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
-        self.markFCsSignal.connect(self.mark1Cstart, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
-        self.markFCeSignal.connect(self.mark1Cend, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
-        self.markSCsSignal.connect(self.mark2Cstart, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
-        self.markSCeSignal.connect(self.mark2Cend, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
-        self.markDropSignal.connect(self.markDrop, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
-        self.markCoolSignal.connect(self.markCoolEnd, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
-        self.onMonitorSignal.connect(self.OnMonitor, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
+        self.markChargeSignal.connect(self.markCharge, type=Qt.ConnectionType.QueuedConnection)
+        self.markTPSignal.connect(self.markTPTrigger, type=Qt.ConnectionType.QueuedConnection)
+        self.markDRYSignal.connect(self.markDryEnd, type=Qt.ConnectionType.QueuedConnection)
+        self.markFCsSignal.connect(self.mark1Cstart, type=Qt.ConnectionType.QueuedConnection)
+        self.markFCeSignal.connect(self.mark1Cend, type=Qt.ConnectionType.QueuedConnection)
+        self.markSCsSignal.connect(self.mark2Cstart, type=Qt.ConnectionType.QueuedConnection)
+        self.markSCeSignal.connect(self.mark2Cend, type=Qt.ConnectionType.QueuedConnection)
+        self.markDropSignal.connect(self.markDrop, type=Qt.ConnectionType.QueuedConnection)
+        self.markCoolSignal.connect(self.markCoolEnd, type=Qt.ConnectionType.QueuedConnection)
+        self.onMonitorSignal.connect(self.OnMonitor, type=Qt.ConnectionType.QueuedConnection)
         self.toggleMonitorSignal.connect(self.toggleMonitorTigger)
         self.toggleRecorderSignal.connect(self.toggleRecorderTigger)
-        self.processAlarmSignal.connect(self.processAlarm, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg] # queued to avoid deadlock between RampSoak processing and EventRecordAction, both accessing the same critical section protected by profileDataSemaphore
+        self.processAlarmSignal.connect(self.processAlarm, type=Qt.ConnectionType.QueuedConnection) # queued to avoid deadlock between RampSoak processing and EventRecordAction, both accessing the same critical section protected by profileDataSemaphore
         self.alarmsetSignal.connect(self.selectAlarmSet)
         self.moveBackgroundSignal.connect(self.moveBackgroundAndRedraw)
         self.eventRecordSignal.connect(self.EventRecordSlot)
         self.eventRecordOverwriteValueSignal.connect(self.EventRecordOverwriteValueSlot)
-        self.eventRecordActionSignal.connect(self.EventRecordActionSlot, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg] # queued to avoid deadlock between PID processing and EventRecordAction, both accessing the same critical section protected by profileDataSemaphore
+        self.eventRecordActionSignal.connect(self.EventRecordActionSlot, type=Qt.ConnectionType.QueuedConnection) # queued to avoid deadlock between PID processing and EventRecordAction, both accessing the same critical section protected by profileDataSemaphore
         self.showCurveSignal.connect(self.showCurve)
         self.showExtraCurveSignal.connect(self.showExtraCurve)
         self.showEventsSignal.connect(self.showEvents)
         self.showBackgroundEventsSignal.connect(self.showBackgroundEvents)
-        self.redrawSignal.connect(self.redraw, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
-        self.redrawKeepViewSignal.connect(self.redraw_keep_view, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
-        self.canvasZoomSignal.connect(self.canvas_zoom, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
-        self.canvasPanSignal.connect(self.canvas_pan, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
+        self.redrawSignal.connect(self.redraw, type=Qt.ConnectionType.QueuedConnection)
+        self.redrawKeepViewSignal.connect(self.redraw_keep_view, type=Qt.ConnectionType.QueuedConnection)
+        self.canvasZoomSignal.connect(self.canvas_zoom, type=Qt.ConnectionType.QueuedConnection)
+        self.canvasPanSignal.connect(self.canvas_pan, type=Qt.ConnectionType.QueuedConnection)
 
     #NOTE: empty Figure is initially drawn at the end of self.awsettingsload()
     #################################    FUNCTIONS    ###################################
@@ -4003,20 +4003,20 @@ class tgraphcanvas(QObject):
 
     @pyqtSlot('QAction*')
     def event_popup_action(self, action:QAction) -> None:
-        if action.key[0] >= 0:  # type: ignore[attr-defined] # "QAction" has no attribute "key"
+        if action.key[0] >= 0:
             # we check if this is the first DROP mark on this roast
-            firstDROP = (action.key[0] == 6 and self.timeindex[6] == 0)  # type: ignore[attr-defined] # "QAction" has no attribute "key"
-            timeindex_before = self.timeindex[action.key[0]]  # type: ignore[attr-defined] # "QAction" has no attribute "key"
-            self.timeindex[action.key[0]] = action.key[1]  # type: ignore[attr-defined] # "QAction" has no attribute "key"
+            firstDROP = (action.key[0] == 6 and self.timeindex[6] == 0)
+            timeindex_before = self.timeindex[action.key[0]]
+            self.timeindex[action.key[0]] = action.key[1]
             # clear custom label positions cache entry
-            if action.key[0] in self.l_annotations_dict:  # type: ignore[attr-defined] # "QAction" has no attribute "key"
-                del self.l_annotations_dict[action.key[0]]  # type: ignore[attr-defined]# "QAction" has no attribute "key"
+            if action.key[0] in self.l_annotations_dict:
+                del self.l_annotations_dict[action.key[0]]
             try:
                 # clear the event mark position cache
-                self.l_annotations_dict.pop(action.key[0])  # type: ignore[attr-defined] # "QAction" has no attribute "key"
+                self.l_annotations_dict.pop(action.key[0])
             except Exception: # pylint: disable=broad-except
                 pass
-            if action.key[0] == 0: # type: ignore[attr-defined] # "QAction" has no attribute "key" # CHARGE
+            if action.key[0] == 0: # CHARGE
                 try:
                     # clear the TP mark position cache (TP depends on CHARGE!)
                     self.l_annotations_dict.pop(-1)
@@ -4046,7 +4046,7 @@ class tgraphcanvas(QObject):
                         self.startofx += self.timex[self.timeindex[0]]
                     self.aw.autoAdjustAxis(deltas=False)
                 self.timealign(redraw=True,recompute=False,force=True) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
-            elif action.key[0] == 6: # type: ignore[attr-defined] # "QAction" has no attribute "key" # DROP
+            elif action.key[0] == 6: # DROP
                 try:
                     # clear the TP mark position cache (TP depends on DROP!)
                     self.l_annotations_dict.pop(-1)
@@ -4087,26 +4087,26 @@ class tgraphcanvas(QObject):
 
 
             # update phases
-            elif action.key[0] == 1 and self.phasesbuttonflag:  # type: ignore[attr-defined] # "QAction" has no attribute "key" # DRY
+            elif action.key[0] == 1 and self.phasesbuttonflag:  # DRY
                 self.phases[1] = int(round(self.temp2[self.timeindex[1]]))
-            elif action.key[0] == 2 and self.phasesbuttonflag:  # type: ignore[attr-defined] # "QAction" has no attribute "key" # FCs
+            elif action.key[0] == 2 and self.phasesbuttonflag:  # FCs
                 self.phases[2] = int(round(self.temp2[self.timeindex[2]]))
 
             self.fileDirtySignal.emit()
-            self.redraw_keep_view(recomputeAllDeltas=(action.key[0] in {0, 6}))  # type: ignore[attr-defined] # "QAction" has no attribute "key" # on moving CHARGE or DROP, we have to recompute the Deltas
+            self.redraw_keep_view(recomputeAllDeltas=(action.key[0] in {0, 6}))  # on moving CHARGE or DROP, we have to recompute the Deltas
         else:
             # add a special event at the current timepoint
             from artisanlib.events import customEventDlg
-            dlg = customEventDlg(self.aw, self.aw, action.key[1], value=action.key[2], event_type=self.custom_event_dlg_default_type) # type: ignore[attr-defined] # "QAction" has no attribute "key"
+            dlg = customEventDlg(self.aw, self.aw, action.key[1], value=action.key[2], event_type=self.custom_event_dlg_default_type)
             if dlg.exec():
-                self.addEvent(action.key[1], # type: ignore[attr-defined] # "QAction" has no attribute "key" # absolute time index
+                self.addEvent(action.key[1], # absolute time index
                     dlg.type, # default: "--"
                     dlg.description, # pyright:ignore[reportUnknownArgumentType]
                     dlg.value)
                 self.custom_event_dlg_default_type = dlg.type
                 self.aw.orderEvents()
                 self.fileDirtySignal.emit()
-                self.redraw_keep_view(recomputeAllDeltas=(action.key[0] in {0, 6}))  # type: ignore[attr-defined] # "QAction" has no attribute "key" # on moving CHARGE or DROP, we have to recompute the Deltas
+                self.redraw_keep_view(recomputeAllDeltas=(action.key[0] in {0, 6})) # on moving CHARGE or DROP, we have to recompute the Deltas
                 # redraw minieditor event selection line
                 currentevent = self.aw.eNumberSpinBox.value()
                 if currentevent:
@@ -4173,7 +4173,7 @@ class tgraphcanvas(QObject):
     @pyqtSlot(str,int)
     def showAlarmPopup(self, message:str, timeout:int) -> None: # pylint: disable=no-self-use # used as slot
         # alarm popup message with <self.alarm_popup_timout>sec timeout
-        amb = ArtisanMessageBox(self.aw, QApplication.translate('Message', 'Alarm notice'),message,timeout=timeout,modal=True) # modal=False prevent rendering as native message box on macOS
+        amb = ArtisanMessageBox(self.aw, self.aw, QApplication.translate('Message', 'Alarm notice'),message,timeout=timeout,modal=True) # modal=False prevent rendering as native message box on macOS
         amb.show()
         #send alarm also to connected WebLCDs clients
         if self.aw.WebLCDs and self.aw.WebLCDsAlerts:
@@ -7627,21 +7627,25 @@ class tgraphcanvas(QObject):
 
 
     # returns True if nothing to save, discard or save was selected and False if canceled by the user
-    def checkSaved(self,allow_discard:bool = True) -> bool:
+    def checkSaved(self, allow_discard:bool = True) -> bool:
         #prevents deleting accidentally a finished roast
         flag = self.safesaveflag
         self.safesaveflag = False
         if flag and len(self.timex) > 3:
             string = QApplication.translate('Message','Save profile?')
-            if allow_discard:
-                buttons = QMessageBox.StandardButton.Discard|QMessageBox.StandardButton.Save|QMessageBox.StandardButton.Cancel
-            else:
-                buttons = QMessageBox.StandardButton.Save|QMessageBox.StandardButton.Cancel
-#On macOS, if the modality is set to Qt::WindowModal and the message box has a parent, then the message box will be a Qt::Sheet,
-#otherwise the message box will be a standard dialog.
-# setWindowModality(Qt.WindowModality.WindowModal)
-            reply = QMessageBox.warning(None, #self.aw,  # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
-                QApplication.translate('Message','Profile unsaved'), string, buttons)
+
+#            if allow_discard:
+#                buttons = QMessageBox.StandardButton.Discard|QMessageBox.StandardButton.Save|QMessageBox.StandardButton.Cancel
+#            else:
+#                buttons = QMessageBox.StandardButton.Save|QMessageBox.StandardButton.Cancel
+##On macOS, if the modality is set to Qt::WindowModal and the message box has a parent, then the message box will be a Qt::Sheet,
+##otherwise the message box will be a standard dialog.
+## setWindowModality(Qt.WindowModality.WindowModal)
+#            reply = QMessageBox.warning(None, #self.aw,  # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+#                QApplication.translate('Message','Profile unsaved'), string, buttons)
+
+            reply = artisan_confirm_save_dialog(self.aw, self.aw,
+                QApplication.translate('Message','Profile unsaved'), string, allow_discard)
             self.safesaveflag = flag
             if reply == QMessageBox.StandardButton.Save:
                 return bool(self.aw.fileSave(self.aw.curFile))  #if accepted, calls fileClean() and thus turns safesaveflag = False
@@ -11459,7 +11463,8 @@ class tgraphcanvas(QObject):
         width = img.width()
         height = img.height()
         imgsize = img.bits()
-        imgsize.setsize(img.sizeInBytes())
+        if imgsize is not None:
+            imgsize.setsize(img.sizeInBytes())
         return numpy.array(imgsize).reshape((height, width, int(32/8)))
 
     #watermark image
@@ -12188,133 +12193,125 @@ class tgraphcanvas(QObject):
         profilelength = len(self.timex)
         if profilelength > 0 or self.background:
             if t == 'F':
-                if silent:
-                    reply = QMessageBox.StandardButton.Yes
-                else:
-                    string = QApplication.translate('Message', 'Convert profile data to Fahrenheit?')
-                    reply = QMessageBox.question(self.aw, QApplication.translate('Message', 'Convert Profile Temperature'),string,
-                            QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
-                if reply == QMessageBox.StandardButton.Cancel:
+                if self.mode == 'C' and (silent or artisan_question(self.aw, self.aw,
+                        QApplication.translate('Message', 'Convert profile data to Fahrenheit?'),
+                        QApplication.translate('Message', 'Convert Profile Temperature'))):
+                    self.aw.CelsiusAction.setDisabled(True)
+                    self.aw.FahrenheitAction.setEnabled(True)
+                    self.aw.ConvertToCelsiusAction.setDisabled(True)
+                    self.aw.ConvertToFahrenheitAction.setEnabled(True)
+                    self.l_annotations_dict = {}
+                    self.l_event_flags_dict = {}
+                    for i in range(profilelength):
+                        self.temp1[i] = fromCtoFstrict(self.temp1[i])    #ET
+                        self.temp2[i] = fromCtoFstrict(self.temp2[i])    #BT
+                        if self.delta1:
+                            self.delta1[i] = RoRfromCtoF(self.delta1[i])  #Delta ET
+                        if self.delta2:
+                            self.delta2[i] = RoRfromCtoF(self.delta2[i])  #Delta BT
+                        #extra devices curves
+                        nextra = len(self.extratemp1)
+                        if nextra:
+                            for e in range(nextra):
+                                try:
+                                    if not (len(self.extraNoneTempHint1) > e and self.extraNoneTempHint1[e]):
+                                        self.extratemp1[e][i] = fromCtoFstrict(self.extratemp1[e][i])
+                                    if not (len(self.extraNoneTempHint2) > e and self.extraNoneTempHint2[e]):
+                                        self.extratemp2[e][i] = fromCtoFstrict(self.extratemp2[e][i])
+                                except Exception: # pylint: disable=broad-except
+                                    pass
+                    if self.ambientTemp != 0:
+                        self.ambientTemp = fromCtoFstrict(self.ambientTemp)  #ambient temperature
+                    if self.greens_temp != 0:
+                        self.greens_temp = fromCtoFstrict(self.greens_temp)
+
+                    #prevents accidentally deleting a modified profile.
+                    self.fileDirtySignal.emit()
+
+                    #background
+                    for i in range(len(self.timeB)):
+                        self.temp1B[i] = fromCtoFstrict(self.temp1B[i])
+                        self.temp2B[i] = fromCtoFstrict(self.temp2B[i])
+                        self.stemp1B[i] = fromCtoF(self.stemp1B[i])
+                        self.stemp2B[i] = fromCtoF(self.stemp2B[i])
+
+                    self.fahrenheitMode(setdefaultaxes=setdefaultaxes)
+                    if not silent:
+                        self.aw.sendmessage(QApplication.translate('Message','Profile changed to Fahrenheit'))
+
+                elif not silent:
+                    artisan_information(self.aw, self.aw,
+                        QApplication.translate('Message', 'Unable to comply. You already are in Fahrenheit'),
+                        QApplication.translate('Message', 'Convert Profile Temperature'))
+                    self.aw.sendmessage(QApplication.translate('Message','Profile not changed'))
                     return
-                if reply == QMessageBox.StandardButton.Yes:
-                    if self.mode == 'C':
-                        self.aw.CelsiusAction.setDisabled(True)
-                        self.aw.FahrenheitAction.setEnabled(True)
-                        self.aw.ConvertToCelsiusAction.setDisabled(True)
-                        self.aw.ConvertToFahrenheitAction.setEnabled(True)
-                        self.l_annotations_dict = {}
-                        self.l_event_flags_dict = {}
-                        for i in range(profilelength):
-                            self.temp1[i] = fromCtoFstrict(self.temp1[i])    #ET
-                            self.temp2[i] = fromCtoFstrict(self.temp2[i])    #BT
-                            if self.delta1:
-                                self.delta1[i] = RoRfromCtoF(self.delta1[i])  #Delta ET
-                            if self.delta2:
-                                self.delta2[i] = RoRfromCtoF(self.delta2[i])  #Delta BT
-                            #extra devices curves
-                            nextra = len(self.extratemp1)
-                            if nextra:
-                                for e in range(nextra):
-                                    try:
-                                        if not (len(self.extraNoneTempHint1) > e and self.extraNoneTempHint1[e]):
-                                            self.extratemp1[e][i] = fromCtoFstrict(self.extratemp1[e][i])
-                                        if not (len(self.extraNoneTempHint2) > e and self.extraNoneTempHint2[e]):
-                                            self.extratemp2[e][i] = fromCtoFstrict(self.extratemp2[e][i])
-                                    except Exception: # pylint: disable=broad-except
-                                        pass
-                        if self.ambientTemp != 0:
-                            self.ambientTemp = fromCtoFstrict(self.ambientTemp)  #ambient temperature
-                        if self.greens_temp != 0:
-                            self.greens_temp = fromCtoFstrict(self.greens_temp)
-
-                        #prevents accidentally deleting a modified profile.
-                        self.fileDirtySignal.emit()
-
-                        #background
-                        for i in range(len(self.timeB)):
-                            self.temp1B[i] = fromCtoFstrict(self.temp1B[i])
-                            self.temp2B[i] = fromCtoFstrict(self.temp2B[i])
-                            self.stemp1B[i] = fromCtoF(self.stemp1B[i])
-                            self.stemp2B[i] = fromCtoF(self.stemp2B[i])
-
-                        self.fahrenheitMode(setdefaultaxes=setdefaultaxes)
-                        if not silent:
-                            self.aw.sendmessage(QApplication.translate('Message','Profile changed to Fahrenheit'))
-
-                    elif not silent:
-                        QMessageBox.information(self.aw, QApplication.translate('Message', 'Convert Profile Temperature'),
-                                                QApplication.translate('Message', 'Unable to comply. You already are in Fahrenheit'))
-                        self.aw.sendmessage(QApplication.translate('Message','Profile not changed'))
-                        return
 
             elif t == 'C':
-                if silent:
-                    reply = QMessageBox.StandardButton.Yes
-                else:
-                    string = QApplication.translate('Message', 'Convert profile data to Celsius?')
-                    reply = QMessageBox.question(self.aw, QApplication.translate('Message', 'Convert Profile Temperature'),string,
-                            QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
-                if reply == QMessageBox.StandardButton.Cancel:
+                if self.mode == 'F' and (silent or artisan_question(self.aw, self.aw,
+                        QApplication.translate('Message', 'Convert profile data to Celsius?'),
+                        QApplication.translate('Message', 'Convert Profile Temperature'))):
+
+                    self.aw.ConvertToFahrenheitAction.setDisabled(True)
+                    self.aw.ConvertToCelsiusAction.setEnabled(True)
+                    self.aw.FahrenheitAction.setDisabled(True)
+                    self.aw.CelsiusAction.setEnabled(True)
+                    self.l_annotations_dict = {}
+                    self.l_event_flags_dict = {}
+                    for i in range(profilelength):
+                        self.temp1[i] = fromFtoCstrict(self.temp1[i])    #ET
+                        self.temp2[i] = fromFtoCstrict(self.temp2[i])    #BT
+                        if self.device != 18 or self.aw.simulator is not None:
+                            if self.delta1:
+                                self.delta1[i] = RoRfromFtoC(self.delta1[i])  #Delta ET
+                            if self.delta2:
+                                self.delta2[i] = RoRfromFtoC(self.delta2[i])  #Delta BT
+                        #extra devices curves
+                        nextra = len(self.extratemp1)
+                        if nextra:
+                            for e in range(nextra):
+                                try:
+                                    if not (len(self.extraNoneTempHint1) > e and self.extraNoneTempHint1[e]):
+                                        self.extratemp1[e][i] = fromFtoCstrict(self.extratemp1[e][i])
+                                    if not (len(self.extraNoneTempHint2) > e and self.extraNoneTempHint2[e]):
+                                        self.extratemp2[e][i] = fromFtoCstrict(self.extratemp2[e][i])
+                                except Exception: # pylint: disable=broad-except
+                                    pass
+
+                    if self.ambientTemp != 0:
+                        self.ambientTemp = fromFtoCstrict(self.ambientTemp)  #ambient temperature
+                    if self.greens_temp != 0:
+                        self.greens_temp = fromFtoCstrict(self.greens_temp)
+
+                    #prevents accidentally deleting a modified profile.
+                    self.fileDirtySignal.emit()
+
+                    #background
+                    for i in range(len(self.timeB)):
+                        self.temp1B[i] = fromFtoCstrict(self.temp1B[i]) #ET B
+                        self.temp2B[i] = fromFtoCstrict(self.temp2B[i]) #BT B
+                        self.stemp1B[i] = fromFtoC(self.stemp1B[i])
+                        self.stemp2B[i] = fromFtoC(self.stemp2B[i])
+
+                    self.celsiusMode(setdefaultaxes=setdefaultaxes)
+                    if not silent:
+                        self.aw.sendmessage(QApplication.translate('Message','Profile changed to Celsius'))
+
+                elif not silent:
+                    artisan_information(self.aw, self.aw,
+                        QApplication.translate('Message', 'Unable to comply. You already are in Celsius'),
+                        QApplication.translate('Message', 'Convert Profile Temperature'))
+                    self.aw.sendmessage(QApplication.translate('Message','Profile not changed'))
                     return
-                if reply == QMessageBox.StandardButton.Yes:
-                    if self.mode == 'F':
-                        self.aw.ConvertToFahrenheitAction.setDisabled(True)
-                        self.aw.ConvertToCelsiusAction.setEnabled(True)
-                        self.aw.FahrenheitAction.setDisabled(True)
-                        self.aw.CelsiusAction.setEnabled(True)
-                        self.l_annotations_dict = {}
-                        self.l_event_flags_dict = {}
-                        for i in range(profilelength):
-                            self.temp1[i] = fromFtoCstrict(self.temp1[i])    #ET
-                            self.temp2[i] = fromFtoCstrict(self.temp2[i])    #BT
-                            if self.device != 18 or self.aw.simulator is not None:
-                                if self.delta1:
-                                    self.delta1[i] = RoRfromFtoC(self.delta1[i])  #Delta ET
-                                if self.delta2:
-                                    self.delta2[i] = RoRfromFtoC(self.delta2[i])  #Delta BT
-                            #extra devices curves
-                            nextra = len(self.extratemp1)
-                            if nextra:
-                                for e in range(nextra):
-                                    try:
-                                        if not (len(self.extraNoneTempHint1) > e and self.extraNoneTempHint1[e]):
-                                            self.extratemp1[e][i] = fromFtoCstrict(self.extratemp1[e][i])
-                                        if not (len(self.extraNoneTempHint2) > e and self.extraNoneTempHint2[e]):
-                                            self.extratemp2[e][i] = fromFtoCstrict(self.extratemp2[e][i])
-                                    except Exception: # pylint: disable=broad-except
-                                        pass
-
-                        if self.ambientTemp != 0:
-                            self.ambientTemp = fromFtoCstrict(self.ambientTemp)  #ambient temperature
-                        if self.greens_temp != 0:
-                            self.greens_temp = fromFtoCstrict(self.greens_temp)
-
-                        #prevents accidentally deleting a modified profile.
-                        self.fileDirtySignal.emit()
-
-                        #background
-                        for i in range(len(self.timeB)):
-                            self.temp1B[i] = fromFtoCstrict(self.temp1B[i]) #ET B
-                            self.temp2B[i] = fromFtoCstrict(self.temp2B[i]) #BT B
-                            self.stemp1B[i] = fromFtoC(self.stemp1B[i])
-                            self.stemp2B[i] = fromFtoC(self.stemp2B[i])
-
-                        self.celsiusMode(setdefaultaxes=setdefaultaxes)
-                        if not silent:
-                            self.aw.sendmessage(QApplication.translate('Message','Profile changed to Celsius'))
-
-                    elif not silent:
-                        QMessageBox.information(self.aw, QApplication.translate('Message', 'Convert Profile Temperature'),
-                                                QApplication.translate('Message', 'Unable to comply. You already are in Celsius'))
-                        self.aw.sendmessage(QApplication.translate('Message','Profile not changed'))
-                        return
 
             if not silent:
                 self.redraw(recomputeAllDeltas=True,re_smooth_foreground=True)
 
         elif not silent:
-            QMessageBox.information(self.aw, QApplication.translate('Message', 'Convert Profile Scale'),
-                                          QApplication.translate('Message', 'No profile data found'))
+#            QMessageBox.information(self.aw, QApplication.translate('Message', 'Convert Profile Scale'),
+#                                          QApplication.translate('Message', 'No profile data found'))
+            artisan_information(self.aw, self.aw,
+                QApplication.translate('Message', 'No profile data found'),
+                QApplication.translate('Message', 'Convert Profile Scale'))
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -17188,16 +17185,17 @@ class tgraphcanvas(QObject):
 
             #interpretation of coefficients: http://www.sagenb.org/home/pub/1708/
 
-            string = f"<b>{QApplication.translate('Message','Polynomial coefficients (Horner form):')}</b><br>"
-            string += f'{coeffs}<br><br>'
-            string += f"<b>{QApplication.translate('Message','Knots:')}</b><br>"
-            string += f'{knots}<br><br>'
-            string += f"<b>{QApplication.translate('Message','Residual:')}</b><br>"
-            string += f'{resid}<br><br>'
-            string += f"<b>{QApplication.translate('Message','Roots:')}</b><br>"
+            string = f"{QApplication.translate('Message','Polynomial coefficients (Horner form):')}\n"
+            string += f'{coeffs}\n\n'
+            string += f"{QApplication.translate('Message','Knots:')}\n"
+            string += f'{knots}\n\n'
+            string += f"{QApplication.translate('Message','Residual:')}\n"
+            string += f'{resid}\n\n'
+            string += f"{QApplication.translate('Message','Roots:')}\n"
             string += str(roots)
 
-            QMessageBox.information(self.aw, QApplication.translate('Message','Profile information'),string)
+#            QMessageBox.information(self.aw, QApplication.translate('Message','Profile information'),string)
+            artisan_information(self.aw, self.aw, string, QApplication.translate('Message','Profile information'))
 
         except ValueError as e:
             _log.exception(e)
@@ -17442,7 +17440,7 @@ class tgraphcanvas(QObject):
                 if tempj is None or numpy.isnan(tempj):
                     return -1
                 s = (tempi - tempj) / (ti - tj)
-                return tempj + s*(seconds - tj)
+                return float(tempj + s*(seconds - tj))
             # should not be reached (guarded by the outer if)
             return tempi
         return -1
@@ -17647,7 +17645,6 @@ class tgraphcanvas(QObject):
 
         if (not background_mode and self.timex) or (background_mode and self.timeB):
             # Show dialog to select number of spline nodes
-            from artisanlib.dialogs import DesignerSplineNodesDlg
             dialog = DesignerSplineNodesDlg(self.aw, self.aw, default_nodes=10)
             if dialog.exec():
                 self.designer_loaded_foreground_profile_file = self.aw.curFile
@@ -17806,8 +17803,11 @@ class tgraphcanvas(QObject):
         """
         if ((background_mode and (self.timeindexB[0] == -1 or self.timeindexB[6] == 0)) or
                 not background_mode and (self.timeindex[0] == -1 or self.timeindex[6] == 0)):
-            QMessageBox.information(self.aw, QApplication.translate('Message','Designer Init'),
-                                    QApplication.translate('Message','Unable to start designer.\nProfile missing [CHARGE] or [DROP]'))
+#            QMessageBox.information(self.aw, QApplication.translate('Message','Designer Init'),
+#                                    QApplication.translate('Message','Unable to start designer.\nProfile missing [CHARGE] or [DROP]'))
+            artisan_information(self.aw, self.aw,
+                QApplication.translate('Message','Unable to start designer.\nProfile missing [CHARGE] or [DROP]'),
+                QApplication.translate('Message','Designer Init'))
             self.disconnect_designer()
             return False
 

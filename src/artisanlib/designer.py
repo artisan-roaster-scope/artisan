@@ -39,7 +39,7 @@ from PyQt6.QtWidgets import (QApplication, QLabel,
 
 
 from artisanlib.util import stringfromseconds, stringtoseconds, getStyleIconPath
-from artisanlib.dialogs import ArtisanDialog
+from artisanlib.dialogs import ArtisanDialog, artisan_information
 from artisanlib.styles import line_edit_style, artisan_minor_push_button_style
 
 
@@ -396,15 +396,21 @@ class designerconfigDlg(ArtisanDialog):
         else:
             self.aw.qmc.ETsplinedegree =  cast(Literal[1,2,3,4,5], min(5, max(1, len(self.aw.qmc.timex)-1)))
             self.ETsplineComboBox.setCurrentIndex(self.aw.qmc.ETsplinedegree-1)
-            ms = QApplication.translate('Message','Not enough time points for an ET curviness of {0}. Set curviness to {1}').format(ETcurviness,self.aw.qmc.ETsplinedegree)
-            QMessageBox.information(self,QApplication.translate('Message','Designer Config'),ms)
+#            ms = QApplication.translate('Message','Not enough time points for an ET curviness of {0}. Set curviness to {1}').format(ETcurviness,self.aw.qmc.ETsplinedegree)
+#            QMessageBox.information(self,QApplication.translate('Message','Designer Config'),ms)
+            artisan_information(self, self.aw,
+                QApplication.translate('Message','Not enough time points for an ET curviness of {0}. Set curviness to {1}').format(ETcurviness,self.aw.qmc.ETsplinedegree),
+                QApplication.translate('Message','Designer Config'))
         if (timepoints - BTcurviness) >= 1:
             self.aw.qmc.BTsplinedegree = cast(Literal[1,2,3,4,5], min(5, max(1, BTcurviness)))
         else:
             self.aw.qmc.BTsplinedegree = cast(Literal[1,2,3,4,5], min(5, max(1, len(self.aw.qmc.timex)-1)))
             self.BTsplineComboBox.setCurrentIndex(self.aw.qmc.BTsplinedegree-1)
-            ms = QApplication.translate('Message','Not enough time points for an BT curviness of {0}. Set curviness to {1}').format(BTcurviness,self.aw.qmc.BTsplinedegree)
-            QMessageBox.information(self,QApplication.translate('Message','Designer Config'),ms)
+#            ms = QApplication.translate('Message','Not enough time points for an BT curviness of {0}. Set curviness to {1}').format(BTcurviness,self.aw.qmc.BTsplinedegree)
+#            QMessageBox.information(self,QApplication.translate('Message','Designer Config'),ms)
+            artisan_information(self, self.aw,
+                QApplication.translate('Message','Not enough time points for an BT curviness of {0}. Set curviness to {1}').format(BTcurviness,self.aw.qmc.BTsplinedegree),
+                QApplication.translate('Message','Designer Config'))
         self.aw.qmc.redrawdesigner()
 
     @pyqtSlot(bool)
@@ -419,13 +425,19 @@ class designerconfigDlg(ArtisanDialog):
                    QApplication.translate('Label','DROP')]
         timecheck = self.validatetime()
         if timecheck != 1000:
-            st = QApplication.translate('Message','Incorrect time format. Please recheck {0} time').format(strings[timecheck])
-            QMessageBox.information(self,QApplication.translate('Message','Designer Config'),st)
+#            st = QApplication.translate('Message','Incorrect time format. Please recheck {0} time').format(strings[timecheck])
+#            QMessageBox.information(self,QApplication.translate('Message','Designer Config'),st)
+            artisan_information(self, self.aw,
+                QApplication.translate('Message','Incorrect time format. Please recheck {0} time').format(strings[timecheck]),
+                QApplication.translate('Message','Designer Config'))
             return
         checkvalue = self.validatetimeorder()
         if checkvalue != 1000:
             st = QApplication.translate('Message','Times need to be in ascending order. Please recheck {0} time').format(strings[checkvalue+1])
             QMessageBox.information(self,QApplication.translate('Message','Designer Config'),st)
+#            artisan_information(self, self.aw,
+#                QApplication.translate('Message','Times need to be in ascending order. Please recheck {0} time').format(strings[checkvalue+1]),
+#                QApplication.translate('Message','Designer Config'))
             return
         if self.Edit0bt.text() != self.Edit0btcopy:
             try:
@@ -704,8 +716,11 @@ class designerconfigDlg(ArtisanDialog):
                        QApplication.translate('Label','SC START'),
                        QApplication.translate('Label','SC END'),
                        QApplication.translate('Label','DROP')]
-            st = QApplication.translate('Message','Times need to be in ascending order. Please recheck {0} time').format(strings[idi])
-            QMessageBox.information(self,QApplication.translate('Message','Designer Config'),st)
+#            st = QApplication.translate('Message','Times need to be in ascending order. Please recheck {0} time').format(strings[idi])
+#            QMessageBox.information(self,QApplication.translate('Message','Designer Config'),st)
+            artisan_information(self, self.aw,
+                QApplication.translate('Message','Times need to be in ascending order. Please recheck {0} time').format(strings[idi]),
+                QApplication.translate('Message','Designer Config'))
             return
         #idi = id index
         if self.aw.qmc.timeindex[idi]:

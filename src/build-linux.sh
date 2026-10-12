@@ -127,6 +127,7 @@ cp includes/roasted-favicon-32x32.png dist
 cp includes/roasted-favicon-48x48.png dist
 cp includes/roasted-favicon.ico dist
 cp includes/roasted-site.webmanifest dist
+cp includes/artisan-combo-mark-white.svg dist
 cp includes/fitty_patched.js dist
 cp includes/bigtext.js dist
 cp includes/sorttable.js dist

@@ -34,7 +34,7 @@ from PyQt6.QtCore import Qt, pyqtSlot, QSettings, QTimer, QSize
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import (QApplication, QLabel, QDialogButtonBox, QGridLayout,
     QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGroupBox,
-    QSpinBox, QWidget, QTabWidget, QTableWidget, QPushButton, QHeaderView, QLineEdit)
+    QSpinBox, QWidget, QTableWidget, QPushButton, QHeaderView, QLineEdit)
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -42,7 +42,7 @@ if TYPE_CHECKING:
 
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.util import deltaLabelUTF8, getStyleIconPath
-from artisanlib.widgets import MyContentLimitedQComboBox, MyQTableWidget, ArtisanMinorPushButton
+from artisanlib.widgets import MyContentLimitedQComboBox, MyQTableWidget, ArtisanMinorPushButton, ArtisanQTabWidget
 from artisanlib.styles import vertical_header_style, table_style, spin_box_style, artisan_minor_push_button_style
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -379,7 +379,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
         self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel))
 
         ### tab1 layout
-        self.TabWidget = QTabWidget()
+        self.TabWidget = ArtisanQTabWidget()
         self.TabWidget.setContentsMargins(0, 0, 0, 0)  # left, top, right, bottom
         tab1layout = QVBoxLayout()
         tab1layout.addWidget(displayGroupLayout)

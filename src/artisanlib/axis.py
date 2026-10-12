@@ -483,10 +483,6 @@ class WindowsDlg(ArtisanDialog):
         mainLayout.addStretch()
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
-        if platform.system() != 'Windows':
-            ok_button: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
-            if ok_button is not None:
-                ok_button.setFocus()
 
         if self.aw.qmc.locktimex:
             self.disableXAxisControls()

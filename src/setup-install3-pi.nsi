@@ -1113,6 +1113,7 @@ Section Uninstall
     Delete "$INSTDIR\roasted-favicon-48x48.png"
     Delete "$INSTDIR\roasted-favicon.ico"
     Delete "$INSTDIR\roasted-site.webmanifest"
+    Delete "$INSTDIR\artisan-combo-mark-white.svg"
     Delete "$INSTDIR\fitty_patched.js"
     Delete "$INSTDIR\bigtext.js"
     Delete "$INSTDIR\sorttable.js"

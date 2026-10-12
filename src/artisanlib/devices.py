@@ -46,14 +46,15 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtCore import Qt, pyqtSlot, QSettings, QTimer, QRegularExpression, QSignalBlocker, QSize
 from PyQt6.QtGui import (QStandardItemModel, QStandardItem, QColor, QIntValidator, QRegularExpressionValidator, QPixmap, QIcon)
 from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
-                             QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,
-                             QGroupBox, QRadioButton, QButtonGroup, QInputDialog, QToolButton,
-                             QTableWidget, QMessageBox, QHeaderView, QTableWidgetItem, QSizePolicy)
+                             QPushButton, QSpinBox, QComboBox, QDialogButtonBox, QGridLayout,
+                             QGroupBox, QRadioButton, QButtonGroup, QToolButton,
+                             QTableWidget, QHeaderView, QTableWidgetItem, QSizePolicy)
+from PyQt6 import sip
 
 from artisanlib.util import (deltaLabelUTF8, setDeviceDebugLogLevel, argb_colorname2rgba_colorname, rgba_colorname2argb_colorname,
     toInt, weight_units, convertWeight, render_weight, getResourcePath, getTaskURL, getStyleIconPath)
-from artisanlib.dialogs import ArtisanResizeablDialog, tareDlg
-from artisanlib.widgets import MyContentLimitedQComboBox, MyQComboBox, MyQDoubleSpinBox, ArtisanMinorPushButton
+from artisanlib.dialogs import ArtisanResizeablDialog, tareDlg, ArtisanInputDialog, artisan_question, artisan_warning
+from artisanlib.widgets import MyContentLimitedQComboBox, MyQComboBox, MyQDoubleSpinBox, ArtisanMinorPushButton, ArtisanQTabWidget
 from artisanlib.scale import SUPPORTED_SCALES
 from artisanlib.styles import tool_button_icon_style, horizontal_header_style, vertical_header_style, line_edit_style, spin_box_style, table_style
 from artisanlib.device_registry import DEVICES, DEVICE_ID_NONE, DEVICE_ID_VIRTUAL, is_non_serial_device, get_device_name, get_device_id
@@ -813,7 +814,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         phidget1200VBox_2.setContentsMargins(0,0,0,0)
         phidget1200HBox_2.setContentsMargins(0,0,0,0)
 
-        phidget1200_tabs = QTabWidget()
+        phidget1200_tabs = ArtisanQTabWidget()
         phidget1200_tab1_widget = QWidget()
         phidget1200_tab1_widget.setLayout(phidget1200VBox)
         phidget1200_tabs.addTab(phidget1200_tab1_widget,'A')
@@ -1537,7 +1538,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         adjustmentHelp.addWidget(symbolicHelpButton)
         adjustmentHelp.addStretch()
         adjustmentHelp.addWidget(self.updateETBTButton)
-        adjustmentHelp.setContentsMargins(10,5,0,0)
+        adjustmentHelp.setContentsMargins(0,5,0,0)
         adjustmentGroupBox = QGroupBox(QApplication.translate('GroupBox','Symbolic Assignments'))
         adjustmentsLayout = QVBoxLayout()
         adjustmentsLayout.addWidget(labelETadvanced)
@@ -1546,7 +1547,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         adjustmentsLayout.addWidget(self.BTfunctionedit)
         adjustmentsLayout.addStretch()
         adjustmentsLayout.addLayout(adjustmentHelp)
-        adjustmentsLayout.setContentsMargins(5,0,5,0)
+        adjustmentsLayout.setContentsMargins(5,0,5,7)
 
         adjustmentGroupBox.setLayout(adjustmentsLayout)
         #LAYOUT TAB 1
@@ -1599,25 +1600,25 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         tab2Layout = QVBoxLayout()
         tab2Layout.addWidget(self.devicetable)
         tab2Layout.setSpacing(5)
-        tab2Layout.setContentsMargins(0,10,0,5)
+        tab2Layout.setContentsMargins(0,10,0,10)
         tab2Layout.addLayout(bLayout)
         #LAYOUT TAB 3 (Symb ET/BT)
         tab3Layout = QVBoxLayout()
         tab3Layout.addWidget(adjustmentGroupBox)
-        tab3Layout.setContentsMargins(2,10,2,2)
+        tab3Layout.setContentsMargins(5,15,5,10)
         #LAYOUT TAB 4 (Phidgets)
         tab4Layout = QVBoxLayout()
         tab4Layout.addLayout(phidgetVBox)
-        tab4Layout.setContentsMargins(2,10,2,5)
+        tab4Layout.setContentsMargins(2,10,2,10)
         tab4Layout.setSpacing(3)
         #LAYOUT TAB 5 (Yoctopuce)
         tab5Layout = QVBoxLayout()
         tab5Layout.addLayout(yoctoVBox)
-        tab5Layout.setContentsMargins(2,10,2,5)
+        tab5Layout.setContentsMargins(2,10,2,10)
         #LAYOUT TAB 6 (Ambient)
         tab6Layout = QVBoxLayout()
         tab6Layout.addLayout(ambientVBox)
-        tab6Layout.setContentsMargins(2,10,2,5)
+        tab6Layout.setContentsMargins(2,10,2,10)
         #LAYOUT TAB 7 (Santoker)
         tab7VLayout = QVBoxLayout()
         tab7VLayout.addWidget(santokerNetworkGroupBox)
@@ -2134,7 +2135,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             tab8LayoutOFF.addStretch()
 
         #main tab widget
-        self.TabWidget = QTabWidget()
+        self.TabWidget = ArtisanQTabWidget()
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
         self.TabWidget.addTab(C1Widget,QApplication.translate('Tab','ET/BT'))
@@ -2422,11 +2423,21 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             current_name = self.aw.get_custom_scale_name(self.aw.scale1_id)
             if current_name is None:
                 current_name = self.aw.scale1_name
-            new_name, state = QInputDialog.getText(self, 'Scale Name', 'Set scale name', QLineEdit.EchoMode.Normal, text=current_name)
-            if state:
-                self.aw.set_custom_scale_name(self.aw.scale1_id, new_name.strip())
+            res:str|None = None
+            dlg = ArtisanInputDialog(self, self.aw, QApplication.translate('Label','Scale Name'),QApplication.translate('Label', 'Set scale name'), text=current_name)
+            if dlg.exec():
+                res = dlg.text
+            try: # sip not supported on older PyQt versions (RPi!)
+                sip.delete(dlg)
+                #print(sip.isdeleted(dlg))
+                del dlg
+            except Exception: # pylint: disable=broad-except
+                pass
+            if res is not None:
+                self.aw.set_custom_scale_name(self.aw.scale1_id, res.strip())
                 # we need to update both popups
                 self.update_scale_names()
+
 
     @pyqtSlot(bool)
     def tareScale1(self, _:bool = False) -> None:
@@ -2549,11 +2560,21 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             current_name = self.aw.get_custom_scale_name(self.aw.scale2_id)
             if current_name is None:
                 current_name = self.aw.scale2_name
-            new_name, state = QInputDialog.getText(self, 'Scale Name', 'Set scale name', QLineEdit.EchoMode.Normal, text=current_name)
-            if state:
-                self.aw.set_custom_scale_name(self.aw.scale2_id, new_name.strip())
+            res:str|None = None
+            dlg = ArtisanInputDialog(self, self.aw, QApplication.translate('Label','Scale Name'),QApplication.translate('Label', 'Set scale name'), text=current_name)
+            if dlg.exec():
+                res = dlg.text
+            try: # sip not supported on older PyQt versions (RPi!)
+                sip.delete(dlg)
+                #print(sip.isdeleted(dlg))
+                del dlg
+            except Exception: # pylint: disable=broad-except
+                pass
+            if res is not None:
+                self.aw.set_custom_scale_name(self.aw.scale2_id, res.strip())
                 # we need to update both popups
                 self.update_scale_names()
+
 
     @pyqtSlot(bool)
     def tareScale2(self, _:bool = False) -> None:
@@ -3498,11 +3519,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             if (nonempty_ETfunction or nonempty_BTfunction):
 
                 # confirm the action
-                string = QApplication.translate('Message', 'Overwrite existing ET and BT values?')
-                reply = QMessageBox.warning(None, #self.aw, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
-                            QApplication.translate('Message', 'Caution - About to overwrite profile data'),string,
-                            QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
-                if reply == QMessageBox.StandardButton.Cancel:
+                reply = artisan_question(self, self.aw,
+                    QApplication.translate('Message', 'Overwrite existing ET and BT values?'),
+                    QApplication.translate('Message', 'Caution - About to overwrite profile data'))
+                if not reply:
                     return
 
                 # confirm updating the dependent Virtual Extra Devices?
@@ -3510,11 +3530,15 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 etorbt = re.compile('Y1|Y2|T1|T2|R1|R2')
                 for j in range(len(self.aw.qmc.extradevices)):
                     if (re.search(etorbt,self.aw.qmc.extramathexpression1[j]) or re.search(etorbt,self.aw.qmc.extramathexpression2[j])):
-                        string = QApplication.translate('Message', 'At least one Virtual Extra Device depends on ET or BT.  Do you want to update all the Virtual Extra Devices after ET and BT are updated?')
-                        reply = QMessageBox.warning(None, #self.aw, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
-                                    QApplication.translate('Message', 'Caution - About to overwrite profile data'),string,
-                                    QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.No)
-                        if reply == QMessageBox.StandardButton.Yes:
+#                        string = QApplication.translate('Message', 'At least one Virtual Extra Device depends on ET or BT.  Do you want to update all the Virtual Extra Devices after ET and BT are updated?')
+#                        reply = QMessageBox.warning(None, #self.aw, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+#                                    QApplication.translate('Message', 'Caution - About to overwrite profile data'),string,
+#                                    QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.No)
+#                        if reply == QMessageBox.StandardButton.Yes:
+#                            updatevirtualextradevices = True
+                        if artisan_question(self, self.aw,
+                                 QApplication.translate('Message', 'At least one Virtual Extra Device depends on ET or BT.  Do you want to update all the Virtual Extra Devices after ET and BT are updated?'),
+                                QApplication.translate('Message', 'Caution - About to overwrite profile data')):
                             updatevirtualextradevices = True
                         break
 
@@ -4516,9 +4540,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     message = QApplication.translate('Message','Device set to {0}').format(meter)
                     permission_status:bool|None = self.aw.app.getBluetoothPermission(request=True)
                     if permission_status is False:
-                        msg:str = QApplication.translate('Message','Bluetootooth access denied')
-                        QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
-                            msg, msg)
+#                        msg:str = QApplication.translate('Message','Bluetootooth access denied')
+#                        QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+#                            msg, msg)
+                        artisan_warning(self, self.aw,
+                            QApplication.translate('Message','Bluetootooth access denied'))
                 ##########################
                 ####  DEVICE 143 is +IKAWA SET/RPM but +DEVICE cannot be set as main device
                 ##########################

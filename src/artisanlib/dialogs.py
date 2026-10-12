@@ -25,6 +25,8 @@
 # AUTHOR
 # Marko Luther, 2023
 
+import os
+import textwrap
 import platform
 import logging
 import re
@@ -34,14 +36,19 @@ if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from PyQt6.QtGui import QCloseEvent, QDragEnterEvent, QDropEvent, QKeyEvent, QShowEvent  # pylint: disable=unused-import
     from PyQt6.QtCore import QTimerEvent, QObject # pylint: disable=unused-import
+    from PyQt6.QtWidgets import QTextEdit # pylint: disable=unused-import
 
+
+from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtCore import Qt, QEvent, QSettings, pyqtSlot, pyqtSignal, QRegularExpression, QSize
-from PyQt6.QtWidgets import (QApplication, QWidget, QDialog, QMessageBox, QDialogButtonBox,
+from PyQt6.QtWidgets import (QApplication, QWidget, QDialog, QMessageBox, QDialogButtonBox, QAbstractButton,
             QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QLayout, QTableWidget, QHeaderView, QPushButton, QSpinBox, QCheckBox)
 from PyQt6.QtGui import QKeySequence, QAction, QIntValidator, QTextCharFormat, QTextCursor, QColor, QIcon, QPalette
 
-from artisanlib.widgets import MyQComboBox, ClickableQLineEdit, ArtisanTextEdit, ArtisanMinorPushButton
-from artisanlib.util import comma2dot, float2float, float2floatWeightVolume, convertWeight, weight_units, getStyleIconPath
+from artisanlib import __version__, __build__, __revision__
+from artisanlib.widgets import MyQComboBox, ClickableQLineEdit, ArtisanTextEdit, ArtisanMinorPushButton, MyQSpinBox, MyQDoubleSpinBox
+from artisanlib.util import (comma2dot, float2float, float2floatWeightVolume, convertWeight, weight_units, getStyleIconPath,
+        getResourcePath, application_viewer_name, appFrozen)
 from artisanlib.styles import horizontal_header_style, vertical_header_style, line_edit_style, spin_box_style, table_style, artisan_dialog_button_style
 
 
@@ -75,7 +82,7 @@ class ArtisanDialog(QDialog):
 #            self.setWindowFlags(windowFlags)
 
         # configure standard dialog buttons
-        self.dialogbuttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel,Qt.Orientation.Horizontal)
+        self.dialogbuttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel, Qt.Orientation.Horizontal)
 
         # style
         palette = self.palette()
@@ -120,7 +127,7 @@ class ArtisanDialog(QDialog):
     # txt: the original source text of the button (in english)
     # trans: the artisan translation to be used if a default Qt translation does not exist
     @staticmethod
-    def setButtonTranslations(btn: 'QPushButton|None', txt:str, trans:str) -> None:
+    def setButtonTranslations(btn: 'QAbstractButton|None', txt:str, trans:str) -> None:
         if btn is not None:
             current_trans = btn.text()
             if txt == current_trans:
@@ -166,18 +173,39 @@ class ArtisanResizeablDialog(ArtisanDialog):
             self.setWindowFlags(windowFlags)
 
 # if modal=False the message box is not rendered as native dialog on macOS!
+# canvas:showAlarmPopup()
 class ArtisanMessageBox(QMessageBox):
 
     __slots__ = ['timeout', 'currentTime']
 
-    def __init__(self, parent:QWidget|None = None, title:str|None = None, text:str|None = None, timeout:int = 0, modal:bool = True) -> None:
+    def __init__(self, parent:QWidget|None, aw:'ApplicationWindow', title:str, text:str|None = None, timeout:int = 0, modal:bool = True) -> None:
         super().__init__(parent)
         self.setWindowTitle(title)
         self.setText(text)
         self.setModal(modal)
-        self.setIcon(QMessageBox.Icon.Information)
+        #self.setIcon(QMessageBox.Icon.Information)
         self.setStandardButtons(QMessageBox.StandardButton.Ok)
         self.setDefaultButton(QMessageBox.StandardButton.Ok)
+
+        # translate
+        okButton: QAbstractButton|None = self.button(QMessageBox.StandardButton.Ok)
+        if okButton is not None:
+            ArtisanDialog.setButtonTranslations(okButton,'OK',QApplication.translate('Button','OK'))
+
+        # style
+        palette = self.palette()
+        accent_color = palette.color(QPalette.ColorRole.Accent)
+        if not accent_color.isValid() or platform.system() != 'darwin':
+            accent_color = QColor('#3979ae')  # Fallback artisan button blue if OS provides none (and on Windows/Linux)
+        # Generate math-driven lighting variants for the accent button
+        accent_name = accent_color.name()
+        accent_hover = accent_color.lighter(115).name() if aw.app.darkmode else accent_color.darker(115).name()
+        accent_pressed = accent_color.darker(110).name() if aw.app.darkmode else accent_color.darker(125).name()
+        self.setStyleSheet(artisan_dialog_button_style(
+            aw.app.darkmode,
+            accent_name,
+            accent_hover,
+            accent_pressed))
 
         self.timeout = timeout # configured timeout, defaults to 0 (no timeout)
         self.currentTime = 0 # counts seconds after timer start
@@ -338,7 +366,7 @@ class HelpDlg(ArtisanDialog):
                 return
             self.current_match_index = (self.current_match_index + 1) % len(self.matches)
 
-        extraSelections = []
+        extraSelections:list['QTextEdit.ExtraSelection'] = []
         match_text = 'black'
         current_match_highlight = '#A6FF00'
         extra_matches_highlight = 'yellow'
@@ -365,8 +393,7 @@ class HelpDlg(ArtisanDialog):
             self.phelp.setTextCursor(tc)
         else:
             # No matches found: ensure extra selections are cleared
-            extraSelections = []
-            self.phelp.setExtraSelections(extraSelections)
+            self.phelp.setExtraSelections([])
             # Also clear any active selection
             tc = self.phelp.textCursor()
             tc.clearSelection()
@@ -378,23 +405,24 @@ class HelpDlg(ArtisanDialog):
 
 class ArtisanInputDialog(ArtisanDialog):
 
-    __slots__ = ['url', 'inputLine']
+    __slots__ = ['text', 'inputLine']
 
-    def __init__(self, parent:QWidget, aw:'ApplicationWindow', title:str = '', label:str = '') -> None:
+    def __init__(self, parent:QWidget, aw:'ApplicationWindow', title:str = '', label:str = '', text:str = '') -> None:
         super().__init__(parent, aw)
 
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, False)
 
-        self.url = ''
+        self.text = text
 
         self.setWindowTitle(title)
         self.setModal(True)
         self.setAcceptDrops(True)
-        self.inputLine = QLineEdit(self.url)
+        self.inputLine = QLineEdit(self.text)
         self.inputLine.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         layout = QVBoxLayout()
         layout.addWidget(QLabel(label))
         layout.addWidget(self.inputLine)
+        layout.addSpacing(10)
         layout.addWidget(self.dialogbuttons)
         self.setLayout(layout)
         self.setFixedHeight(self.sizeHint().height())
@@ -408,7 +436,7 @@ class ArtisanInputDialog(ArtisanDialog):
     @pyqtSlot()
     @override
     def accept(self) -> None:
-        self.url = self.inputLine.text()
+        self.text = self.inputLine.text()
         super().accept()
 
     @override
@@ -431,6 +459,537 @@ class ArtisanInputDialog(ArtisanDialog):
                     self.inputLine.setText(urls[0].toString())
 
 
+class ArtisanFloatDialog(ArtisanDialog):
+
+    __slots__ = [ 'value', 'spinBox' ]
+
+    def __init__(self, parent:QWidget, aw:'ApplicationWindow', title:str = '', text:str = '', value:float = 0, minimum:float=-9999, maximum:float=9999, decimals:int=1) -> None:
+        super().__init__(parent, aw)
+        self.value:float|None = value
+        self.setWindowTitle(title)
+        self.setModal(True)
+        self.spinBox = MyQDoubleSpinBox()
+        self.spinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.spinBox.setRange(minimum,maximum)
+        self.spinBox.setDecimals(decimals)
+        self.spinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
+        self.spinBox.setValue(value)
+        spinBoxLayout = QHBoxLayout()
+        spinBoxLayout.addStretch()
+        spinBoxLayout.addWidget(self.spinBox)
+        spinBoxLayout.addStretch()
+        layout = QVBoxLayout()
+        layout.addWidget(QLabel(text))
+        layout.addSpacing(5)
+        layout.addLayout(spinBoxLayout)
+        layout.addSpacing(15)
+        layout.addWidget(self.dialogbuttons)
+        self.setLayout(layout)
+        self.setFixedHeight(self.sizeHint().height())
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.rejected.connect(self.reject)
+        self.dialogbuttons.accepted.connect(self.accept)
+        okButton: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+        if okButton is not None:
+            okButton.setFocus()
+
+    @pyqtSlot()
+    @override
+    def accept(self) -> None:
+        self.value = self.spinBox.value()
+        QDialog.accept(self)
+
+    @pyqtSlot()
+    @override
+    def reject(self) -> None:
+        self.value = None
+        QDialog.accept(self)
+
+
+class ArtisanIntegerDialog(ArtisanDialog):
+
+    __slots__ = [ 'value', 'spinBox' ]
+
+    def __init__(self, parent:QWidget, aw:'ApplicationWindow', title:str = '', text:str = '', value:int = 0, minimum:int=-9999, maximum:int=9999) -> None:
+        super().__init__(parent, aw)
+        self.value:int|None = value
+        self.setWindowTitle(title)
+        self.setModal(True)
+        self.spinBox = MyQSpinBox()
+        self.spinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.spinBox.setRange(minimum,maximum)
+        self.spinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
+        self.spinBox.setValue(value)
+        spinBoxLayout = QHBoxLayout()
+        spinBoxLayout.addStretch()
+        spinBoxLayout.addWidget(self.spinBox)
+        spinBoxLayout.addStretch()
+        layout = QVBoxLayout()
+        layout.addWidget(QLabel(text))
+        layout.addSpacing(5)
+        layout.addLayout(spinBoxLayout)
+        layout.addSpacing(15)
+        layout.addWidget(self.dialogbuttons)
+        self.setLayout(layout)
+        self.setFixedHeight(self.sizeHint().height())
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.rejected.connect(self.reject)
+        self.dialogbuttons.accepted.connect(self.accept)
+        okButton: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+        if okButton is not None:
+            okButton.setFocus()
+
+    @pyqtSlot()
+    @override
+    def accept(self) -> None:
+        self.value = self.spinBox.value()
+        QDialog.accept(self)
+
+    @pyqtSlot()
+    @override
+    def reject(self) -> None:
+        self.value = None
+        QDialog.accept(self)
+
+
+class ArtisanConfirmationDialog(ArtisanDialog):
+
+    __slots__ = [ 'res' ]
+
+    # title should not be empty!
+    def __init__(self, parent:QWidget, aw:'ApplicationWindow', title:str = '', text:str = '', info:bool = False, default_cancel:bool = False) -> None:
+        super().__init__(parent, aw)
+        self.res:bool = False
+#        self.setWindowTitle(title) # we set the title within the dialog instead
+        self.setModal(True)
+        labelLayout = QHBoxLayout()
+        labelLayout.addStretch()
+        text_lines = text.splitlines()
+        wrapped_text = '\n'.join(['\n'.join(textwrap.wrap(line, width=60)) for line in text_lines])
+        textLabel = QLabel(wrapped_text)
+        textLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+#        textLabel.setWordWrap(True)
+        textLabel.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        labelLayout.addWidget(textLabel)
+        labelLayout.addStretch()
+        titleLabel = QLabel(title)
+        font = titleLabel.font()
+        font.setBold(True)
+        titleLabel.setFont(font)
+        titleLayout = QHBoxLayout()
+        titleLayout.addStretch()
+        titleLayout.addWidget(titleLabel)
+        titleLayout.addStretch()
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addStretch()
+        buttonLayout.addWidget(self.dialogbuttons)
+        buttonLayout.addStretch()
+        layout = QVBoxLayout()
+        layout.addLayout(titleLayout)
+        layout.addLayout(labelLayout)
+        layout.addSpacing(15)
+        layout.addLayout(buttonLayout)
+        self.setLayout(layout)
+#        self.setFixedWidth(max(400,self.sizeHint().width()))
+        self.setMinimumWidth(200)
+        self.setMaximumWidth(400)
+        layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
+        self.setFixedHeight(self.sizeHint().height())
+        okButton: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+        if okButton is not None:
+            okButton.setFocus()
+            self.setButtonTranslations(okButton,'OK',QApplication.translate('Button','OK'))
+        if info:
+            # on info dialogs, only show the OK button
+            self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel))
+        else:
+            cancelButton: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel)
+            if cancelButton is not None:
+                if default_cancel:
+                    cancelButton.setAutoDefault(True)
+                    cancelButton.setDefault(True)
+                    cancelButton.setFocus()
+                self.setButtonTranslations(cancelButton,'Cancel',QApplication.translate('Button','Cancel'))
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.rejected.connect(self.reject)
+        self.dialogbuttons.accepted.connect(self.accept)
+        self.setWindowFlags(Qt.WindowType.Dialog |
+            Qt.WindowType.MSWindowsFixedSizeDialogHint | Qt.WindowType.WindowTitleHint |
+            Qt.WindowType.WindowCloseButtonHint)
+#        self.setWindowFlags(Qt.WindowType.Dialog | Qt.WindowType.MSWindowsFixedSizeDialogHint | Qt.WindowType.FramelessWindowHint)
+
+    @pyqtSlot()
+    @override
+    def accept(self) -> None:
+        self.res = True
+        QDialog.accept(self)
+
+    @pyqtSlot()
+    @override
+    def reject(self) -> None:
+        self.res = False
+        QDialog.accept(self)
+
+# text should be a simple text without html formatting (\n characters are fine) to show as native dialog on macOS
+# on all other platforms the dialog with use the standard Artisan styling
+# if info is True, only a OK button is presented
+# title should not be empty!
+# if yes_no, Yes and No buttons are used instead of OK and Cancel
+def artisan_confirmation_dialog(parent:QWidget, aw:'ApplicationWindow', title:str, text:str, info:bool = False, default_cancel:bool = False) -> bool:
+    if platform.system() == 'Darwin':
+        mbox = QMessageBox()
+        mbox.setText(title)
+        mbox.setInformativeText(text)
+        from plus.util import setPlusIcon
+        setPlusIcon(mbox, aw.app.darkmode)
+        mbox.setStandardButtons(QMessageBox.StandardButton.Ok if info else QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel)
+        # apply translations
+        okButton = mbox.button(QMessageBox.StandardButton.Ok)
+        cancelButton = mbox.button(QMessageBox.StandardButton.Cancel)
+        for btn,txt,trans in [
+                (okButton,'OK', QApplication.translate('Button','OK')),
+                (cancelButton,'Cancel',QApplication.translate('Button','Cancel'))]:
+            ArtisanDialog.setButtonTranslations(btn,txt,trans)
+        # set default
+        if default_cancel:
+            mbox.setDefaultButton(QMessageBox.StandardButton.Cancel)
+        else:
+            mbox.setDefaultButton(QMessageBox.StandardButton.Ok)
+        return mbox.exec() == QMessageBox.StandardButton.Ok
+    dialog = ArtisanConfirmationDialog(parent, aw, title=title, text=text, info=info, default_cancel=default_cancel)
+    return dialog.res if dialog.exec() else False
+
+
+# warning dialog (styled replacement for QMessageBox.warning)
+def artisan_warning(parent:QWidget, aw:'ApplicationWindow', text:str, title:str|None=None) -> None:
+    if title is None:
+        title = QApplication.translate('Message', 'Warning')
+    artisan_confirmation_dialog(parent, aw, title, text, True)
+
+# information dialog (styled replacement for QMessageBox.information)
+def artisan_information(parent:QWidget, aw:'ApplicationWindow', text:str, title:str|None=None) -> None:
+    if title is None:
+        title = QApplication.translate('Message', 'Information')
+    artisan_confirmation_dialog(parent, aw, title, text, True)
+
+
+# question dialog (styled replacement for QMessageBox.warning)
+def artisan_question(parent:QWidget, aw:'ApplicationWindow', text:str, title:str|None=None, default_cancel:bool = False) -> bool:
+    if title is None:
+        title = text #QApplication.translate('Message', 'Question')
+        text = ''
+    return artisan_confirmation_dialog(parent, aw, title, text, False, default_cancel)
+
+
+
+
+class ArtisanConfirmSaveDialog(ArtisanDialog):
+
+    Discarded = 2
+
+    __slots__ = [ 'res' ]
+
+    # title should not be empty!
+    def __init__(self, parent:QWidget, aw:'ApplicationWindow', title:str, text:str, allow_discard:bool) -> None:
+        super().__init__(parent, aw)
+        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, False) # keep the dialog alive on closing it
+        self.res:bool|None = None # defaults to 'Cancel' (Save: True; Discard: False; Cancel: None)
+        self.setWindowTitle(title)
+        self.setModal(True)
+
+        self.dialogbuttons = QDialogButtonBox(
+            (QDialogButtonBox.StandardButton.Save | QDialogButtonBox.StandardButton.Discard | QDialogButtonBox.StandardButton.Cancel if allow_discard else
+                QDialogButtonBox.StandardButton.Save | QDialogButtonBox.StandardButton.Cancel),
+            Qt.Orientation.Horizontal)
+
+        labelLayout = QHBoxLayout()
+        labelLayout.addStretch()
+        text_lines = text.splitlines()
+        wrapped_text = '\n'.join(['\n'.join(textwrap.wrap(line, width=60)) for line in text_lines])
+        textLabel = QLabel(wrapped_text)
+        textLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+#        textLabel.setWordWrap(True)
+        textLabel.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        font = textLabel.font()
+        font.setBold(True)
+        textLabel.setFont(font)
+        labelLayout.addWidget(textLabel)
+        labelLayout.addStretch()
+
+#        titleLabel = QLabel(title)
+#        font = titleLabel.font()
+#        font.setBold(True)
+#        titleLabel.setFont(font)
+#        titleLayout = QHBoxLayout()
+#        titleLayout.addStretch()
+#        titleLayout.addWidget(titleLabel)
+#        titleLayout.addStretch()
+
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addStretch()
+        buttonLayout.addWidget(self.dialogbuttons)
+        buttonLayout.addStretch()
+        layout = QVBoxLayout()
+#        layout.addLayout(titleLayout)
+        layout.addLayout(labelLayout)
+        layout.addSpacing(15)
+        layout.addLayout(buttonLayout)
+        self.setLayout(layout)
+#        self.setFixedWidth(max(400,self.sizeHint().width()))
+        self.setMinimumWidth(200)
+        self.setMaximumWidth(400)
+        layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
+        self.setFixedHeight(self.sizeHint().height())
+
+        # translations
+        okButton: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+        if okButton is not None:
+            okButton.setFocus()
+            self.setButtonTranslations(okButton,'OK',QApplication.translate('Button','OK'))
+        discardButton: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Discard)
+        if discardButton is not None:
+            self.setButtonTranslations(discardButton,'Discard',QApplication.translate('Button','Discard'))
+        cancelButton: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel)
+        if cancelButton is not None:
+            self.setButtonTranslations(cancelButton,'Cancel',QApplication.translate('Button','Cancel'))
+
+        # style
+        palette = self.palette()
+        accent_color = palette.color(QPalette.ColorRole.Accent)
+        if not accent_color.isValid() or platform.system() != 'darwin':
+            accent_color = QColor('#3979ae')  # Fallback artisan button blue if OS provides none (and on Windows/Linux)
+        # Generate math-driven lighting variants for the accent button
+        accent_name = accent_color.name()
+        accent_hover = accent_color.lighter(115).name() if aw.app.darkmode else accent_color.darker(115).name()
+        accent_pressed = accent_color.darker(110).name() if aw.app.darkmode else accent_color.darker(125).name()
+        self.setStyleSheet(artisan_dialog_button_style(
+            aw.app.darkmode,
+            accent_name,
+            accent_hover,
+            accent_pressed))
+
+        # connect the standard buttons
+        self.dialogbuttons.clicked.connect(self.handle_clicks)
+
+        self.setWindowFlags(Qt.WindowType.Dialog |
+            Qt.WindowType.MSWindowsFixedSizeDialogHint | Qt.WindowType.WindowTitleHint)
+
+# no window decorations (no close box)
+#        self.setWindowFlags(
+#            Qt.WindowType.Window |
+#            Qt.WindowType.CustomizeWindowHint |
+#            Qt.WindowType.WindowTitleHint)
+
+#        self.setWindowFlags(Qt.WindowType.Dialog | Qt.WindowType.MSWindowsFixedSizeDialogHint | Qt.WindowType.FramelessWindowHint)
+
+
+    def handle_clicks(self, button:QAbstractButton) -> None:
+        std_btn = self.dialogbuttons.standardButton(button)
+        if std_btn == QDialogButtonBox.StandardButton.Save:
+            self.res = True
+            self.done(QDialog.DialogCode.Accepted) # Returns 1
+        elif std_btn == QDialogButtonBox.StandardButton.Discard:
+            self.res = False
+            self.done(ArtisanConfirmSaveDialog.Discarded)  # Returns 2
+        elif std_btn == QDialogButtonBox.StandardButton.Cancel:
+            self.res = None
+            self.done(QDialog.DialogCode.Rejected) # Returns 0
+
+# text should be a simple text without html formatting (\n characters are fine) to show as native dialog on macOS
+# on all other platforms the dialog with use the standard Artisan styling
+# if info is True, only a OK button is presented
+# title should not be empty!
+# if yes_no, Yes and No buttons are used instead of OK and Cancel
+def artisan_confirm_save_dialog(parent:QWidget, aw:'ApplicationWindow', title:str, text:str, allow_discard:bool) -> QMessageBox.StandardButton:
+    if platform.system() == 'Darwin':
+        mbox = QMessageBox()
+        mbox.setText(title)
+        mbox.setInformativeText(text)
+        from plus.util import setPlusIcon
+        setPlusIcon(mbox, aw.app.darkmode)
+        mbox.setStandardButtons(QMessageBox.StandardButton.Discard|QMessageBox.StandardButton.Save|QMessageBox.StandardButton.Cancel
+            if allow_discard else QMessageBox.StandardButton.Save|QMessageBox.StandardButton.Cancel)
+        # apply translations
+        discardButton = mbox.button(QMessageBox.StandardButton.Discard)
+        saveButton = mbox.button(QMessageBox.StandardButton.Save)
+        cancelButton = mbox.button(QMessageBox.StandardButton.Cancel)
+        for btn,txt,trans in [
+                (discardButton, 'Discard', QApplication.translate('Button','Discard')),
+                (saveButton, 'Save', QApplication.translate('Button','Save')),
+                (cancelButton, 'Cancel',QApplication.translate('Button','Cancel'))]:
+            ArtisanDialog.setButtonTranslations(btn,txt,trans)
+        # set default
+        mbox.setDefaultButton(QMessageBox.StandardButton.Ok)
+        return cast(QMessageBox.StandardButton, mbox.exec())
+    dialog = ArtisanConfirmSaveDialog(parent, aw, title=title, text=text, allow_discard=allow_discard)
+    dialog.exec()
+    res = dialog.res
+    dialog.deleteLater()
+#    try: # sip not supported on older PyQt versions (RPi!); could crash if events/signals are pending
+#        sip.delete(dialog)
+#        #print(sip.isdeleted(dialog))
+#    except Exception:  # pylint: disable=broad-except
+#        pass
+    del dialog
+    return (QMessageBox.StandardButton.Cancel if res is None else (QMessageBox.StandardButton.Save if res else QMessageBox.StandardButton.Discard))
+
+
+
+
+
+class ArtisanYesNoCancelDialog(ArtisanDialog):
+
+    Discarded = 2
+
+    __slots__ = [ 'res' ]
+
+    # title should not be empty!
+    def __init__(self, parent:QWidget, aw:'ApplicationWindow', title:str, text:str) -> None:
+        super().__init__(parent, aw)
+        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, False) # keep the dialog alive on closing it
+        self.res:bool|None = None # defaults to Cancel (Yes: True; No: False; Cancel: None)
+        self.setWindowTitle(title)
+        self.setModal(True)
+
+        self.dialogbuttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Yes | QDialogButtonBox.StandardButton.No | QDialogButtonBox.StandardButton.Cancel,
+                Qt.Orientation.Horizontal)
+
+        labelLayout = QHBoxLayout()
+        labelLayout.addStretch()
+        text_lines = text.splitlines()
+        wrapped_text = '\n'.join(['\n'.join(textwrap.wrap(line, width=60)) for line in text_lines])
+        textLabel = QLabel(wrapped_text)
+        textLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+#        textLabel.setWordWrap(True)
+        textLabel.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        font = textLabel.font()
+        font.setBold(True)
+        textLabel.setFont(font)
+        labelLayout.addWidget(textLabel)
+        labelLayout.addStretch()
+
+#        titleLabel = QLabel(title)
+#        font = titleLabel.font()
+#        font.setBold(True)
+#        titleLabel.setFont(font)
+#        titleLayout = QHBoxLayout()
+#        titleLayout.addStretch()
+#        titleLayout.addWidget(titleLabel)
+#        titleLayout.addStretch()
+
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addStretch()
+        buttonLayout.addWidget(self.dialogbuttons)
+        buttonLayout.addStretch()
+        layout = QVBoxLayout()
+#        layout.addLayout(titleLayout)
+        layout.addLayout(labelLayout)
+        layout.addSpacing(15)
+        layout.addLayout(buttonLayout)
+        self.setLayout(layout)
+#        self.setFixedWidth(max(400,self.sizeHint().width()))
+        self.setMinimumWidth(200)
+        self.setMaximumWidth(400)
+        layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
+        self.setFixedHeight(self.sizeHint().height())
+
+        # translations
+        yesButton: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Yes)
+        if yesButton is not None:
+            yesButton.setFocus()
+            self.setButtonTranslations(yesButton,'Yes',QApplication.translate('Button','Yes'))
+        noButton: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.No)
+        if noButton is not None:
+            self.setButtonTranslations(noButton,'No',QApplication.translate('Button','No'))
+        cancelButton: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel)
+        if cancelButton is not None:
+            self.setButtonTranslations(cancelButton,'Cancel',QApplication.translate('Button','Cancel'))
+
+        # style
+        palette = self.palette()
+        accent_color = palette.color(QPalette.ColorRole.Accent)
+        if not accent_color.isValid() or platform.system() != 'darwin':
+            accent_color = QColor('#3979ae')  # Fallback artisan button blue if OS provides none (and on Windows/Linux)
+        # Generate math-driven lighting variants for the accent button
+        accent_name = accent_color.name()
+        accent_hover = accent_color.lighter(115).name() if aw.app.darkmode else accent_color.darker(115).name()
+        accent_pressed = accent_color.darker(110).name() if aw.app.darkmode else accent_color.darker(125).name()
+        self.setStyleSheet(artisan_dialog_button_style(
+            aw.app.darkmode,
+            accent_name,
+            accent_hover,
+            accent_pressed))
+
+        # connect the standard buttons
+        self.dialogbuttons.clicked.connect(self.handle_clicks)
+
+        self.setWindowFlags(Qt.WindowType.Dialog |
+            Qt.WindowType.MSWindowsFixedSizeDialogHint | Qt.WindowType.WindowTitleHint)
+
+# no window decorations (no close box)
+#        self.setWindowFlags(
+#            Qt.WindowType.Window |
+#            Qt.WindowType.CustomizeWindowHint |
+#            Qt.WindowType.WindowTitleHint)
+
+#        self.setWindowFlags(Qt.WindowType.Dialog | Qt.WindowType.MSWindowsFixedSizeDialogHint | Qt.WindowType.FramelessWindowHint)
+
+
+    def handle_clicks(self, button:QAbstractButton) -> None:
+        std_btn = self.dialogbuttons.standardButton(button)
+        if std_btn == QDialogButtonBox.StandardButton.Yes:
+            self.res = True
+            self.done(QDialog.DialogCode.Accepted) # Returns 1
+        elif std_btn == QDialogButtonBox.StandardButton.No:
+            self.res = False
+            self.done(ArtisanConfirmSaveDialog.Discarded)  # Returns 2
+        elif std_btn == QDialogButtonBox.StandardButton.Cancel:
+            self.res = None
+            self.done(QDialog.DialogCode.Rejected) # Returns 0
+
+# text should be a simple text without html formatting (\n characters are fine) to show as native dialog on macOS
+# on all other platforms the dialog with use the standard Artisan styling
+# if info is True, only a OK button is presented
+# title should not be empty!
+# if yes_no, Yes and No buttons are used instead of OK and Cancel
+def artisan_yes_no_cancel_dialog(parent:QWidget, aw:'ApplicationWindow', title:str, text:str) -> QMessageBox.StandardButton:
+    if platform.system() == 'Darwin':
+        mbox = QMessageBox()
+        mbox.setText(title)
+        mbox.setInformativeText(text)
+        from plus.util import setPlusIcon
+        setPlusIcon(mbox, aw.app.darkmode)
+        mbox.setStandardButtons(QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.No|QMessageBox.StandardButton.Cancel)
+        # apply translations
+        yesButton = mbox.button(QMessageBox.StandardButton.Yes)
+        noButton = mbox.button(QMessageBox.StandardButton.No)
+        cancelButton = mbox.button(QMessageBox.StandardButton.Cancel)
+        for btn,txt,trans in [
+                (yesButton, 'Yes', QApplication.translate('Button','Yes')),
+                (noButton, 'Discard', QApplication.translate('Button','No')),
+                (cancelButton, 'Cancel',QApplication.translate('Button','Cancel'))]:
+            ArtisanDialog.setButtonTranslations(btn,txt,trans)
+        # set default
+        mbox.setDefaultButton(QMessageBox.StandardButton.Yes)
+        return cast(QMessageBox.StandardButton, mbox.exec())
+    dialog = ArtisanYesNoCancelDialog(parent, aw, title=title, text=text)
+    dialog.exec()
+    res = dialog.res
+    dialog.deleteLater()
+#    try: # sip not supported on older PyQt versions (RPi!); could crash if events/signals are pending
+#        sip.delete(dialog)
+#        #print(sip.isdeleted(dialog))
+#    except Exception:  # pylint: disable=broad-except
+#        pass
+    del dialog
+    return (QMessageBox.StandardButton.Cancel if res is None else (QMessageBox.StandardButton.Yes if res else QMessageBox.StandardButton.No))
+
+
+
+
+
+
+
 class ArtisanComboBoxDialog(ArtisanDialog):
 
     __slots__ = [ 'idx', 'comboBox' ]
@@ -449,6 +1008,7 @@ class ArtisanComboBoxDialog(ArtisanDialog):
         layout = QVBoxLayout()
         layout.addWidget(QLabel(label))
         layout.addWidget(self.comboBox)
+        layout.addSpacing(15)
         layout.addWidget(self.dialogbuttons)
         self.setLayout(layout)
         self.setFixedHeight(self.sizeHint().height())
@@ -567,6 +1127,7 @@ class ArtisanPortsDialog(ArtisanDialog):
         layout = QVBoxLayout()
         layout.addWidget(QLabel(QApplication.translate('Message', 'Comm Port') if label is None else label))
         layout.addWidget(self.comboBox)
+        layout.addSpacing(15)
         layout.addWidget(self.dialogbuttons)
         self.setLayout(layout)
         self.setFixedHeight(self.sizeHint().height())
@@ -691,9 +1252,11 @@ class tareDlg(ArtisanDialog):
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
         buttonLayout.addWidget(self.dialogbuttons)
+        buttonLayout.addStretch()
         layout = QVBoxLayout()
         layout.addWidget(self.taretable)
         layout.addLayout(contentbuttonLayout)
+        layout.addSpacing(10)
         layout.addLayout(buttonLayout)
         self.setLayout(layout)
         self.setMinimumWidth(230)
@@ -873,13 +1436,19 @@ class DesignerSplineNodesDlg(ArtisanDialog):
         input_layout.addWidget(self.nodes_spinbox)
         input_layout.addStretch()
 
+        buttonsLayout = QHBoxLayout()
+        buttonsLayout.addStretch()
+        buttonsLayout.addWidget(self.dialogbuttons)
+        buttonsLayout.addStretch()
+
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(info_label)
         mainLayout.addWidget(self.legacy_checkbox)
         mainLayout.addSpacing(10)
         mainLayout.addLayout(input_layout)
         mainLayout.addWidget(self.spline_info_label)
-        mainLayout.addWidget(self.dialogbuttons)
+        mainLayout.addSpacing(15)
+        mainLayout.addLayout(buttonsLayout)
 
         self.setLayout(mainLayout)
         mainLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
@@ -908,3 +1477,139 @@ class DesignerSplineNodesDlg(ArtisanDialog):
     def get_num_nodes(self) -> int:
         """Return the selected number of nodes (0 = legacy mode)."""
         return self.num_nodes
+
+
+# click and drag on background to move dialog
+class RoundedArtisanDialog(ArtisanDialog):
+    def __init__(self, parent:QWidget|None, aw:'ApplicationWindow') -> None:
+        super().__init__(parent,aw)
+
+        # Initialize drag position tracker
+#        self._drag_position = QPoint()
+
+        self.setStyleSheet('QDialog { border: none; background: transparent; }')
+
+        self.setWindowFlags(Qt.WindowType.Dialog | Qt.WindowType.FramelessWindowHint)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(15, 15, 15, 15)
+
+        self.container = QWidget()
+        self.container.setObjectName('ContainerWidget')
+
+        # style
+        self.container.setStyleSheet("""
+            QWidget#ContainerWidget {
+                background-color: #4D97C3;
+                border: none;
+                border-radius: 30px;
+            }
+            QLabel {
+                color: #ffffff;
+                font-size: 12px;
+            }
+            QPushButton {
+                background-color: transparent;
+                color: white;
+                outline: none;
+                border: 1px solid white;
+                border-radius: 12px;
+                padding: 3px 16px;
+                font-size: 13px;
+                min-width: 60px;
+                height: 20px;
+            }
+            QPushButton:hover {
+                background-color: white;
+                color: #4D97C3;
+            }
+            QPushButton:pressed {
+                background-color: #F0F0F0;
+                color: #4D97C3;
+            }
+
+        """)
+        main_layout.addWidget(self.container)
+
+#    # --- Window Dragging Logic ---
+#
+#    @override
+#    def mousePressEvent(self, event):
+#        # Capture the initial click position if it's the left mouse button
+#        if event.button() == Qt.MouseButton.LeftButton:
+#            # globalPosition() returns a QPointF, convert it to a standard QPoint for move()
+#            self._drag_position = event.globalPosition().toPoint() - self.frameGeometry().topLeft()
+#            event.accept()
+#
+#    @override
+#    def mouseMoveEvent(self, event):
+#        # Move the window tracking the difference from the initial click
+#        if event.buttons() == Qt.MouseButton.LeftButton:
+#            self.move(event.globalPosition().toPoint() - self._drag_position)
+#            event.accept()
+
+
+def about_dialog(parent:QWidget, aw:'ApplicationWindow') -> None:
+    dialog = RoundedArtisanDialog(parent, aw)
+    dialog.setModal(True)
+
+    close_btn = QPushButton('OK')
+    close_btn.clicked.connect(dialog.accept)
+    dialog.setButtonTranslations(close_btn,'OK',QApplication.translate('Button','OK'))
+
+    logo = QSvgWidget(os.path.join(getResourcePath(), 'artisan-combo-mark-white.svg'))
+    svg_renderer = logo.renderer()
+    if svg_renderer is not None:
+        svg_renderer.setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
+    logo.setFixedWidth(200)
+    logoLayout = QHBoxLayout()
+    logoLayout.addSpacing(20)
+    logoLayout.addWidget(logo)
+    logoLayout.addSpacing(20)
+
+    version = f'v{__version__} {(__build__ if __build__ != '0' else '')}{(f' ({str(__revision__)})' if str(__revision__) != '' else '')}'
+    version_label = QLabel(f'{application_viewer_name} version' if aw.app.artisanviewerMode else version)
+    version_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+    version_label.setStyleSheet('QLabel { color: #ffffff; font-size: 16px; }')
+
+    unofficial_build_label = QLabel(QApplication.translate('Message', 'unoffical build'))
+    if not appFrozen() or aw.official_build:
+        unofficial_build_label.setVisible(False)
+
+    dev_label = QLabel(QApplication.translate('About', 'Core Developers'))
+    font = dev_label.font()
+    font.setBold(True)
+    dev_label.setFont(font)
+    core_developers = QLabel('Rafael Cobo, Marko Luther & Dave Baxter')
+    license_label = QLabel(QApplication.translate('About', 'License'))
+    font = dev_label.font()
+    font.setBold(True)
+    license_label.setFont(font)
+    artisan_license = QLabel('<a href="https://www.gnu.org/licenses/agpl-3.0.html" style="color: white">GNU Affero General Public License (AGPLv3.0)</a>')
+    artisan_license.setTextFormat(Qt.TextFormat.RichText)
+    artisan_license.setTextInteractionFlags(Qt.TextInteractionFlag.TextBrowserInteraction)
+    artisan_license.setOpenExternalLinks(True)
+
+    layout = QVBoxLayout()
+    layout.addLayout(logoLayout)
+    layout.addWidget(version_label, alignment=Qt.AlignmentFlag.AlignCenter)
+    layout.addWidget(unofficial_build_label, alignment=Qt.AlignmentFlag.AlignCenter)
+    layout.addSpacing(20)
+    layout.addWidget(dev_label)
+    layout.addSpacing(3)
+    layout.addWidget(core_developers)
+    layout.addSpacing(10)
+    layout.addWidget(license_label)
+    layout.addSpacing(3)
+    layout.addWidget(artisan_license)
+    layout.addSpacing(35)
+    layout.addWidget(close_btn, alignment=Qt.AlignmentFlag.AlignCenter)
+    layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
+    layout.setContentsMargins(30, 5, 30, 20)
+    layout.setSpacing(0)
+    dialog.container.setLayout(layout)
+
+    dialog.setWindowFlags(Qt.WindowType.Dialog | Qt.WindowType.FramelessWindowHint)
+
+    dialog.show()

@@ -35,11 +35,11 @@ from PyQt6.QtCore import Qt, QTimer, pyqtSlot, QSize
 from PyQt6.QtGui import QColor, QFont, QPalette, QIcon
 from PyQt6.QtWidgets import (QApplication, QWidget, QLabel, QPushButton,
     QSizePolicy, QHBoxLayout, QVBoxLayout, QDialogButtonBox, QGridLayout, QGroupBox,
-    QLayout, QSpinBox, QTabWidget, QMessageBox)
+    QLayout, QSpinBox)
 
 from artisanlib.util import deltaLabelUTF8, rgba_colorname2argb_colorname, argb_colorname2rgba_colorname, getStyleIconPath
-from artisanlib.dialogs import ArtisanDialog
-from artisanlib.widgets import ArtisanMinorPushButton
+from artisanlib.dialogs import ArtisanDialog, artisan_warning
+from artisanlib.widgets import ArtisanMinorPushButton, ArtisanQTabWidget
 from artisanlib.styles import spin_box_style, artisan_minor_push_button_style
 
 
@@ -571,7 +571,7 @@ class graphColorDlg(ArtisanDialog):
         lllayout.setSpacing(5)
 
         ###################################
-        self.TabWidget = QTabWidget()
+        self.TabWidget = ArtisanQTabWidget()
         C0Widget = QWidget()
         C0Widget.setLayout(graphlinesLayout)
         self.TabWidget.addTab(C0Widget,QApplication.translate('Tab','Curves'))
@@ -912,10 +912,13 @@ class graphColorDlg(ArtisanDialog):
             nc = argb_colorname2rgba_colorname(res.name(QColor.NameFormat.HexArgb))
             if nc == disj_palette[select] or (nc in {'white', '#ffffff', '#fffffffff'} and disj_palette[select] in {'white', '#ffffff', '#fffffffff'}) or (nc in {'black', '#000000', '#000000ff'} and disj_palette[select] in {'black', '#000000', '#000000ff'}):
                 # this QMessageBox is not rendered native on macOS for unknown reason. The same dialog called from a different dialog is rendered nativ.
-                QMessageBox.warning(None, #self.aw, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
-                    QApplication.translate('Message', 'Config LCD colors'),
+#                QMessageBox.warning(None, #self.aw, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+#                    QApplication.translate('Message', 'Config LCD colors'),
+#                    QApplication.translate('Message', 'LCD digits color and background color cannot be the same.'),
+#                    QMessageBox.StandardButton.Ok)
+                artisan_warning(self, self.aw,
                     QApplication.translate('Message', 'LCD digits color and background color cannot be the same.'),
-                    QMessageBox.StandardButton.Ok)
+                    QApplication.translate('Message', 'Config LCD colors'))
             else:
                 palette[select] = nc
 

@@ -41,13 +41,13 @@ from uic import SliderCalculatorDialog # pyright: ignore[attr-defined] # pylint:
 from PyQt6.QtCore import Qt, pyqtSlot, QSettings, QTimer, QSize
 from PyQt6.QtGui import QColor, QFont, QIntValidator, QIcon, QPalette
 from PyQt6.QtWidgets import (QApplication, QCheckBox, QComboBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
-                             QPushButton, QSpinBox, QWidget, QTabWidget, QDialogButtonBox,
+                             QPushButton, QSpinBox, QWidget, QDialogButtonBox,
                              QGridLayout, QGroupBox, QTableWidget, QHeaderView, QToolButton)
 
 from artisanlib.main import UI_MODE
 from artisanlib.util import comma2dot, eventtime2string, getStyleIconPath
 from artisanlib.dialogs import ArtisanResizeablDialog, ArtisanDialog
-from artisanlib.widgets import MyQComboBox, MyQDoubleSpinBox, ArtisanMinorPushButton
+from artisanlib.widgets import MyQComboBox, MyQDoubleSpinBox, ArtisanMinorPushButton, ArtisanQTabWidget
 from artisanlib.styles import (tool_button_icon_style, horizontal_header_style, vertical_header_style,
     line_edit_style, spin_box_style, table_style, artisan_minor_push_button_style, artisan_dialog_button_style)
 
@@ -1932,7 +1932,7 @@ class EventsDlg(ArtisanResizeablDialog):
         C6VBox.addLayout(QuantifierApplyHBox)
 ###########################################
         #tab layout
-        self.TabWidget = QTabWidget()
+        self.TabWidget = ArtisanQTabWidget()
         C1Widget = QWidget()
         C1Widget.setLayout(tab1layout)
         self.TabWidget.addTab(C1Widget,QApplication.translate('Tab','Config'))
@@ -2805,7 +2805,7 @@ class EventsDlg(ArtisanResizeablDialog):
 
     def updatePalettePopup(self) -> None:
         self.transferpalettecombobox.clear()
-        palettelist = []
+        palettelist:list[str] = []
         for i, _ in enumerate(self.aw.buttonpalette):
             palettelist.append(f'#{str(i)} {self.aw.buttonpalette[i][25]}')
         self.transferpalettecombobox.addItems(palettelist)

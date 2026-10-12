@@ -34,10 +34,10 @@ if TYPE_CHECKING:
     from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
 
 from PyQt6.QtCore import Qt, pyqtSlot, QSettings
-from PyQt6.QtWidgets import (QMessageBox, QApplication, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout,
+from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout,
                              QDialogButtonBox, QLayout)
 
-from artisanlib.dialogs import ArtisanDialog
+from artisanlib.dialogs import ArtisanDialog, artisan_warning
 from artisanlib.widgets import MyQDoubleSpinBox
 from artisanlib.styles import spin_box_style
 
@@ -90,14 +90,18 @@ class SamplingDlg(ArtisanDialog):
         flagLayout.addStretch()
         flagLayout.addLayout(flagGrid)
         flagLayout.addStretch()
+        flagLayout.setContentsMargins(10,0,10,0)
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addStretch()
         buttonsLayout.addWidget(self.dialogbuttons)
+        buttonsLayout.addStretch()
 
         #incorporate layouts
         layout = QVBoxLayout()
         layout.addLayout(intervalLayout)
+        layout.addSpacing(5)
         layout.addLayout(flagLayout)
+        layout.addSpacing(15)
         layout.addStretch()
         layout.addLayout(buttonsLayout)
         self.setLayout(layout)
@@ -141,8 +145,10 @@ class SamplingDlg(ArtisanDialog):
             interval = interval * 60
         self.aw.setSamplingRate(int(interval))
         if self.aw.qmc.delay < self.aw.qmc.default_delay:
-            QMessageBox.warning(None, #self.aw, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
-                QApplication.translate('Message', 'Warning'),
+#            QMessageBox.warning(None, #self.aw, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+#                QApplication.translate('Message', 'Warning'),
+#                QApplication.translate('Message', 'A tight sampling interval might lead to instability on some machines. We suggest a minimum of 1s.'))
+            artisan_warning(self, self.aw,
                 QApplication.translate('Message', 'A tight sampling interval might lead to instability on some machines. We suggest a minimum of 1s.'))
         self.storeSettings()
         self.accept()

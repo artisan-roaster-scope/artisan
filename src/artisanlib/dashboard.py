@@ -80,8 +80,8 @@ class Dashboard(QWidget):
 
             # TODO: remove
             self.ui.beans_comboBox.addItems(['Brazil Santos [30,7kg]','some cool','items that look','different','all of them'])
-            self.ui.blend_comboBox.addItems(['Brazil Santos [30,7kg]','some cool','items that look','different','all of them'])
-            self.ui.space_comboBox.addItems(['Brazil Santos [30,7kg]','some cool','items that look','different','all of them'])
+#            self.ui.blend_comboBox.addItems(['Brazil Santos [30,7kg]','some cool','items that look','different','all of them'])
+#            self.ui.space_comboBox.addItems(['Brazil Santos [30,7kg]','some cool','items that look','different','all of them'])
 
             # set static styles
             self.ui.login_pushButton.setStyleSheet(artisan_push_button_style())
@@ -140,6 +140,12 @@ class Dashboard(QWidget):
 
             self.ui.donate_pushButton.setIconSize(QSize(20,20))
             self.ui.donate_pushButton.setIcon(QIcon(getStyleIconPath('heart-handshake-stroke-rounded-white.svg')))
+
+            self.ui.plus_button.setIconSize(QSize(20,20))
+            self.ui.plus_button.setIcon(QIcon(getStyleIconPath('add-01-stroke-rounded-white.svg')))
+
+            self.ui.minus_button.setIconSize(QSize(20,20))
+            self.ui.minus_button.setIcon(QIcon(getStyleIconPath('remove-01-stroke-rounded-white.svg')))
 
             self.ui.login_pushButton.setIconSize(QSize(20,20))
             self.ui.login_pushButton.setIcon(QIcon(getStyleIconPath('user-circle-stroke-rounded-dark.svg')))
@@ -594,10 +600,15 @@ class Dashboard(QWidget):
         if self.aw.qmc.title != QApplication.translate('Scope Title', 'Roaster Scope') and self.aw.qmc.weight[0] != 0:
             # enable "+" addRecentRoast button
             self.ui.plus_button.setEnabled(True)
+            self.ui.plus_button.setIcon(QIcon(getStyleIconPath('add-01-stroke-rounded-white.svg')))
             self.ui.minus_button.setEnabled(True)
+            self.ui.minus_button.setIcon(QIcon(getStyleIconPath('remove-01-stroke-rounded-white.svg')))
         else:
             self.ui.plus_button.setEnabled(False)
+            darkmode = self.aw.dark_canvas_p()
+            self.ui.plus_button.setIcon(QIcon(getStyleIconPath('add-01-stroke-rounded-white.svg' if darkmode else 'add-01-stroke-rounded.svg')))
             self.ui.minus_button.setEnabled(False)
+            self.ui.minus_button.setIcon(QIcon(getStyleIconPath('remove-01-stroke-rounded-white.svg' if darkmode else 'remove-01-stroke-rounded.svg')))
 
     def update_compare_create_buttons(self) -> None:
         self.ui.compare_pushButton.setVisible(not self.aw.inProductionMode())

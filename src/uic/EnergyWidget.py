@@ -177,7 +177,7 @@ class Ui_EnergyWidget(object):
         self.verticalLayout_6.addLayout(self.horizontalLayout)
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
         self.verticalLayout_6.addItem(spacerItem)
-        self.tabWidget = QtWidgets.QTabWidget(parent=EnergyWidget)
+        self.tabWidget = ArtisanQTabWidget(parent=EnergyWidget)
         self.tabWidget.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.tabWidget.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.tabWidget.setToolTip("")
@@ -1371,7 +1371,7 @@ class Ui_EnergyWidget(object):
         self.meter2UnitLabel.setText(_translate("EnergyWidget", "Unit"))
         self.meter2FuelLabel.setText(_translate("EnergyWidget", "Fuel"))
         self.meter2SourceLabel.setText(_translate("EnergyWidget", "Source"))
-from artisanlib.widgets import ClickableQGroupBox
+from artisanlib.widgets import ArtisanQTabWidget, ClickableQGroupBox
 
 
 if __name__ == "__main__":

@@ -30,6 +30,7 @@
 
 import os
 import logging
+import platform
 from typing import override, Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -39,12 +40,13 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QGroupBox, QHBoxLayout, # QCheckBox,
     QVBoxLayout, QLabel, QLineEdit, QDialogButtonBox, QWidget, QLayout)
 from PyQt6.QtCore import Qt, pyqtSlot
-from PyQt6.QtGui import QKeySequence, QAction
+from PyQt6.QtGui import QKeySequence, QAction, QPalette, QColor
 
 
 from artisanlib.util import getResourcePath
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import StyledQLineEdit
+from artisanlib.styles import artisan_dialog_button_style
 from plus import config
 
 
@@ -115,12 +117,27 @@ class Login(ArtisanDialog):
         self.dialogbuttons.accepted.connect(self.setCredentials)
         self.dialogbuttons.rejected.connect(self.reject)
 
+        # style
+        palette = self.palette()
+        accent_color = palette.color(QPalette.ColorRole.Accent)
+        if not accent_color.isValid() or platform.system() != 'darwin':
+            accent_color = QColor('#3979ae')  # Fallback artisan button blue if OS provides none (and on Windows/Linux)
+        # Generate math-driven lighting variants for the accent button
+        accent_name = accent_color.name()
+        accent_hover = accent_color.lighter(115).name() if self.aw.app.darkmode else accent_color.darker(115).name()
+        accent_pressed = accent_color.darker(110).name() if self.aw.app.darkmode else accent_color.darker(125).name()
+
         self.ok_button = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
         if self.ok_button is not None:
             self.ok_button.setEnabled(False)
             self.ok_button.setFocusPolicy(
                 Qt.FocusPolicy.StrongFocus
             )
+            self.ok_button.setStyleSheet(artisan_dialog_button_style(
+                self.aw.app.darkmode,
+                accent_name,
+                accent_hover,
+                accent_pressed))
         self.cancel_button = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel)
         if self.cancel_button is not None:
             self.cancel_button.setDefault(True)
@@ -135,6 +152,11 @@ class Login(ArtisanDialog):
             self.cancel_button.addActions(
                 [cancelAction]
             )
+            self.cancel_button.setStyleSheet(artisan_dialog_button_style(
+                self.aw.app.darkmode,
+                accent_name,
+                accent_hover,
+                accent_pressed))
 
         self.textPass = StyledQLineEdit(self)
         self.textPass.setMinimumWidth(230)

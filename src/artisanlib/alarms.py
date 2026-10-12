@@ -44,14 +44,14 @@ from PyQt6.QtCore import Qt, pyqtSlot, QSettings, QTimer, QSize
 from PyQt6.QtGui import QColor, QIntValidator, QIcon
 from PyQt6.QtWidgets import (QApplication, QWidget, QLabel, QLineEdit, QComboBox, QDialogButtonBox,
             QTableWidget, QHBoxLayout, QVBoxLayout, QCheckBox, QPushButton, QSizePolicy, QSpinBox,
-            QTableWidgetSelectionRange, QTimeEdit, QTabWidget, QGridLayout, QGroupBox, QHeaderView, QStyledItemDelegate, QAbstractSpinBox)
+            QTableWidgetSelectionRange, QTimeEdit, QGridLayout, QGroupBox, QHeaderView, QStyledItemDelegate, QAbstractSpinBox)
 
 
 from artisanlib.main import UI_MODE
 from artisanlib.util import deltaLabelUTF8, comma2dot, float2float, deserialize, getStyleIconPath
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.widgets import (MyQComboBox, MyTableWidgetItemNumber, MyTableWidgetItemQCheckBox, ArtisanMinorPushButton,
-                                MyTableWidgetItemQComboBox, MyTableWidgetItemQLineEdit, MyTableWidgetItemQTime)
+                                MyTableWidgetItemQComboBox, MyTableWidgetItemQLineEdit, MyTableWidgetItemQTime, ArtisanQTabWidget)
 from artisanlib.styles import horizontal_header_style, line_edit_style, spin_box_style, table_style, artisan_minor_push_button_style
 
 
@@ -189,24 +189,22 @@ class AlarmDlg(ArtisanResizeablDialog):
         self.alarmsfile.setMinimumWidth(300)
         self.alarmsfile.setSizePolicy(QSizePolicy.Policy.MinimumExpanding,QSizePolicy.Policy.Preferred)
         tablelayout = QVBoxLayout()
+        tablelayout.addWidget(self.alarmtable)
         buttonlayout = QHBoxLayout()
         okbuttonlayout = QHBoxLayout()
         buttonlayout.addWidget(helpButton)
-        buttonlayout.addWidget(clearButton)
-        tablelayout.addWidget(self.alarmtable)
         buttonlayout.addWidget(self.copyalarmTableButton)
-        buttonlayout.addSpacing(10)
+        buttonlayout.addWidget(clearButton)
+        buttonlayout.addSpacing(25)
         buttonlayout.addStretch()
-        buttonlayout.addWidget(allonButton)
-        buttonlayout.addWidget(alloffButton)
-        buttonlayout.addStretch()
-        buttonlayout.addSpacing(15)
         buttonlayout.addWidget(addButton)
         buttonlayout.addWidget(self.insertButton)
         buttonlayout.addWidget(deleteButton)
-        buttonlayout.addSpacing(15)
+        buttonlayout.addSpacing(25)
         buttonlayout.addStretch()
-        buttonlayout.addSpacing(10)
+        buttonlayout.addWidget(allonButton)
+        buttonlayout.addWidget(alloffButton)
+        buttonlayout.addSpacing(15)
         buttonlayout.addWidget(importButton)
         buttonlayout.addWidget(exportButton)
         buttonlayout.setSpacing(3)
@@ -267,7 +265,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         alarmsetGroupLayout = QGroupBox(QApplication.translate('GroupBox','Management'))
         alarmsetGroupLayout.setLayout(alarmsetManagementBox)
         #tab layout
-        self.TabWidget = QTabWidget()
+        self.TabWidget = ArtisanQTabWidget()
 
         tab1layout = QVBoxLayout()
         tab1layout.addLayout(tablelayout)
@@ -324,7 +322,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         self.TabWidget.setCurrentIndex(self.activeTab)
 
     def setAlarmSetLabels(self) -> None:
-        alarmset_labels = []
+        alarmset_labels:list[str] = []
         for i in range(self.aw.qmc.ALARMSET_COUNT):
             alarmset:AlarmSet|None = self.aw.qmc.getAlarmSet(i)
             if alarmset is not None:

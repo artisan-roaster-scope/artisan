@@ -540,6 +540,7 @@ class ROESTdialog(ArtisanDialog):
         layout.addWidget(credentialsGroup)
         layout.addSpacing(5)
         layout.addWidget(machineGroup)
+        layout.addSpacing(10)
         layout.addLayout(buttonLayout)
         layout.setContentsMargins(10, 10, 10, 10)
         layout.setSpacing(5)

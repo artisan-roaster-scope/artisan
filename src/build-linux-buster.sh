@@ -125,9 +125,10 @@ cp includes/roasted-android-chrome-512x512.png dist
 cp includes/roasted-apple-touch-icon.png dist
 cp includes/roasted-favicon-16x16.png dist
 cp includes/roasted-favicon-32x32.png dist
-cp includes/roasted-favicon-48x48.png dist
+cp includes/roasted-favicon-48x48.png diet
 cp includes/roasted-favicon.ico dist
 cp includes/roasted-site.webmanifest dist
+cp includes/build-linux-buster.sh dist
 cp includes/bigtext.js dist
 cp includes/fitty_patched.js dist
 cp includes/sorttable.js dist

@@ -901,7 +901,7 @@
                <string notr="true"/>
               </property>
               <property name="text">
-               <string notr="true">+</string>
+               <string notr="true"/>
               </property>
              </widget>
             </item>
@@ -929,7 +929,7 @@
                <string notr="true"/>
               </property>
               <property name="text">
-               <string notr="true">–</string>
+               <string notr="true"/>
               </property>
              </widget>
             </item>

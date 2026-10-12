@@ -41,15 +41,15 @@ if TYPE_CHECKING:
 from PyQt6.QtCore import Qt, pyqtSlot, QSettings, QSize
 from PyQt6.QtGui import QIntValidator, QStandardItemModel, QIcon
 from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
-                             QPushButton, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,QSizePolicy,
+                             QPushButton, QComboBox, QDialogButtonBox, QGridLayout,QSizePolicy,
                              QGroupBox, QTableWidget, QTableWidgetItem, QDialog, QDoubleSpinBox,
                              QHeaderView, QScrollArea, QFrame)
 
 from artisanlib.util import toFloat, uchr, comma2dot, float2float, toInt, getStyleIconPath
 from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog, PortComboBox
-from artisanlib.widgets import wait_cursor, ArtisanPlainTextEdit, ArtisanMinorPushButton
+from artisanlib.widgets import wait_cursor, ArtisanPlainTextEdit, ArtisanMinorPushButton, ArtisanQTabWidget
 from artisanlib.comm import serialport
-from artisanlib.styles import horizontal_header_style, vertical_header_style, line_edit_style, spin_box_style, table_style, artisan_minor_push_button_style
+from artisanlib.styles import horizontal_header_style, vertical_header_style, line_edit_style, spin_box_style, table_style, artisan_minor_push_button_style, scroller_style
 from artisanlib.device_registry import get_device_name, is_non_serial_device, DEVICE_ID_MAX, DEVICE_ID_NONE, DEVICE_ID_VIRTUAL
 
 
@@ -960,6 +960,7 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_input_scroll_content.setSizePolicy(QSizePolicy.Policy.MinimumExpanding,QSizePolicy.Policy.Ignored)
         modbus_input_scroll_content.setLayout(modbus_input_grid)
         modbus_input_scroll.setWidget(modbus_input_scroll_content)
+        modbus_input_scroll.setStyleSheet(scroller_style(self.aw.app.darkmode))
 
 
         modbus_gridVLayout = QHBoxLayout()
@@ -990,7 +991,7 @@ class comportDlg(ArtisanResizeablDialog):
         tab3Layout.addLayout(modbus_PID_IP)
         tab3Layout.addStretch()
         tab3Layout.addLayout(modbus_setup)
-        tab3Layout.setContentsMargins(5,0,5,0)
+        tab3Layout.setContentsMargins(5,0,5,10)
         tab3Layout.setSpacing(5)
 
         #LAYOUT TAB 4
@@ -1296,7 +1297,7 @@ class comportDlg(ArtisanResizeablDialog):
         tab4Layout.addWidget(s7_pidgroup)
         tab4Layout.addStretch()
         tab4Layout.addLayout(s7_setup)
-        tab4Layout.setContentsMargins(5,0,7,1)
+        tab4Layout.setContentsMargins(5,0,7,10)
         tab4Layout.setSpacing(5)
 
 
@@ -1815,6 +1816,7 @@ class comportDlg(ArtisanResizeablDialog):
         mqtt_line3 = QScrollArea()
         mqtt_line3.setWidgetResizable(False)
         mqtt_line3.setWidget(mqtt_input_scroll_content)
+        mqtt_line3.setStyleSheet(scroller_style(self.aw.app.darkmode))
 
 
         tab6Layout = QVBoxLayout()
@@ -1831,7 +1833,7 @@ class comportDlg(ArtisanResizeablDialog):
 
 
         #tab widget
-        self.TabWidget = QTabWidget()
+        self.TabWidget = ArtisanQTabWidget()
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
         self.TabWidget.addTab(C1Widget,QApplication.translate('Tab','ET/BT'))

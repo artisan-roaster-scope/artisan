@@ -110,14 +110,14 @@ except Exception: # pylint: disable=broad-except
 
 
 from PyQt6.QtWidgets import (QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, QGraphicsDropShadowEffect,
-                         QInputDialog, QGroupBox, QLineEdit, QStatusBar,
+                         QGroupBox, QLineEdit, QStatusBar,
                          QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton,
                          QLCDNumber, QSpinBox, QComboBox,
                          QSlider, QToolButton, QStackedWidget,
                          QColorDialog, QFrame, QScrollArea, QProgressDialog,
                          QStyleFactory, QMenuBar, QMenu, QLayout, QDockWidget)
 from PyQt6.QtGui import (QScreen, QPageLayout, QAction, QWindow,
-                            QKeySequence, QShortcut,
+                            QKeySequence, QShortcut, QPalette,
                             QPixmap,QColor,QDesktopServices, QIcon,
                             QRegularExpressionValidator, QDoubleValidator, QPainter, QCursor)
 from PyQt6.QtPrintSupport import (QPrinter,QPrintDialog)
@@ -238,8 +238,8 @@ class Artisan(QtSingleApplication):
         super().__init__(appGuid, viewerAppGuid, args)
 
         # with Qt.ConnectionType.QueuedConnection the signal is queued even if called from the same thread
-        self.sendmessage2ArtisanInstanceSignal.connect(self._sendMessage2ArtisanInstanceSlot, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
-        self.sendmessage2ArtisanViewerSignal.connect(self._sendMessage2ArtisanViewerSlot, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
+        self.sendmessage2ArtisanInstanceSignal.connect(self._sendMessage2ArtisanInstanceSlot, type=Qt.ConnectionType.QueuedConnection)
+        self.sendmessage2ArtisanViewerSignal.connect(self._sendMessage2ArtisanViewerSlot, type=Qt.ConnectionType.QueuedConnection)
 
         self.sentToBackground:float|None = None # set to timestamp on putting app to background without any open dialog
         self.plus_sync_cache_expiration = 1*40 # how long a plus sync is valid in seconds
@@ -643,19 +643,26 @@ if multiprocessing.current_process().name == 'MainProcess':
 else:
     _log.info('child process loaded')
 
-
 if platform.system().startswith('Windows'):
     # on Windows we use the Fusion style per default which supports the dark mode
     app.setStyle('Fusion')
     app.setWindowIcon(QIcon(os.path.join(getAppPath(),'artisan.png')))
+    # set artisan accent color
+    app_style_palette = app.palette()
+    app_style_palette.setColor(QPalette.ColorRole.Accent,  QColor('#3979ae'))
+    app.setPalette(app_style_palette)
+    del app_style_palette
 
 from artisanlib.s7port import s7port
 from artisanlib.wsport import wsport
 from artisanlib.mqttport import mqttport
 from artisanlib.modbusport import modbusport
 from artisanlib.styles import (artisan_slider_style, artisan_slider_frame_style, artisan_event_button_style, qlcd_style,
-    push_button_style, artisan_sv_plus_push_button_style, artisan_sv_minus_push_button_style, events_editor_style)
-from artisanlib.dialogs import HelpDlg, ArtisanInputDialog, ArtisanComboBoxDialog, ArtisanPortsDialog, ArtisanSliderLCDinputDlg
+    push_button_style, artisan_sv_plus_push_button_style, artisan_sv_minus_push_button_style, events_editor_style,
+    scroller_style)
+from artisanlib.dialogs import (HelpDlg, ArtisanInputDialog, ArtisanComboBoxDialog, ArtisanPortsDialog, ArtisanSliderLCDinputDlg,
+    ArtisanIntegerDialog, ArtisanFloatDialog, artisan_confirmation_dialog, about_dialog, artisan_information,
+    artisan_warning, artisan_question, artisan_yes_no_cancel_dialog)
 from artisanlib.logs import (serialLogDlg, errorDlg, messageDlg)
 from artisanlib.comm import serialport
 from artisanlib.widgets import (MyQLCDNumber, EventPushButton, MajorEventPushButton,
@@ -1191,23 +1198,28 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                 # n days left <= red if <=3
                 #  3 days, 2 days, 1 day, 0 days left
                 #
-# no links in macOS style boxes
-#                subscription_message_box = ArtisanMessageBox(self.aw, QApplication.translate('Message', 'Subscription'), message)
-                subscription_message_box = QMessageBox() # only without super this one shows the native dialog on macOS under Qt 6.6.2
-#                subscription_message_box.setTextFormat(Qt.TextFormat.RichText)
-                plus_util.setPlusIcon(subscription_message_box, self.aw.app.darkmode)
                 if percent_used_formatted != '':
                     percent_used_formatted = '\n' + percent_used_formatted
-                subscription_message_box.setText(QApplication.translate('Plus','Do you want to extend your subscription?'))
-                subscription_message_box.setInformativeText((QApplication.translate('Plus','Your subscription ends on') if remaining_days>0 else QApplication.translate('Plus','Your subscription ended on')) + f'\n{QDate(pu.year,pu.month,pu.day).toString(QLocale().dateFormat(QLocale.FormatType.LongFormat))}. {days}. {percent_used_formatted}')
-                subscription_message_box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-                res = subscription_message_box.exec()
+
+#                subscription_message_box = QMessageBox() # only without super this one shows the native dialog on macOS under Qt 6.6.2
+#                plus_util.setPlusIcon(subscription_message_box, self.aw.app.darkmode)
+#                subscription_message_box.setText(QApplication.translate('Plus','Do you want to extend your subscription?'))
+#                subscription_message_box.setInformativeText((QApplication.translate('Plus','Your subscription ends on') if remaining_days>0 else QApplication.translate('Plus','Your subscription ended on')) + f'\n{QDate(pu.year,pu.month,pu.day).toString(QLocale().dateFormat(QLocale.FormatType.LongFormat))}. {days}. {percent_used_formatted}')
+#                subscription_message_box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+#                res = subscription_message_box.exec()
+
+                res = artisan_confirmation_dialog(self, self.aw,
+                    QApplication.translate('Plus','Do you want to extend your subscription?'),
+                    ((QApplication.translate('Plus','Your subscription ends on') if remaining_days>0 else QApplication.translate('Plus','Your subscription ended on')) + f'\n{QDate(pu.year,pu.month,pu.day).toString(QLocale().dateFormat(QLocale.FormatType.LongFormat))}. {days}. {percent_used_formatted}'))
+
+
                 plus_link = plus.config.shop_base_url
                 if self.aw.plus_subscription in {'PRO', 'MAX'}:
                     plus_link += '/professional-roasters'
                 elif self.aw.plus_subscription == 'HOME':
                     plus_link += '/home-roasters'
-                if res == QMessageBox.StandardButton.Yes:
+#                if res == QMessageBox.StandardButton.Yes:
+                if res:
                     QDesktopServices.openUrl(QUrl(plus_link, QUrl.ParsingMode.TolerantMode)) # zuban:ignore[unreachable]
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
@@ -3563,6 +3575,7 @@ class ApplicationWindow(QMainWindow):
         self.scroller.setWidgetResizable(True)
         self.scroller.setFrameShape(QFrame.Shape.NoFrame)
         self.scroller.setVisible(False)
+        self.scroller.setStyleSheet(scroller_style(self.app.darkmode))
 
         self.splitter: Splitter = Splitter(Qt.Orientation.Vertical)
         self.splitter.addWidget(self.qmc.canvas)
@@ -3602,7 +3615,7 @@ class ApplicationWindow(QMainWindow):
         self.stack.addWidget(level3layoutFrame)
         self.stack.addWidget(self.dashboard)
 
-        self.setMinimumWidth(1080)
+        self.setMinimumWidth(950) # use 1080 to prevent overlapping phases LCDs if CONTROL button is shown and AUC lcd
         self.setMinimumHeight(620)
 
         midleftlayout = QVBoxLayout()
@@ -3874,7 +3887,8 @@ class ApplicationWindow(QMainWindow):
             string += QApplication.translate('Message',"Caution, the only way to share settings between artisan and artisanViewer is to explicitly save and load them using 'Help>Save Settings' and 'Help>Load Settings'.") + '\n\n'
             string += QApplication.translate('Message','Enjoy using artisanViewer,') +'\n'
             string += QApplication.translate('Message','The artisan team')
-            QMessageBox.information(self, QApplication.translate('Message','One time message about artisanViewer'),string)
+#            QMessageBox.information(self, QApplication.translate('Message','One time message about artisanViewer'),string)
+            artisan_information(self,self, string, QApplication.translate('Message','One time message about artisanViewer'))
             settings.setValue('Mode',self.qmc.mode)  #prevent this popup in case a second instance is started before this first one is closed.
 
         self.recording_version:str = str(__version__) # saved to and loaded from profiles, indicating the artisan version that created this profile, will be set to __version__ on RESET
@@ -3912,26 +3926,26 @@ class ApplicationWindow(QMainWindow):
         self.kaleidoSendMessageSignal.connect(self.kaleidoSendMessage)
         self.kaleidoSendMessageAwaitSignal.connect(self.kaleidoSendMessageAwait)
         self.orbiterSendMessageSignal.connect(self.orbiterSendMessage)
-        self.addEventSignal.connect(self.addEventSlot, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
-        self.addRawEventSignal.connect(self.addRawEventSlot, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
+        self.addEventSignal.connect(self.addEventSlot, type=Qt.ConnectionType.QueuedConnection)
+        self.addRawEventSignal.connect(self.addRawEventSlot, type=Qt.ConnectionType.QueuedConnection)
            # by default the connection type is AutoConnection (If the emitter & receiver are in the same thread, a DirectConnection is used. Otherwise, a QueuedConnection is used.)
            # if the signal is send/receveid in the same thread a direct connection equals to a direct function call, the event is NOT put on the event loop and this not potentially processed delays
            # explicitly specifying QueuedConnection puts the message on the event loop and delays the processing potentially also if running in the same thread as the sender
         self.updateMessageLogSignal.connect(self.updateMessageLog)
         self.updateSerialLogSignal.connect(self.updateSerialLog)
         self.updateErrorLogSignal.connect(self.updateErrorLog)
-        self.establishQuantifiedEventSignal.connect(self.establishQuantifiedEventSlot, type=Qt.ConnectionType.QueuedConnection)  # type: ignore[call-arg]
+        self.establishQuantifiedEventSignal.connect(self.establishQuantifiedEventSlot, type=Qt.ConnectionType.QueuedConnection)
         self.updateExtraEventButtonsVisibilitySignal.connect(self.update_extraeventbuttons_visibility)
         self.realignButtonsSignal.connect(self.realignbuttons)
-        self.loadAlarmsSignal.connect(self.loadAlarms, type=Qt.ConnectionType.QueuedConnection)  # type: ignore[call-arg]
-        self.loadFileSignal.connect(self.loadFileSlot, type=Qt.ConnectionType.QueuedConnection)  # type: ignore[call-arg]
-        self.loadPalettesSignal.connect(self.loadPalettesSlot, type=Qt.ConnectionType.QueuedConnection)  # type: ignore[call-arg]
-        self.importArtisanURLSignal.connect(self.importArtisanURLSlot, type=Qt.ConnectionType.QueuedConnection)  # type: ignore[call-arg]
-        self.comparatorAddProfileURLSignal.connect(self.comparatorAddProfileURLSlot, type=Qt.ConnectionType.QueuedConnection)  # type: ignore[call-arg]
-        self.comparatorAddProfileSignal.connect(self.comparatorAddProfileSlot, type=Qt.ConnectionType.QueuedConnection)  # type: ignore[call-arg]
-        self.updateScheduleSignal.connect(self.updateSchedule, type=Qt.ConnectionType.QueuedConnection)  # type: ignore[call-arg]
-        self.setTimerColorSignal.connect(self.setTimerColor, type=Qt.ConnectionType.QueuedConnection)  # type: ignore[call-arg]
-        self.loadThemeSignal.connect(self.loadThemeFile, type=Qt.ConnectionType.QueuedConnection)  # type: ignore[call-arg]
+        self.loadAlarmsSignal.connect(self.loadAlarms, type=Qt.ConnectionType.QueuedConnection)
+        self.loadFileSignal.connect(self.loadFileSlot, type=Qt.ConnectionType.QueuedConnection)
+        self.loadPalettesSignal.connect(self.loadPalettesSlot, type=Qt.ConnectionType.QueuedConnection)
+        self.importArtisanURLSignal.connect(self.importArtisanURLSlot, type=Qt.ConnectionType.QueuedConnection)
+        self.comparatorAddProfileURLSignal.connect(self.comparatorAddProfileURLSlot, type=Qt.ConnectionType.QueuedConnection)
+        self.comparatorAddProfileSignal.connect(self.comparatorAddProfileSlot, type=Qt.ConnectionType.QueuedConnection)
+        self.updateScheduleSignal.connect(self.updateSchedule, type=Qt.ConnectionType.QueuedConnection)
+        self.setTimerColorSignal.connect(self.setTimerColor, type=Qt.ConnectionType.QueuedConnection)
+        self.loadThemeSignal.connect(self.loadThemeFile, type=Qt.ConnectionType.QueuedConnection)
 
         self.notificationManager:NotificationManager|None = None
         if not self.app.artisanviewerMode:
@@ -5499,302 +5513,383 @@ class ApplicationWindow(QMainWindow):
                 label = (action.text() if action.data()[1] == '' else f'{action.data()[1]} {action.text()}')
                 label = label.replace('&&','&') # we reduce those && again to & that were introduced to have the & rendered in the menu entry
     #            string = QApplication.translate('Message', 'Configure for<br>{0}?<br><br>Your current settings will be overwritten!<br><br>It is advisable to save your current settings beforehand via menu Help >> Save Settings.').format(label)
-                help_menu = QApplication.translate('Menu', 'Help')
-                string = QApplication.translate('Message', 'Configure for<br>{0}?<br><br>Some of your settings will be modified!<br><br>Before proceeding it is best to save your current settings and reset Artisan<br>(first menu {1} >> {2} then {4} >> {3})').format(label, help_menu, QApplication.translate('Menu', 'Save Settings...'),QApplication.translate('Menu', 'Factory Reset'),help_menu)
-                reply = QMessageBox.question(self, QApplication.translate('Message', 'Adjust Settings'),string,
-                    QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
-                if reply == QMessageBox.StandardButton.Cancel:
+
+                string = QApplication.translate('Message', 'Configure for {0}?').format(label)
+                result = artisan_confirmation_dialog(self, self, QApplication.translate('Message', 'Adjust Settings'), string) #, QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel)
+
+                if not result:
                     return
-                if reply == QMessageBox.StandardButton.Yes and hasattr(action,'data') and hasattr(action,'text'):
-                    self.qmc.etypes = self.qmc.etypesdefault[:]
-                    # keep original information to Cancel
-                    org_etypes = self.qmc.etypes
-                    org_device = self.qmc.device
-                    org_machinesetup = self.qmc.machinesetup
-                    org_modbus_host = self.modbus.host
-                    org_s7_host = self.s7.host
-                    org_ws_host = self.ws.host
-                    org_kaleido_host = self.kaleidoHost
-                    org_mugma_host = self.mugmaHost
-                    org_comport = self.ser.comport
-                    org_modbus_comport = self.modbus.comport
-                    org_roastersize_setup = self.qmc.roastersize_setup
-                    org_last_batchsize = self.qmc.last_batchsize
-                    org_roastersize = self.qmc.roastersize
-                    org_roasterheating_setup = self.qmc.roasterheating_setup
-                    org_roasterheating = self.qmc.roasterheating
-                    org_eventsbuttonflag = self.eventsbuttonflag
-                    no_config = False
-                    # reset roaster_setup_default to ensure we do not offer a default from a previously loaded machine setup
-                    self.qmc.roastersize_setup_default = 0
-                    self.qmc.roasterheating_setup_default = 0
-                    # also reset roastersize_setup to have the machine setup work as after a reset on each call
-                    self.qmc.roastersize_setup = 0
-                    self.qmc.roasterheating_setup = 0
-                    # don't show the events button by default if a machine setup is activated
-                    self.eventsbuttonflag = 0
-                    #
-                    self.loadSettings(fn=action.data()[0],remember=False,machine=True,reload=False)
-                    res:bool = False
-                    res2: bool|None = None
-                    ### setup specific configuration dialogs
-                    if action.data()[1] == 'Phidget':
-                        if action.text() == 'VINT Ambient Modules':
-                            elevation, res2 = QInputDialog.getInt(self,
-                                QApplication.translate('Message', 'Ambient'),
-                                QApplication.translate('Message', 'Elevation (MASL)'),value=self.qmc.elevation)
-                            if res2:
-                                try:
-                                    self.qmc.elevation = int(elevation)
-                                except Exception: # pylint: disable=broad-except
-                                    pass
-                            else:
-                                res = False
-                                self.sendmessage(QApplication.translate('Message','Action canceled'))
-                        else:
-                            res = True
-                            self.qmc.machinesetup = action.text()
-                        if res:
-                            QTimer.singleShot(700, self.qmc.startPhidgetManager)
-                    elif action.data()[2] == 'Lebrew':
-                        no_config = True # no further configurations required
-                    elif action.data()[2] == 'RoastHubs':
-                        no_config = True # no further configurations required
-                        from artisanlib.roasthubs import configureConnection
-                        res = configureConnection(self)
-                        if not res:
-                            self.sendmessage(QApplication.translate('Message','Action canceled'))
-                    elif action.data()[1] == 'ROEST' and self.qmc.device:
-                        no_config = True # no further configurations required
-                        # select ROEST machine and retrieve MQTT credentials
-                        from artisanlib.roest import RoestMachine, selectROESTmachine
-                        roest_machine:RoestMachine|None = selectROESTmachine(self)
-                        if roest_machine is not None:
-                            self.mqtt.user = roest_machine['mqtt_user']
-                            self.mqtt.password = roest_machine['mqtt_password']
-                            self.mqtt.topic = roest_machine['mqtt_topic']
-
-                            has_drum = roest_machine.get('has_drum', None)
-                            if has_drum is not None:
-                                self.extraLCDvisibility1[0] = has_drum
-                                self.extraLCDframe1[0].setVisible(has_drum)
-                                self.extraCurveVisibility1[0] = has_drum
-                                self.qmc.resetlinecountcaches()
-
-                            has_inlet = roest_machine.get('has_inlet', None)
-                            if has_inlet is not None:
-                                self.extraLCDvisibility2[0] = has_inlet
-                                self.extraLCDframe2[0].setVisible(has_inlet)
-                                self.extraCurveVisibility2[0] = has_inlet
-                                self.qmc.resetlinecountcaches()
-
-                            if 'next_batch_number' in roest_machine:
-                                self.qmc.batchcounter = max(0, roest_machine['next_batch_number'] - 1)
-                            if 'elevation' in roest_machine:
-                                self.qmc.elevation = roest_machine['elevation']
+                self.qmc.etypes = self.qmc.etypesdefault[:]
+                # keep original information to Cancel
+                org_etypes = self.qmc.etypes
+                org_device = self.qmc.device
+                org_machinesetup = self.qmc.machinesetup
+                org_modbus_host = self.modbus.host
+                org_s7_host = self.s7.host
+                org_ws_host = self.ws.host
+                org_kaleido_host = self.kaleidoHost
+                org_mugma_host = self.mugmaHost
+                org_comport = self.ser.comport
+                org_modbus_comport = self.modbus.comport
+                org_roastersize_setup = self.qmc.roastersize_setup
+                org_last_batchsize = self.qmc.last_batchsize
+                org_roastersize = self.qmc.roastersize
+                org_roasterheating_setup = self.qmc.roasterheating_setup
+                org_roasterheating = self.qmc.roasterheating
+                org_eventsbuttonflag = self.eventsbuttonflag
+                no_config = False
+                # reset roaster_setup_default to ensure we do not offer a default from a previously loaded machine setup
+                self.qmc.roastersize_setup_default = 0
+                self.qmc.roasterheating_setup_default = 0
+                # also reset roastersize_setup to have the machine setup work as after a reset on each call
+                self.qmc.roastersize_setup = 0
+                self.qmc.roasterheating_setup = 0
+                # don't show the events button by default if a machine setup is activated
+                self.eventsbuttonflag = 0
+                #
+                self.loadSettings(fn=action.data()[0],remember=False,machine=True,reload=False)
+                res:bool = False
+                permission_status:bool|None = None
+                ### setup specific configuration dialogs
+                if action.data()[1] == 'Phidget':
+                    if action.text() == 'VINT Ambient Modules':
+                        int_dlg = ArtisanIntegerDialog(self, self,
+                            QApplication.translate('Message', 'Ambient'),
+                            QApplication.translate('Message', 'Elevation (MASL)'),
+                            value=self.qmc.elevation,
+                            minimum=-500,
+                            maximum=9000)
+                        elevation = int_dlg.value if int_dlg.exec() else None
+                        no_config = True # no further configuration needed
+                        if elevation is not None:
+                            try:
+                                self.qmc.elevation = int(elevation)
+                            except Exception: # pylint: disable=broad-except
+                                pass
                             res = True
                         else:
                             res = False
                             self.sendmessage(QApplication.translate('Message','Action canceled'))
                     else:
-                        self.qmc.machinesetup = action.text()
                         res = True
-                    ###
-                    if not no_config and (self.qmc.device == 29 or 29 in self.qmc.extradevices) and self.modbus.type in {3,4}: # MODBUS TCP or UDP
-                        # as default we offer the current settings MODBUS host, or if this is set to its default as after a factory reset (self.modbus.default_host) we take the one from the machine setup
-                        defaultModbusHost:str = (self.modbus.host if org_modbus_host == self.modbus.default_host else org_modbus_host)
-                        host, res2 = QInputDialog.getText(self,
-                            f"{QApplication.translate('Message', 'Machine')} (MODBUS)",
-                            QApplication.translate('Message', 'Network name or IP address'),text=defaultModbusHost)
-                        if res2:
-                            res = res2
-                            self.modbus.host = host
-                        else:
-                            res = False
-                    elif not no_config and (self.qmc.device == 79 or 79 in self.qmc.extradevices): # S7
-                        # as default we offer the current settings S7 host, or if this is set to its default as after a factory reset (self.s7.default_host) we take the one from the machine setup
-                        defaultS7Host:str = (self.s7.host if org_s7_host == self.s7.default_host else org_s7_host)
-                        host, res2 = QInputDialog.getText(self,
-                            f"{QApplication.translate('Message', 'Machine')} (S7)",
-                            QApplication.translate('Message', 'Network name or IP address'),text=defaultS7Host)
-                        if res2:
-                            res = res2
-                            self.s7.host = host
-                        else:
-                            res = False
-                    elif not no_config and (self.qmc.device == 111 or 111 in self.qmc.extradevices): # WebSocket
-                        # as default we offer the current settings WebSocket host, or if this is set to its default as after a factory reset (self.ws.default_host) we take the one from the machine setup
-                        defaultWSHost:str = (self.ws.host if org_ws_host == self.ws.default_host else org_ws_host)
-                        host, res2 = QInputDialog.getText(self,
-                            f"{QApplication.translate('Message', 'Machine')} (WebSocket)",
-                            QApplication.translate('Message', 'Network name or IP address'),text=defaultWSHost)
-                        if res2:
-                            res = res2
-                            self.ws.host = host
-                        else:
-                            res = False
-                    elif not no_config and (self.qmc.device == 138 and not self.kaleidoSerial): # Kaleido Network
-                        # as default we offer the current settings kaleido host, or if this is set to its default as after a factory reset (self.kaleido_default_host) we take the one from the machine setup
-                        defaultKaleidoHost:str = (self.kaleidoHost if org_kaleido_host == self.kaleido_default_host else org_kaleido_host)
-                        host, res2 = QInputDialog.getText(self,
-                            QApplication.translate('Message', 'Machine'),
-                            QApplication.translate('Message', 'Network name or IP address'),text=defaultKaleidoHost)
-                        if res2:
-                            res = res2
-                            self.kaleidoHost = host
-                        else:
-                            res = False
-                    elif not no_config and (self.qmc.device == 164): # Mugma
-                        # as default we offer the current settings mugma host, or if this is set to its default as after a factory reset (self.mugma_default_host) we take the one from the machine setup
-                        defaultMugmaHost:str = (self.mugmaHost if org_mugma_host == self.mugma_default_host else org_mugma_host)
-                        host, res2 = QInputDialog.getText(self,
-                            QApplication.translate('Message', 'Machine'),
-                            QApplication.translate('Message', 'Network name or IP address'),text=defaultMugmaHost)
-                        if res2:
-                            res = res2
-                            self.mugmaHost = host
-                        else:
-                            res = False
-                    elif not no_config and (self.qmc.device in {0, 9, 19, 53, 101, 115, 126, 196} or ((self.qmc.device == 29 or 29 in self.qmc.extradevices) and self.modbus.type in {0, 1, 2}) or
-                            (self.qmc.device == 134 and self.santokerSerial and not self.santokerBLE) or
-                            (self.qmc.device == 138 and self.kaleidoSerial)): # Fuji, Center301, TC4, Hottop, Behmor or MODBUS serial, HB/ARC
-                        select_device_name = None
-                        # as default we offer the current settings serial/modbus port, or if this is set to its default as after a factory reset (self.ser.default_comport or self.modbus.default_comport) we take the one from the machine setup
-                        defaultComPort:str = ((self.modbus.comport if org_modbus_comport == self.modbus.default_comport else org_modbus_comport) if self.qmc.device == 29 else (self.ser.comport if org_comport == self.ser.default_comport else org_comport))
-                        select_modbus_serial_port:bool = self.qmc.device == 29 or (29 in self.qmc.extradevices and self.qmc.device not in {0, 9, 19, 53, 101, 115, 126, 134, 138})
-                        serial_port_dialog_title:str = QApplication.translate('Message', 'Port Configuration')
-                        if select_modbus_serial_port:
-                            serial_port_dialog_title = f'{serial_port_dialog_title} (MODBUS)'
-                        if self.qmc.device == 53: # Hottop 2k+:
-                            select_device_name = 'FT230X Basic UART'
-                        commPort_dlg:ArtisanPortsDialog = ArtisanPortsDialog(self, self,
-                            title = serial_port_dialog_title,
-                            selection=defaultComPort, select_device_name=select_device_name)
-                        res = bool(commPort_dlg.exec())
-                        if res:
-                            new_port = commPort_dlg.getSelection()
-                            if new_port is not None:
-                                if select_modbus_serial_port: # MODBUS serial
-                                    self.modbus.comport = new_port
-                                else: # Fuji or HOTTOP
-                                    self.ser.comport = new_port
-                    elif not no_config and self.qmc.device == 142: # IKAWA
-                        # we request Bluetooth permission
-                        permission_status:bool|None = self.app.getBluetoothPermission(request=True)
-                        if permission_status is False:
-                            message:str = QApplication.translate('Message','Bluetootooth access denied')
-                            QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
-                                    message, message)
+                        self.qmc.machinesetup = action.text()
                     if res:
-                        if not no_config and self.qmc.roastersize_setup == 0:
-                            batchsize, res2 = QInputDialog.getDouble(self,
-                                QApplication.translate('Message', 'Machine'),
-                                QApplication.translate('Message', 'Machine Capacity (kg)'),
-                                self.qmc.roastersize_setup_default, # default value as loaded from the machine setup
-                                0, # min
-                                999, # max
-                                1) # decimals
-                            if res2:
-                                res = res2
-                                self.qmc.roastersize_setup = self.qmc.roastersize = batchsize
-                        else:
-                            res = self.qmc.roastersize_setup != 0 # roastersize_setup was loaded from machine setup
-                    if res:
-                        # first establish roastersize_setup batchsizes as default batchsize (potentially unit converted)
-                        if not no_config and self.qmc.roastersize_setup > 0:
-                            weight_unit = self.qmc.weight[2]
-                            self.qmc.last_batchsize = convertWeight(self.qmc.roastersize_setup,1,0) # nominal batch size in g
-                            nominal_batch_size = convertWeight(self.qmc.roastersize_setup,1,weight_units.index(weight_unit))
-                            self.qmc.end_weight_est = 0
-                            self.qmc.weight = (nominal_batch_size,0,weight_unit)
-                        # size set, ask for heating
-                        resi:int|None
-                        if not no_config and self.qmc.roasterheating_setup == 0:
-                            dlg:ArtisanComboBoxDialog = ArtisanComboBoxDialog(self, self, QApplication.translate('Message',
-                                    'Machine'),QApplication.translate('Label', 'Heating'),self.qmc.heating_types,self.qmc.roasterheating_setup_default)
-                            resi = dlg.idx if dlg.exec() else None
-                        else:
-                            resi = self.qmc.roasterheating_setup
-                        if resi is not None:
-                            res = True
-                            self.qmc.roasterheating_setup = self.qmc.roasterheating = resi
-                            # now check if the machine setup contains energy default ratings for the given batch size and energy rating
-                            if self.qmc.machinesetup_energy_ratings is not None and self.qmc.roastersize_setup > 0 and self.qmc.roasterheating_setup > 0 and \
-                                    self.qmc.roasterheating_setup in self.qmc.machinesetup_energy_ratings:
-                                heating_ratings = self.qmc.machinesetup_energy_ratings[self.qmc.roasterheating_setup]
-                                if self.qmc.roastersize_setup in heating_ratings:
-                                    ratings = heating_ratings[self.qmc.roastersize_setup]
-                                    if 'loadlabels' in ratings and len(ratings['loadlabels']) == 4:
-                                        self.qmc.loadlabels_setup = [str(lb) for lb in ratings['loadlabels']]
-                                    if 'loadratings' in ratings and len(ratings['loadratings']) == 4:
-                                        self.qmc.loadratings_setup = [float(lr) for lr in ratings['loadratings']]
-                                    if 'ratingunits' in ratings and len(ratings['ratingunits']) == 4:
-                                        self.qmc.ratingunits_setup = [int(lu) for lu in ratings['ratingunits']]
-                                    if 'sourcetypes' in ratings and len(ratings['sourcetypes']) == 4:
-                                        self.qmc.sourcetypes_setup = [int(st) for st in ratings['sourcetypes']]
-                                    if 'load_etypes' in ratings and len(ratings['load_etypes']) == 4:
-                                        self.qmc.load_etypes_setup = [int(let) for let in ratings['load_etypes']]
-                                    if 'presssure_percents' in ratings and len(ratings['presssure_percents']) == 4:
-                                        self.qmc.presssure_percents_setup = [bool(pp) for pp in ratings['presssure_percents']]
-                                    if 'loadevent_zeropcts' in ratings and len(ratings['loadevent_zeropcts']) == 4:
-                                        self.qmc.loadevent_zeropcts_setup = [int(lzp) for lzp in ratings['loadevent_zeropcts']]
-                                    if 'loadevent_hundpcts' in ratings and len(ratings['loadevent_hundpcts']) == 4:
-                                        self.qmc.loadevent_hundpcts_setup = [int(lhp) for lhp in ratings['loadevent_hundpcts']]
-                                    if 'meterlabels' in ratings and len(ratings['meterlabels']) == 2:
-                                        self.qmc.meterlabels_setup = [str(ml) for ml in ratings['meterlabels']]
-                                    if 'meterunits' in ratings and len(ratings['meterunits']) == 2:
-                                        self.qmc.meterunits_setup = [int(mu) for mu in ratings['meterunits']]
-                                    if 'meterfuels' in ratings and len(ratings['meterfuels']) == 2:
-                                        self.qmc.meterfuels_setup = [int(mf) for mf in ratings['meterfuels']]
-                                    if 'metersources' in ratings and len(ratings['metersources']) == 2:
-                                        self.qmc.metersources_setup = [int(ms) for ms in ratings['metersources']]
-                                    if 'preheatDuration' in ratings and len(ratings['preheatenergies']) == 1:
-                                        self.qmc.preheatDuration_setup = int(ratings['preheatDuration'][0])
-                                    if 'preheatenergies' in ratings and len(ratings['preheatenergies']) == 4:
-                                        self.qmc.preheatenergies_setup = [float(phe) for phe in ratings['preheatenergies']]
-                                    if 'betweenbatchDuration' in ratings and len(ratings['betweenbatchDuration']) == 1:
-                                        self.qmc.betweenbatchDuration_setup = int(ratings['betweenbatchDuration'][0])
-                                    if 'betweenbatchenergies' in ratings and len(ratings['betweenbatchenergies']) == 4:
-                                        self.qmc.betweenbatchenergies_setup = [float(bbe) for bbe in ratings['betweenbatchenergies']]
-                                    if 'coolingDuration' in ratings and len(ratings['coolingDuration']) == 1:
-                                        self.qmc.coolingDuration_setup = int(ratings['coolingDuration'][0])
-                                    if 'coolingenergies' in ratings and len(ratings['coolingenergies']) == 4:
-                                        self.qmc.coolingenergies_setup = [float(ce) for ce in ratings['coolingenergies']]
-
-                                    self.qmc.restoreEnergyLoadDefaults()
-                                    self.qmc.restoreEnergyProtocolDefaults()
-                                    self.sendmessage(QApplication.translate('Message','Energy loads configured for {0} {1}kg').format(label,self.qmc.roastersize_setup))
-                            self.sendmessage(QApplication.translate('Message','artisan configured for {0}').format(label))
-                            _log.info('artisan configured for %s',label)
-                        else:
-                            res = False
-                    if no_config:
-                        self.sendmessage(QApplication.translate('Message','Configured'))
-                    elif not res:
-                        # reset
-                        self.qmc.etypes= org_etypes
-                        self.qmc.device = org_device
-                        self.qmc.machinesetup = org_machinesetup
-                        self.modbus.host = org_modbus_host
-                        self.s7.host = org_s7_host
-                        self.ws.host = org_ws_host
-                        self.kaleidoHost = org_kaleido_host
-                        self.mugmaHost = org_mugma_host
-                        self.ser.comport = org_comport
-                        self.modbus.comport = org_modbus_comport
-                        self.qmc.roastersize_setup = org_roastersize_setup
-                        self.qmc.last_batchsize = org_last_batchsize
-                        self.qmc.roastersize = org_roastersize
-                        self.qmc.roasterheating_setup = org_roasterheating_setup
-                        self.qmc.roasterheating = org_roasterheating
-                        self.eventsbuttonflag = org_eventsbuttonflag
-                        #
-                        self.sendmessage(QApplication.translate('Message','Action canceled'))
+                        QTimer.singleShot(700, self.qmc.startPhidgetManager)
+                elif not no_config and action.data()[2] == 'Lebrew':
+                    # we request Bluetooth permission
+                    permission_status = self.app.getBluetoothPermission(request=True)
+                    if permission_status is False:
+                        message:str = QApplication.translate('Message','Bluetootooth access denied')
+#                        QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+#                                message, message)
+                        artisan_confirmation_dialog(self, self, QApplication.translate('Message','Warning'), message, True)
                     else:
-                        # setup not canceled, we establish the last_batchsize
+                        res = True
+                        no_config = True # no further configurations required
+                elif not no_config and action.data()[1] == 'ROEST' and self.qmc.device:
+                    no_config = True # no further configurations required
+                    # select ROEST machine and retrieve MQTT credentials
+                    from artisanlib.roest import RoestMachine, selectROESTmachine
+                    roest_machine:RoestMachine|None = selectROESTmachine(self)
+                    if roest_machine is not None:
+                        self.mqtt.user = roest_machine['mqtt_user']
+                        self.mqtt.password = roest_machine['mqtt_password']
+                        self.mqtt.topic = roest_machine['mqtt_topic']
+
+                        has_drum = roest_machine.get('has_drum', None)
+                        if has_drum is not None:
+                            self.extraLCDvisibility1[0] = has_drum
+                            self.extraLCDframe1[0].setVisible(has_drum)
+                            self.extraCurveVisibility1[0] = has_drum
+                            self.qmc.resetlinecountcaches()
+
+                        has_inlet = roest_machine.get('has_inlet', None)
+                        if has_inlet is not None:
+                            self.extraLCDvisibility2[0] = has_inlet
+                            self.extraLCDframe2[0].setVisible(has_inlet)
+                            self.extraCurveVisibility2[0] = has_inlet
+                            self.qmc.resetlinecountcaches()
+
+                        if 'next_batch_number' in roest_machine:
+                            self.qmc.batchcounter = max(0, roest_machine['next_batch_number'] - 1)
+                        if 'elevation' in roest_machine:
+                            self.qmc.elevation = roest_machine['elevation']
+                        res = True
+                    else:
+                        res = False
+                        self.sendmessage(QApplication.translate('Message','Action canceled'))
+                else:
+                    self.qmc.machinesetup = action.text()
+                    res = True
+                ###
+                if not no_config and (self.qmc.device == 29 or 29 in self.qmc.extradevices) and self.modbus.type in {3,4}: # MODBUS TCP or UDP
+                    # as default we offer the current settings MODBUS host, or if this is set to its default as after a factory reset (self.modbus.default_host) we take the one from the machine setup
+                    defaultModbusHost:str = (self.modbus.host if org_modbus_host == self.modbus.default_host else org_modbus_host)
+
+#                    host, res2 = QInputDialog.getText(self,
+#                        f"{QApplication.translate('Message', 'Machine')} (MODBUS)",
+#                        QApplication.translate('Message', 'Network name or IP address'),text=defaultModbusHost)
+#                    if res2:
+#                        res = res2
+#                        self.modbus.host = host
+#                    else:
+#                        res = False
+
+                    host_dlg = ArtisanInputDialog(self, self,
+                        f"{QApplication.translate('Message', 'Machine')} (MODBUS)",
+                        QApplication.translate('Message', 'Network name or IP address'),
+                        text=defaultModbusHost)
+                    host = host_dlg.text if host_dlg.exec() else None
+                    del host_dlg
+                    if host is not None:
+                        res = True
+                        self.modbus.host = host
+                    else:
+                        res = False
+
+                elif not no_config and (self.qmc.device == 79 or 79 in self.qmc.extradevices): # S7
+                    # as default we offer the current settings S7 host, or if this is set to its default as after a factory reset (self.s7.default_host) we take the one from the machine setup
+                    defaultS7Host:str = (self.s7.host if org_s7_host == self.s7.default_host else org_s7_host)
+
+#                    host, res2 = QInputDialog.getText(self,
+#                        f"{QApplication.translate('Message', 'Machine')} (S7)",
+#                        QApplication.translate('Message', 'Network name or IP address'),text=defaultS7Host)
+#                    if res2:
+#                        res = res2
+#                        self.s7.host = host
+#                    else:
+#                        res = False
+
+                    host_dlg = ArtisanInputDialog(self, self,
+                        f"{QApplication.translate('Message', 'Machine')} (S7)",
+                        QApplication.translate('Message', 'Network name or IP address'),
+                        text=defaultS7Host)
+                    host = host_dlg.text if host_dlg.exec() else None
+                    del host_dlg
+                    if host is not None:
+                        res = True
+                        self.s7.host = host
+                    else:
+                        res = False
+
+
+                elif not no_config and (self.qmc.device == 111 or 111 in self.qmc.extradevices): # WebSocket
+                    # as default we offer the current settings WebSocket host, or if this is set to its default as after a factory reset (self.ws.default_host) we take the one from the machine setup
+                    defaultWSHost:str = (self.ws.host if org_ws_host == self.ws.default_host else org_ws_host)
+#                    host, res2 = QInputDialog.getText(self,
+#                        f"{QApplication.translate('Message', 'Machine')} (WebSocket)",
+#                        QApplication.translate('Message', 'Network name or IP address'),text=defaultWSHost)
+#                    if res2:
+#                        res = res2
+#                        self.ws.host = host
+#                    else:
+#                        res = False
+
+                    host_dlg = ArtisanInputDialog(self, self,
+                        f"{QApplication.translate('Message', 'Machine')} (WebSocket)",
+                        QApplication.translate('Message', 'Network name or IP address'),
+                        text=defaultWSHost)
+                    host = host_dlg.text if host_dlg.exec() else None
+                    del host_dlg
+                    if host is not None:
+                        res = True
+                        self.ws.host = host
+                    else:
+                        res = False
+
+                elif not no_config and (self.qmc.device == 138 and not self.kaleidoSerial): # Kaleido Network
+                    # as default we offer the current settings kaleido host, or if this is set to its default as after a factory reset (self.kaleido_default_host) we take the one from the machine setup
+                    defaultKaleidoHost:str = (self.kaleidoHost if org_kaleido_host == self.kaleido_default_host else org_kaleido_host)
+#                    host, res2 = QInputDialog.getText(self,
+#                        QApplication.translate('Message', 'Machine'),
+#                        QApplication.translate('Message', 'Network name or IP address'),text=defaultKaleidoHost)
+#                    if res2:
+#                        res = res2
+#                        self.kaleidoHost = host
+#                    else:
+#                        res = False
+
+                    host_dlg = ArtisanInputDialog(self, self,
+                        QApplication.translate('Message', 'Machine'),
+                        QApplication.translate('Message', 'Network name or IP address'),
+                        text=defaultKaleidoHost)
+                    host = host_dlg.text if host_dlg.exec() else None
+                    del host_dlg
+                    if host is not None:
+                        res = True
+                        self.kaleidoHost = host
+                    else:
+                        res = False
+
+                elif not no_config and (self.qmc.device == 164): # Mugma
+                    # as default we offer the current settings mugma host, or if this is set to its default as after a factory reset (self.mugma_default_host) we take the one from the machine setup
+                    defaultMugmaHost:str = (self.mugmaHost if org_mugma_host == self.mugma_default_host else org_mugma_host)
+#                    host, res2 = QInputDialog.getText(self,
+#                        QApplication.translate('Message', 'Machine'),
+#                        QApplication.translate('Message', 'Network name or IP address'),text=defaultMugmaHost)
+#                    if res2:
+#                        res = res2
+#                        self.mugmaHost = host
+#                    else:
+#                        res = False
+
+                    host_dlg = ArtisanInputDialog(self, self,
+                        QApplication.translate('Message', 'Machine'),
+                        QApplication.translate('Message', 'Network name or IP address'),
+                        text=defaultMugmaHost)
+                    host = host_dlg.text if host_dlg.exec() else None
+                    del host_dlg
+                    if host is not None:
+                        res = True
+                        self.mugmaHost = host
+                    else:
+                        res = False
+
+                elif not no_config and (self.qmc.device in {0, 9, 19, 53, 101, 115, 126, 196} or ((self.qmc.device == 29 or 29 in self.qmc.extradevices) and self.modbus.type in {0, 1, 2}) or
+                        (self.qmc.device == 134 and self.santokerSerial and not self.santokerBLE) or
+                        (self.qmc.device == 138 and self.kaleidoSerial)): # Fuji, Center301, TC4, Hottop, Behmor or MODBUS serial, HB/ARC
+                    select_device_name = None
+                    # as default we offer the current settings serial/modbus port, or if this is set to its default as after a factory reset (self.ser.default_comport or self.modbus.default_comport) we take the one from the machine setup
+                    defaultComPort:str = ((self.modbus.comport if org_modbus_comport == self.modbus.default_comport else org_modbus_comport) if self.qmc.device == 29 else (self.ser.comport if org_comport == self.ser.default_comport else org_comport))
+                    select_modbus_serial_port:bool = self.qmc.device == 29 or (29 in self.qmc.extradevices and self.qmc.device not in {0, 9, 19, 53, 101, 115, 126, 134, 138})
+                    serial_port_dialog_title:str = QApplication.translate('Message', 'Port Configuration')
+                    if select_modbus_serial_port:
+                        serial_port_dialog_title = f'{serial_port_dialog_title} (MODBUS)'
+                    if self.qmc.device == 53: # Hottop 2k+:
+                        select_device_name = 'FT230X Basic UART'
+                    commPort_dlg:ArtisanPortsDialog = ArtisanPortsDialog(self, self,
+                        title = serial_port_dialog_title,
+                        selection=defaultComPort, select_device_name=select_device_name)
+                    res = bool(commPort_dlg.exec())
+                    if res:
+                        new_port = commPort_dlg.getSelection()
+                        if new_port is not None:
+                            if select_modbus_serial_port: # MODBUS serial
+                                self.modbus.comport = new_port
+                            else: # Fuji or HOTTOP
+                                self.ser.comport = new_port
+                elif not no_config and self.qmc.device == 142: # IKAWA
+                    # we request Bluetooth permission
+                    permission_status = self.app.getBluetoothPermission(request=True)
+                    if permission_status is False:
+                        message = QApplication.translate('Message','Bluetootooth access denied')
+#                        QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+#                                message, message)
+                        artisan_confirmation_dialog(self, self, QApplication.translate('Message','Warning'), message, True)
+                if res and not no_config:
+                    if  self.qmc.roastersize_setup == 0:
+
+                        float_dlg = ArtisanFloatDialog(self, self,
+                            QApplication.translate('Message', 'Machine'),
+                            QApplication.translate('Message', 'Machine Capacity (kg)'),
+                            value=self.qmc.roastersize_setup_default, # default value as loaded from the machine setup
+                            minimum=0,
+                            maximum=999,
+                            decimals=1)
+                        batchsize = float_dlg.value if float_dlg.exec() else None
+                        if batchsize is not None:
+                            res = True
+                            self.qmc.roastersize_setup = self.qmc.roastersize = batchsize
+                    else:
+                        res = self.qmc.roastersize_setup != 0 # roastersize_setup was loaded from machine setup
+                if res and not no_config:
+                    # first establish roastersize_setup batchsizes as default batchsize (potentially unit converted)
+                    if self.qmc.roastersize_setup > 0:
+                        weight_unit = self.qmc.weight[2]
+                        self.qmc.last_batchsize = convertWeight(self.qmc.roastersize_setup,1,0) # nominal batch size in g
+                        nominal_batch_size = convertWeight(self.qmc.roastersize_setup,1,weight_units.index(weight_unit))
                         self.qmc.end_weight_est = 0
-                        self.qmc.weight = (convertWeight(self.qmc.last_batchsize,0,weight_units.index(self.qmc.weight[2])),0,self.qmc.weight[2])
-                    self.establish_etypes()
+                        self.qmc.weight = (nominal_batch_size,0,weight_unit)
+                    # size set, ask for heating
+                    resi:int|None
+                    if self.qmc.roasterheating_setup == 0:
+                        dlg:ArtisanComboBoxDialog = ArtisanComboBoxDialog(self, self, QApplication.translate('Message',
+                                'Machine'),QApplication.translate('Label', 'Heating'),self.qmc.heating_types,self.qmc.roasterheating_setup_default)
+                        resi = dlg.idx if dlg.exec() else None
+                        del dlg
+                    else:
+                        resi = self.qmc.roasterheating_setup
+                    if resi is not None:
+                        res = True
+                        self.qmc.roasterheating_setup = self.qmc.roasterheating = resi
+                        # now check if the machine setup contains energy default ratings for the given batch size and energy rating
+                        if self.qmc.machinesetup_energy_ratings is not None and self.qmc.roastersize_setup > 0 and self.qmc.roasterheating_setup > 0 and \
+                                self.qmc.roasterheating_setup in self.qmc.machinesetup_energy_ratings:
+                            heating_ratings = self.qmc.machinesetup_energy_ratings[self.qmc.roasterheating_setup]
+                            if self.qmc.roastersize_setup in heating_ratings:
+                                ratings = heating_ratings[self.qmc.roastersize_setup]
+                                if 'loadlabels' in ratings and len(ratings['loadlabels']) == 4:
+                                    self.qmc.loadlabels_setup = [str(lb) for lb in ratings['loadlabels']]
+                                if 'loadratings' in ratings and len(ratings['loadratings']) == 4:
+                                    self.qmc.loadratings_setup = [float(lr) for lr in ratings['loadratings']]
+                                if 'ratingunits' in ratings and len(ratings['ratingunits']) == 4:
+                                    self.qmc.ratingunits_setup = [int(lu) for lu in ratings['ratingunits']]
+                                if 'sourcetypes' in ratings and len(ratings['sourcetypes']) == 4:
+                                    self.qmc.sourcetypes_setup = [int(st) for st in ratings['sourcetypes']]
+                                if 'load_etypes' in ratings and len(ratings['load_etypes']) == 4:
+                                    self.qmc.load_etypes_setup = [int(let) for let in ratings['load_etypes']]
+                                if 'presssure_percents' in ratings and len(ratings['presssure_percents']) == 4:
+                                    self.qmc.presssure_percents_setup = [bool(pp) for pp in ratings['presssure_percents']]
+                                if 'loadevent_zeropcts' in ratings and len(ratings['loadevent_zeropcts']) == 4:
+                                    self.qmc.loadevent_zeropcts_setup = [int(lzp) for lzp in ratings['loadevent_zeropcts']]
+                                if 'loadevent_hundpcts' in ratings and len(ratings['loadevent_hundpcts']) == 4:
+                                    self.qmc.loadevent_hundpcts_setup = [int(lhp) for lhp in ratings['loadevent_hundpcts']]
+                                if 'meterlabels' in ratings and len(ratings['meterlabels']) == 2:
+                                    self.qmc.meterlabels_setup = [str(ml) for ml in ratings['meterlabels']]
+                                if 'meterunits' in ratings and len(ratings['meterunits']) == 2:
+                                    self.qmc.meterunits_setup = [int(mu) for mu in ratings['meterunits']]
+                                if 'meterfuels' in ratings and len(ratings['meterfuels']) == 2:
+                                    self.qmc.meterfuels_setup = [int(mf) for mf in ratings['meterfuels']]
+                                if 'metersources' in ratings and len(ratings['metersources']) == 2:
+                                    self.qmc.metersources_setup = [int(ms) for ms in ratings['metersources']]
+                                if 'preheatDuration' in ratings and len(ratings['preheatenergies']) == 1:
+                                    self.qmc.preheatDuration_setup = int(ratings['preheatDuration'][0])
+                                if 'preheatenergies' in ratings and len(ratings['preheatenergies']) == 4:
+                                    self.qmc.preheatenergies_setup = [float(phe) for phe in ratings['preheatenergies']]
+                                if 'betweenbatchDuration' in ratings and len(ratings['betweenbatchDuration']) == 1:
+                                    self.qmc.betweenbatchDuration_setup = int(ratings['betweenbatchDuration'][0])
+                                if 'betweenbatchenergies' in ratings and len(ratings['betweenbatchenergies']) == 4:
+                                    self.qmc.betweenbatchenergies_setup = [float(bbe) for bbe in ratings['betweenbatchenergies']]
+                                if 'coolingDuration' in ratings and len(ratings['coolingDuration']) == 1:
+                                    self.qmc.coolingDuration_setup = int(ratings['coolingDuration'][0])
+                                if 'coolingenergies' in ratings and len(ratings['coolingenergies']) == 4:
+                                    self.qmc.coolingenergies_setup = [float(ce) for ce in ratings['coolingenergies']]
+
+                                self.qmc.restoreEnergyLoadDefaults()
+                                self.qmc.restoreEnergyProtocolDefaults()
+                                self.sendmessage(QApplication.translate('Message','Energy loads configured for {0} {1}kg').format(label,self.qmc.roastersize_setup))
+                        self.sendmessage(QApplication.translate('Message','artisan configured for {0}').format(label))
+                        _log.info('artisan configured for %s',label)
+                    else:
+                        res = False
+                if no_config and res:
+                    self.sendmessage(QApplication.translate('Message','Configured'))
+                elif not res:
+                    # reset
+                    self.qmc.etypes= org_etypes
+                    self.qmc.device = org_device
+                    self.qmc.machinesetup = org_machinesetup
+                    self.modbus.host = org_modbus_host
+                    self.s7.host = org_s7_host
+                    self.ws.host = org_ws_host
+                    self.kaleidoHost = org_kaleido_host
+                    self.mugmaHost = org_mugma_host
+                    self.ser.comport = org_comport
+                    self.modbus.comport = org_modbus_comport
+                    self.qmc.roastersize_setup = org_roastersize_setup
+                    self.qmc.last_batchsize = org_last_batchsize
+                    self.qmc.roastersize = org_roastersize
+                    self.qmc.roasterheating_setup = org_roasterheating_setup
+                    self.qmc.roasterheating = org_roasterheating
+                    self.eventsbuttonflag = org_eventsbuttonflag
+                    #
+                    self.sendmessage(QApplication.translate('Message','Action canceled'))
+                else:
+                    # setup not canceled, we establish the last_batchsize
+                    self.qmc.end_weight_est = 0
+                    self.qmc.weight = (convertWeight(self.qmc.last_batchsize,0,weight_units.index(self.qmc.weight[2])),0,self.qmc.weight[2])
+                self.establish_etypes()
+
                 self.qmc.redraw(False,False)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
@@ -5824,20 +5919,25 @@ class ApplicationWindow(QMainWindow):
         action = self.sender()
         if action and isinstance(action, QAction) and hasattr(action,'data') and hasattr(action,'text'):
             label = (action.text() if action.data()[1] == '' else f'{action.data()[1]} {action.text()}')
-            string = QApplication.translate('Message', 'Load theme {0}?').format(label)
 
-#            reply = QMessageBox.question(self, QApplication.translate('Message', 'Adjust Theme Related Settings'),string,
-#                QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
-            box = QMessageBox()
-            box.setText(string)
-            plus_util.setPlusIcon(box, self.app.darkmode)
-            box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-            reply = box.exec()
+#            string = QApplication.translate('Message', 'Load theme {0}?').format(label)
+##            reply = QMessageBox.question(self, QApplication.translate('Message', 'Adjust Theme Related Settings'),string,
+##                QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
+#            box = QMessageBox()
+#            box.setText(string)
+#            plus_util.setPlusIcon(box, self.app.darkmode)
+#            box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+#            reply = box.exec()
+#            if reply == QMessageBox.StandardButton.Cancel:
+#                return # zuban:ignore[unreachable]
+#            if reply == QMessageBox.StandardButton.Yes:
+#                self.loadThemeSignal.emit(action.data()[0], label)  # zuban:ignore[unreachable]
 
-            if reply == QMessageBox.StandardButton.Cancel:
-                return # zuban:ignore[unreachable]
-            if reply == QMessageBox.StandardButton.Yes:
-                self.loadThemeSignal.emit(action.data()[0], label)  # zuban:ignore[unreachable]
+            if artisan_question(self, self,
+                    QApplication.translate('Message', 'Load theme {0}?').format(label),
+                    #QApplication.translate('Message', 'Adjust Theme Related Settings')
+                    ):
+                self.loadThemeSignal.emit(action.data()[0], label)
 
 
     @pyqtSlot(str,str)
@@ -11533,27 +11633,28 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def resetApplication(self, _:bool = False) -> None:
         if self.app.artisanviewerMode:
-            string = QApplication.translate('Message','Do you want to reset all settings?<br> ArtisanViewer has to be restarted!')
+            string = QApplication.translate('Message','Do you want to reset all settings?\nArtisanViewer has to be restarted!')
         else:
-            string = QApplication.translate('Message','Do you want to reset all settings?<br> Artisan has to be restarted!')
+            string = QApplication.translate('Message','Do you want to reset all settings?\nArtisan has to be restarted!')
 
-        # native dialog
-        if platform.system() == 'Darwin':
-            mbox = QMessageBox() # only without super this one shows the native dialog on macOS under Qt 6.6.2
-            # for native dialogs, text and informativetext need to be plain strings, no RTF incl. HTML instructions like <br>
-            mbox.setText(QApplication.translate('Message','Factory Reset'))
-            mbox.setInformativeText(string.replace('<br>',' '))
-            mbox.setWindowModality(Qt.WindowModality.ApplicationModal) # for native dialog it has to be ApplicationModal
-            mbox.setStandardButtons(QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Reset)
-            mbox.setDefaultButton(QMessageBox.StandardButton.Cancel)
-            reply = mbox.exec()
-        else:
-            # non-native dialog
-            reply = QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
-                            QApplication.translate('Message','Factory Reset'),string,
-                            QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Reset, QMessageBox.StandardButton.Cancel)
+#        # native dialog
+#        if platform.system() == 'Darwin':
+#            mbox = QMessageBox() # only without super this one shows the native dialog on macOS under Qt 6.6.2
+#            # for native dialogs, text and informativetext need to be plain strings, no RTF incl. HTML instructions like <br>
+#            mbox.setText(QApplication.translate('Message','Factory Reset'))
+#            mbox.setInformativeText(string.replace('<br>',' '))
+#            mbox.setWindowModality(Qt.WindowModality.ApplicationModal) # for native dialog it has to be ApplicationModal
+#            mbox.setStandardButtons(QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Reset)
+#            mbox.setDefaultButton(QMessageBox.StandardButton.Cancel)
+#            reply = mbox.exec()
+#        else:
+#            # non-native dialog
+#            reply = QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+#                            QApplication.translate('Message','Factory Reset'),string,
+#                            QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Reset, QMessageBox.StandardButton.Cancel)
+#        if reply == QMessageBox.StandardButton.Reset:
 
-        if reply == QMessageBox.StandardButton.Reset:
+        if artisan_question(self,self, string, QApplication.translate('Message','Factory Reset'), True):
             #raise flag. Next time app will open, the settings (bad settings) will not be loaded.
             self.resetqsettings = 1  # zuban:ignore[unreachable]
             self.clearExtraDeviceSettingsBackup()
@@ -11570,7 +11671,7 @@ class ApplicationWindow(QMainWindow):
             if active_window is not None:
                 fw = active_window.focusWidget()
                 if fw is not None and hasattr(fw, 'cut') and callable(getattr(fw, 'cut')): # noqa: B009
-                    fw.cut() # pyright: ignore[reportAttributeAccessIssue] # ty:ignore[call-non-callable]
+                    fw.cut() # pyright: ignore[reportAttributeAccessIssue]
         except Exception: # pylint: disable=broad-except
             pass # not every QWidget has a cut method
 
@@ -11582,7 +11683,7 @@ class ApplicationWindow(QMainWindow):
             if active_window is not None:
                 fw = active_window.focusWidget()
                 if fw is not None and hasattr(fw, 'copy') and callable(getattr(fw, 'copy')): # noqa: B009
-                    fw.copy() # pyright: ignore[reportAttributeAccessIssue] # ty:ignore[call-non-callable]
+                    fw.copy() # pyright: ignore[reportAttributeAccessIssue]
         except Exception: # pylint: disable=broad-except
             pass # not every QWidget has a copy method
 
@@ -11594,7 +11695,7 @@ class ApplicationWindow(QMainWindow):
             if active_window is not None:
                 fw = active_window.focusWidget()
                 if fw is not None and hasattr(fw, 'paste') and callable(getattr(fw, 'paste')): # noqa: B009
-                    fw.paste() # pyright: ignore[reportAttributeAccessIssue] # ty:ignore[call-non-callable]
+                    fw.paste() # pyright: ignore[reportAttributeAccessIssue]
         except Exception: # pylint: disable=broad-except
             pass # not every QWidget has a paste method
 
@@ -12604,9 +12705,14 @@ class ApplicationWindow(QMainWindow):
                         self.toggleFullscreen()
                     elif self.qmc.designerflag:
                         #if designer ON
-                        string = QApplication.translate('Message','Exit Designer?')
-                        reply = QMessageBox.question(self, QApplication.translate('Message', 'Designer Mode ON'),string,QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
-                        if reply == QMessageBox.StandardButton.Yes:
+#                        string = QApplication.translate('Message','Exit Designer?')
+#                        reply = QMessageBox.question(self, QApplication.translate('Message', 'Designer Mode ON'),string,QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
+#                        if reply == QMessageBox.StandardButton.Yes:
+#                            self.stopdesigner()
+#                        else:
+#                            return
+                        if artisan_question(self, self,
+                                QApplication.translate('Message','Exit Designer?')):
                             self.stopdesigner()
                         else:
                             return
@@ -13510,13 +13616,14 @@ class ApplicationWindow(QMainWindow):
     def ArtisanOpenURLDialog(self,msg:str|None = None) -> QUrl|None:
         if msg is None:
             msg = QApplication.translate('Message','Open')
-        res = None
+        res:str|None = None
         dlg = ArtisanInputDialog(self,self,msg,QApplication.translate('Message', 'URL'))
         if dlg.exec():
-            res = dlg.url
+            res = dlg.text
         try: # sip not supported on older PyQt versions (RPi!)
             sip.delete(dlg)
             #print(sip.isdeleted(dlg))
+            del dlg
         except Exception: # pylint: disable=broad-except
             pass
         if res is not None:
@@ -15429,13 +15536,17 @@ class ApplicationWindow(QMainWindow):
                     public_key.verify(signature, message)
             except Exception: # pylint: disable=broad-except
                 _log.error('profile signature invalid')
-                if not quiet:
-                    reply = QMessageBox.question(self,
-                                QApplication.translate('Message', 'Load profile?'),
-                                QApplication.translate('Message', 'Not a genuine Artisan profile. Load it anyway?'),
-                                QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
-                    if reply == QMessageBox.StandardButton.Yes:
-                        return profile
+#                if not quiet:
+#                    reply = QMessageBox.question(self,
+#                                QApplication.translate('Message', 'Load profile?'),
+#                                QApplication.translate('Message', 'Not a genuine Artisan profile. Load it anyway?'),
+#                                QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
+#                    if reply == QMessageBox.StandardButton.Yes:
+#                        return profile
+                if not quiet and artisan_question(self, self,
+                        QApplication.translate('Message', 'Not a genuine Artisan profile. Load it anyway?'),
+                        QApplication.translate('Message', 'Load Profile')):
+                    return profile
                 raise # let the profile loading fail
 
             if 'hash' in profile:
@@ -15445,13 +15556,17 @@ class ApplicationWindow(QMainWindow):
                 computed_hash = hashlib.sha256(json.dumps(rec_int_to_float(profile), sort_keys=True, ensure_ascii=True, separators=(',', ':')).encode()).hexdigest()
                 if profile_hash != computed_hash:
                     _log.error('profile hash invalid')
-                    if not quiet:
-                        reply = QMessageBox.question(self,
-                                    QApplication.translate('Message', 'Load profile?'),
-                                    QApplication.translate('Message', 'Modified Artisan profile. Load it anyway?'),
-                                    QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
-                        if reply == QMessageBox.StandardButton.Yes:
-                            return profile
+#                    if not quiet:
+#                        reply = QMessageBox.question(self,
+#                                    QApplication.translate('Message', 'Load profile'),
+#                                    QApplication.translate('Message', 'Modified Artisan profile. Load it anyway?'),
+#                                    QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
+#                        if reply == QMessageBox.StandardButton.Yes:
+#                            return profile
+                    if not quiet and artisan_question(self, self,
+                            QApplication.translate('Message', 'Modified Artisan profile. Load it anyway?'),
+                            QApplication.translate('Message', 'Load Profile')):
+                        return profile
                     raise InvalidProfileHash
 
         return profile
@@ -15513,8 +15628,9 @@ class ApplicationWindow(QMainWindow):
                             if quiet:
                                 reply = QMessageBox.StandardButton.Yes
                             else:
-                                reply = QMessageBox.question(self, QApplication.translate('Message', 'Found a different set of extra devices'), string,
-                                        QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel, QMessageBox.StandardButton.No)
+#                                reply = QMessageBox.question(self, QApplication.translate('Message', 'Found a different set of extra devices'), string,
+#                                        QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel, QMessageBox.StandardButton.No)
+                                reply = artisan_yes_no_cancel_dialog(self, self, QApplication.translate('Message', 'Found a different set of extra devices'), string)
 
                         if reply == QMessageBox.StandardButton.Yes:
                             if not reset or self.qmc.reset(redraw=False): # operation not canceled by the user in the save dirty state dialog
@@ -16221,8 +16337,8 @@ class ApplicationWindow(QMainWindow):
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             # we don't report errors on settingsLoad
-            _, _, exc_tb = sys.exc_info()
-            QMessageBox.information(self, QApplication.translate('Error Message', 'Exception:') + ' setProfile()',str(ex) + '@line ' + str(getattr(exc_tb, 'tb_lineno', '?')))
+#            _, _, exc_tb = sys.exc_info()
+#            QMessageBox.information(self, QApplication.translate('Error Message', 'Exception:') + ' setProfile()',str(ex) + '@line ' + str(getattr(exc_tb, 'tb_lineno', '?')))
             return False
 
     def profileQuality(self, profileMode:str = '',checkDebugLevel:bool = False) -> str:
@@ -17876,8 +17992,10 @@ class ApplicationWindow(QMainWindow):
                                 string = QApplication.translate('Message','Your batch counter is set to {}. Turn it off as in the settings file to be imported?').format(current_counter)
                             else:
                                 string = QApplication.translate('Message','Overwrite your current batch counter {} by {} from the settings file to be imported?').format(current_counter,files_counter)
-                            reply = QMessageBox.question(self, QApplication.translate('Message','Batch Counter'),string,
-                                    QMessageBox.StandardButton.Cancel |QMessageBox.StandardButton.No|QMessageBox.StandardButton.Yes)
+#                            reply = QMessageBox.question(self, QApplication.translate('Message','Batch Counter'),string,
+#                                    QMessageBox.StandardButton.Cancel|QMessageBox.StandardButton.No|QMessageBox.StandardButton.Yes)
+
+                            reply = artisan_yes_no_cancel_dialog(self, self, QApplication.translate('Message','Batch Counter'), string)
                             if reply == QMessageBox.StandardButton.Cancel:
                                 self.sendmessage(QApplication.translate('Message','Load Settings canceled'))
                                 return False
@@ -19489,8 +19607,8 @@ class ApplicationWindow(QMainWindow):
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             res = False
-            _, _, exc_tb = sys.exc_info()
-            QMessageBox.information(self, QApplication.translate('Error Message', 'Error'),QApplication.translate('Error Message', 'Exception:') + '  settingsLoad()  @line ' + str(getattr(exc_tb, 'tb_lineno', '?')))
+#            _, _, exc_tb = sys.exc_info()
+#            QMessageBox.information(self, QApplication.translate('Error Message', 'Error'),QApplication.translate('Error Message', 'Exception:') + '  settingsLoad()  @line ' + str(getattr(exc_tb, 'tb_lineno', '?')))
 
 #--------------------------------
         try:
@@ -19511,6 +19629,11 @@ class ApplicationWindow(QMainWindow):
                     i = [x.lower() for x in available].index(toString(settings.value('appearance')))
                     self.app.setStyle(available[i])
                     self.appearance = available[i].lower()
+                    if not sys.platform.startswith('darwin'):
+                        # set artisan accent color (but on macOS where it does not has any effect)
+                        style_palette = self.app.palette()
+                        style_palette.setColor(QPalette.ColorRole.Accent,  QColor('#3979ae'))
+                        self.app.setPalette(style_palette)
                 except Exception: # pylint: disable=broad-except
                     pass # appearance not in list of available once on this platform
 
@@ -19591,8 +19714,13 @@ class ApplicationWindow(QMainWindow):
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             res = False
-            _, _, exc_tb = sys.exc_info()
-            QMessageBox.information(self,QApplication.translate('Error Message', 'Error'),QApplication.translate('Error Message', 'Exception:') + ' settingsLoad()  @line ' + str(getattr(exc_tb, 'tb_lineno', '?')))
+#            _, _, exc_tb = sys.exc_info()
+#            QMessageBox.information(self,QApplication.translate('Error Message', 'Error'),QApplication.translate('Error Message', 'Exception:') + ' settingsLoad()  @line ' + str(getattr(exc_tb, 'tb_lineno', '?')))
+        if not res:
+#            QMessageBox.information(self, QApplication.translate('Error Message', 'Error'),QApplication.translate('Error Message', 'Failed to load settings'))
+            artisan_information(self, self,
+                QApplication.translate('Error Message', 'Failed to load settings'),
+                QApplication.translate('Error Message', 'Error'))
 
         return res
 
@@ -21176,7 +21304,8 @@ class ApplicationWindow(QMainWindow):
 
             if settings.status() != QSettings.Status.NoError:
                 _log.error('Failed to save settings')
-                QMessageBox.information(self, QApplication.translate('Error Message', 'Error'),QApplication.translate('Error Message', 'Failed to save settings'))
+#                QMessageBox.information(self, QApplication.translate('Error Message', 'Error'),QApplication.translate('Error Message', 'Failed to save settings'))
+                artisan_information(self, self, QApplication.translate('Error Message', 'Failed to save settings'), QApplication.translate('Error Message', 'Error'))
                 return False
             if not read_defaults:
                 _log.info('wrote %s settings in %.2fs', len(settings.allKeys()), libtime.process_time() - start_time)
@@ -21184,8 +21313,10 @@ class ApplicationWindow(QMainWindow):
 
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-            _, _, exc_tb = sys.exc_info()
-            QMessageBox.information(self, QApplication.translate('Error Message', 'Error'),QApplication.translate('Error Message', 'Exception:') + ' saveAllSettings()  @line ' + str(getattr(exc_tb, 'tb_lineno', '?')))
+#            _, _, exc_tb = sys.exc_info()
+#            QMessageBox.information(self, QApplication.translate('Error Message', 'Error'),QApplication.translate('Error Message', 'Exception:') + ' saveAllSettings()  @line ' + str(getattr(exc_tb, 'tb_lineno', '?')))
+#            QMessageBox.information(self, QApplication.translate('Error Message', 'Error'),QApplication.translate('Error Message', 'Failed to save settings'))
+            artisan_information(self, self, QApplication.translate('Error Message', 'Failed to save settings'), QApplication.translate('Error Message', 'Error'))
         return False
 
     def closeEventSettings_theme(self, filename:str|None = None) -> None:
@@ -21320,8 +21451,8 @@ class ApplicationWindow(QMainWindow):
 
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-            _, _, exc_tb = sys.exc_info()
-            QMessageBox.information(self, QApplication.translate('Error Message', 'Error'),QApplication.translate('Error Message', 'Exception:') + ' closeEventSettings_theme()  @line ' + str(getattr(exc_tb, 'tb_lineno', '?')))
+#            _, _, exc_tb = sys.exc_info()
+#            QMessageBox.information(self, QApplication.translate('Error Message', 'Error'),QApplication.translate('Error Message', 'Exception:') + ' closeEventSettings_theme()  @line ' + str(getattr(exc_tb, 'tb_lineno', '?')))
 
 
     def stopActivities(self) -> None:
@@ -22974,8 +23105,11 @@ class ApplicationWindow(QMainWindow):
                     prop.set_size('x-small')
 
                     if self.qmc.ax is None or len(profiles) > max_profiles:
-                        QMessageBox.information(self, QApplication.translate('HTML Report Template', 'Ranking Report'),
-                                                  QApplication.translate('Message', 'Ranking graphs are only generated up to {0} profiles').format(str(max_profiles)))
+#                        QMessageBox.information(self, QApplication.translate('HTML Report Template', 'Ranking Report'),
+#                                                  QApplication.translate('Message', 'Ranking graphs are only generated up to {0} profiles').format(str(max_profiles)))
+                        artisan_information(self, self,
+                            QApplication.translate('Message', 'Ranking graphs are only generated up to {0} profiles').format(str(max_profiles)),
+                            QApplication.translate('HTML Report Template', 'Ranking Report'))
                     else:
                         try:
 
@@ -24457,25 +24591,26 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def helpAbout(self, _:bool = False) -> None:
+        about_dialog(self, self)
         # pylint: disable=consider-using-f-string
-        coredevelopers:str = '<br>Rafael Cobo, Marko Luther &amp; Dave Baxter'
-        box = QMessageBox()
-        box.setStyleSheet("""
-            QMessageBox {{
-                font-weight: normal;
-            }}
-        """)
-        name:str = (application_viewer_name if self.app.artisanviewerMode else application_name)
-        box.setText(
-                f"""<center><h1>{name.lower()}</h1>v{__version__} {(__build__ if __build__ != '0' else '')}{(f' ({str(__revision__)})' if str(__revision__) != '' else '')}
-                <i>{('' if not appFrozen() or self.official_build else QApplication.translate('Message', 'unoffical build'))}</i></center>
-                <p><center><a href="https://artisan-scope.org">https://artisan-scope.org</a></center><br></p>
-                <p><b>{QApplication.translate('About', 'Core Developers')}</b><small>{coredevelopers}</small></p>
-                <p><b>{QApplication.translate('About', 'License')}</b><br><small><a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU Affero General Public License (AGPLv3.0)</a></small></p><br>
-                """)
-        #box.setIconPixmap(QPixmap(os.path.join(getResourcePath(),'Icons','plus-connected.svg')))
-        box.setWindowTitle(QApplication.translate('About', 'About'))
-        box.exec()
+#        coredevelopers:str = '<br>Rafael Cobo, Marko Luther &amp; Dave Baxter'
+#        box = QMessageBox()
+#        box.setStyleSheet("""
+#            QMessageBox {{
+#                font-weight: normal;
+#            }}
+#        """)
+#        name:str = (application_viewer_name if self.app.artisanviewerMode else application_name)
+#        box.setText(
+#                f"""<center><h1>{name.lower()}</h1>v{__version__} {(__build__ if __build__ != '0' else '')}{(f' ({str(__revision__)})' if str(__revision__) != '' else '')}
+#                <i>{('' if not appFrozen() or self.official_build else QApplication.translate('Message', 'unoffical build'))}</i></center>
+#                <p><center><a href="https://artisan-scope.org">https://artisan-scope.org</a></center><br></p>
+#                <p><b>{QApplication.translate('About', 'Core Developers')}</b><small>{coredevelopers}</small></p>
+#                <p><b>{QApplication.translate('About', 'License')}</b><br><small><a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU Affero General Public License (AGPLv3.0)</a></small></p><br>
+#                """)
+#        #box.setIconPixmap(QPixmap(os.path.join(getResourcePath(),'Icons','plus-connected.svg')))
+#        box.setWindowTitle(QApplication.translate('About', 'About'))
+#        box.exec()
 
 
     @pyqtSlot()
@@ -24526,14 +24661,8 @@ class ApplicationWindow(QMainWindow):
             _a, _b, exc_tb = sys.exc_info()
             self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' checkUpdate() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
-        box = QMessageBox()
-#        box.about(self,
-#                QApplication.translate('About', 'Update status'),
-#                f"""<p>{update_str}</p>{update_url}""")
-        box.setText(QApplication.translate('About', 'Update status'))
-#        box.setInformativeText(f"""<p>{update_str}</p>{update_url}""")
-        box.setInformativeText(update_str)
-        box.exec()
+        title = QApplication.translate('About', 'Update status')
+        artisan_confirmation_dialog(self, self, title, update_str, True)
 
     def applicationscreenshot(self) -> None:
         imag = self.grab()
@@ -24563,10 +24692,21 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def set_machine_name(self, _:bool = False) -> None:
-        new_name, ok = QInputDialog.getText(self, QApplication.translate('Menu', 'Machine Name'), QApplication.translate('Menu', 'Machine Name'), text=self.qmc.roastertype_setup)
-        if ok:
-            self.qmc.roastertype_setup = new_name
-
+        res = None
+        dlg = ArtisanInputDialog(self,self,
+            QApplication.translate('Menu', 'Machine Name'),
+            QApplication.translate('Menu', 'Machine Name'),
+            text=self.qmc.roastertype_setup)
+        if dlg.exec():
+            res = dlg.text
+        try: # sip not supported on older PyQt versions (RPi!)
+            sip.delete(dlg)
+            #print(sip.isdeleted(dlg))
+            del dlg
+        except Exception: # pylint: disable=broad-except
+            pass
+        if res is not None:
+            self.qmc.roastertype_setup = res
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -24870,9 +25010,13 @@ class ApplicationWindow(QMainWindow):
                         self.sendmessage(QApplication.translate('Message','Hottop control turned on'))
                     self.HottopControlActive = True
         else:
-            QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
-                QApplication.translate('Message', 'Warning'), QApplication.translate('Message',
+#            QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+#                QApplication.translate('Message', 'Warning'), QApplication.translate('Message',
+#                'To control a Hottop you need to activate the super user mode via a right click on the timer LCD first!'))
+            artisan_warning(self, self,
+                QApplication.translate('Message',
                 'To control a Hottop you need to activate the super user mode via a right click on the timer LCD first!'))
+
 
     @pyqtSlot(bool)
     def PIDcontrol(self, _:bool = False) -> None:
@@ -25191,10 +25335,15 @@ class ApplicationWindow(QMainWindow):
             else:
                 filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Theme'),ext='*.athm')
             if filename:
-                string = QApplication.translate('Message', 'Load theme {0}?').format(os.path.basename(filename))
-                reply = QMessageBox.question(self, QApplication.translate('Message', 'Adjust Theme Related Settings'),string,
-                    QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
-                if reply == QMessageBox.StandardButton.Cancel:
+#                string = QApplication.translate('Message', 'Load theme {0}?').format(os.path.basename(filename))
+#                reply = QMessageBox.question(self, QApplication.translate('Message', 'Adjust Theme Related Settings'),string,
+#                    QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
+#                if reply == QMessageBox.StandardButton.Cancel:
+#                    return
+                if not artisan_question(self, self,
+                        QApplication.translate('Message', 'Load theme {0}?').format(os.path.basename(filename)),
+                        #QApplication.translate('Message', 'Adjust Theme Related Settings')
+                    ):
                     return
                 try:
                     res = self.settingsLoad(filename,theme=True,redraw=False)
@@ -25635,9 +25784,9 @@ class ApplicationWindow(QMainWindow):
 
     @pyqtSlot(bool)
     def exitTriggered(self, _:bool = False) -> None:
-        if self.qmc.designerflag:
+        if self.qmc.designerflag and artisan_question(self, self, QApplication.translate('Message','Exit Designer?')):
             self.stopdesigner()
-        elif self.qmc.wheelflag and self.wheeldialog is not None:
+        elif self.qmc.wheelflag and self.wheeldialog is not None and artisan_question(self, self, QApplication.translate('Message','Exit Wheel Graph?')):
             self.stop_wheelgraph()
 
     @pyqtSlot()
@@ -25668,8 +25817,7 @@ class ApplicationWindow(QMainWindow):
             string = QApplication.translate('Message', 'Save as background roast template?')
             mbox = QMessageBox()
             mbox.setText(string)
-            from plus.util import setPlusIcon
-            setPlusIcon(mbox, self.app.darkmode)
+            plus_util.setPlusIcon(mbox, self.app.darkmode)
             mbox.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel)
             res = mbox.exec()
             if res == QMessageBox.StandardButton.Cancel:
@@ -25723,8 +25871,7 @@ class ApplicationWindow(QMainWindow):
             dialog = AlarmDlg(self,self,self.AlarmDlg_activeTab)
             dialog.show()
         else:
-            QMessageBox.information(self, QApplication.translate('Message', 'Alarm Config'),
-                                    QApplication.translate('Message', 'Alarms are not available for device None'))
+            artisan_confirmation_dialog(self, self, QApplication.translate('Message', 'Alarm Config'), QApplication.translate('Message', 'Alarms are not available for device None'), True)
 
     def switchLanguageFlag(self, loc:str, value:bool) -> None:
         try:
@@ -25741,11 +25888,15 @@ class ApplicationWindow(QMainWindow):
 
     def changelocale(self, languagelocale:str) -> None:
         if self.locale_str != languagelocale:
-            string = QApplication.translate('Message','Switching the language needs a restart. Restart now?')
-            reply = QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
-                        QApplication.translate('Message','Restart'),string,
-                        QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Yes)
-            if reply == QMessageBox.StandardButton.Yes:
+#            string = QApplication.translate('Message','Switching the language needs a restart. Restart now?')
+#            reply = QMessageBox.warning(None, self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+#                        QApplication.translate('Message','Restart'),string,
+#                        QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Yes)
+#            if reply == QMessageBox.StandardButton.Yes:
+            res = artisan_question(self, self,
+                QApplication.translate('Message','Switching the language needs a restart. Restart now?'),
+                QApplication.translate('Message','Restart'))
+            if res:
                 # switch old flag off
                 self.switchLanguageFlag(self.locale_str, False)
                 # check if etypes are unmodified by user and in that case, remove etypes from settings to avoid overwriting of translations:
@@ -27541,9 +27692,12 @@ class ApplicationWindow(QMainWindow):
 
             # show warning if the analysis starts earlier than curve fit
             if curvefit_starttime > analysis_starttime:
-                string = QApplication.translate('Message','Warning: The start of the analysis interval of interest is earlier than the start of curve fitting.\nCorrect this on the Config>Curves>Analyze tab.')
-                QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
-                        QApplication.translate('Message','Analysis earlier than Curve fit'),string)
+#                string = QApplication.translate('Message','Warning: The start of the analysis interval of interest is earlier than the start of curve fitting.\nCorrect this on the Config>Curves>Analyze tab.')
+#                QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+#                        QApplication.translate('Message','Analysis earlier than Curve fit'),string)
+                artisan_warning(self, self,
+                    QApplication.translate('Message','Warning: The start of the analysis interval of interest is earlier than the start of curve fitting.\nCorrect this on the Config>Curves>Analyze tab.'),
+                    QApplication.translate('Message','Analysis earlier than Curve fit'))
 
             #reset the annotation location if the origin is out of the screen
             for dim in self.qmc.analysisresultsloc:
@@ -27671,9 +27825,12 @@ class ApplicationWindow(QMainWindow):
                 error = f'P2: \n-{iv}\n\n[{EQU[1]}]'
 
         if error:
-            string = QApplication.translate('Message','Incompatible variables found in %s')%error # pylint: disable=consider-using-f-string
-            QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
-                QApplication.translate('Message','Assignment problem'),string)
+#            string = QApplication.translate('Message','Incompatible variables found in %s')%error # pylint: disable=consider-using-f-string
+#            QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+#                QApplication.translate('Message','Assignment problem'),string)
+            artisan_warning(self, self,
+                QApplication.translate('Message','Incompatible variables found in {}').format(error),
+                QApplication.translate('Message','Assignment problem'))
         else:
             try:
                 equ = EQU[0]

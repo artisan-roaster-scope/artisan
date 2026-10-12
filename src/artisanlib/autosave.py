@@ -34,11 +34,11 @@ if TYPE_CHECKING:
 
 from PyQt6.QtCore import Qt, pyqtSlot, QSettings, QSize
 from PyQt6.QtGui import QIcon
-from PyQt6.QtWidgets import (QApplication, QMessageBox, QLabel, QPushButton, QDialogButtonBox, QFrame,
+from PyQt6.QtWidgets import (QApplication, QLabel, QPushButton, QDialogButtonBox, QFrame,
     QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QLineEdit, QSpacerItem)
 
 from artisanlib.util import getStyleIconPath
-from artisanlib.dialogs import ArtisanDialog
+from artisanlib.dialogs import ArtisanDialog, artisan_warning
 from artisanlib.widgets import ArtisanMinorPushButton
 from artisanlib.styles import line_edit_style, artisan_minor_push_button_style
 
@@ -236,6 +236,8 @@ class autosaveDlg(ArtisanDialog):
         settings.setValue('autosaveGeometry',self.saveGeometry())
 
         if self.aw.qmc.autosaveflag and self.aw.qmc.autosavepath == '':
-            QMessageBox.warning(None, #self.aw, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
-                QApplication.translate('Message', 'Warning'),
+#            QMessageBox.warning(None, #self.aw, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+#                QApplication.translate('Message', 'Warning'),
+#                QApplication.translate('Message', 'Autosave turned ON, but filepath empty!\n\nATTENTION: Recorded data will get cleared without confirmation'))
+            artisan_warning(self, self.aw,
                 QApplication.translate('Message', 'Autosave turned ON, but filepath empty!\n\nATTENTION: Recorded data will get cleared without confirmation'))
