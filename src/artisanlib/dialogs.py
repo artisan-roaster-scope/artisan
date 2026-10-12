@@ -366,7 +366,7 @@ class HelpDlg(ArtisanDialog):
                 return
             self.current_match_index = (self.current_match_index + 1) % len(self.matches)
 
-        extraSelections:list['QTextEdit.ExtraSelection'] = []
+        extraSelections:list[QTextEdit.ExtraSelection] = []
         match_text = 'black'
         current_match_highlight = '#A6FF00'
         extra_matches_highlight = 'yellow'
