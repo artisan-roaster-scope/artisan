@@ -29,3 +29,24 @@ The device types connecting to the RoastSee NEXT are
    - Time of detect Yellow/DRY point in seconds since recording on device started
 - RoastSeeNEXT Yellow
    - Yellow mark (1 at the moment the Yellow/DRY point was detected; 0 otherwise)
+
+
+The IO Command `lebrew(\<msg\>)' sends the given '\<msg\>' to the device while it is connected. This command can be assigned to buttons as shown below. Supported messages are
+
+- `roasting` : switch to roasting screen
+- `start` : start recording and start sending readings to artisan
+- `stop` : stop recording and stop sending readings to artisan
+
+On pressing the ON button, artisan scope connects to the device and sends the message `roasting` followed by the message `start` to receive readings.
+
+<figure>
+<a href="{{ site.baseurl }}/assets/images/RoastSeeNEXT_event_buttons.webp" target="_blank">
+<img width="60%" src="{{ site.baseurl }}/assets/images/RoastSeeNEXT_event_buttons.webp"></a>
+    <figcaption>Custom event buttons</figcaption>
+</figure>
+
+<figure>
+<a href="{{ site.baseurl }}/assets/images/RoastSeeNEXT_clock_restart.webp" target="_blank">
+<img width="60%" src="{{ site.baseurl }}/assets/images/RoastSeeNEXT_clock_restart.webp"></a>
+    <figcaption>Restart device clock on CHARGE</figcaption>
+</figure>
