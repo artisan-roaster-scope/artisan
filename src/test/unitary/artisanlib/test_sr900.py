@@ -87,7 +87,7 @@ def _make_driver(**overrides: Any) -> Any:
     for name in _METHODS:
         setattr(d, name, MethodType(getattr(SR900_BLE, name), d))
     # collect what would be written rather than reaching for a BLE client
-    d.send = MethodType(lambda self, message, **_kwargs: sent.append(bytes(message)), d)
+    d.send = MethodType(lambda _self, message, **_kwargs: sent.append(bytes(message)), d)
     for key, value in overrides.items():
         setattr(d, key, value)
     return d
@@ -148,7 +148,7 @@ class TestFrameLayout:
         assert (b[32], b[33]) == (ETX_LO, ETX_HI)
 
     def test_be16_is_big_endian(self) -> None:
-        assert sr900.be16(bytes((0, 1, 0x02, 0x9B)), 2) == 0x029B == 667
+        assert sr900.be16(bytes((0, 1, 0x02, 0x9B)), 2) == 0x029B #== 667
 
 
 class TestCommandToken:
