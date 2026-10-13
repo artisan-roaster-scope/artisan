@@ -40,7 +40,8 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 #  tuples (model name, connection type) with connection type from {0: BT, 1: WiFi, 2: Serial}
 SUPPORTED_SCALES:Final[list[tuple[str,int]]] = [
     ('Acaia Bluetooth', 0),
-    ('Acaia Serial', 1)
+    ('Acaia Serial', 1),
+    ('MT-SICS Serial', 2)
 ]
 
 ScaleSpec = tuple[str,str] # scale name, scale id (eg. ble address or serial port)
@@ -268,6 +269,9 @@ class ScaleManager(QObject):
             from artisanlib.acaia import AcaiaSerial
             return AcaiaSerial(model, ident, name, lambda : self.connected_handler(ident, name), lambda : self.disconnected_handler(ident, name),
                 stable_only=False, decimals=0)
+        if model == 2:
+            from artisanlib.mtsics import MTSICSSerial
+            return MTSICSSerial(model, ident, name, lambda : self.connected_handler(ident, name), lambda : self.disconnected_handler(ident, name))
         return None
 
     # returns readability of the connected scale_nr (0 or 1) if connected and otherwise 0
@@ -345,7 +349,7 @@ class ScaleManager(QObject):
 
     @pyqtSlot(int)
     def scan_scale1_slot(self, model:int) -> None:
-        if model in {0, 1}: # Acaia Bluetooth or Serial
+        if model in {0, 1, 2}: # Acaia Bluetooth or Serial, or MT-SICS Serial
             self.set_scale1_slot(model, '', '')
             if self.scale1 is not None:
                 self.scale1.scan()
@@ -512,7 +516,7 @@ class ScaleManager(QObject):
 
     @pyqtSlot(int)
     def scan_scale2_slot(self, model:int) -> None:
-        if model in {0, 1}: # Acaia Bluetooth or Serial
+        if model in {0, 1, 2}: # Acaia Bluetooth or Serial, or MT-SICS Serial
             self.set_scale2_slot(model, '', '')
             if self.scale2 is not None:
                 self.scale2.scan()
