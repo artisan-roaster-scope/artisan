@@ -1279,6 +1279,35 @@ class PIDcontrol:
 
         self.slider_force_move:bool = True # if True move the slider independent of the slider position to fire slider action!
 
+
+    def setPositiveTargetMin(self, value:int) -> None:
+        if self.aw.pidcontrol.pidPositiveTarget != 0:
+            slidernr = self.pidPositiveTarget - 1
+            slider_min = self.aw.eventslidermin[slidernr]
+            slider_max = self.aw.eventslidermax[slidernr]
+            self.positiveTargetMin = max(slider_min, min(slider_max, value, self.positiveTargetMax))
+
+    def setPositiveTargetMax(self, value:int) -> None:
+        if self.aw.pidcontrol.pidPositiveTarget != 0:
+            slidernr = self.pidPositiveTarget - 1
+            slider_min = self.aw.eventslidermin[slidernr]
+            slider_max = self.aw.eventslidermax[slidernr]
+            self.positiveTargetMax = max(slider_min, min(slider_max, value), self.positiveTargetMin)
+
+    def setNegativeTargetMin(self, value:int) -> None:
+        if self.aw.pidcontrol.pidNegativeTarget != 0:
+            slidernr = self.pidNegativeTarget - 1
+            slider_min = self.aw.eventslidermin[slidernr]
+            slider_max = self.aw.eventslidermax[slidernr]
+            self.negativeTargetMin = max(slider_min, min(slider_max, value, self.negativeTargetMax))
+
+    def setNegativeTargetMax(self, value:int) -> None:
+        if self.aw.pidcontrol.pidNegativeTarget != 0:
+            slidernr = self.pidNegativeTarget - 1
+            slider_min = self.aw.eventslidermin[slidernr]
+            slider_max = self.aw.eventslidermax[slidernr]
+            self.negativeTargetMax = max(slider_min, min(slider_max, value), self.negativeTargetMax)
+
     @staticmethod
     def RStotalTime(ramps:list[int], soaks:list[int]) -> int:
         return sum(ramps) + sum(soaks)

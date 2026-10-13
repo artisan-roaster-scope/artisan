@@ -893,6 +893,43 @@ def events_editor_style(dark:bool, background_color:str, line_edit_color:str) ->
 """
 
 
+# toolbar style
+
+@functools.lru_cache
+def toolbar_style(color:str, background_color:str, border_color:str, selected_background_color:str) -> str:
+    return f"""
+        QToolBar {{
+            background-color: {background_color};
+            border: 0px solid;
+            color: {color};
+            spacing: 2px;
+        }}
+        QToolBar::separator {{
+            background-color: transparent;
+        }}
+        QToolButton:checked {{
+            background-color: {selected_background_color};
+        }}
+        QToolButton:hover {{
+            border-color: {border_color};
+        }}
+        QToolButton:checked:hover {{
+            border-color: {border_color};
+            background-color: {selected_background_color};
+        }}
+        QToolButton {{
+            border-width: 1px;
+            border-style: solid;
+            border-radius: 5px;
+            border-color: transparent;
+            margin: 0px;
+            padding: 0px;
+            background-color: transparent;
+        }}
+    """
+
+
+
 # ComboBox style
 
 @functools.lru_cache

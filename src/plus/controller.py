@@ -66,7 +66,7 @@ def is_synced() -> bool:
     aw = config.app_window
     if aw is not None:
         if aw.qmc.roastUUID is None:
-            # not in sync if no roastUUID and saved to file or (OFF and not saved yet but at least 5min in length)
+            # not in sync if no roastUUID and (saved to file or (OFF and not saved yet but at least 5min in length))
             return not (bool(aw.curFile) or
                 (not aw.qmc.flagon and
                     (len(aw.qmc.timex)>0 and ((aw.qmc.timex[-1] - (aw.qmc.timex[aw.qmc.timeindex[0]] if aw.qmc.timeindex[0] != -1 else 0)) > 5*60))))
@@ -96,7 +96,7 @@ def toggle(app_window:'ApplicationWindow') -> None:
         ):  # @UndefinedVariable
             sync.sync()
     elif config.connected:
-        if not is_synced() and app_window.qmc.checkSaved(allow_discard=False):
+        if not is_synced() and not app_window.qmc.flagon and app_window.qmc.checkSaved(allow_discard=False):
             # we (manually) turn syncing for the current roast on
             queue.addRoast(unsynced=True)
         else:

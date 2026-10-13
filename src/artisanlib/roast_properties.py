@@ -602,7 +602,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.org_meterlabels:list[str] = ['']*2
         self.org_loadevent_hundpcts:list[int] = [100]*4
         self.org_loadevent_zeropcts:list[int] = [0]*4
-        self.org_presssure_percents:list[bool] = [False]*4
+        self.org_pressure_percents:list[bool] = [False]*4
         self.org_load_etypes:list[int] = [0]*4
         self.org_sourcetypes:list[int] = [0]*4
         self.org_ratingunits:list[int] = [0]*4
@@ -2975,7 +2975,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.org_ratingunits = self.aw.qmc.ratingunits.copy()
             self.org_sourcetypes = self.aw.qmc.sourcetypes.copy()
             self.org_load_etypes = self.aw.qmc.load_etypes.copy()
-            self.org_presssure_percents = self.aw.qmc.presssure_percents.copy()
+            self.org_pressure_percents = self.aw.qmc.pressure_percents.copy()
             self.org_loadevent_zeropcts = self.aw.qmc.loadevent_zeropcts.copy()
             self.org_loadevent_hundpcts = self.aw.qmc.loadevent_hundpcts.copy()
             self.org_meterlabels = self.aw.qmc.meterlabels.copy()
@@ -3445,10 +3445,10 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui.zeropcts3.setEnabled(False)
             self.energy_ui.hundredpct3.setEnabled(True)
         # pressure percent
-        self.energy_ui.pressureCheckBox0.setChecked(self.aw.qmc.presssure_percents[0])
-        self.energy_ui.pressureCheckBox1.setChecked(self.aw.qmc.presssure_percents[1])
-        self.energy_ui.pressureCheckBox2.setChecked(self.aw.qmc.presssure_percents[2])
-        self.energy_ui.pressureCheckBox3.setChecked(self.aw.qmc.presssure_percents[3])
+        self.energy_ui.pressureCheckBox0.setChecked(self.aw.qmc.pressure_percents[0])
+        self.energy_ui.pressureCheckBox1.setChecked(self.aw.qmc.pressure_percents[1])
+        self.energy_ui.pressureCheckBox2.setChecked(self.aw.qmc.pressure_percents[2])
+        self.energy_ui.pressureCheckBox3.setChecked(self.aw.qmc.pressure_percents[3])
         # zeropcts
         self.energy_ui.zeropcts0.setValue(self.aw.qmc.loadevent_zeropcts[0])
         self.energy_ui.zeropcts1.setValue(self.aw.qmc.loadevent_zeropcts[1])
@@ -3535,10 +3535,10 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.updateMetricsLabel()
 
     def updatePressurePercent(self, updateMetrics:bool = True) -> None:
-        self.aw.qmc.presssure_percents[0] = self.energy_ui.pressureCheckBox0.isChecked()
-        self.aw.qmc.presssure_percents[1] = self.energy_ui.pressureCheckBox1.isChecked()
-        self.aw.qmc.presssure_percents[2] = self.energy_ui.pressureCheckBox2.isChecked()
-        self.aw.qmc.presssure_percents[3] = self.energy_ui.pressureCheckBox3.isChecked()
+        self.aw.qmc.pressure_percents[0] = self.energy_ui.pressureCheckBox0.isChecked()
+        self.aw.qmc.pressure_percents[1] = self.energy_ui.pressureCheckBox1.isChecked()
+        self.aw.qmc.pressure_percents[2] = self.energy_ui.pressureCheckBox2.isChecked()
+        self.aw.qmc.pressure_percents[3] = self.energy_ui.pressureCheckBox3.isChecked()
         if updateMetrics:
             self.updateMetricsLabel()
 
@@ -3669,7 +3669,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.ratingunits = self.org_ratingunits.copy()
             self.aw.qmc.sourcetypes = self.org_sourcetypes.copy()
             self.aw.qmc.load_etypes = self.org_load_etypes.copy()
-            self.aw.qmc.presssure_percents = self.org_presssure_percents.copy()
+            self.aw.qmc.pressure_percents = self.org_pressure_percents.copy()
             self.aw.qmc.loadevent_zeropcts = self.org_loadevent_zeropcts.copy()
             self.aw.qmc.loadevent_hundpcts = self.org_loadevent_hundpcts.copy()
             self.aw.qmc.meterlabels = self.org_meterlabels.copy()
@@ -3920,7 +3920,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.ratingunits != self.aw.qmc.ratingunits_setup or
             self.aw.qmc.sourcetypes != self.aw.qmc.sourcetypes_setup or
             self.aw.qmc.load_etypes != self.aw.qmc.load_etypes_setup or
-            self.aw.qmc.presssure_percents != self.aw.qmc.presssure_percents_setup or
+            self.aw.qmc.pressure_percents != self.aw.qmc.pressure_percents_setup or
             self.aw.qmc.loadevent_zeropcts != self.aw.qmc.loadevent_zeropcts_setup or
             self.aw.qmc.loadevent_hundpcts != self.aw.qmc.loadevent_hundpcts_setup or
             self.aw.qmc.meterlabels != self.aw.qmc.meterlabels_setup or
@@ -4010,7 +4010,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         if isinstance(sender, QCheckBox):
             try:
                 i = [self.energy_ui.pressureCheckBox0, self.energy_ui.pressureCheckBox1, self.energy_ui.pressureCheckBox2, self.energy_ui.pressureCheckBox3].index(sender)
-                self.aw.qmc.presssure_percents[i] = sender.isChecked()
+                self.aw.qmc.pressure_percents[i] = sender.isChecked()
                 self.updateMetricsLabel()
                 self.loadsEdited()
             except Exception: # pylint: disable=broad-except

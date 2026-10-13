@@ -318,7 +318,8 @@ class ProfileData(TypedDict, total=False):
     ratingunits: list[int]
     sourcetypes: list[int]
     load_etypes: list[int]
-    presssure_percents: list[bool]
+    presssure_percents: list[bool] # typo; kept to load legacy profiles
+    pressure_percents: list[bool]
     loadevent_zeropcts: list[int]
     loadevent_hundpcts: list[int]
     meterlabels: list[str]

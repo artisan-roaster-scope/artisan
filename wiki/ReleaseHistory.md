@@ -9,7 +9,7 @@ v4.2.2
   - adds support for [Dutch Master Roasters](https://artisan-scope.org/machines/dmr/)
   - adds autoCHARGE/DROP and drum speed control to the [Schuilenburg](https://artisan-scope.org/machines/schuilenburg/) PLC machine setup
   - adds autoCHARGE/autoDROP recognition for [IMF](https://artisan-scope.org/machines/imf/) as 'auto' setup which picks up CHARGE and DROP events from the machine
-  - adds device setup for Lebrews online-color sensor [RoastSee NEXT](https://lebrewtech.com/products/roastsee-next)
+  - adds device setup for Lebrews online-color sensor [RoastSee NEXT](https://artisan-scope.org/devices/lebrew/) and `lebrew(<msg>)` IO Command
   - improved support for [Orbiter](https://artisan-scope.org/machines/orbiter/) smart roasters
   - adds UI scaling factor
   - adds [Catppuccin](https://github.com/catppuccin) and some more new themes
@@ -17,6 +17,7 @@ v4.2.2
   - adds Artisan Commands `pidDerivativeFilter(<n>)`, `pidDerivativeLimit(<n>)`, `pidILF(<n>)`, `pidIWP(<bool>)`, and `pidIRoC(<bool>)` to configure the internal PID (for John)
   - adds Artisan Commands `zoom(<x>[,<y>])`, `pan(<x>[,<y>])`, `center(<x>,<y>[,<clamp>])`, `clamp(<n>)`, `followMode(<bool>)`, and `followModePanning(<x>[,<y>])` to update the canvas perspective
   - adds Artisan Commands `home`, `back` and `forward` to operate the navigation bar
+  - adds Artisan Commands `pidPositiveTargetMin(<n>)`, `pidPositiveTargetMax(<n>)`, `pidNegativeTargetMin(<n>)`, and `pidNegativeTargetMax(<n>)` to adjust PID min/max target limits (eg. for preheating) ([Issue #2238](../../../issues/2238))
 * CHANGES
   - tightened license from [GPLv3](https://www.gnu.org/licenses/gpl-3.0.html) to [AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html) to prevent commercialization as headless engine
   - smaller builds by replacing headless Chromium engine by Rust-based [fulgur lib](https://github.com/fulgur-rs/fulgur) for HTML2PDF conversion (size reduced by ~45%)

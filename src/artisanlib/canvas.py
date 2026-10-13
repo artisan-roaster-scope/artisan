@@ -371,10 +371,10 @@ class tgraphcanvas(QObject):
         'ax_background', 'block_update', 'fmt_data_RoR', 'fmt_data_curve', 'running_LCDs', 'plotterstack', 'plotterequationresults', 'plottermessage', 'alarm_popup_timout',
         'RTtemp1', 'RTtemp2', 'RTextratemp1', 'RTextratemp2', 'RTextratx', 'idx_met', 'showmet', 'met_annotate', 'met_timex_temp1_delta',
         'extendevents', 'statssummary', 'showtimeguide', 'statsmaxchrperline', 'energyunits', 'powerunits', 'sourcenames', 'loadlabels_setup',
-        'loadratings_setup', 'ratingunits_setup', 'sourcetypes_setup', 'load_etypes_setup', 'presssure_percents_setup', 'loadevent_zeropcts_setup',
+        'loadratings_setup', 'ratingunits_setup', 'sourcetypes_setup', 'load_etypes_setup', 'pressure_percents_setup', 'loadevent_zeropcts_setup',
         'loadevent_hundpcts_setup', 'preheatDuration_setup', 'preheatenergies_setup', 'betweenbatchDuration_setup', 'betweenbatchenergies_setup',
         'coolingDuration_setup', 'coolingenergies_setup', 'betweenbatch_after_preheat_setup', 'electricEnergyMix_setup', 'gasMix_setup', 'energyresultunit_setup',
-        'kind_list', 'perKgRoastMode', 'loadlabels', 'loadratings', 'ratingunits', 'sourcetypes', 'load_etypes', 'presssure_percents', 'loadevent_zeropcts',
+        'kind_list', 'perKgRoastMode', 'loadlabels', 'loadratings', 'ratingunits', 'sourcetypes', 'load_etypes', 'pressure_percents', 'loadevent_zeropcts',
         'loadevent_hundpcts', 'preheatDuration', 'preheatenergies', 'betweenbatchDuration', 'betweenbatchenergies', 'coolingDuration', 'coolingenergies',
         'betweenbatch_after_preheat', 'electricEnergyMix', 'gasMix', 'baseX', 'baseY', 'base_horizontalcrossline', 'base_verticalcrossline',
         'base_messagevisible', 'colorDifferenceThreshold', 'handles', 'labels', 'legend_lines', 'eventmessage', 'backgroundeventmessage',
@@ -2071,7 +2071,7 @@ class tgraphcanvas(QObject):
         self.ratingunits_setup:list[int] = [0]*4                   # index in list self.powerunits
         self.sourcetypes_setup:list[int] = [0]*4                   # index in list self.sourcenames
         self.load_etypes_setup:list[int] = [0]*4                   # index of the etype that is the gas/burner setting (if idx > 4, the PID Duty extra dev is selected as source)
-        self.presssure_percents_setup:list[bool] = [False]*4       # event value in pressure percent
+        self.pressure_percents_setup:list[bool] = [False]*4       # event value in pressure percent
         self.loadevent_zeropcts_setup:list[int] = [0]*4            # event value corresponding to 0 percent
         self.loadevent_hundpcts_setup:list[int] = [100]*4          # event value corresponding to 100 percent
         # Meters
@@ -2129,7 +2129,7 @@ class tgraphcanvas(QObject):
         self.ratingunits = self.ratingunits_setup[:]             # index in list self.heatunits
         self.sourcetypes = self.sourcetypes_setup[:]             # index in list self.sourcetypes
         self.load_etypes = self.load_etypes_setup[:]             # index of the etype that is the gas/burner setting (if idx > 4, the PID Duty extra dev is selected as source)
-        self.presssure_percents = self.presssure_percents_setup[:]  # event value in pressure percent
+        self.pressure_percents = self.pressure_percents_setup[:]  # event value in pressure percent
         self.loadevent_zeropcts = self.loadevent_zeropcts_setup[:]  # event value corresponding to 0 percent
         self.loadevent_hundpcts = self.loadevent_hundpcts_setup[:]  # event value corresponding to 100 percent
         # Meters
@@ -2501,7 +2501,7 @@ class tgraphcanvas(QObject):
         self.ratingunits_setup = self.ratingunits[:]
         self.sourcetypes_setup = self.sourcetypes[:]
         self.load_etypes_setup = self.load_etypes[:]
-        self.presssure_percents_setup = self.presssure_percents[:]
+        self.pressure_percents_setup = self.pressure_percents[:]
         self.loadevent_zeropcts_setup = self.loadevent_zeropcts[:]
         self.loadevent_hundpcts_setup = self.loadevent_hundpcts[:]
         self.meterlabels_setup = self.meterlabels[:]
@@ -2518,7 +2518,7 @@ class tgraphcanvas(QObject):
         self.ratingunits = self.ratingunits_setup[:]
         self.sourcetypes = self.sourcetypes_setup[:]
         self.load_etypes = self.load_etypes_setup[:]
-        self.presssure_percents = self.presssure_percents_setup[:]
+        self.pressure_percents = self.pressure_percents_setup[:]
         self.loadevent_zeropcts = self.loadevent_zeropcts_setup[:]
         self.loadevent_hundpcts = self.loadevent_hundpcts_setup[:]
         self.meterlabels = self.meterlabels_setup[:]
@@ -16391,7 +16391,7 @@ class tgraphcanvas(QObject):
                 emax = toInt(self.loadevent_hundpcts[i])
                 scaled = (val - emin) / (emax - emin)  #emax > emin enforced by energy.py
                 load_pct = min(1.0, max(0.0, scaled)) * 100
-                if self.presssure_percents[i] and self.sourcetypes[i] in {0, 1}:   # gas loads only
+                if self.pressure_percents[i] and self.sourcetypes[i] in {0, 1}:   # gas loads only
                     # convert pressure to heat
                     factor = math.sqrt(load_pct / 100)
                 else:
@@ -16415,7 +16415,7 @@ class tgraphcanvas(QObject):
             # Local function to record energies of continuous loads
             def record_continuous_energies(_i: int, _kind: int, _duration: float) -> None:
                 load_pct = self.loadevent_hundpcts[_i]  #needed only for the btu_list and outmsg
-                if self.presssure_percents[_i] and self.sourcetypes[_i] in {0, 1}:   # gas loads only
+                if self.pressure_percents[_i] and self.sourcetypes[_i] in {0, 1}:   # gas loads only
                     # convert pressure to heat
                     factor = math.sqrt(load_pct / 100)
                 else:
@@ -16452,7 +16452,7 @@ class tgraphcanvas(QObject):
                         load_pct = self.extratemp2[_pid_duty_extradevice_index][j]
 
                         # scale when Pressure % is ticked
-                        if self.presssure_percents[_i] and self.sourcetypes[_i] in {0, 1}:   # gas loads only
+                        if self.pressure_percents[_i] and self.sourcetypes[_i] in {0, 1}:   # gas loads only
                             # convert pressure to heat
                             factor = math.sqrt(load_pct / 100)
                         else:
@@ -16699,7 +16699,7 @@ class tgraphcanvas(QObject):
                     if self.preheatenergies[i] < 0 < self.preheatDuration:
                         # percent load multiplied by duration
                         load_pct = abs(self.preheatenergies[i] * 1000./10)
-                        if self.presssure_percents[i] and self.sourcetypes[i] in {0, 1}:   # gas loads only
+                        if self.pressure_percents[i] and self.sourcetypes[i] in {0, 1}:   # gas loads only
                             # convert pressure to heat
                             factor = math.sqrt(load_pct / 100)
                         else:
@@ -16736,7 +16736,7 @@ class tgraphcanvas(QObject):
                     if self.betweenbatchenergies[i] < 0 < self.betweenbatchDuration:
                         # percent load multiplied by duration
                         load_pct = abs(self.betweenbatchenergies[i] * 1000./10)
-                        if self.presssure_percents[i] and self.sourcetypes[i] in {0, 1}:   # gas loads only
+                        if self.pressure_percents[i] and self.sourcetypes[i] in {0, 1}:   # gas loads only
                             # convert pressure to heat
                             factor = math.sqrt(load_pct / 100)
                         else:
@@ -16772,7 +16772,7 @@ class tgraphcanvas(QObject):
                     if self.coolingenergies[i] < 0 < self.coolingDuration:
                         # percent load multiplied by duration
                         load_pct = abs(self.coolingenergies[i] * 1000./10)
-                        if self.presssure_percents[i] and self.sourcetypes[i] in {0, 1}:   # gas loads only
+                        if self.pressure_percents[i] and self.sourcetypes[i] in {0, 1}:   # gas loads only
                             # convert pressure to heat
                             factor = math.sqrt(load_pct / 100)
                         else:
@@ -16982,7 +16982,7 @@ class tgraphcanvas(QObject):
                     emax = toInt(self.loadevent_hundpcts[i])
                     scaled = (val - emin) / (emax - emin)  #emax > emin enforced by energy.py
                     load_pct = min(1.0, max(0.0, scaled)) * 100
-                    if self.presssure_percents[i] and self.sourcetypes[i] in {0, 1}:   # gas loads only
+                    if self.pressure_percents[i] and self.sourcetypes[i] in {0, 1}:   # gas loads only
                         # convert pressure to heat
                         factor = math.sqrt(load_pct / 100)
                     else:

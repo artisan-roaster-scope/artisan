@@ -25,7 +25,6 @@
 # AUTHOR
 # Marko Luther, 2025
 
-import time
 import re
 import asyncio
 import logging
@@ -217,11 +216,17 @@ class Lebrew_RoastSeeNEXT:
         self._ble_client = None
         self._ble_client_started = False
 
+    # adds \r\n to make sure commands are processed
+    def send_message(self, msg:str) -> None:
+        self.send_msg(f'{msg}\r\n'.encode(encoding='ascii', errors='ignore'))
+
     def start_measuring(self) -> None:
-        self.send_msg(b'roasting\r\n')
-#        time.sleep(1.5) # seems not needed
-        self.send_msg(b'start\r\n')
+        self.send_message('roasting')
+        self.send_message('start')
 
     def stop_measuring(self) -> None:
-        self.send_msg(b'stop\r\n')
-        time.sleep(0.2)
+        self.send_message('stop')
+
+# further commands
+#  agtron
+#  zeroing

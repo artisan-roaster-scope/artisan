@@ -213,7 +213,8 @@ from artisanlib.util import (appFrozen, uchr, decodeLocal, decodeLocalStrict, en
         eventtime2string, toDim, signature_message, rec_int_to_float, smooth_list, getStyleIconPath)
 from artisanlib.device_registry import DEVICE_ID_MIN, DEVICE_ID_MAX, DEVICE_ID_NONE, DEVICE_ID_VIRTUAL, get_device_name
 from artisanlib.qtsingleapplication import QtSingleApplication
-from artisanlib.dashboard import Dashboard, combobox_style
+from artisanlib.dashboard import Dashboard
+from artisanlib.styles import toolbar_style, combobox_style
 
 
 
@@ -1393,6 +1394,7 @@ class ApplicationWindow(QMainWindow):
     kaleidoSendMessageSignal = pyqtSignal(str,str)
     kaleidoSendMessageAwaitSignal = pyqtSignal(str,str,int,int)
     orbiterSendMessageSignal = pyqtSignal(bytes,bytes,bytes,int)
+    lebrewSendMessageSignal = pyqtSignal(str)
     addEventSignal = pyqtSignal(int,int,bool,bool,bool)
     addRawEventSignal = pyqtSignal(int,float,int,bool,bool,bool)
     updateMessageLogSignal = pyqtSignal()
@@ -3932,6 +3934,7 @@ class ApplicationWindow(QMainWindow):
         self.kaleidoSendMessageSignal.connect(self.kaleidoSendMessage)
         self.kaleidoSendMessageAwaitSignal.connect(self.kaleidoSendMessageAwait)
         self.orbiterSendMessageSignal.connect(self.orbiterSendMessage)
+        self.lebrewSendMessageSignal.connect(self.lebrewSendMessage)
         self.addEventSignal.connect(self.addEventSlot, type=Qt.ConnectionType.QueuedConnection)
         self.addRawEventSignal.connect(self.addRawEventSlot, type=Qt.ConnectionType.QueuedConnection)
            # by default the connection type is AutoConnection (If the emitter & receiver are in the same thread, a DirectConnection is used. Otherwise, a QueuedConnection is used.)
@@ -5834,8 +5837,10 @@ class ApplicationWindow(QMainWindow):
                                     self.qmc.sourcetypes_setup = [int(st) for st in ratings['sourcetypes']]
                                 if 'load_etypes' in ratings and len(ratings['load_etypes']) == 4:
                                     self.qmc.load_etypes_setup = [int(let) for let in ratings['load_etypes']]
-                                if 'presssure_percents' in ratings and len(ratings['presssure_percents']) == 4:
-                                    self.qmc.presssure_percents_setup = [bool(pp) for pp in ratings['presssure_percents']]
+                                if 'presssure_percents' in ratings and len(ratings['presssure_percents']) == 4: # typo; kept for compatibility with legacy settings
+                                    self.qmc.pressure_percents_setup = [bool(pp) for pp in ratings['presssure_percents']]
+                                if 'pressure_percents' in ratings and len(ratings['pressure_percents']) == 4:
+                                    self.qmc.pressure_percents_setup = [bool(pp) for pp in ratings['pressure_percents']]
                                 if 'loadevent_zeropcts' in ratings and len(ratings['loadevent_zeropcts']) == 4:
                                     self.qmc.loadevent_zeropcts_setup = [int(lzp) for lzp in ratings['loadevent_zeropcts']]
                                 if 'loadevent_hundpcts' in ratings and len(ratings['loadevent_hundpcts']) == 4:
@@ -6356,36 +6361,42 @@ class ApplicationWindow(QMainWindow):
             selected_canvas_color = selected_canvas_color.darker(120)
             border_color = '#3c3c3c'
 
-        self.ntb.setStyleSheet(f"""
-            QToolBar {{
-                background-color: {rgba_colorname2argb_colorname(canvas_color)};
-                border: 0px solid;
-                color: {rgba_colorname2argb_colorname(title_color)};
-                spacing: 2px;
-            }}
-            QToolBar::separator {{
-                background-color: transparent;
-            }}
-            QToolButton:checked {{
-                background-color: {selected_canvas_color.name()};
-            }}
-            QToolButton:hover {{
-                border-color: {border_color};
-            }}
-            QToolButton:checked:hover {{
-                border-color: {border_color};
-                background-color: {selected_canvas_color.name()};
-            }}
-            QToolButton {{
-                border-width: 1px;
-                border-style: solid;
-                border-radius: 5px;
-                border-color: transparent;
-                margin: 0px;
-                padding: 0px;
-                background-color: transparent;
-            }}
-        """)
+        self.ntb.setStyleSheet(toolbar_style(
+            rgba_colorname2argb_colorname(title_color),
+            rgba_colorname2argb_colorname(canvas_color),
+            border_color,
+            selected_canvas_color.name()))
+
+#        self.ntb.setStyleSheet(f"""
+#            QToolBar {{
+#                background-color: {rgba_colorname2argb_colorname(canvas_color)};
+#                border: 0px solid;
+#                color: {rgba_colorname2argb_colorname(title_color)};
+#                spacing: 2px;
+#            }}
+#            QToolBar::separator {{
+#                background-color: transparent;
+#            }}
+#            QToolButton:checked {{
+#                background-color: {selected_canvas_color.name()};
+#            }}
+#            QToolButton:hover {{
+#                border-color: {border_color};
+#            }}
+#            QToolButton:checked:hover {{
+#                border-color: {border_color};
+#                background-color: {selected_canvas_color.name()};
+#            }}
+#            QToolButton {{
+#                border-width: 1px;
+#                border-style: solid;
+#                border-radius: 5px;
+#                border-color: transparent;
+#                margin: 0px;
+#                padding: 0px;
+#                background-color: transparent;
+#            }}
+#        """)
 
 
         if self.comparator is None:
@@ -9218,6 +9229,8 @@ class ApplicationWindow(QMainWindow):
                     ##  sleep(s) : sleep for s seconds, s a float
                     ##  santoker(<target>,<value>) : the byte <target> indicates where <value> of type integer should be written to
                     ##  kaleido(<target>,<value>) : the <target> string indicates where <value> of type string should be written to
+                    ##  orbiter(<cmd>[,<value>[,<param>]]) : <cmd>: command (1 byte in hex syntax), optional: <value> a 16bit positive number, <param> a number 0-255
+                    ##  lebrew(<msg>) : sends message <msg> to the connected RoastSee NEXT device
                     ##  shellyrelay(n,b) : switches Shelly plug number <n> ON if b is true or 1, and OFF otherwise
                     ##  publish(<topic>,<data>) : converts the given data to JSON and publishes it on the MQTT server to the given topic.
                     #      Publish will connect to the specified broker if not yet connected and subscribe to the configured topics
@@ -9457,6 +9470,20 @@ class ApplicationWindow(QMainWindow):
                                                     self.orbiterSendMessageSignal.emit(orbiter_cmd, orbiter_data, orbiter_param, self.qmc.current_time())
                                             except Exception as e: # pylint: disable=broad-except
                                                 _log.error(e)
+
+                                # notify(<t>[,<m>) with <t> the title of the notification and <m> an optional message
+                                # lebrew(<msg>) : sends message <msg> to the connected RoastSee NEXT device
+                                elif cs.startswith('lebrew(') and cs.endswith(')'):
+                                    try:
+                                        cs_split = cs[len('lebrew('):-1].split(',')
+                                        if len(cs_split) == 1:
+                                            try:
+                                                msg = str(eval(cs_split[0][:eval_limit])) # pylint: disable=eval-used
+                                            except Exception: # pylint: disable=broad-except
+                                                msg = str(cs_split[0])
+                                            self.lebrewSendMessageSignal.emit(msg)
+                                    except Exception as e: # pylint: disable=broad-except
+                                        _log.exception(e)
 
                                 ##  shellyrelay(n,b) : switches Shelly plug number <n> ON if b is true or 1, and OFF otherwise
                                 elif c.startswith('shellyrelay'):
@@ -10790,6 +10817,36 @@ class ApplicationWindow(QMainWindow):
                                     self.sendmessage(QApplication.translate('Message','Replay Lookahead: {0}').format(self.qmc.ramp_lookahead))
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
+
+                            # pidPositiveTargetMin(<n>) : PID positive target range minimum <n> (integer, limited by the range of the positive target slider range)
+                            elif cs.startswith('pidPositiveTargetMin(') and cs.endswith(')'):
+                                try:
+                                    int_value = toInt(eval(cs[len('pidPositiveTargetMin('):-1][:eval_limit])) # pylint: disable=eval-used
+                                    self.pidcontrol.setPositiveTargetMin(int_value)
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+                            # pidPositiveTargetMax(<n>) : PID positive target range maximum <n> (integer, limited by the range of the positive target slider range)
+                            elif cs.startswith('pidPositiveTargetMax(') and cs.endswith(')'):
+                                try:
+                                    int_value = toInt(eval(cs[len('pidPositiveTargetMax('):-1][:eval_limit])) # pylint: disable=eval-used
+                                    self.pidcontrol.setPositiveTargetMax(int_value)
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+                            # pidNegativeTargetMin(<n>) : PID negative target range minimum <n> (integer, limited by the range of the negative target slider range)
+                            elif cs.startswith('pidNegativeTargetMin(') and cs.endswith(')'):
+                                try:
+                                    int_value = toInt(eval(cs[len('pidNegativeTargetMin('):-1][:eval_limit])) # pylint: disable=eval-used
+                                    self.pidcontrol.setNegativeTargetMin(int_value)
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+                            # pidNegativeTargetMax(<n>) : PID negative target range maximum <n> (integer, limited by the range of the negative target slider range)
+                            elif cs.startswith('pidNegativeTargetMax(') and cs.endswith(')'):
+                                try:
+                                    int_value = toInt(eval(cs[len('pidNegativeTargetMax('):-1][:eval_limit])) # pylint: disable=eval-used
+                                    self.pidcontrol.setNegativeTargetMax(int_value)
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+
                             # keyboard(<bool>) enable/disable keyboard mode
                             elif cs.startswith('keyboard(') and cs.endswith(')'):
                                 try:
@@ -14049,8 +14106,10 @@ class ApplicationWindow(QMainWindow):
             self.qmc.sourcetypes = [int(x) for x in profile['sourcetypes']]
         if 'load_etypes' in profile and len(profile['load_etypes']) == 4:
             self.qmc.load_etypes = [int(x) for x in profile['load_etypes']]
-        if 'presssure_percents' in profile and len(profile['presssure_percents']) == 4:
-            self.qmc.presssure_percents = [bool(x) for x in profile['presssure_percents']]
+        if 'presssure_percents' in profile and len(profile['presssure_percents']) == 4: # typo; kept for compatibility to legacy settings
+            self.qmc.pressure_percents = [bool(x) for x in profile['presssure_percents']]
+        if 'pressure_percents' in profile and len(profile['pressure_percents']) == 4:
+            self.qmc.pressure_percents = [bool(x) for x in profile['pressure_percents']]
         if 'loadevent_zeropcts' in profile and len(profile['loadevent_zeropcts']) == 4:
             self.qmc.loadevent_zeropcts = [int(x) for x in profile['loadevent_zeropcts']]
         if 'loadevent_hundpcts' in profile and len(profile['loadevent_hundpcts']) == 4:
@@ -17161,7 +17220,7 @@ class ApplicationWindow(QMainWindow):
                 profile['ratingunits'] = self.qmc.ratingunits
                 profile['sourcetypes'] = self.qmc.sourcetypes
                 profile['load_etypes'] = self.qmc.load_etypes
-                profile['presssure_percents'] = self.qmc.presssure_percents
+                profile['pressure_percents'] = self.qmc.pressure_percents
                 profile['loadevent_zeropcts'] = self.qmc.loadevent_zeropcts
                 profile['loadevent_hundpcts'] = self.qmc.loadevent_hundpcts
                 profile['meterlabels'] = self.qmc.meterlabels
@@ -17848,6 +17907,12 @@ class ApplicationWindow(QMainWindow):
     def orbiterSendMessage(self, cmd:bytes, data:bytes, param:bytes, time:int) -> None:
         if self.orbiter is not None:
             self.orbiter.send_msg_await(cmd, data, param, time)
+
+    # lebrewSendMessage() just sends out the message to the RoastSee NEXT device without waiting for a response
+    @pyqtSlot(str)
+    def lebrewSendMessage(self, msg:str) -> None:
+        if self.lebrew_roastseeNEXT is not None:
+            self.lebrew_roastseeNEXT.send_message(msg)
 
     # if record is True, an event is added during recording, otherwise only the slider is moved
     # if fire_slider_action is True, the slider action is fired
@@ -19014,7 +19079,8 @@ class ApplicationWindow(QMainWindow):
             self.qmc.ratingunits_setup = [toInt(x) for x in toList(settings.value('ratingunits_setup', self.qmc.ratingunits_setup))]
             self.qmc.sourcetypes_setup = [toInt(x) for x in toList(settings.value('sourcetypes_setup', self.qmc.sourcetypes_setup))]
             self.qmc.load_etypes_setup = [toInt(x) for x in toList(settings.value('load_etypes_setup', self.qmc.load_etypes_setup))]
-            self.qmc.presssure_percents_setup = [toBool(x) for x in toList(settings.value('presssure_percents_setup', self.qmc.presssure_percents_setup))]
+            self.qmc.pressure_percents_setup = [toBool(x) for x in toList(settings.value('presssure_percents_setup', self.qmc.pressure_percents_setup))] # typo; kept to load legacy settings
+            self.qmc.pressure_percents_setup = [toBool(x) for x in toList(settings.value('pressure_percents_setup', self.qmc.pressure_percents_setup))]
             self.qmc.loadevent_zeropcts_setup = [toInt(x) for x in toList(settings.value('loadevent_zeropcts_setup', self.qmc.loadevent_zeropcts_setup))]
             self.qmc.loadevent_hundpcts_setup = [toInt(x) for x in toList(settings.value('loadevent_hundpcts_setup', self.qmc.loadevent_hundpcts_setup))]
             self.qmc.meterlabels_setup = [toString(x) for x in toList(settings.value('meterlabels_setup', self.qmc.meterlabels_setup))]
@@ -20891,7 +20957,7 @@ class ApplicationWindow(QMainWindow):
             self.settingsSetValue(settings, default_settings, 'ratingunits_setup',self.qmc.ratingunits_setup, read_defaults)
             self.settingsSetValue(settings, default_settings, 'sourcetypes_setup',self.qmc.sourcetypes_setup, read_defaults)
             self.settingsSetValue(settings, default_settings, 'load_etypes_setup',self.qmc.load_etypes_setup, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'presssure_percents_setup',self.qmc.presssure_percents_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'pressure_percents_setup',self.qmc.pressure_percents_setup, read_defaults)
             self.settingsSetValue(settings, default_settings, 'loadevent_zeropcts_setup',self.qmc.loadevent_zeropcts_setup, read_defaults)
             self.settingsSetValue(settings, default_settings, 'loadevent_hundpcts_setup',self.qmc.loadevent_hundpcts_setup, read_defaults)
             self.settingsSetValue(settings, default_settings, 'meterlabels_setup',self.qmc.meterlabels_setup, read_defaults)

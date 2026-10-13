@@ -163,22 +163,23 @@ class BLE:
 
     def write(self, client:BleakClient, write_uuid:str, message:bytes, response:bool = False, chunk:int = 20) -> None:
         if hasattr(self, '_asyncLoopThread') and self._asyncLoopThread is not None and client.is_connected:
-            async def _do_chunked_write() -> None:
-                for i in range(0, len(message), chunk):
-                    try:
-                        await client.write_gatt_char(write_uuid, message[i:i+chunk], response=response)
-                    except Exception as e:
-                        _log.error('chunk not written to airwave %d : %s', i, e)
-                        raise # Return error for handling below
-            fut = asyncio.run_coroutine_threadsafe(_do_chunked_write(), self._asyncLoopThread.loop)
             try:
-                # Add a 5 second timeout to avoid a complete crash in the event of hardware failure.
-                fut.result(timeout=5.0)
-            except TimeoutError:
-                _log.error('BLE timeout')
-                fut.cancel()
-                raise
-            except Exception as e:
+                async def _do_chunked_write() -> None:
+                    for i in range(0, len(message), chunk):
+                        try:
+                            await client.write_gatt_char(write_uuid, message[i:i+chunk], response=response)
+                        except Exception as e:
+                            _log.error('chunk not written to airwave %d : %s', i, e)
+                            raise # Return error for handling below
+                fut = asyncio.run_coroutine_threadsafe(_do_chunked_write(), self._asyncLoopThread.loop)
+                try:
+                    # Add a 5 second timeout to avoid a complete crash in the event of hardware failure.
+                    fut.result(timeout=5.0)
+                except TimeoutError:
+                    _log.error('BLE timeout')
+                    fut.cancel()
+                    raise
+            except Exception as e: # could be disconnected
                 _log.error('unhandled error on BLE : %s', e)
                 raise
 
