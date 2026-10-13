@@ -31,7 +31,7 @@ The device types connecting to the RoastSee NEXT are
    - Yellow mark (1 at the moment the Yellow/DRY point was detected; 0 otherwise)
 
 
-The IO Command `lebrew(\<msg\>)` sends the given `\<msg\>` to the device while it is connected. This command can be assigned to buttons as shown below. Supported messages are
+The IO Command `lebrew(<msg>)` sends the given `<msg>` to the device while it is connected. This command can be assigned to buttons as shown below. Supported messages are
 
 - `roasting` : switch to roasting screen
 - `start` : start recording and start sending readings to artisan
