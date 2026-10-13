@@ -28,7 +28,7 @@
 # Marko Luther
 
 from PyQt6.QtCore import QSemaphore, QTimer, Qt, pyqtSlot
-from PyQt6.QtWidgets import QApplication, QMessageBox
+from PyQt6.QtWidgets import QApplication
 
 import platform
 import threading
@@ -38,7 +38,8 @@ from typing import Final, TYPE_CHECKING
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
 
-from plus import config, connection, stock, queue, sync, roast, util
+from plus import config, connection, stock, queue, sync, roast
+from artisanlib.dialogs import artisan_question
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -333,14 +334,9 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
 # show a dialog to have the user confirm the disconnect action
 # NOTE: adding a stylesheet to the QApplication referts this to a Qt dialog instead of native dialogs again
 def disconnect_confirmed() -> bool:
-    string = QApplication.translate('Plus', 'Disconnect?')
-    mbox = QMessageBox()
-    mbox.setText(string)
     if config.app_window is not None:
-        util.setPlusIcon(mbox, config.app_window.app.darkmode)
-    mbox.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-    res = mbox.exec()
-    return QMessageBox.StandardButton.Yes == res
+        return artisan_question(config.app_window, config.app_window, '', QApplication.translate('Plus', 'Disconnect?'), default_cancel=True)
+    return False
 
 # if keepON is set (the default), the credentials are not removed at all and
 # just the connected flag is toggled to keep plus in ON (dark-grey) state

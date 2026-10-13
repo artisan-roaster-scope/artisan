@@ -505,12 +505,8 @@ class editGraphDlg(ArtisanResizeablDialog):
     connectScaleSignal = pyqtSignal()
     readScaleSignal = pyqtSignal()
 
-    # if start_recording_on_exit is set, on leaving the dialog with OK, the recording is started in case plus is connected and beans have been set
-    # and the flags "Open on CHARGE" and "Open on DROP" are not set
-    def __init__(self, parent:QWidget, aw:'ApplicationWindow', activeTab:int = 0, start_recording_on_exit:bool = False) -> None:
+    def __init__(self, parent:QWidget, aw:'ApplicationWindow', activeTab:int = 0) -> None:
         super().__init__(parent, aw)
-
-        self.start_recording_on_exit = start_recording_on_exit
 
         self.ETname = self.aw.qmc.device_name_subst(self.aw.ETname)
         self.BTname = self.aw.qmc.device_name_subst(self.aw.BTname)
@@ -1764,16 +1760,6 @@ class editGraphDlg(ArtisanResizeablDialog):
         totallayout.setSpacing(4)
         self.volume_percent()
 
-        if start_recording_on_exit:
-            from PyQt6.QtWidgets import QMessageBox
-            string = QApplication.translate('Message', 'artisan platform needs to know the beans you are roasting')
-            mbox = QMessageBox(self.aw)
-            mbox.setText(string)
-            plus.util.setPlusIcon(mbox, self.aw.app.darkmode)
-            mbox.setStandardButtons(QMessageBox.StandardButton.Ok)
-            mbox.exec()
-            self.aw.qmc.plus_beans_reminder_on_start = False # prevent this warning to be shown again for this recording
-
         self.setLayout(totallayout)
 
         self.populatePlusCoffeeBlendCombos()
@@ -2061,18 +2047,9 @@ class editGraphDlg(ArtisanResizeablDialog):
                     line = line + str(int(round(i['ratio']*100))) + '% ' + c
             if line and len(line)>0 and self.plus_store_selected is not None and self.plus_store_selected_label is not None:
                 line = line + f'  (<a href="{plus.util.storeLink(self.plus_store_selected)}"{dark_mode_link_color}>{self.plus_store_selected_label}</a>)'
-            ok_button: QPushButton|None
             if line == '':
                 # beans not specified
                 line = QApplication.translate('Label','Choose beans')
-                if self.start_recording_on_exit:
-                    ok_button = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
-                    if ok_button is not None:
-                        ok_button.setEnabled(False)
-            elif self.start_recording_on_exit:
-                ok_button = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
-                if ok_button is not None:
-                    ok_button.setEnabled(True)
 
             self.plus_selected_line.setText(line)
         except Exception as e: # pylint: disable=broad-except
@@ -5963,15 +5940,6 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         # update dashboard
         self.aw.dashboard.update_dashboard()
-
-        if (self.start_recording_on_exit and
-                not self.aw.qmc.flagstart and                        # not yet recording
-                self.aw.plus_account is not None and                 # plus connected
-                not self.aw.qmc.roastpropertiesAutoOpenFlag and      # no "Open on CHARGE"
-                not self.aw.qmc.roastpropertiesAutoOpenDropFlag and  # no "Open on DROP"
-                (self.aw.qmc.plus_coffee is not None or self.aw.qmc.plus_blend_spec is not None or self.aw.qmc.beans != '')): # beans are set
-            # we trigger the START of the recording on leaving this dialog
-            self.aw.qmc.toggleRecorderSignal.emit()
 
         super().accept()
 

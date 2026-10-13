@@ -51,11 +51,13 @@ class SamplingDlg(ArtisanDialog):
 
         self.keepOnFlag = QCheckBox(QApplication.translate('Label','Keep ON'))
         self.keepOnFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.keepOnFlag.setChecked(bool(self.aw.qmc.flagKeepON))
+        self.keepOnFlag.setChecked(self.aw.qmc.flagKeepON)
+        self.keepOnFlag.stateChanged.connect(self.keepOn_flag_changed)
 
         self.openCompletedFlag = QCheckBox(QApplication.translate('Label','Open Completed Roast in Viewer'))
         self.openCompletedFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.openCompletedFlag.setChecked(bool(self.aw.qmc.flagOpenCompleted))
+        self.openCompletedFlag.setChecked(self.aw.qmc.flagOpenCompleted)
+        self.openCompletedFlag.setEnabled(self.aw.qmc.flagKeepON)
 
         self.interval = MyQDoubleSpinBox()
         self.interval.setStyleSheet(spin_box_style(self.aw.app.darkmode))
@@ -114,6 +116,10 @@ class SamplingDlg(ArtisanDialog):
             self.move(settings.value('SamplingPosition'))
 
         layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
+
+    @pyqtSlot(int)
+    def keepOn_flag_changed(self, _:int = 0) -> None:
+        self.openCompletedFlag.setEnabled(self.keepOnFlag.isChecked())
 
     #window close box
     @pyqtSlot('QCloseEvent')

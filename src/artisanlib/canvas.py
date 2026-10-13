@@ -75,7 +75,8 @@ from artisanlib.util import (to_ascii, uchr, fill_gaps, deltaLabelPrefix, deltaL
 from artisanlib import pid
 from artisanlib.time import ArtisanTime
 #from artisanlib.filters import LiveMedian
-from artisanlib.dialogs import DesignerSplineNodesDlg, ArtisanMessageBox, artisan_information, artisan_question, artisan_confirm_save_dialog
+from artisanlib.dialogs import (DesignerSplineNodesDlg, ArtisanMessageBox, artisan_information, artisan_question,
+    artisan_confirm_save_dialog, artisan_confirmation_dialog)
 from artisanlib.atypes import SerialSettings, BTBreakParams, BbpCache, AlarmSet, EnergyMetrics
 from artisanlib.styles import push_button_style
 from artisanlib.device_registry import is_special_device, is_non_temp_device, is_non_temp_device_chan, is_phidget_device, is_binary_device
@@ -14095,7 +14096,11 @@ class tgraphcanvas(QObject):
                     (self.plus_coffee is None and self.plus_blend_spec is None and self.beans == '') and # beans are not set
                     (self.aw.schedule_window is None or self.aw.schedule_window.selected_remaining_item is None) # scheduler is off or no schedule item selected
                     ):
-                self.aw.open_roast_properties_dialog(start_recording_on_exit=True)
+                self.aw.dashboard.show_dashboard()
+                self.aw.qmc.plus_beans_reminder_on_start = False # prevent this warning to be shown again for this recording
+                artisan_confirmation_dialog(self.aw, self.aw,
+                    QApplication.translate('Message', 'artisan platform needs to know the beans you are roasting'), '',
+                    True)
                 return
 
             self.aw.soundpopSignal.emit()

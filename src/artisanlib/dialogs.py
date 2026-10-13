@@ -586,7 +586,8 @@ class ArtisanConfirmationDialog(ArtisanDialog):
         buttonLayout.addStretch()
         layout = QVBoxLayout()
         layout.addLayout(titleLayout)
-        layout.addLayout(labelLayout)
+        if wrapped_text != '':
+            layout.addLayout(labelLayout)
         layout.addSpacing(15)
         layout.addLayout(buttonLayout)
         self.setLayout(layout)

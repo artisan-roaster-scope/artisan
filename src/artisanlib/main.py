@@ -392,6 +392,7 @@ class Artisan(QtSingleApplication):
                         aw.loadBackgroundSignal.emit(filename, True, True)
                     else:
                         aw.loadFileSignal.emit(filename)
+                    aw.dashboard.hide_dashboard()
                 elif file_suffix == 'alrm' and not aw.app.artisanviewerMode:
                     # load Artisan alarms on double-click on *.alrm file
                     aw.loadAlarmsSignal.emit(filename)
@@ -401,22 +402,27 @@ class Artisan(QtSingleApplication):
                 elif file_suffix == 'json' and not aw.app.artisanviewerMode and aw.comparator is None:
                     # import Artisan JSON profile
                     aw.importJSON(filename)
+                    aw.dashboard.hide_dashboard()
                 elif file_suffix == 'xls' and not aw.app.artisanviewerMode and aw.comparator is None:
                     # import Cropster XLS profile
                     from artisanlib.cropster import extractProfileCropsterXLS
                     aw.importExternal(extractProfileCropsterXLS, QApplication.translate('Message','Import {}').format('Cropster XLS'),'*.xls',filename)
+                    aw.dashboard.hide_dashboard()
                 elif file_suffix == 'csv' and not aw.app.artisanviewerMode and aw.comparator is None:
                     # import Giesen CSV profile
                     from artisanlib.giesen import extractProfileGiesenCSV
                     aw.importExternal(extractProfileGiesenCSV, QApplication.translate('Message','Import {}').format('Giesen CSV'),'*.csv',filename)
+                    aw.dashboard.hide_dashboard()
                 elif file_suffix == 'xlsx' and not aw.app.artisanviewerMode and aw.comparator is None:
                     # import Stronghold XLSX profile
                     from artisanlib.stronghold import extractProfileStrongholdXLSX
                     aw.importExternal(extractProfileStrongholdXLSX, QApplication.translate('Message','Import {}').format('Stronghold XLSX'),'*.xlsx',filename)
+                    aw.dashboard.hide_dashboard()
                 if filename.endswith(('.zip', '.rop')) and not aw.app.artisanviewerMode and aw.comparator is None:
                     # import Orbiter .rop/.zip profile
                     from artisanlib.orbiter import extractProfileOrbiterROP
                     aw.importExternal(extractProfileOrbiterROP, QApplication.translate('Message','Import {}').format('Orbiter'),'(*.rop *.zip)',filename)
+                    aw.dashboard.hide_dashboard()
 
 
         elif platform.system() == 'Windows' and not self.artisanviewerMode:
@@ -25843,10 +25849,10 @@ class ApplicationWindow(QMainWindow):
     def editgraph(self, _:bool = False) -> None:
         self.open_roast_properties_dialog()
 
-    def open_roast_properties_dialog(self, start_recording_on_exit:bool=False) -> None:
+    def open_roast_properties_dialog(self) -> None:
         if self.editgraphdialog is not False and self.editgraphdialog is None: # Roast Properties dialog is not blocked!
             from artisanlib.roast_properties import editGraphDlg
-            self.editgraphdialog = editGraphDlg(self,self,self.editGraphDlg_activeTab,start_recording_on_exit)
+            self.editgraphdialog = editGraphDlg(self,self,self.editGraphDlg_activeTab)
             self.editgraphdialog.show()
 
     @pyqtSlot()
@@ -26346,6 +26352,7 @@ class ApplicationWindow(QMainWindow):
                     url = self.ArtisanOpenURLDialog(msg=message)
                 if url is None:
                     return
+                self.dashboard.show_dashboard()
                 try:
                     obj = extractor(url,
                                     self.qmc.etypesdefault[:],
