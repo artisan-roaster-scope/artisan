@@ -181,6 +181,10 @@ if TYPE_CHECKING:
         from artisanlib.ikawa import IKAWA_BLE # pylint: disable=unused-import
     except Exception: # pylint: disable=broad-except
         pass
+    try:
+        from artisanlib.sr900 import SR900_BLE # pylint: disable=unused-import
+    except Exception: # pylint: disable=broad-except
+        pass
     from matplotlib.text import Annotation # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
     from openpyxl.worksheet.worksheet import Worksheet # pylint: disable=unused-import
     import numpy.typing as npt # pylint: disable=unused-import
@@ -1361,6 +1365,7 @@ class ApplicationWindow(QMainWindow):
     kaleidoSendMessageSignal = pyqtSignal(str,str)
     kaleidoSendMessageAwaitSignal = pyqtSignal(str,str,int,int)
     orbiterSendMessageSignal = pyqtSignal(bytes,bytes,bytes,int)
+    sr900SendMessageSignal = pyqtSignal(str,int)
     addEventSignal = pyqtSignal(int,int,bool,bool,bool)
     addRawEventSignal = pyqtSignal(int,float,int,bool,bool,bool)
     updateMessageLogSignal = pyqtSignal()
@@ -1398,7 +1403,7 @@ class ApplicationWindow(QMainWindow):
         'seriallog', 'ser', 'modbus', 'extraMODBUStemps', 'extraMODBUStx', 's7', 'extraS7tx', 'ws', 'extraser', 'extracomport', 'extrabaudrate',
         'extrabytesize', 'extraparity', 'extrastopbits', 'extratimeout', 'hottop', 'santokerHost', 'santokerPort', 'santokerSerial', 'santokerBLE', 'santokerEventFlags', 'santoker', 'santokerR', 'lebrew_roastseeNEXT', 'thermoworksBlueDOT', 'fujipid', 'dtapid', 'pidcontrol', 'soundflag', 'recentRoasts', 'maxRecentRoasts',
         'mugmaHost','mugmaPort', 'mugma', 'mugma_default_host', 'shelly_3EMPro_host', 'shelly_PlusPlug_host',
-        'kaleido_default_host', 'kaleidoHost', 'kaleidoPort', 'kaleidoSerial', 'kaleidoPID', 'kaleido', 'kaleidoEventFlags', 'colorTrack_mean_window_size', 'colorTrack_median_window_size', 'ikawa',
+        'kaleido_default_host', 'kaleidoHost', 'kaleidoPort', 'kaleidoSerial', 'kaleidoPID', 'kaleido', 'kaleidoEventFlags', 'colorTrack_mean_window_size', 'colorTrack_median_window_size', 'ikawa', 'sr900',
         'lcdpaletteB', 'lcdpaletteF', 'extraeventsbuttonsflags', 'extraeventslabels', 'extraeventbuttoncolor', 'extraeventsactionstrings',
         'extraeventbuttonround', 'block_quantification_sampling_ticks', 'sampling_seconds_to_block_quantifiction', 'sampling_ticks_to_block_quantifiction', 'extraeventsactionslastvalue',
         'org_extradevicesettings', 'eventslidervalues', 'eventslidervisibilities', 'eventsliderKeyboardControl', 'eventsliderAlternativeLayout_default',
@@ -1792,6 +1797,9 @@ class ApplicationWindow(QMainWindow):
 
         # Ikawa BLE
         self.ikawa:'IKAWA_BLE|None' = None # noqa: UP037
+
+        # SR900 BLE
+        self.sr900:'SR900_BLE|None' = None # noqa: UP037
 
         # create a ET control objects
         self.fujipid: FujiPID = FujiPID(self)
@@ -3831,6 +3839,7 @@ class ApplicationWindow(QMainWindow):
         self.kaleidoSendMessageSignal.connect(self.kaleidoSendMessage)
         self.kaleidoSendMessageAwaitSignal.connect(self.kaleidoSendMessageAwait)
         self.orbiterSendMessageSignal.connect(self.orbiterSendMessage)
+        self.sr900SendMessageSignal.connect(self.sr900SendMessage)
         self.addEventSignal.connect(self.addEventSlot, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
         self.addRawEventSignal.connect(self.addRawEventSlot, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
            # by default the connection type is AutoConnection (If the emitter & receiver are in the same thread, a DirectConnection is used. Otherwise, a QueuedConnection is used.)
@@ -5580,7 +5589,7 @@ class ApplicationWindow(QMainWindow):
                                     self.modbus.comport = new_port
                                 else: # Fuji or HOTTOP
                                     self.ser.comport = new_port
-                    elif not no_config and self.qmc.device == 142: # IKAWA
+                    elif not no_config and self.qmc.device in {142, 209}: # IKAWA, SR900
                         # we request Bluetooth permission
                         permission_status:bool|None = self.app.getBluetoothPermission(request=True)
                         if permission_status is False:
@@ -8991,6 +9000,7 @@ class ApplicationWindow(QMainWindow):
                     ##  sleep(s) : sleep for s seconds, s a float
                     ##  santoker(<target>,<value>) : the byte <target> indicates where <value> of type integer should be written to
                     ##  kaleido(<target>,<value>) : the <target> string indicates where <value> of type string should be written to
+                    ##  sr900(<target>[,<value>]) : the <target> string selects the SR900 command, <value> an optional integer argument
                     ##  shellyrelay(n,b) : switches Shelly plug number <n> ON if b is true or 1, and OFF otherwise
                     ##  publish(<topic>,<data>) : converts the given data to JSON and publishes it on the MQTT server to the given topic.
                     #      Publish will connect to the specified broker if not yet connected and subscribe to the configured topics
@@ -9228,6 +9238,27 @@ class ApplicationWindow(QMainWindow):
                                                     if len(parts) > 2:
                                                         orbiter_param = min(255, max(0, int(round(float(parts[2]))))).to_bytes(1, 'little')
                                                     self.orbiterSendMessageSignal.emit(orbiter_cmd, orbiter_data, orbiter_param, self.qmc.current_time())
+                                            except Exception as e: # pylint: disable=broad-except
+                                                _log.error(e)
+
+                                ##  sr900(<target>[,<value>]) : the <target> string selects the command, <value> an optional integer argument
+                                #     targets: heat,<0-9> / fan,<0-9> / start / stop / cool /
+                                #              roasttime,<minutes> / cooltime,<minutes> (firmware timers sent with start) /
+                                #              autostop,<T> (firmware bean temperature cutoff in F or C, 0 is OFF) /
+                                #              altitude,<0|1> (below/above 3000ft) / voltage,<0|1|2> (<113V/113-118V/>118V)
+                                #     ex: sr900(heat,7) => set the heater level to 7; sr900(start) => start a manual roast
+                                elif c.startswith('sr900'):
+                                    if self.sr900 is not None:
+                                        args = c[len('sr900'):]
+                                        if args.startswith('(') and args.endswith(')'):
+                                            parts = args[1:-1].split(',')
+                                            try:
+                                                target = parts[0].strip()
+                                                sr900_value:int = 0
+                                                if len(parts) > 1:
+                                                    # <value> can be a formula like "1 - _" or "1 - $"
+                                                    sr900_value = int(round(float(eval(parts[1][:eval_limit])))) # pylint: disable=eval-used
+                                                self.sr900SendMessageSignal.emit(target, sr900_value)
                                             except Exception as e: # pylint: disable=broad-except
                                                 _log.error(e)
 
@@ -17780,6 +17811,12 @@ class ApplicationWindow(QMainWindow):
     def orbiterSendMessage(self, cmd:bytes, data:bytes, param:bytes, time:int) -> None:
         if self.orbiter is not None:
             self.orbiter.send_msg_await(cmd, data, param, time)
+
+    # sr900SendMessage() just sends out the message to the machine without waiting for a response
+    @pyqtSlot(str,int)
+    def sr900SendMessage(self, target:str, value:int) -> None:
+        if self.sr900 is not None:
+            self.sr900.send_msg(target, value)
 
     # if record is True, an event is added during recording, otherwise only the slider is moved
     # if fire_slider_action is True, the slider action is fired

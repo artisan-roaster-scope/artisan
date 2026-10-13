@@ -13064,6 +13064,19 @@ class tgraphcanvas(QObject):
                         _log.exception(ex)
                         _, _, exc_tb = sys.exc_info()
                         self.adderror((QApplication.translate('Error Message', 'Exception:') + ' Bluetooth BLE support not available {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+                elif self.device == 209:
+                    try:
+                        from artisanlib.sr900 import SR900_BLE
+                        self.aw.sr900 = SR900_BLE(
+                            connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('SR900'),True,None),
+                            disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('SR900'),True,None))
+                        self.aw.sr900.setLogging(self.device_logging)
+                        self.aw.sr900.start_sampling()
+                        self.aw.sendmessageSignal.emit(QApplication.translate('Message', 'scanning for device'),True,None)
+                    except Exception as ex:  # pylint: disable=broad-except
+                        _log.exception(ex)
+                        _, _, exc_tb = sys.exc_info()
+                        self.adderror((QApplication.translate('Error Message', 'Exception:') + ' Bluetooth BLE support not available {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                 elif self.device == 164:
                     # connect Mugma
                     from artisanlib.mugma import Mugma
@@ -13272,6 +13285,11 @@ class tgraphcanvas(QObject):
                 if not bool(self.aw.simulator) and self.device == 196 and self.aw.orbiter is not None:
                     self.aw.orbiter.disconnect(wasRecording, self.timeindex[6] != 0)
                     self.aw.orbiter = None
+
+                # disconnect SR900
+                if not bool(self.aw.simulator) and self.device == 209 and self.aw.sr900 is not None:
+                    self.aw.sr900.stop_sampling(wasRecording, self.timeindex[6] != 0)
+                    self.aw.sr900 = None
 
                 # disconnect MQTT
                 if not bool(self.aw.simulator) and self.device == 201:
