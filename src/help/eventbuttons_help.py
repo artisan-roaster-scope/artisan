@@ -146,6 +146,7 @@ def content() -> str:
     tbl_Commands.add_row(['&#160;','kaleido(<target>,<value>)',QApplication.translate('HelpDlg','sends <value> to <target> via the Kaleido Serial or Network protocol')])
     tbl_Commands.add_row(['&#160;','orbiter(<cmd>[,<value>[,<param>]])',QApplication.translate('HelpDlg','sends <cmd> (1byte in HEX) and optional <value> (0-65535) and <param> (0-255) to Orbiter')])
     tbl_Commands.add_row(['&#160;','lebrew(<msg>)',QApplication.translate('HelpDlg','sends <msg> to the BLE connected RoastSeeNEXT device')])
+    tbl_Commands.add_row(['&#160;','sr900(<target>[,<value>])',QApplication.translate('HelpDlg','sends <target> command like ‘heat’ and ‘fan’, with optional int <value>')])
     tbl_Commands.add_row(['&#160;','shellyrelay(n,b)',QApplication.translate('HelpDlg','switches Shelly plug number <n> ON if b is true or 1, and OFF otherwise')])
     tbl_Commands.add_row(['&#160;','publish(<topic>, <value>)',QApplication.translate('HelpDlg','converts the given data to JSON and publishes it on the MQTT server to the given topic')])
     tbl_Commands.add_row([QApplication.translate('HelpDlg','Hottop Heater'),'&#160;',QApplication.translate('HelpDlg','sets heater to value')])

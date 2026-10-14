@@ -181,6 +181,10 @@ if TYPE_CHECKING:
         from artisanlib.ikawa import IKAWA_BLE # pylint: disable=unused-import
     except Exception: # pylint: disable=broad-except
         pass
+    try:
+        from artisanlib.sr900 import SR900_BLE # pylint: disable=unused-import
+    except Exception: # pylint: disable=broad-except
+        pass
     from matplotlib.text import Annotation # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
     from openpyxl.worksheet.worksheet import Worksheet # pylint: disable=unused-import
     import numpy.typing as npt # pylint: disable=unused-import
@@ -704,7 +708,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
     def __init__(self, plotCanvas:tgraphcanvas, parent:QWidget, white_icons:bool = False) -> None:
 
         # toolitem entries of the form (text, tooltip_text, image_file, callback)
-        self.toolitems: list[tuple[str, ...] | tuple[None, ...]] = [ # zuban:ignore[assignment] # pyrefly:ignore[bad-override]
+        self.toolitems: list[tuple[str, ...] | tuple[None, ...]] = [ # zuban:ignore[assignment] # pyrefly:ignore[bad-override] # ty:ignore[invalid-attribute-override]
                 ('Plus', QApplication.translate('Tooltip', 'Connect to plus service'), 'plus-off', 'plus'),
                 ('', QApplication.translate('Tooltip', 'Subscription'), 'plus-pro', 'subscription'),
                 (None, None, None, None),
@@ -1394,6 +1398,7 @@ class ApplicationWindow(QMainWindow):
     kaleidoSendMessageSignal = pyqtSignal(str,str)
     kaleidoSendMessageAwaitSignal = pyqtSignal(str,str,int,int)
     orbiterSendMessageSignal = pyqtSignal(bytes,bytes,bytes,int)
+    sr900SendMessageSignal = pyqtSignal(str,int)
     lebrewSendMessageSignal = pyqtSignal(str)
     addEventSignal = pyqtSignal(int,int,bool,bool,bool)
     addRawEventSignal = pyqtSignal(int,float,int,bool,bool,bool)
@@ -1432,7 +1437,7 @@ class ApplicationWindow(QMainWindow):
         'seriallog', 'ser', 'modbus', 'extraMODBUStemps', 'extraMODBUStx', 's7', 'extraS7tx', 'ws', 'extraser', 'extracomport', 'extrabaudrate',
         'extrabytesize', 'extraparity', 'extrastopbits', 'extratimeout', 'hottop', 'santokerHost', 'santokerPort', 'santokerSerial', 'santokerBLE', 'santokerEventFlags', 'santoker', 'santokerR', 'lebrew_roastseeNEXT', 'thermoworksBlueDOT', 'fujipid', 'dtapid', 'pidcontrol', 'soundflag', 'recentRoasts', 'maxRecentRoasts',
         'mugmaHost','mugmaPort', 'mugma', 'mugma_default_host', 'shelly_3EMPro_host', 'shelly_PlusPlug_host',
-        'kaleido_default_host', 'kaleidoHost', 'kaleidoPort', 'kaleidoSerial', 'kaleidoPID', 'kaleido', 'kaleidoEventFlags', 'colorTrack_mean_window_size', 'colorTrack_median_window_size', 'ikawa',
+        'kaleido_default_host', 'kaleidoHost', 'kaleidoPort', 'kaleidoSerial', 'kaleidoPID', 'kaleido', 'kaleidoEventFlags', 'colorTrack_mean_window_size', 'colorTrack_median_window_size', 'ikawa', 'sr900',
         'lcdpaletteB', 'lcdpaletteF', 'extraeventsbuttonsflags', 'extraeventslabels', 'extraeventbuttoncolor', 'extraeventsactionstrings',
         'extraeventbuttonround', 'block_quantification_sampling_ticks', 'sampling_seconds_to_block_quantifiction', 'sampling_ticks_to_block_quantifiction', 'extraeventsactionslastvalue',
         'org_extradevicesettings', 'eventslidervalues', 'eventslidervisibilities', 'eventsliderKeyboardControl', 'eventsliderAlternativeLayout_default',
@@ -1829,6 +1834,9 @@ class ApplicationWindow(QMainWindow):
 
         # Ikawa BLE
         self.ikawa:'IKAWA_BLE|None' = None # noqa: UP037
+
+        # SR900 BLE
+        self.sr900:'SR900_BLE|None' = None # noqa: UP037
 
         # create a ET control objects
         self.fujipid: FujiPID = FujiPID(self)
@@ -3934,6 +3942,7 @@ class ApplicationWindow(QMainWindow):
         self.kaleidoSendMessageSignal.connect(self.kaleidoSendMessage)
         self.kaleidoSendMessageAwaitSignal.connect(self.kaleidoSendMessageAwait)
         self.orbiterSendMessageSignal.connect(self.orbiterSendMessage)
+        self.sr900SendMessageSignal.connect(self.sr900SendMessage)
         self.lebrewSendMessageSignal.connect(self.lebrewSendMessage)
         self.addEventSignal.connect(self.addEventSlot, type=Qt.ConnectionType.QueuedConnection)
         self.addRawEventSignal.connect(self.addRawEventSlot, type=Qt.ConnectionType.QueuedConnection)
@@ -5777,7 +5786,7 @@ class ApplicationWindow(QMainWindow):
                                 self.modbus.comport = new_port
                             else: # Fuji or HOTTOP
                                 self.ser.comport = new_port
-                elif not no_config and self.qmc.device == 142: # IKAWA
+                elif not no_config and self.qmc.device in {142, 209}: # IKAWA, SR900
                     # we request Bluetooth permission
                     permission_status = self.app.getBluetoothPermission(request=True)
                     if permission_status is False:
@@ -9229,6 +9238,7 @@ class ApplicationWindow(QMainWindow):
                     ##  sleep(s) : sleep for s seconds, s a float
                     ##  santoker(<target>,<value>) : the byte <target> indicates where <value> of type integer should be written to
                     ##  kaleido(<target>,<value>) : the <target> string indicates where <value> of type string should be written to
+                    ##  sr900(<target>[,<value>]) : the <target> string selects the SR900 command, <value> an optional integer argument
                     ##  orbiter(<cmd>[,<value>[,<param>]]) : <cmd>: command (1 byte in hex syntax), optional: <value> a 16bit positive number, <param> a number 0-255
                     ##  lebrew(<msg>) : sends message <msg> to the connected RoastSee NEXT device
                     ##  shellyrelay(n,b) : switches Shelly plug number <n> ON if b is true or 1, and OFF otherwise
@@ -9484,6 +9494,27 @@ class ApplicationWindow(QMainWindow):
                                             self.lebrewSendMessageSignal.emit(msg)
                                     except Exception as e: # pylint: disable=broad-except
                                         _log.exception(e)
+
+                                ##  sr900(<target>[,<value>]) : the <target> string selects the command, <value> an optional integer argument
+                                #     targets: heat,<0-9> / fan,<0-9> / start / stop / cool /
+                                #              roasttime,<minutes> / cooltime,<minutes> (firmware timers sent with start) /
+                                #              autostop,<T> (firmware bean temperature cutoff in F or C, 0 is OFF) /
+                                #              altitude,<0|1> (below/above 3000ft) / voltage,<0|1|2> (<113V/113-118V/>118V)
+                                #     ex: sr900(heat,7) => set the heater level to 7; sr900(start) => start a manual roast
+                                elif c.startswith('sr900'):
+                                    if self.sr900 is not None:
+                                        args = c[len('sr900'):]
+                                        if args.startswith('(') and args.endswith(')'):
+                                            parts = args[1:-1].split(',')
+                                            try:
+                                                target = parts[0].strip()
+                                                sr900_value:int = 0
+                                                if len(parts) > 1:
+                                                    # <value> can be a formula like "1 - _" or "1 - $"
+                                                    sr900_value = int(round(float(eval(parts[1][:eval_limit])))) # pylint: disable=eval-used
+                                                self.sr900SendMessageSignal.emit(target, sr900_value)
+                                            except Exception as e: # pylint: disable=broad-except
+                                                _log.error(e)
 
                                 ##  shellyrelay(n,b) : switches Shelly plug number <n> ON if b is true or 1, and OFF otherwise
                                 elif c.startswith('shellyrelay'):
@@ -17907,6 +17938,12 @@ class ApplicationWindow(QMainWindow):
     def orbiterSendMessage(self, cmd:bytes, data:bytes, param:bytes, time:int) -> None:
         if self.orbiter is not None:
             self.orbiter.send_msg_await(cmd, data, param, time)
+
+    # sr900SendMessage() just sends out the message to the machine without waiting for a response
+    @pyqtSlot(str,int)
+    def sr900SendMessage(self, target:str, value:int) -> None:
+        if self.sr900 is not None:
+            self.sr900.send_msg(target, value)
 
     # lebrewSendMessage() just sends out the message to the RoastSee NEXT device without waiting for a response
     @pyqtSlot(str)

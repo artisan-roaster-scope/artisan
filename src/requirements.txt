@@ -61,7 +61,7 @@ pillow==12.3.0
 pydantic==2.14.1
 babel==2.18.0
 bleak==3.0.2
-python-statemachine==3.2.1
+python-statemachine==3.2.2
 yoctopuce==2.1.16087
 PyQt6==6.11.0
 paho-mqtt==2.1.0

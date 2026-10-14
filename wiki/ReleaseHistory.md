@@ -2,11 +2,12 @@ Detailed Release History
 ========================
 
 ----
-v4.2.2
+v5.0.0
 ------------------
 
 * ADDITIONS
   - adds support for [Dutch Master Roasters](https://artisan-scope.org/machines/dmr/)
+  - adds support for [FreshRoast SR900](https://artisan-scope.org/machines/freshroast/) including the IO Command `sr900(<target>[,<value>])`
   - adds autoCHARGE/DROP and drum speed control to the [Schuilenburg](https://artisan-scope.org/machines/schuilenburg/) PLC machine setup
   - adds autoCHARGE/autoDROP recognition for [IMF](https://artisan-scope.org/machines/imf/) as 'auto' setup which picks up CHARGE and DROP events from the machine
   - adds device setup for Lebrews online-color sensor [RoastSee NEXT](https://artisan-scope.org/devices/lebrew/) and `lebrew(<msg>)` IO Command
