@@ -16,7 +16,7 @@ types-xlrd>=2.0.0.20260518
 lxml-stubs>=0.5.1
 mypy==2.4.0
 pyright==1.1.414
-ruff>=0.17.0
+ruff>=0.17.1
 pylint==4.1.3
 pre-commit>=4.7.0
 pytest>=9.1.1

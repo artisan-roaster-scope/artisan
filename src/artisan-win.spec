@@ -311,7 +311,7 @@ for fn in [
     r'includes\roasted-favicon-48x48.png',
     r'includes\roasted-favicon.ico',
     r'includes\roasted-site.webmanifest',
-    r'includes\ artisan-combo-mark-white.svg',
+    r'includes\artisan-combo-mark-white.svg',
     r'includes\fitty_patched.js',
     r'includes\bigtext.js',
     r'includes\sorttable.js',
