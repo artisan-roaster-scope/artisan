@@ -27,6 +27,7 @@
 
 import asyncio
 import logging
+from concurrent.futures import CancelledError as FutureCancelledError, Future
 from bleak import BleakScanner, BleakClient
 from bleak.exc import BleakError, BleakCharacteristicNotFoundError, BleakBluetoothNotAvailableError
 
@@ -36,7 +37,7 @@ from PyQt6.QtCore import QObject
 from artisanlib.async_comm import AsyncLoopThread
 
 from collections.abc import Callable, Awaitable
-from typing import Final, TYPE_CHECKING
+from typing import Final, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from bleak.backends.device import BLEDevice # pylint: disable=unused-import
@@ -161,20 +162,21 @@ class BLE:
 
 ##
 
-    def write(self, client:BleakClient, write_uuid:str, message:bytes, response:bool = False, chunk:int = 20) -> None:
+    def write(self, client:BleakClient, write_uuid:str, message:bytes, response:bool = False, chunk:int = 20) -> bool:
         if hasattr(self, '_asyncLoopThread') and self._asyncLoopThread is not None and client.is_connected:
             try:
-                async def _do_chunked_write() -> None:
+                async def _do_chunked_write() -> bool:
                     for i in range(0, len(message), chunk):
                         try:
                             await client.write_gatt_char(write_uuid, message[i:i+chunk], response=response)
                         except Exception as e:
-                            _log.error('chunk not written to airwave %d : %s', i, e)
+                            _log.error('chunk not written %d : %s', i, e)
                             raise # Return error for handling below
+                    return True
                 fut = asyncio.run_coroutine_threadsafe(_do_chunked_write(), self._asyncLoopThread.loop)
                 try:
                     # Add a 5 second timeout to avoid a complete crash in the event of hardware failure.
-                    fut.result(timeout=5.0)
+                    return bool(fut.result(timeout=5.0))
                 except TimeoutError:
                     _log.error('BLE timeout')
                     fut.cancel()
@@ -182,15 +184,19 @@ class BLE:
             except Exception as e: # could be disconnected
                 _log.error('unhandled error on BLE : %s', e)
                 raise
+        return False
 
 
-    def read(self, client:BleakClient, read_uuid:str) -> bytes|None:
+    def read(self, client:BleakClient, read_uuid:str, timeout:float|None = None) -> bytes|None:
         if hasattr(self, '_asyncLoopThread') and self._asyncLoopThread is not None and client.is_connected:
             fut = asyncio.run_coroutine_threadsafe(
                     client.read_gatt_char(read_uuid),
                     self._asyncLoopThread.loop)
             try:
-                return bytes(fut.result())
+                return bytes(fut.result(timeout=timeout))
+            except TimeoutError:
+                fut.cancel()
+                _log.error('BLE read timeout')
             except Exception: # pylint: disable=broad-except
                 _log.error('exception in read: %s', fut.exception())
         return None
@@ -219,6 +225,8 @@ class BLE:
                 self._asyncLoopThread.loop)
         try:
             return fut.result()
+        except FutureCancelledError:
+            return None, None, None
         except BleakBluetoothNotAvailableError:
             _log.error('Bluetooth is not supported, turned off or permission is denied')
             return None, None, None
@@ -243,7 +251,8 @@ class BLE:
             try:
                 fut.result()
             except Exception:  # pylint: disable=broad-except
-                _log.error('exception in start_notify: %s', fut.exception())
+                exc = fut.exception() if not fut.cancelled() else asyncio.CancelledError()
+                _log.error('exception in start_notify: %s', exc)
                 self.disconnect_ble(client) # disconnect from ble client in case we cannot establish the notifications
 
     def stop_notify(self, client:'BleakClient', uuid:str) -> None:
@@ -254,7 +263,8 @@ class BLE:
             try:
                 fut.result()
             except Exception:  # pylint: disable=broad-except
-                _log.error('exception in stop_notify: %s', fut.exception())
+                exc = fut.exception() if not fut.cancelled() else asyncio.CancelledError()
+                _log.error('exception in stop_notify: %s', exc)
 
 ble = BLE() # unique to module
 
@@ -284,6 +294,9 @@ class ClientBLE(QObject):
         self._disconnected_event:asyncio.Event               = asyncio.Event() # event set on disconnect
         self._active_notification_uuids:set[str]             = set() # uuids of characteristics were notification are active
         self._sleep_between_scans:float                      = self.SCAN_BETWEEN_SCANS_START
+        ## runner submitted to the per-client loop; retained so stop()
+        ## can cancel it before joining that loop.
+        self._runner_future: Future[Any] | None              = None
 
         # configuration
         self._device_descriptions:dict[str|None, set[str]|None] = {} # maps service UUIDs to a set of device name prefixes
@@ -394,9 +407,14 @@ class ClientBLE(QObject):
 
     # release the async lock _disconnected_event after disconnect triggered to enable the automatic reconnect
     async def set_event(self) -> None:
+        deadline:float = 3.0 # max seconds to wait
+        elapsed:float = 0.0
         # if still connected, wait somewhat until really disconnected
-        while self._ble_client is not None and self._ble_client.is_connected:
+        while self._ble_client is not None and self._ble_client.is_connected and elapsed < deadline:
             await asyncio.sleep(0.05)
+            elapsed += 0.05
+        if elapsed >= deadline:
+            _log.warning('set_event: timeout waiting for disconnect, forcing event')
         await asyncio.sleep(0.1)
         self._disconnected_event.set()
 
@@ -407,7 +425,9 @@ class ClientBLE(QObject):
             asyncio.run_coroutine_threadsafe(self.set_event(), self._async_loop_thread.loop)
         self.stop_notifications()
 
-    def send(self, message:bytes, response:bool = False, write_characteristic:str|None = None, chunk:int = 20) -> None:
+    # returns whether the message was handed to a write characteristic and
+    # delivered; every early exit below is a silent no-op otherwise.
+    def send(self, message:bytes, response:bool = False, write_characteristic:str|None = None, chunk:int = 20) -> bool:
         if self._ble_client is not None and self._connected_service_uuid is not None and self._connected_service_uuid in self._writers:
             if self._logging:
                 _log.debug('send to %s: %s', self._writers[self._connected_service_uuid], message)
@@ -425,9 +445,10 @@ class ClientBLE(QObject):
                 else:
                     _log.debug('send failed. Characteristic %s not registered for write for service %s', write_characteristic, self._connected_service_uuid)
             else:
-                ble.write(self._ble_client, wc, message, response, chunk)
+                return ble.write(self._ble_client, wc, message, response, chunk)
+        return False
 
-    def read(self, read_characteristic:str|None = None) -> bytes|None:
+    def read(self, read_characteristic:str|None = None, timeout:float|None = None) -> bytes|None:
         if self._ble_client is not None and self._connected_service_uuid is not None and self._connected_service_uuid in self._readers:
             if self._logging:
                 _log.debug('receive from %s', self._readers[self._connected_service_uuid])
@@ -445,7 +466,7 @@ class ClientBLE(QObject):
                 else:
                     _log.debug('read failed. Characteristic %s not registered for read for service %s', read_characteristic, self._connected_service_uuid)
             else:
-                return ble.read(self._ble_client, rc)
+                return ble.read(self._ble_client, rc, timeout)
         return None
 
     async def _keep_alive(self) -> None:
@@ -459,7 +480,7 @@ class ClientBLE(QObject):
             self._keep_alive())
 
 
-    def scan(self, scan_timeout:float = 10.0) -> 'list[tuple[BLEDevice, AdvertisementData]]':
+    def scan(self, scan_timeout:float = 10.0, grace:float = 2.0) -> 'list[tuple[BLEDevice, AdvertisementData]]':
         try:
             if not hasattr(self, '_async_loop_thread') or self._async_loop_thread is None:
                 self._running = True # enable automatic reconnects
@@ -468,14 +489,22 @@ class ClientBLE(QObject):
                 coro = BleakScanner.discover(
                     timeout=scan_timeout,
                     return_adv=True)
+                self._runner_future = asyncio.run_coroutine_threadsafe(
+                    coro, self._async_loop_thread.loop)
                 try:
-                    res = asyncio.run_coroutine_threadsafe(
-                        coro,
-                        self._async_loop_thread.loop).result()
+                    # if the scan is cancelled or stopped while running, we catch the exception and return an empty list instead of crashing
+                    # hard cap on the blocking wait: discover() occupies the full
+                    # scan window, so a healthy scan always completes within scan_timeout;
+                    # if Core Bluetooth hangs, we degrade to [] instead of blocking the
+                    # caller (and the config dialog) forever.
+                    res = self._runner_future.result(timeout=scan_timeout + grace)
                 except Exception:  # pylint: disable=broad-except
+                    self._runner_future.cancel()
                     # ble scan might have been canceled
                     _log.debug('scan_ble canceled')
                     return []
+                finally:
+                    self._runner_future = None
                 _log.debug('scan_ble ended')
                 if res:
                     return list(res.values())
@@ -499,7 +528,7 @@ class ClientBLE(QObject):
                     self._running = True # enable automatic reconnects
                     self._async_loop_thread = AsyncLoopThread()
                     # run _connect in async loop
-                    asyncio.run_coroutine_threadsafe(
+                    self._runner_future = asyncio.run_coroutine_threadsafe(
                         self._connect_and_keep_alive(case_sensitive, scan_timeout, connect_timeout, address),
                         self._async_loop_thread.loop)
                     _log.debug('BLE client started')
@@ -514,10 +543,16 @@ class ClientBLE(QObject):
             self._running = False # disable automatic reconnects
             if self._ble_client is None:
                 ble.terminate_scan() # we stop ongoing scanning
+            runner = self._runner_future
+            self._runner_future = None
+            if runner is not None:
+                runner.cancel()
             self._disconnect()
             if self._async_loop_thread is not None:
-                del self._async_loop_thread
+                loop_thread = self._async_loop_thread
                 self._async_loop_thread = None
+                if not loop_thread.stop(timeout=2.0):
+                    _log.warning('BLE client async loop did not stop cleanly')
             self._ble_client = None
             self._connected_service_uuid = None
             self._connected_device_name = None

@@ -25,6 +25,7 @@
 # AUTHOR
 # Marko Luther, 2023
 
+import platform
 from typing import override, cast, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -33,7 +34,7 @@ if TYPE_CHECKING:
     from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
 
 from PyQt6.QtCore import Qt, pyqtSlot, QSize
-from PyQt6.QtGui import QColor, QIcon
+from PyQt6.QtGui import QColor, QIcon, QPalette
 from PyQt6.QtWidgets import (QApplication, QLabel, QTableWidget, QPushButton,
     QComboBox, QHBoxLayout, QVBoxLayout, QTableWidgetItem, QDialogButtonBox,
     QDoubleSpinBox, QGroupBox, QLineEdit, QSpinBox, QHeaderView, QToolButton, QWidget)
@@ -42,7 +43,7 @@ from artisanlib.util import serialize, getStyleIconPath
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import ArtisanMinorPushButton, MyQSpinBox
 from artisanlib.styles import (horizontal_header_style, vertical_header_style, line_edit_style, spin_box_style,
-    table_style, artisan_minor_push_button_style, tool_button_icon_style)
+    table_style, artisan_minor_push_button_style, tool_button_icon_style, artisan_dialog_button_style)
 
 
 class WheelDlg(ArtisanDialog):
@@ -65,14 +66,13 @@ class WheelDlg(ArtisanDialog):
             table.setShowGrid(False)
 
         self.subdialogbuttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Close | QDialogButtonBox.StandardButton.RestoreDefaults, Qt.Orientation.Horizontal)
-        self.setButtonTranslations(self.subdialogbuttons.button(QDialogButtonBox.StandardButton.RestoreDefaults),'Restore Defaults',QApplication.translate('Button','Restore Defaults'))
-        self.setButtonTranslations(self.subdialogbuttons.button(QDialogButtonBox.StandardButton.Close),'Close',QApplication.translate('Button','Close'))
 
         restoreButton = self.subdialogbuttons.button(QDialogButtonBox.StandardButton.RestoreDefaults)
         if restoreButton is not None:
             self.subdialogbuttons.removeButton(restoreButton)
             restoreButton.clicked.connect(self.resetlabelparents)
             restoreButton.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
+            self.setButtonTranslations(restoreButton,'Restore Defaults',QApplication.translate('Button','Restore Defaults'))
             restoreButton.setIconSize(QSize(14,14))
             restoreButton.setIcon(QIcon(getStyleIconPath(
                 'undo-03-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'undo-03-stroke-rounded-white.svg')))
@@ -81,6 +81,7 @@ class WheelDlg(ArtisanDialog):
             self.subdialogbuttons.removeButton(closeButton)
             closeButton.clicked.connect(self.closelabels)
             closeButton.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
+            self.setButtonTranslations(closeButton,'Close',QApplication.translate('Button','Close'))
             closeButton.setIconSize(QSize(14,14))
             closeButton.setIcon(QIcon(getStyleIconPath(
                 'cancel-square-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'cancel-square-stroke-rounded-white.svg')))
@@ -216,28 +217,32 @@ class WheelDlg(ArtisanDialog):
             self.main_buttons.removeButton(openButton)
             openButton.setToolTip(QApplication.translate('Tooltip','Open wheel graph file'))
             openButton.clicked.connect(self.loadWheel)
+            self.setButtonTranslations(openButton,'Open',QApplication.translate('Button','Open'))
             openButton.setIconSize(QSize(14,14))
             openButton.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
             openButton.setIcon(QIcon(getStyleIconPath('file-02-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'file-02-stroke-rounded-white.svg')))
 
-        viewModeButton: QPushButton|None = self.main_buttons.addButton(QDialogButtonBox.StandardButton.Close)
-        if viewModeButton is not None:
-            viewModeButton.setToolTip(QApplication.translate('Tooltip','Sets Wheel graph to view mode'))
-            viewModeButton.clicked.connect(self.viewmode)
-#            viewModeButton.setIconSize(QSize(14,14))
-#            viewModeButton.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
-#            viewModeButton.setIcon(QIcon(getStyleIconPath('cancel-square-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'cancel-square-stroke-rounded-white.svg')))
-
-
-        closeButton = self.main_buttons.button(QDialogButtonBox.StandardButton.Close)
-        if closeButton is not None:
-            closeButton.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
-            closeButton.setIconSize(QSize(14,14))
-            closeButton.setIcon(QIcon(getStyleIconPath(
-                'cancel-square-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'cancel-square-stroke-rounded-white.svg')))
-
-        self.setButtonTranslations(self.main_buttons.button(QDialogButtonBox.StandardButton.Close),'Close', QApplication.translate('Button','Close'))
-        self.setButtonTranslations(self.main_buttons.button(QDialogButtonBox.StandardButton.Open),'Open', QApplication.translate('Button','Open'))
+        closeButton_main: QPushButton|None = self.main_buttons.addButton(QDialogButtonBox.StandardButton.Close)
+        if closeButton_main is not None:
+            closeButton_main.setToolTip(QApplication.translate('Tooltip','Sets Wheel graph to view mode'))
+            closeButton_main.clicked.connect(self.viewmode)
+            self.setButtonTranslations(closeButton_main,'Close',QApplication.translate('Button','Close'))
+            # style
+            palette = self.palette()
+            accent_color = palette.color(QPalette.ColorRole.Accent)
+            if not accent_color.isValid() or platform.system() != 'darwin':
+                accent_color = QColor('#3979ae')  # Fallback artisan button blue if OS provides none (and on Windows/Linux)
+            # Generate math-driven lighting variants for the accent button
+            accent_name = accent_color.name()
+            accent_hover = accent_color.lighter(115).name() if self.aw.app.darkmode else accent_color.darker(115).name()
+            accent_pressed = accent_color.darker(110).name() if self.aw.app.darkmode else accent_color.darker(125).name()
+            closeButton_main.setStyleSheet(artisan_dialog_button_style(
+                self.aw.app.darkmode,
+                accent_name,
+                accent_hover,
+                accent_pressed))
+            closeButton_main.setIcon(QIcon())
+            closeButton_main.setFocus()
 
         self.aw.qmc.drawWheel()
         label2layout = QHBoxLayout()

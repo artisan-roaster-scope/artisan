@@ -27,11 +27,7 @@
 # AUTHOR
 # Marko Luther
 
-from PyQt6.QtWidgets import (QApplication, QComboBox, QLineEdit, QDialogButtonBox,
-    QToolButton, QTableWidget, QHeaderView, QWidget, QHBoxLayout)
-from PyQt6.QtCore import Qt, pyqtSlot, QSize, QSettings
-from PyQt6.QtGui import QKeySequence, QAction, QStandardItemModel
-
+import platform
 import logging
 from uic import BlendDialog # OFF type: ignore[attr-defined] # pylint: disable=no-name-in-module
 from collections.abc import Collection
@@ -42,10 +38,16 @@ if TYPE_CHECKING:
     from PyQt6.QtWidgets import QWidget # noqa: F401 # pylint: disable=unused-import,reimported
     from PyQt6.QtGui import QCloseEvent, QKeyEvent # pylint: disable=unused-import
 
-from artisanlib.util import comma2dot, float2floatWeightVolume
+from PyQt6.QtWidgets import (QApplication, QComboBox, QLineEdit, QDialogButtonBox,
+    QToolButton, QTableWidget, QHeaderView, QWidget, QHBoxLayout)
+from PyQt6.QtCore import Qt, pyqtSlot, QSize, QSettings
+from PyQt6.QtGui import QKeySequence, QAction, QStandardItemModel, QColor, QIcon, QPalette
+
+from artisanlib.util import comma2dot, float2floatWeightVolume, getStyleIconPath
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox
-from artisanlib.styles import tool_button_icon_style, line_edit_style, table_style, horizontal_header_style, vertical_header_style
+from artisanlib.styles import (tool_button_icon_style, line_edit_style, table_style, horizontal_header_style,
+    vertical_header_style, artisan_dialog_button_style, artisan_push_button_style)
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -123,7 +125,7 @@ class CustomBlendDialog(ArtisanDialog):
         super().__init__(parent, aw)
         self.initialTotalWeight:float = inWeight
         self.inWeight:float = inWeight
-        self.weightUnit:str = weightUnit
+        self.weightUnit:str = weightUnit.lower()
         self.coffee_hr_ids_with_stock_in_store:set[str] = coffee_hr_ids_with_stock_in_store
         self.coffees:dict[str, str] = coffees # dict associating coffee names to their hr_id
         self.coffee_ids:dict[str, str] = {v: k for k, v in self.coffees.items()} # dict associating coffee hr_ids to their names
@@ -142,6 +144,7 @@ class CustomBlendDialog(ArtisanDialog):
         if applyButton is not None:
             self.ui.buttonBox.removeButton(applyButton)
             self.applyButton = self.ui.buttonBox.addButton(applyButton.text(), QDialogButtonBox.ButtonRole.AcceptRole)
+            self.setButtonTranslations(self.applyButton, 'Apply', QApplication.translate('Button','Apply'))
 
         cancelButton = self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Cancel)
         if cancelButton is not None:
@@ -158,8 +161,30 @@ class CustomBlendDialog(ArtisanDialog):
             except Exception: # pylint: disable=broad-except
                 pass
             cancelButton.addActions([cancelAction])
+            cancelButton.setIcon(QIcon())
+        self.setButtonTranslations(cancelButton, 'Cancel', QApplication.translate('Button','Cancel'))
+
+        self.ui.pushButton_add.setFixedSize(QSize(26,26))
+        self.ui.pushButton_add.setText('')
+        self.ui.pushButton_add.setIconSize(QSize(20,20))
+        self.ui.pushButton_add.setIcon(QIcon(getStyleIconPath('add-01-stroke-rounded-white.svg')))
+        self.ui.pushButton_add.setStyleSheet(artisan_push_button_style(self.aw.app.darkmode))
+        self.ui.pushButton_add.setEnabled(True)
 
         # style
+        palette = self.palette()
+        accent_color = palette.color(QPalette.ColorRole.Accent)
+        if not accent_color.isValid() or platform.system() != 'darwin':
+            accent_color = QColor('#3979ae')  # Fallback artisan button blue if OS provides none (and on Windows/Linux)
+        # Generate math-driven lighting variants for the accent button
+        accent_name = accent_color.name()
+        accent_hover = accent_color.lighter(115).name() if self.aw.app.darkmode else accent_color.darker(115).name()
+        accent_pressed = accent_color.darker(110).name() if self.aw.app.darkmode else accent_color.darker(125).name()
+        self.ui.buttonBox.setStyleSheet(artisan_dialog_button_style(
+            self.aw.app.darkmode,
+            accent_name,
+            accent_hover,
+            accent_pressed))
         self.ui.tableWidget.setStyleSheet(table_style(self.aw.app.darkmode))
         self.ui.tableWidget.setShowGrid(False)
         horizontal_header = self.ui.tableWidget.horizontalHeader()
@@ -174,6 +199,9 @@ class CustomBlendDialog(ArtisanDialog):
             vertical_header.setSectionsClickable(False)
             vertical_header.setHighlightSections(False)
             vertical_header.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+
+        # tooltips
+        self.ui.pushButton_add.setToolTip(QApplication.translate('Tooltip','add a component'))
 
         # populate widgets
         self.ui.lineEdit_name.setStyleSheet(line_edit_style(self.aw.app.darkmode))
@@ -346,7 +374,12 @@ class CustomBlendDialog(ArtisanDialog):
         return True
 
     def updateAddButton(self) -> None:
-        self.ui.pushButton_add.setEnabled(len(self.coffees)>len(self.blend.components))
+        enabled = len(self.coffees)>len(self.blend.components)
+        self.ui.pushButton_add.setEnabled(enabled)
+        if enabled:
+            self.ui.pushButton_add.setIcon(QIcon(getStyleIconPath('add-01-stroke-rounded-white.svg')))
+        else:
+            self.ui.pushButton_add.setIcon(QIcon(getStyleIconPath('add-01-stroke-rounded-white.svg' if self.aw.app.darkmode else 'add-01-stroke-rounded.svg')))
 
     # returns True if all component ratios sum up to (about) 1 and all individual ratios are above 0 and below 100
     def checkRatio(self) -> bool:

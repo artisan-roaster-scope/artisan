@@ -276,10 +276,10 @@ class EventsDlg(ArtisanResizeablDialog):
             helpButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             helpButton.clicked.connect(self.showEventannotationhelp)
             helpButton.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
+            self.setButtonTranslations(helpButton,'Help',QApplication.translate('Button','Help')) # before setting the icon!
             helpButton.setIconSize(QSize(14,14))
             helpButton.setIcon(QIcon(getStyleIconPath(
                 'help-square-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'help-square-stroke-rounded-white.svg')))
-            self.setButtonTranslations(helpButton,'Help',QApplication.translate('Button','Help'))
 
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(helpButton)
@@ -751,10 +751,10 @@ class EventsDlg(ArtisanResizeablDialog):
             helpButtonD.setToolTip(QApplication.translate('Tooltip','Show help'))
             helpButtonD.clicked.connect(self.showEventbuttonhelp)
             helpButtonD.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
+            self.setButtonTranslations(helpButtonD,'Help',QApplication.translate('Button','Help'))
             helpButtonD.setIconSize(QSize(14,14))
             helpButtonD.setIcon(QIcon(getStyleIconPath(
                 'help-square-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'help-square-stroke-rounded-white.svg')))
-            self.setButtonTranslations(helpButtonD,'Help',QApplication.translate('Button','Help'))
 
         #color patterns
         #flag that prevents changing colors too fast
@@ -1107,10 +1107,10 @@ class EventsDlg(ArtisanResizeablDialog):
             helpsliderbutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             helpsliderbutton.clicked.connect(self.showSliderHelp)
             helpsliderbutton.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
+            self.setButtonTranslations(helpsliderbutton,'Help',QApplication.translate('Button','Help'))
             helpsliderbutton.setIconSize(QSize(14,14))
             helpsliderbutton.setIcon(QIcon(getStyleIconPath(
                 'help-square-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'help-square-stroke-rounded-white.svg')))
-            self.setButtonTranslations(helpsliderbutton,'Help',QApplication.translate('Button','Help'))
         self.sliderKeyboardControlflag = QCheckBox(QApplication.translate('CheckBox','Keyboard Control'))
         self.sliderKeyboardControlflag.setToolTip(QApplication.translate('Tooltip', 'Move slider under focus using the up/down cursor keys'))
         self.sliderKeyboardControlflag.setChecked(self.aw.eventsliderKeyboardControl)
@@ -4127,7 +4127,6 @@ class SliderCalculator(ArtisanDialog):
                 self.applyButton.setStyleSheet(artisan_dialog_style)
         artisan_cancel_button: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel)
         if artisan_cancel_button is not None:
-            _log.debug('PRINT artisan cancel button exists')
             defaultCancelButton = self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Cancel)
             if defaultCancelButton is not None:
                 self.ui.buttonBox.removeButton(defaultCancelButton)

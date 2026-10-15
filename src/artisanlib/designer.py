@@ -291,6 +291,7 @@ class designerconfigDlg(ArtisanDialog):
         defaults_button: QPushButton|None = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.RestoreDefaults)
         if close_button is not None:
             self.setButtonTranslations(close_button,'Close',QApplication.translate('Button','Close'))
+            close_button.setIcon(QIcon())
         if apply_button is not None:
             self.setButtonTranslations(apply_button,'Apply',QApplication.translate('Button','Apply'))
             apply_button.clicked.connect(self.settimes)

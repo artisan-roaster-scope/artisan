@@ -93,10 +93,10 @@ class autosaveDlg(ArtisanDialog):
         if self.helpButton is not None:
             self.dialogbuttons.removeButton(self.helpButton)
             self.helpButton.clicked.connect(self.showautosavehelp)
+            self.setButtonTranslations(self.helpButton,'Help',QApplication.translate('Button','Help'))
             self.helpButton.setIconSize(QSize(14,14))
             self.helpButton.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
             self.helpButton.setIcon(QIcon(getStyleIconPath('help-square-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'help-square-stroke-rounded-white.svg')))
-            self.setButtonTranslations(self.helpButton,'Help',QApplication.translate('Button','Help'))
 
 
         pathButton = ArtisanMinorPushButton(QApplication.translate('Button','Path'),

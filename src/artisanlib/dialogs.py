@@ -123,9 +123,13 @@ class ArtisanDialog(QDialog):
                 (okButton,'OK', QApplication.translate('Button','OK')),
                 (cancelButton,'Cancel',QApplication.translate('Button','Cancel'))]:
             self.setButtonTranslations(btn,txt,trans)
+            if btn is not None:
+                btn.setIcon(QIcon()) # suppress standard button icons on Linux
 
     # txt: the original source text of the button (in english)
     # trans: the artisan translation to be used if a default Qt translation does not exist
+    # NOTE: this also removes icons (often set on the Linux platform) and removes width constraints
+    #   thus custom button icons should be set after applying translations with setButtonTranslations()!
     @staticmethod
     def setButtonTranslations(btn: 'QAbstractButton|None', txt:str, trans:str) -> None:
         if btn is not None:
@@ -137,7 +141,6 @@ class ArtisanDialog(QDialog):
                 btn.setText(current_trans)
                 btn.setMaximumWidth(16777215)
                 btn.setMinimumWidth(0)
-#                btn.setMinimumSize(btn.sizeHint())
 
     @pyqtSlot()
     def cancelDialog(self) -> None:  # ESC key
@@ -747,12 +750,15 @@ class ArtisanConfirmSaveDialog(ArtisanDialog):
         if okButton is not None:
             okButton.setFocus()
             self.setButtonTranslations(okButton,'OK',QApplication.translate('Button','OK'))
+            okButton.setIcon(QIcon()) # suppress standard button icons on Linux
         discardButton: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Discard)
         if discardButton is not None:
             self.setButtonTranslations(discardButton,'Discard',QApplication.translate('Button','Discard'))
+            discardButton.setIcon(QIcon()) # suppress standard button icons on Linux
         cancelButton: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel)
         if cancelButton is not None:
             self.setButtonTranslations(cancelButton,'Cancel',QApplication.translate('Button','Cancel'))
+            cancelButton.setIcon(QIcon()) # suppress standard button icons on Linux
 
         # style
         palette = self.palette()
@@ -899,12 +905,15 @@ class ArtisanYesNoCancelDialog(ArtisanDialog):
         if yesButton is not None:
             yesButton.setFocus()
             self.setButtonTranslations(yesButton,'Yes',QApplication.translate('Button','Yes'))
+            yesButton.setIcon(QIcon()) # suppress standard button icons on Linux
         noButton: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.No)
         if noButton is not None:
             self.setButtonTranslations(noButton,'No',QApplication.translate('Button','No'))
+            noButton.setIcon(QIcon()) # suppress standard button icons on Linux
         cancelButton: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel)
         if cancelButton is not None:
             self.setButtonTranslations(cancelButton,'Cancel',QApplication.translate('Button','Cancel'))
+            cancelButton.setIcon(QIcon()) # suppress standard button icons on Linux
 
         # style
         palette = self.palette()

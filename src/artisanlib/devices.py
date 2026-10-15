@@ -167,6 +167,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         # hack to access the Qt automatic translation of the Help button
         db_help = QDialogButtonBox(QDialogButtonBox.StandardButton.Help)
         help_button = db_help.button(QDialogButtonBox.StandardButton.Help)
+        self.setButtonTranslations(help_button,'Help',QApplication.translate('Button','Help'))
         if help_button is not None:
             help_text_translated = help_button.text()
         else:
@@ -175,7 +176,6 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             'help-square-stroke-rounded-white.svg',
             'help-square-stroke-rounded-dark.svg',
             self.aw.app.darkmode)
-        self.setButtonTranslations(helpprogrambutton,'Help',QApplication.translate('Button','Help'))
         helpprogrambutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         helpprogrambutton.clicked.connect(self.showhelpprogram)
         selectoutprogrambutton = ArtisanMinorPushButton(QApplication.translate('Button','Select'),
@@ -283,7 +283,6 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             'help-square-stroke-rounded-white.svg',
             'help-square-stroke-rounded-dark.svg',
             self.aw.app.darkmode)
-        self.setButtonTranslations(symbolicHelpButton,'Help',QApplication.translate('Button','Help'))
         symbolicHelpButton.setMaximumSize(symbolicHelpButton.sizeHint())
         symbolicHelpButton.setMinimumSize(symbolicHelpButton.minimumSizeHint())
         symbolicHelpButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -323,6 +322,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         # hack to access the Qt automatic translation of the RestoreDefaults button
         db_reset = QDialogButtonBox(QDialogButtonBox.StandardButton.Reset)
         db_reset_button = db_reset.button(QDialogButtonBox.StandardButton.Reset)
+        self.setButtonTranslations(db_reset_button,'Reset',QApplication.translate('Button','Reset'))
         if db_reset_button is not None:
             reset_text_translated = db_reset_button.text()
         else:
@@ -331,14 +331,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             'undo-03-stroke-rounded-white.svg',
             'undo-03-stroke-rounded-dark.svg',
             self.aw.app.darkmode)
-        self.setButtonTranslations(resetButton,'Reset',QApplication.translate('Button','Reset'))
         resetButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         resetButton.clicked.connect(self.resetextradevices)
         extradevHelpButton = ArtisanMinorPushButton(help_text_translated,
             'help-square-stroke-rounded-white.svg',
             'help-square-stroke-rounded-dark.svg',
             self.aw.app.darkmode)
-        self.setButtonTranslations(extradevHelpButton,'Help',QApplication.translate('Button','Help'))
         extradevHelpButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         extradevHelpButton.clicked.connect(self.showExtradevHelp)
         self.delButton = ArtisanMinorPushButton(QApplication.translate('Button','Delete'),

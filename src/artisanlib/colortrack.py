@@ -165,7 +165,7 @@ class ColorTrackBLE(ClientBLE):
 
     # second result is the raw average
     def getColor(self) -> tuple[float, float]:
-#        read_res = self.read(self.COLORTRACK_READ_NOTIFY_LASER_UUID) # returns 20 bytes (same format as via the notifications)
+#        read_res = self.read(self.COLORTRACK_READ_NOTIFY_LASER_UUID, timeout=1) # returns 20 bytes (same format as via the notifications)
 #        _log.debug('getLaser: %s',read_res)
 
 #        try:

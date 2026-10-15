@@ -1549,8 +1549,9 @@ class ApplicationWindow(QMainWindow):
         self.percent_decimals:int = 1 # number of decimals to render percentage values like weight loss (set to 0, 1 or 2)
 
         self.appearance:str = ''
-        # on Windows we use the Fusion style per default which supports the dark mode
-        if platform.system().startswith('Windows'):
+        # on Windows and Linux we use the Fusion style per default which supports the dark mode and
+        # prevents those ultra bold labels on Linux
+        if platform.system() != 'Darwin':
             self.appearance = 'fusion'
 
         # matplotlib font properties:

@@ -43,7 +43,7 @@ from uuid import UUID
 from packaging.version import Version
 
 from PyQt6.QtCore import (Qt, QMimeData, QSettings, pyqtSlot, pyqtSignal, QPoint, QPointF, QLocale, QDate, QDateTime, QSemaphore, QTimer, QUrl, QSize)
-from PyQt6.QtGui import (QDrag, QPixmap, QPainter, QTextLayout, QTextLine, QColor, QFontMetrics, QCursor, QAction, QDesktopServices, QIcon)
+from PyQt6.QtGui import (QDrag, QPixmap, QPainter, QTextLayout, QTextLine, QColor, QFontMetrics, QCursor, QAction, QDesktopServices, QIcon, QPalette)
 from PyQt6.QtWidgets import (QDialogButtonBox, QStackedWidget, QApplication, QWidget, QVBoxLayout, QHBoxLayout, QFrame,
         QCheckBox, QGroupBox, QScrollArea, QLabel, QSizePolicy, QPushButton,
         QGraphicsDropShadowEffect, QLineEdit, QMenu, QStatusBar, QToolButton)
@@ -76,7 +76,7 @@ from artisanlib.widgets import ClickableQLabel, ClickableQLineEdit, Splitter, Ar
 from artisanlib.dialogs import ArtisanResizeablDialog, artisan_question
 from artisanlib.util import (float2float, float2str, convertWeight, weight_units, render_weight, comma2dot, float2floatWeightVolume, getDirectory,
     deserialize, roast_time, get_total_roast_time_from_profile, stringfromseconds, getTaskURL, getStyleIconPath, open_link)
-from artisanlib.styles import tool_button_icon_style, artisan_push_button_style, line_edit_style, scroller_style
+from artisanlib.styles import tool_button_icon_style, artisan_push_button_style, line_edit_style, scroller_style, artisan_dialog_button_style
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -2359,6 +2359,31 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.update_conf_button = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok)
         self.update_conf_button.setCenterButtons(True)
         self.update_conf_button.accepted.connect(self.accept_updated_schedule)
+
+        update_conf_button_ok_button = self.update_conf_button.button(QDialogButtonBox.StandardButton.Ok)
+        if update_conf_button_ok_button is not None:
+            update_conf_button_ok_button.setDefault(True)
+            update_conf_button_ok_button.setAutoDefault(True)
+            update_conf_button_ok_button.setFocusPolicy(Qt.FocusPolicy.StrongFocus) # to add to tab focus switch
+            okButton: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+            if okButton is not None:
+                update_conf_button_ok_button.setText(okButton.text())
+            # style
+            palette = self.palette()
+            accent_color = palette.color(QPalette.ColorRole.Accent)
+            if not accent_color.isValid() or platform.system() != 'darwin':
+                accent_color = QColor('#3979ae')  # Fallback artisan button blue if OS provides none (and on Windows/Linux)
+            # Generate math-driven lighting variants for the accent button
+            accent_name = accent_color.name()
+            accent_hover = accent_color.lighter(115).name() if self.aw.app.darkmode else accent_color.darker(115).name()
+            accent_pressed = accent_color.darker(110).name() if self.aw.app.darkmode else accent_color.darker(125).name()
+            update_conf_button_ok_button.setStyleSheet(artisan_dialog_button_style(
+                self.aw.app.darkmode,
+                accent_name,
+                accent_hover,
+                accent_pressed))
+            self.setButtonTranslations(update_conf_button_ok_button,'OK', QApplication.translate('Button','OK'))
+            update_conf_button_ok_button.setIcon(QIcon()) # suppress standard button icons on Linux
 
         update_conf_layout = QVBoxLayout()
         update_conf_layout.addStretch()
