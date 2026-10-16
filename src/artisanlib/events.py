@@ -2295,14 +2295,17 @@ class EventsDlg(ArtisanResizeablDialog):
                 self.saveQuantifierSettings()
                 self.saveAnnotationsSettings()
             elif i == 2: # switched to Slider tab
+                self.saveEventTypes()
                 self.saveQuantifierSettings()
                 self.saveAnnotationsSettings()
                 self.updateSliderTab()  # reflect updated event names if changed in tab 1
             elif i == 3: # switched to Quantifier tab
+                self.saveEventTypes()
                 self.saveSliderSettings()
                 self.saveAnnotationsSettings()
                 self.updateQuantifierTab() # reflect updated event names if changed in tab 1
             elif i == 4: # switched to Palette tab
+                self.saveEventTypes()
                 # store slider settings from Slider tab to global variables
                 # store sliders
                 self.saveSliderSettings()
@@ -2311,11 +2314,13 @@ class EventsDlg(ArtisanResizeablDialog):
     #            self.savetableextraeventbutton()
                 self.saveAnnotationsSettings()
             elif i == 5: # switched to Style tab
+                self.saveEventTypes()
                 self.updateStyleTab()
                 self.saveSliderSettings()
                 self.saveQuantifierSettings()
                 self.saveAnnotationsSettings()
             elif i == 6: # switched to Annotations tab
+                self.saveEventTypes()
                 self.updateAnnotationsTab()
                 self.saveQuantifierSettings()
 
@@ -3824,95 +3829,95 @@ class EventsDlg(ArtisanResizeablDialog):
         try:
             self.closeHelp()
 
-            if self.aw.ui_mode is UI_MODE.EXPERT:
-                self.aw.buttonsize = self.nbuttonsSizeBox.currentIndex()
-                self.aw.mark_last_button_pressed = self.markLastButtonPressed.isChecked()
-                self.aw.show_extrabutton_tooltips = self.showExtraButtonTooltips.isChecked()
-                self.aw.buttonpalette_label = self.transferpalettecurrentLabelEdit.text()
-                # save column widths
-                self.aw.eventbuttontablecolumnwidths = [self.eventbuttontable.columnWidth(c) for c in range(self.eventbuttontable.columnCount())]
-                #save default buttons
-                self.aw.qmc.main_event_buttons_undo_enabled = self.eventUndo.isChecked()
-                self.aw.qmc.buttonvisibility[0] = self.CHARGEbutton.isChecked()
-                self.aw.buttonCHARGE.setVisible(bool(self.aw.qmc.buttonvisibility[0]))
-                if bool(self.aw.qmc.buttonvisibility[0]) and not self.aw.buttonCHARGE.isFlat() and not self.aw.buttonCHARGE.animating:
-                    # if animation is not running and button is enabled and not flat, we start the animation
-                    self.aw.buttonCHARGE.startAnimation()
-                self.aw.qmc.buttonvisibility[1] = self.DRYbutton.isChecked()
-                self.aw.buttonDRY.setVisible(bool(self.aw.qmc.buttonvisibility[1]))
-                self.aw.qmc.buttonvisibility[2] = self.FCSbutton.isChecked()
-                self.aw.buttonFCs.setVisible(bool(self.aw.qmc.buttonvisibility[2]))
-                self.aw.qmc.buttonvisibility[3] = self.FCEbutton.isChecked()
-                self.aw.buttonFCe.setVisible(bool(self.aw.qmc.buttonvisibility[3]))
-                self.aw.qmc.buttonvisibility[4] = self.SCSbutton.isChecked()
-                self.aw.buttonSCs.setVisible(bool(self.aw.qmc.buttonvisibility[4]))
-                self.aw.qmc.buttonvisibility[5] = self.SCEbutton.isChecked()
-                self.aw.buttonSCe.setVisible(bool(self.aw.qmc.buttonvisibility[5]))
-                self.aw.qmc.buttonvisibility[6] = self.DROPbutton.isChecked()
-                self.aw.buttonDROP.setVisible(bool(self.aw.qmc.buttonvisibility[6]))
-                coolButtonVisibilityOrg = self.aw.qmc.buttonvisibility[7]
-                self.aw.qmc.buttonvisibility[7] = self.COOLbutton.isChecked()
-                if coolButtonVisibilityOrg != self.aw.qmc.buttonvisibility[7]:
-                    # adjust foreground or if no foreground but background is loaded the background; depending on showFull and COOL button state the max limit might be different
-                    self.aw.autoAdjustAxis(background=self.aw.qmc.background and (not len(self.aw.qmc.timex) > 3), deltas=False)
-                self.aw.buttonCOOL.setVisible(bool(self.aw.qmc.buttonvisibility[7]))
-                #save sliders
-                self.saveSliderSettings()
-                self.saveQuantifierSettings()
-                # save palette label
-                self.aw.buttonpalette_label = self.transferpalettecurrentLabelEdit.text()
-                #
-                self.aw.qmc.buttonactions[0] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.CHARGEbuttonActionType.currentIndex()])
-                self.aw.qmc.buttonactions[1] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.DRYbuttonActionType.currentIndex()])
-                self.aw.qmc.buttonactions[2] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.FCSbuttonActionType.currentIndex()])
-                self.aw.qmc.buttonactions[3] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.FCEbuttonActionType.currentIndex()])
-                self.aw.qmc.buttonactions[4] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.SCSbuttonActionType.currentIndex()])
-                self.aw.qmc.buttonactions[5] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.SCEbuttonActionType.currentIndex()])
-                self.aw.qmc.buttonactions[6] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.DROPbuttonActionType.currentIndex()])
-                self.aw.qmc.buttonactions[7] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.COOLbuttonActionType.currentIndex()])
-                self.aw.qmc.extrabuttonactions[0] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.ONbuttonActionType.currentIndex()])
-                self.aw.qmc.extrabuttonactions[1] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.OFFbuttonActionType.currentIndex()])
-                self.aw.qmc.extrabuttonactions[2] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.SAMPLINGbuttonActionType.currentIndex()])
-                self.aw.qmc.xextrabuttonactions[0] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.RESETbuttonActionType.currentIndex()])
-                self.aw.qmc.xextrabuttonactions[1] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.STARTbuttonActionType.currentIndex()])
-                self.aw.qmc.buttonactionstrings[0] = self.CHARGEbuttonActionString.text()
-                self.aw.qmc.buttonactionstrings[1] = self.DRYbuttonActionString.text()
-                self.aw.qmc.buttonactionstrings[2] = self.FCSbuttonActionString.text()
-                self.aw.qmc.buttonactionstrings[3] = self.FCEbuttonActionString.text()
-                self.aw.qmc.buttonactionstrings[4] = self.SCSbuttonActionString.text()
-                self.aw.qmc.buttonactionstrings[5] = self.SCEbuttonActionString.text()
-                self.aw.qmc.buttonactionstrings[6] = self.DROPbuttonActionString.text()
-                self.aw.qmc.buttonactionstrings[7] = self.COOLbuttonActionString.text()
-                self.aw.qmc.extrabuttonactionstrings[0] = self.ONbuttonActionString.text()
-                self.aw.qmc.extrabuttonactionstrings[1] = self.OFFbuttonActionString.text()
-                self.aw.qmc.extrabuttonactionstrings[2] = self.SAMPLINGbuttonActionString.text()
-                try:
-                    self.aw.qmc.extra_event_sampling_delay = self.sampling_delays[self.SAMPLINGbuttonActionInterval.currentIndex()]
-                except Exception: # pylint: disable=broad-except
-                    pass
-                self.aw.qmc.xextrabuttonactionstrings[0] = self.RESETbuttonActionString.text()
-                self.aw.qmc.xextrabuttonactionstrings[1] = self.STARTbuttonActionString.text()
+            self.aw.buttonsize = self.nbuttonsSizeBox.currentIndex()
+            self.aw.mark_last_button_pressed = self.markLastButtonPressed.isChecked()
+            self.aw.show_extrabutton_tooltips = self.showExtraButtonTooltips.isChecked()
+            self.aw.buttonpalette_label = self.transferpalettecurrentLabelEdit.text()
+            # save column widths
+            self.aw.eventbuttontablecolumnwidths = [self.eventbuttontable.columnWidth(c) for c in range(self.eventbuttontable.columnCount())]
+            #save default buttons
+            self.aw.qmc.main_event_buttons_undo_enabled = self.eventUndo.isChecked()
+            self.aw.qmc.buttonvisibility[0] = self.CHARGEbutton.isChecked()
+            self.aw.buttonCHARGE.setVisible(bool(self.aw.qmc.buttonvisibility[0]))
+            if bool(self.aw.qmc.buttonvisibility[0]) and not self.aw.buttonCHARGE.isFlat() and not self.aw.buttonCHARGE.animating:
+                # if animation is not running and button is enabled and not flat, we start the animation
+                self.aw.buttonCHARGE.startAnimation()
+            self.aw.qmc.buttonvisibility[1] = self.DRYbutton.isChecked()
+            self.aw.buttonDRY.setVisible(bool(self.aw.qmc.buttonvisibility[1]))
+            self.aw.qmc.buttonvisibility[2] = self.FCSbutton.isChecked()
+            self.aw.buttonFCs.setVisible(bool(self.aw.qmc.buttonvisibility[2]))
+            self.aw.qmc.buttonvisibility[3] = self.FCEbutton.isChecked()
+            self.aw.buttonFCe.setVisible(bool(self.aw.qmc.buttonvisibility[3]))
+            self.aw.qmc.buttonvisibility[4] = self.SCSbutton.isChecked()
+            self.aw.buttonSCs.setVisible(bool(self.aw.qmc.buttonvisibility[4]))
+            self.aw.qmc.buttonvisibility[5] = self.SCEbutton.isChecked()
+            self.aw.buttonSCe.setVisible(bool(self.aw.qmc.buttonvisibility[5]))
+            self.aw.qmc.buttonvisibility[6] = self.DROPbutton.isChecked()
+            self.aw.buttonDROP.setVisible(bool(self.aw.qmc.buttonvisibility[6]))
+            coolButtonVisibilityOrg = self.aw.qmc.buttonvisibility[7]
+            self.aw.qmc.buttonvisibility[7] = self.COOLbutton.isChecked()
+            if coolButtonVisibilityOrg != self.aw.qmc.buttonvisibility[7]:
+                # adjust foreground or if no foreground but background is loaded the background; depending on showFull and COOL button state the max limit might be different
+                self.aw.autoAdjustAxis(background=self.aw.qmc.background and (not len(self.aw.qmc.timex) > 3), deltas=False)
+            self.aw.buttonCOOL.setVisible(bool(self.aw.qmc.buttonvisibility[7]))
+            #save sliders
+            self.saveSliderSettings()
+            self.saveQuantifierSettings()
+            # save palette label
+            self.aw.buttonpalette_label = self.transferpalettecurrentLabelEdit.text()
+            #
+            self.aw.qmc.buttonactions[0] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.CHARGEbuttonActionType.currentIndex()])
+            self.aw.qmc.buttonactions[1] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.DRYbuttonActionType.currentIndex()])
+            self.aw.qmc.buttonactions[2] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.FCSbuttonActionType.currentIndex()])
+            self.aw.qmc.buttonactions[3] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.FCEbuttonActionType.currentIndex()])
+            self.aw.qmc.buttonactions[4] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.SCSbuttonActionType.currentIndex()])
+            self.aw.qmc.buttonactions[5] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.SCEbuttonActionType.currentIndex()])
+            self.aw.qmc.buttonactions[6] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.DROPbuttonActionType.currentIndex()])
+            self.aw.qmc.buttonactions[7] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.COOLbuttonActionType.currentIndex()])
+            self.aw.qmc.extrabuttonactions[0] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.ONbuttonActionType.currentIndex()])
+            self.aw.qmc.extrabuttonactions[1] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.OFFbuttonActionType.currentIndex()])
+            self.aw.qmc.extrabuttonactions[2] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.SAMPLINGbuttonActionType.currentIndex()])
+            self.aw.qmc.xextrabuttonactions[0] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.RESETbuttonActionType.currentIndex()])
+            self.aw.qmc.xextrabuttonactions[1] = self.buttonActionTypes.index(self.buttonActionTypesSorted[self.STARTbuttonActionType.currentIndex()])
+            self.aw.qmc.buttonactionstrings[0] = self.CHARGEbuttonActionString.text()
+            self.aw.qmc.buttonactionstrings[1] = self.DRYbuttonActionString.text()
+            self.aw.qmc.buttonactionstrings[2] = self.FCSbuttonActionString.text()
+            self.aw.qmc.buttonactionstrings[3] = self.FCEbuttonActionString.text()
+            self.aw.qmc.buttonactionstrings[4] = self.SCSbuttonActionString.text()
+            self.aw.qmc.buttonactionstrings[5] = self.SCEbuttonActionString.text()
+            self.aw.qmc.buttonactionstrings[6] = self.DROPbuttonActionString.text()
+            self.aw.qmc.buttonactionstrings[7] = self.COOLbuttonActionString.text()
+            self.aw.qmc.extrabuttonactionstrings[0] = self.ONbuttonActionString.text()
+            self.aw.qmc.extrabuttonactionstrings[1] = self.OFFbuttonActionString.text()
+            self.aw.qmc.extrabuttonactionstrings[2] = self.SAMPLINGbuttonActionString.text()
+            try:
+                self.aw.qmc.extra_event_sampling_delay = self.sampling_delays[self.SAMPLINGbuttonActionInterval.currentIndex()]
+            except Exception: # pylint: disable=broad-except
+                pass
+            self.aw.qmc.xextrabuttonactionstrings[0] = self.RESETbuttonActionString.text()
+            self.aw.qmc.xextrabuttonactionstrings[1] = self.STARTbuttonActionString.text()
 
 
-                self.aw.qmc.overlappct = int(self.overlapEdit.value())
+            self.aw.qmc.overlappct = int(self.overlapEdit.value())
 
-                self.aw.buttonpalette_shortcuts = self.switchPaletteByNumberKey.isChecked()
+            self.aw.buttonpalette_shortcuts = self.switchPaletteByNumberKey.isChecked()
 
-                # keyboard control flag
-                self.aw.eventsliderKeyboardControl = self.sliderKeyboardControlflag.isChecked()
-                if self.aw.eventsliderKeyboardControl != self.eventsliderKeyboardControlstored and self.aw.sliderFrame.isVisible():
-                    if self.aw.eventsliderKeyboardControl:
-                        self.aw.setSliderFocusPolicy(Qt.FocusPolicy.StrongFocus)
-                    else:
-                        self.aw.setSliderFocusPolicy(Qt.FocusPolicy.NoFocus)
-                self.aw.updateSliderLayout(self.sliderAlternativeLayoutFlag.isChecked())
-                #save quantifiers
-                self.aw.updateSlidersProperties() # set visibility and event names on slider widgets
-                #save special event annotations
-                self.saveAnnotationsSettings()
-                self.savetableextraeventbutton()
+            # keyboard control flag
+            self.aw.eventsliderKeyboardControl = self.sliderKeyboardControlflag.isChecked()
+            if self.aw.eventsliderKeyboardControl != self.eventsliderKeyboardControlstored and self.aw.sliderFrame.isVisible():
+                if self.aw.eventsliderKeyboardControl:
+                    self.aw.setSliderFocusPolicy(Qt.FocusPolicy.StrongFocus)
+                else:
+                    self.aw.setSliderFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.aw.updateSliderLayout(self.sliderAlternativeLayoutFlag.isChecked())
+            #save special event annotations
+            self.saveAnnotationsSettings()
+            self.savetableextraeventbutton()
 
-
+            #save events
+            self.saveEventTypes()
+            # update sliders
+            self.aw.updateSlidersProperties() # set visibility and event names on slider widgets
 
             # settings accessible in any mode:
             self.aw.qmc.eventslabelschars = self.eventslabelscharsSpinner.value()

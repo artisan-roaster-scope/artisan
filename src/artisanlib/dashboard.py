@@ -137,7 +137,7 @@ class Dashboard(QWidget):
             self.ui.create_pushButton.setIcon(QIcon(getStyleIconPath('add-01-stroke-rounded-white.svg')))
 
             self.ui.compare_pushButton.setIconSize(QSize(14,14))
-            self.ui.compare_pushButton.setIcon(QIcon(getStyleIconPath('git-compare-arrows-stroke-rounded-light.svg')))
+            self.ui.compare_pushButton.setIcon(QIcon(getStyleIconPath('git-compare-arrows-stroke-rounded.svg')))
 
             self.ui.donate_pushButton.setIconSize(QSize(20,20))
             self.ui.donate_pushButton.setIcon(QIcon(getStyleIconPath('heart-handshake-stroke-rounded-white.svg')))

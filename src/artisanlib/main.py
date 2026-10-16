@@ -27253,6 +27253,8 @@ class ApplicationWindow(QMainWindow):
                 #
                 self.realignbuttons()
                 self.updateSlidersProperties()
+                self.updateSliderMinMax()
+                self.computeLinespaces() # update quantifier linespaces as ranges might have been changed!
                 self.lastbuttonpressed = -1
                 message = QApplication.translate('Message','Palette #%i restored')%pindex
                 if self.buttonpalette_label != '':
