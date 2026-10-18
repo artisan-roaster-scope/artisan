@@ -229,26 +229,26 @@ class ScaleManager(QObject):
         self.scale2: Scale|None = None
         self.available:bool = False # true if any of the both scales is connected but not assigned
 
-        self.scan_scale1_signal.connect(self.scan_scale1_slot, type=Qt.ConnectionType.QueuedConnection)
-        self.set_scale1_signal.connect(self.set_scale1_slot, type=Qt.ConnectionType.QueuedConnection)
-        self.connect_scale1_signal.connect(self.connect_scale1_slot, type=Qt.ConnectionType.QueuedConnection)
-        self.disconnect_scale1_signal.connect(self.disconnect_scale1_slot, type=Qt.ConnectionType.QueuedConnection)
-        self.tare_scale1_signal.connect(self.tare_scale1_slot, type=Qt.ConnectionType.QueuedConnection)
-        self.signal_user_scale1_signal.connect(self.signal_user_scale1_slot, type=Qt.ConnectionType.QueuedConnection)
-        self.reserve_scale1_signal.connect(self.reserve_scale1_slot, type=Qt.ConnectionType.QueuedConnection)
-        self.release_scale1_signal.connect(self.release_scale1_slot, type=Qt.ConnectionType.QueuedConnection)
+        self.scan_scale1_signal.connect(self.scan_scale1_slot, type=Qt.ConnectionType.QueuedConnection) # xtype: ignore[call-arg]
+        self.set_scale1_signal.connect(self.set_scale1_slot, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
+        self.connect_scale1_signal.connect(self.connect_scale1_slot, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
+        self.disconnect_scale1_signal.connect(self.disconnect_scale1_slot, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
+        self.tare_scale1_signal.connect(self.tare_scale1_slot, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
+        self.signal_user_scale1_signal.connect(self.signal_user_scale1_slot, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
+        self.reserve_scale1_signal.connect(self.reserve_scale1_slot, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
+        self.release_scale1_signal.connect(self.release_scale1_slot, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
 
-        self.scan_scale2_signal.connect(self.scan_scale2_slot, type=Qt.ConnectionType.QueuedConnection)
-        self.set_scale2_signal.connect(self.set_scale2_slot, type=Qt.ConnectionType.QueuedConnection)
-        self.connect_scale2_signal.connect(self.connect_scale2_slot, type=Qt.ConnectionType.QueuedConnection)
-        self.disconnect_scale2_signal.connect(self.disconnect_scale2_slot, type=Qt.ConnectionType.QueuedConnection)
-        self.tare_scale2_signal.connect(self.tare_scale2_slot, type=Qt.ConnectionType.QueuedConnection)
-        self.signal_user_scale2_signal.connect(self.signal_user_scale2_slot, type=Qt.ConnectionType.QueuedConnection)
-        self.reserve_scale2_signal.connect(self.reserve_scale2_slot, type=Qt.ConnectionType.QueuedConnection)
-        self.release_scale2_signal.connect(self.release_scale2_slot, type=Qt.ConnectionType.QueuedConnection)
+        self.scan_scale2_signal.connect(self.scan_scale2_slot, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
+        self.set_scale2_signal.connect(self.set_scale2_slot, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
+        self.connect_scale2_signal.connect(self.connect_scale2_slot, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
+        self.disconnect_scale2_signal.connect(self.disconnect_scale2_slot, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
+        self.tare_scale2_signal.connect(self.tare_scale2_slot, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
+        self.signal_user_scale2_signal.connect(self.signal_user_scale2_slot, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
+        self.reserve_scale2_signal.connect(self.reserve_scale2_slot, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
+        self.release_scale2_signal.connect(self.release_scale2_slot, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
 
-        self.disconnect_all_signal.connect(self.disconnect_all_slot, type=Qt.ConnectionType.QueuedConnection)
-        self.connect_all_signal.connect(self.connect_all_slot, type=Qt.ConnectionType.QueuedConnection)
+        self.disconnect_all_signal.connect(self.disconnect_all_slot, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
+        self.connect_all_signal.connect(self.connect_all_slot, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
 
         self.scale1_last_weight:int|None = None     # in g; cleared by arrival of fresh non-stable weights, holding last weight to-be-come stable_weight
         self.scale1_stable_reading_timer = QTimer()

@@ -44,7 +44,7 @@ from PyQt6.QtCore import Qt, pyqtSlot, QSettings, QTimer, QSize
 from PyQt6.QtGui import QColor, QIntValidator, QIcon
 from PyQt6.QtWidgets import (QApplication, QWidget, QLabel, QLineEdit, QComboBox, QDialogButtonBox,
             QTableWidget, QHBoxLayout, QVBoxLayout, QCheckBox, QPushButton, QSizePolicy, QSpinBox,
-            QTableWidgetSelectionRange, QTimeEdit, QGridLayout, QGroupBox, QHeaderView, QStyledItemDelegate, QAbstractSpinBox)
+            QTableWidgetSelectionRange, QTimeEdit, QGridLayout, QGroupBox, QHeaderView, QStyledItemDelegate)
 
 
 from artisanlib.main import UI_MODE
@@ -934,7 +934,9 @@ class AlarmDlg(ArtisanResizeablDialog):
         timeoffsetedit.setAlignment(Qt.AlignmentFlag.AlignRight)
         timeoffsetedit.setDisplayFormat('mm:ss')
         timeoffsetedit.setTime(self.aw.time2QTime(max(0,self.aw.qmc.alarmoffset[i])))
-        timeoffsetedit.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
+        timeoffsetedit.setSpecialValueText(' ')
+#        timeoffsetedit.setDisplayFormat('mm:ss')
+#        timeoffsetedit.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons) # on Qt6.12 with the setStyle() set this results in white on white
         #6: type/source
         typeComboBox = MyQComboBox()
         typeComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
@@ -1096,32 +1098,31 @@ class AlarmDlg(ArtisanResizeablDialog):
             #populate table
             for i in range(nalarms):
                 self.setalarmtablerow(i)
-            fixed_columns:list[int] = [0,1,5,7,10]
+            fixed_columns:list[tuple[int,int]] = [(0,30),(1, 20),(5, 80), (7, 80), (10, 40)] # tuple with idx and minimum width
             header = self.alarmtable.horizontalHeader()
             if header is not None:
                 header.setStretchLastSection(True)
                 self.alarmtable.resizeColumnsToContents()
-                for i in fixed_columns:
+                for i, min_width  in fixed_columns:
                     header.setSectionResizeMode(i, QHeaderView.ResizeMode.Fixed)
-                    header.resizeSection(i, header.sectionSize(i) + (20 if i in {0,5} else 20))
+                    header.resizeSection(i, max(min_width, header.sectionSize(i)))
             if not self.aw.qmc.alarmtablecolumnwidths:
                 self.alarmtable.setColumnWidth(1, 50)
                 self.alarmtable.setColumnWidth(2, 50)
                 self.alarmtable.setColumnWidth(3, 50)
                 self.alarmtable.setColumnWidth(4, 95)
-                self.alarmtable.setColumnWidth(5, 65)
                 self.alarmtable.setColumnWidth(6, 100)
                 self.alarmtable.setColumnWidth(8, 51)
                 self.alarmtable.setColumnWidth(9, 103)
             else:
                 # remember the columnwidth
                 for i, _ in enumerate(self.aw.qmc.alarmtablecolumnwidths):
-                    if i not in fixed_columns:
+                    if i not in [i for i,mw in fixed_columns]:
                         try:
                             w = self.aw.qmc.alarmtablecolumnwidths[i]
-                            if i == 6:
-                                w = max(100,w)
-                            self.alarmtable.setColumnWidth(i,w)
+                            if i in {4, 6, 9}: # popups min width
+                                w = max(80,w)
+                            self.alarmtable.setColumnWidth(i, max(60, w))
                         except Exception: # pylint: disable=broad-except
                             pass
             self.markNotEnabledAlarmRows()
@@ -1129,6 +1130,7 @@ class AlarmDlg(ArtisanResizeablDialog):
             self.alarmtable.sortItems(0)
 
         except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' createalarmtable() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 

@@ -38,7 +38,7 @@ if TYPE_CHECKING:
 
 from PyQt6.QtCore import (Qt, pyqtSignal, pyqtSlot, QLine, QEvent,
     QByteArray, QPropertyAnimation, QEasingCurve, QLocale)
-from PyQt6.QtCore import pyqtProperty, QSize
+from PyQt6.QtCore import pyqtProperty, QSize # Xtype: ignore[attr-defined]
 from PyQt6.QtWidgets import (QApplication, QSplitter, QSplitterHandle, QLabel, QComboBox, QLineEdit, QTextEdit, QPlainTextEdit, QDoubleSpinBox, QPushButton,
     QTableWidget, QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame, QSlider, QStyle, QStyleOptionSlider, QListView, QToolButton, QSpinBox,
     QTabWidget, QTabBar)
@@ -223,7 +223,7 @@ class ArtisanQTabWidget(QTabWidget):
     def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[Any,Any]) -> None:
         super().__init__(parent, **kwargs)
         app = QApplication.instance()
-        if app is not None and app.style().name().lower() in {'fusion', 'windows', 'windowsvista'}:
+        if app is not None and app.style().name().lower() in {'fusion', 'windows', 'windowsvista'}: # Xtype: ignore[attr-defined]
             # increase tab height to prevent vertical clipping of descenders observed on Windows/Fusion-style
             self.setTabBar(SpaciousTabBar())
 # alternative fix, which alters tab height to font size + safety buffer (somewhat smaller than original design)
@@ -781,7 +781,7 @@ class SplitterHandle(QSplitterHandle):
     def enterEvent(self, event:QEnterEvent|None) -> None:
         if event is not None:
             app:QCoreApplication|None = QApplication.instance()
-            if app is not None and app.darkmode:
+            if app is not None and app.darkmode: # Xtype: ignore[attr-defined]
                 self.pen_color = self.pen_color_hover_darkmode
             else:
                 self.pen_color = self.pen_color_hover_lightmode

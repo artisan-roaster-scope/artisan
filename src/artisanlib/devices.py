@@ -1276,9 +1276,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.kaleidoSerialFlag = QCheckBox(QApplication.translate('Label','WiFi'))
         self.kaleidoSerialFlag.setChecked(not self.aw.kaleidoSerial)
         self.kaleidoSerialFlag.stateChanged.connect(self.kaleidoSerialStateChanged)
-        kaleidoPIDLabel = QLabel('PID')
-        self.kaleidoPIDFlag = QCheckBox()
+        self.kaleidoPIDFlag = QCheckBox('PID')
         self.kaleidoPIDFlag.setChecked(self.aw.kaleidoPID)
+        self.kaleidoPIDFlag.setToolTip(QApplication.translate('Tooltip','If checked, the machines internal PID is used, otherwise the software PID'))
 
         self.kaleidoEventFlags:list[QCheckBox] = [QCheckBox(l) for l in eventFlagLabels]
         for i, cb in enumerate(self.kaleidoEventFlags):
@@ -1372,12 +1372,14 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         kaleidoNetworkGrid.addWidget(self.kaleidoHost,0,2)
         kaleidoNetworkGrid.addWidget(kaleidoPortLabel,1,1)
         kaleidoNetworkGrid.addWidget(self.kaleidoPort,1,2)
-        kaleidoNetworkGrid.addWidget(self.kaleidoPIDFlag,2,0)
-        kaleidoNetworkGrid.addWidget(kaleidoPIDLabel,2,1)
         kaleidoNetworkGrid.setSpacing(20)
         kaleidoHBox = QHBoxLayout()
         kaleidoHBox.addLayout(kaleidoNetworkGrid)
         kaleidoHBox.addStretch()
+
+        kaleidoPIDHbox = QHBoxLayout()
+        kaleidoPIDHbox.addWidget(self.kaleidoPIDFlag)
+        kaleidoPIDHbox.addStretch()
 
         kaleidoEventFlagHBox = QHBoxLayout()
         kaleidoEventFlagHBox.setSpacing(17)
@@ -1390,6 +1392,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
         kaleidoVBox = QVBoxLayout()
         kaleidoVBox.addLayout(kaleidoHBox)
+        kaleidoVBox.addSpacing(10)
+        kaleidoVBox.addLayout(kaleidoPIDHbox)
         kaleidoVBox.addSpacing(15)
         kaleidoVBox.addLayout(kaleidoEventFlagHBox)
         kaleidoVBox.addStretch()

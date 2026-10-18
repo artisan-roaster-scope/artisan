@@ -243,8 +243,8 @@ class Artisan(QtSingleApplication):
         super().__init__(appGuid, viewerAppGuid, args)
 
         # with Qt.ConnectionType.QueuedConnection the signal is queued even if called from the same thread
-        self.sendmessage2ArtisanInstanceSignal.connect(self._sendMessage2ArtisanInstanceSlot, type=Qt.ConnectionType.QueuedConnection)
-        self.sendmessage2ArtisanViewerSignal.connect(self._sendMessage2ArtisanViewerSlot, type=Qt.ConnectionType.QueuedConnection)
+        self.sendmessage2ArtisanInstanceSignal.connect(self._sendMessage2ArtisanInstanceSlot, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
+        self.sendmessage2ArtisanViewerSignal.connect(self._sendMessage2ArtisanViewerSlot, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
 
         self.sentToBackground:float|None = None # set to timestamp on putting app to background without any open dialog
         self.plus_sync_cache_expiration = 1*40 # how long a plus sync is valid in seconds
@@ -1418,6 +1418,9 @@ class ApplicationWindow(QMainWindow):
     disconnectPlusSignal = pyqtSignal() # connected/disconnected in plus/scheduler.py
     setTimerColorSignal = pyqtSignal(str)
     loadThemeSignal = pyqtSignal(str,str)
+    toggleDashboardSignal = pyqtSignal()
+    showDashboardSignal = pyqtSignal()
+    hideDashboardSignal = pyqtSignal()
 
     __slots__ = [ 'locale_str', 'app', 'superusermode', 'sample_loop_running', 'time_stopped', 'plus_account', 'plus_account_id', 'plus_remember_credentials', 'plus_email', 'plus_language', 'plus_subscription', 'percent_decimals',
         'plus_paidUntil', 'plus_rlimit', 'plus_used', 'plus_readonly', 'plus_user_id', 'appearance', 'mpl_fontproperties', 'full_screen_mode_active', 'processingKeyEvent', 'quickEventShortCut',
@@ -3945,26 +3948,29 @@ class ApplicationWindow(QMainWindow):
         self.orbiterSendMessageSignal.connect(self.orbiterSendMessage)
         self.sr900SendMessageSignal.connect(self.sr900SendMessage)
         self.lebrewSendMessageSignal.connect(self.lebrewSendMessage)
-        self.addEventSignal.connect(self.addEventSlot, type=Qt.ConnectionType.QueuedConnection)
-        self.addRawEventSignal.connect(self.addRawEventSlot, type=Qt.ConnectionType.QueuedConnection)
+        self.addEventSignal.connect(self.addEventSlot, type=Qt.ConnectionType.QueuedConnection)  # Xtype: ignore[call-arg]
+        self.addRawEventSignal.connect(self.addRawEventSlot, type=Qt.ConnectionType.QueuedConnection)  # Xtype: ignore[call-arg]
            # by default the connection type is AutoConnection (If the emitter & receiver are in the same thread, a DirectConnection is used. Otherwise, a QueuedConnection is used.)
            # if the signal is send/receveid in the same thread a direct connection equals to a direct function call, the event is NOT put on the event loop and this not potentially processed delays
            # explicitly specifying QueuedConnection puts the message on the event loop and delays the processing potentially also if running in the same thread as the sender
         self.updateMessageLogSignal.connect(self.updateMessageLog)
         self.updateSerialLogSignal.connect(self.updateSerialLog)
         self.updateErrorLogSignal.connect(self.updateErrorLog)
-        self.establishQuantifiedEventSignal.connect(self.establishQuantifiedEventSlot, type=Qt.ConnectionType.QueuedConnection)
+        self.establishQuantifiedEventSignal.connect(self.establishQuantifiedEventSlot, type=Qt.ConnectionType.QueuedConnection)  # Xtype: ignore[call-arg]
         self.updateExtraEventButtonsVisibilitySignal.connect(self.update_extraeventbuttons_visibility)
         self.realignButtonsSignal.connect(self.realignbuttons)
-        self.loadAlarmsSignal.connect(self.loadAlarms, type=Qt.ConnectionType.QueuedConnection)
-        self.loadFileSignal.connect(self.loadFileSlot, type=Qt.ConnectionType.QueuedConnection)
-        self.loadPalettesSignal.connect(self.loadPalettesSlot, type=Qt.ConnectionType.QueuedConnection)
-        self.importArtisanURLSignal.connect(self.importArtisanURLSlot, type=Qt.ConnectionType.QueuedConnection)
-        self.comparatorAddProfileURLSignal.connect(self.comparatorAddProfileURLSlot, type=Qt.ConnectionType.QueuedConnection)
-        self.comparatorAddProfileSignal.connect(self.comparatorAddProfileSlot, type=Qt.ConnectionType.QueuedConnection)
-        self.updateScheduleSignal.connect(self.updateSchedule, type=Qt.ConnectionType.QueuedConnection)
-        self.setTimerColorSignal.connect(self.setTimerColor, type=Qt.ConnectionType.QueuedConnection)
-        self.loadThemeSignal.connect(self.loadThemeFile, type=Qt.ConnectionType.QueuedConnection)
+        self.loadAlarmsSignal.connect(self.loadAlarms, type=Qt.ConnectionType.QueuedConnection)  # Xtype: ignore[call-arg]
+        self.loadFileSignal.connect(self.loadFileSlot, type=Qt.ConnectionType.QueuedConnection)  # Xtype: ignore[call-arg]
+        self.loadPalettesSignal.connect(self.loadPalettesSlot, type=Qt.ConnectionType.QueuedConnection)  # Xtype: ignore[call-arg]
+        self.importArtisanURLSignal.connect(self.importArtisanURLSlot, type=Qt.ConnectionType.QueuedConnection)  # Xtype: ignore[call-arg]
+        self.comparatorAddProfileURLSignal.connect(self.comparatorAddProfileURLSlot, type=Qt.ConnectionType.QueuedConnection)  # Xtype: ignore[call-arg]
+        self.comparatorAddProfileSignal.connect(self.comparatorAddProfileSlot, type=Qt.ConnectionType.QueuedConnection)  # Xtype: ignore[call-arg]
+        self.updateScheduleSignal.connect(self.updateSchedule, type=Qt.ConnectionType.QueuedConnection)  # Xtype: ignore[call-arg]
+        self.setTimerColorSignal.connect(self.setTimerColor, type=Qt.ConnectionType.QueuedConnection)  # Xtype: ignore[call-arg]
+        self.loadThemeSignal.connect(self.loadThemeFile, type=Qt.ConnectionType.QueuedConnection)  # Xtype: ignore[call-arg]
+        self.toggleDashboardSignal.connect(self.dashboard.toggle_dashboard, type=Qt.ConnectionType.QueuedConnection)  # Xtype: ignore[call-arg]
+        self.showDashboardSignal.connect(self.dashboard.show_dashboard, type=Qt.ConnectionType.QueuedConnection)  # Xtype: ignore[call-arg]
+        self.hideDashboardSignal.connect(self.dashboard.hide_dashboard, type=Qt.ConnectionType.QueuedConnection)  # Xtype: ignore[call-arg]
 
         self.notificationManager:NotificationManager|None = None
         if not self.app.artisanviewerMode:
@@ -6376,38 +6382,6 @@ class ApplicationWindow(QMainWindow):
             rgba_colorname2argb_colorname(canvas_color),
             border_color,
             selected_canvas_color.name()))
-
-#        self.ntb.setStyleSheet(f"""
-#            QToolBar {{
-#                background-color: {rgba_colorname2argb_colorname(canvas_color)};
-#                border: 0px solid;
-#                color: {rgba_colorname2argb_colorname(title_color)};
-#                spacing: 2px;
-#            }}
-#            QToolBar::separator {{
-#                background-color: transparent;
-#            }}
-#            QToolButton:checked {{
-#                background-color: {selected_canvas_color.name()};
-#            }}
-#            QToolButton:hover {{
-#                border-color: {border_color};
-#            }}
-#            QToolButton:checked:hover {{
-#                border-color: {border_color};
-#                background-color: {selected_canvas_color.name()};
-#            }}
-#            QToolButton {{
-#                border-width: 1px;
-#                border-style: solid;
-#                border-radius: 5px;
-#                border-color: transparent;
-#                margin: 0px;
-#                padding: 0px;
-#                background-color: transparent;
-#            }}
-#        """)
-
 
         if self.comparator is None:
             if self.qmc.background and self.qmc.title != '':
@@ -10940,13 +10914,6 @@ class ApplicationWindow(QMainWindow):
                                         self.qmc.showBackgroundEventsSignal.emit(state)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
-                            # upload
-                            elif cs == 'upload2RoastHubs':
-                                try:
-                                    QTimer.singleShot(10, self.qmc.uploadRoastHubs)
-                                    self.sendmessage(f'Artisan Command: {cs}')
-                                except Exception as e: # pylint: disable=broad-except
-                                    _log.exception(e)
 
                             # zoom(<factor_x>[,<factor_y>]) zooms the canvas with <factor_x> and the optional <factor_y> floats indicating
                             #  the zoom factor in x and y direction, respectivily. A factor 1 does not apply any zoom,
@@ -11069,6 +11036,19 @@ class ApplicationWindow(QMainWindow):
                                         self.qmc.fig.canvas.toolbar.forward()
                                 except Exception as e:
                                     _log.error(e)
+
+                            # dashboard([<bool>]) if no argument is given, the visibility of the dashboard is toggled, if argument is true show, otherwise hide it
+                            elif cs.startswith('dashboard(') and cs.endswith(')'):
+                                try:
+                                    value_str = cs[len('dashboard('):-1].strip()
+                                    if value_str == '':
+                                        self.toggleDashboardSignal.emit()
+                                    elif value_str.lower() in {'yes', 'true', 't', '1'}:
+                                        self.showDashboardSignal.emit()
+                                    else:
+                                        self.hideDashboardSignal.emit()
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
 
                             else:
                                 # command not recognized
@@ -12957,9 +12937,10 @@ class ApplicationWindow(QMainWindow):
                         self.sendmessage(f"{QApplication.translate('Label','Event button')}", append=False)
                     elif no_modifier and not self.app.artisanviewerMode and not self.qmc.designerflag and not self.qmc.wheelflag:
                         self.toggleextraeventrows()
-                elif k == Qt.Key.Key_M and no_modifier: # 77:          #M (hides/shows standard buttons row)
-                    if self.qmc.flagstart:
-                        self.standardButtonsVisibility()
+# dangerous if you accidentially hit this and don't know how to make those visible again during a running roast!
+#                elif k == Qt.Key.Key_M and no_modifier: # 77:          #M (hides/shows standard buttons row)
+#                    if self.qmc.flagstart:
+#                        self.standardButtonsVisibility()
                 #Extra event buttons palette. Numerical keys [0,1,2,3,4,5,6,7,8,9]
                 elif k in numberkeys and (no_modifier or keypad_modifier): # 47 < k < 58:
                     if not self.app.artisanviewerMode:

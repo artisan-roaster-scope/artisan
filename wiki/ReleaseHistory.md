@@ -12,9 +12,10 @@ v5.0.0
   - adds autoCHARGE/autoDROP recognition for [IMF](https://artisan-scope.org/machines/imf/) as 'auto' setup which picks up CHARGE and DROP events from the machine
   - adds device setup for Lebrews online-color sensor [RoastSee NEXT](https://artisan-scope.org/devices/lebrew/) and `lebrew(<msg>)` IO Command
   - improved support for [Orbiter](https://artisan-scope.org/machines/orbiter/) smart roasters
+  - adds configuration to use the artisan internal software PID instead of the [Kaleido machines](https://artisan-scope.org/machines/kaleido/) internal one
   - adds [Catppuccin](https://github.com/catppuccin) and some more new themes
   - adds UI scaling factor
-  - adds dashboard
+  - adds a dashboard
   - adds two more MODBUS device channels
   - adds Artisan Commands `pidDerivativeFilter(<n>)`, `pidDerivativeLimit(<n>)`, `pidILF(<n>)`, `pidIWP(<bool>)`, and `pidIRoC(<bool>)` to configure the internal PID (for John)
   - adds Artisan Commands `zoom(<x>[,<y>])`, `pan(<x>[,<y>])`, `center(<x>,<y>[,<clamp>])`, `clamp(<n>)`, `followMode(<bool>)`, and `followModePanning(<x>[,<y>])` to update the canvas perspective

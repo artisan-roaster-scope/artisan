@@ -26,8 +26,11 @@
 # Marko Luther, 2025
 
 import re
+import time
 import asyncio
 import logging
+import struct
+from pymodbus.framer.rtu import FramerRTU
 from collections.abc import Callable, Awaitable
 from typing import override, Final, TYPE_CHECKING
 
@@ -100,10 +103,13 @@ class Lebrew_RoastSeeNEXT_BLE(ClientBLE):
 
 class Lebrew_RoastSeeNEXT:
 
-    SEPARATOR:Final[bytes] = b'\x00'
+#    SEPARATOR:Final[bytes] = b'\x00'
+    HEADER:Final[bytes] = b'\xAA\x55'
+    TAIL:Final[bytes] = b'\x53\x42'
 
     __slots__ = [ '_connected_handler', '_disconnected_handler', '_ble_client', '_ble_client_started',
-        '_payload_pattern', '_agtron', '_crack', '_RoR', '_FoR', '_distance', '_time', '_yellow', '_logging' ]
+        '_payload_pattern', '_agtron', '_crack', '_RoR', '_FoR', '_distance', '_time', '_yellow', '_logging',
+        '_verify_crc' ]
 
     def __init__(self,
                     connected_handler:Callable[[], None]|None = None,
@@ -127,6 +133,7 @@ class Lebrew_RoastSeeNEXT:
 
         # configuration
         self._logging = False         # if True device communication is logged
+        self._verify_crc:bool = True  # if True the CRC of incoming messages is verified
 
     # handlers
 
@@ -178,23 +185,73 @@ class Lebrew_RoastSeeNEXT:
 
     # message decoder
 
+#    def register_reading(self, data:bytes) -> None:
+#        if self._logging:
+#            _log.debug('register_reading(%s)',data)
+#        try:
+#            values = tuple(float(v) for v in self._payload_pattern.sub('', data.decode('utf-8')).split(','))
+#            if len(values) == 7:
+#                self._agtron, self._crack, self._RoR, self._FoR, self._distance, self._time, self._yellow = values
+#        except UnicodeDecodeError:
+#            pass
+
     def register_reading(self, data:bytes) -> None:
         if self._logging:
             _log.debug('register_reading(%s)',data)
         try:
-            values = tuple(float(v) for v in self._payload_pattern.sub('', data.decode('utf-8')).split(','))
-            if len(values) == 7:
-                self._agtron, self._crack, self._RoR, self._FoR, self._distance, self._time, self._yellow = values
-        except UnicodeDecodeError:
-            pass
+            if len(data)>3:
+                self._agtron = struct.unpack('<f', data[:4])[0] # little endian interpretation of 4 bytes as float
+            if len(data)>4:
+                self._crack = data[4]
+            if len(data)>8:
+                self._RoR = struct.unpack('<f', data[5:9])[0]
+            if len(data)>12:
+                self._FoR = struct.unpack('<f', data[9:13])[0]
+            if len(data)>14:
+                self._distance = int.from_bytes(data[13:15], 'little')
+            if len(data)>16:
+                self._time = int.from_bytes(data[15:17], 'little')
+            if len(data)>17:
+                self._yellow = data[17]
+#            if len(data)>19L
+#                roast_nr = int.from_bytes(data[18:20], "little") # nr of roast
+        except Exception as e:
+            _log.exception(e)
 
     # asyncio read implementation
 
-    # https://www.oreilly.com/library/view/using-asyncio-in/9781492075325/ch04.html
+#    # https://www.oreilly.com/library/view/using-asyncio-in/9781492075325/ch04.html
+#    async def read_msg(self, stream: asyncio.StreamReader|IteratorReader) -> None:
+#        data = await stream.readuntil(self.SEPARATOR)
+#        # register readings
+#        self.register_reading(data[:-len(self.SEPARATOR)]) # self.SEPARATOR is included in readuntil result and need to be removed
+
     async def read_msg(self, stream: asyncio.StreamReader|IteratorReader) -> None:
-        data = await stream.readuntil(self.SEPARATOR)
-        # register readings
-        self.register_reading(data[:-len(self.SEPARATOR)]) # self.SEPARATOR is included in readuntil result and need to be removed
+        try:
+            await stream.readuntil(self.HEADER[0:1])
+            # check for the second header byte
+            snd_byte = await stream.readexactly(1)
+            if snd_byte != self.HEADER[1:2]:
+                return
+            data_len = await stream.readexactly(1)
+            data = await stream.readexactly(data_len[0])
+
+            # CRC calculated over data
+            calculated_crc = FramerRTU.compute_CRC(data_len + data).to_bytes(2, 'big')
+            crc = await stream.readexactly(2)
+            if self._verify_crc and crc != calculated_crc:
+                if self._logging:
+                    _log.debug('CRC error')
+                return
+            tail = await stream.readexactly(2)
+            if tail != self.TAIL:
+                return
+
+            self.register_reading(data)
+
+        except Exception as e:
+            _log.exception(e)
+
 
     def send_msg(self, message:bytes) -> None:
         if hasattr(self, '_ble_client') and self._ble_client is not None:
@@ -222,6 +279,7 @@ class Lebrew_RoastSeeNEXT:
 
     def start_measuring(self) -> None:
         self.send_message('roasting')
+        time.sleep(0.3)
         self.send_message('start')
 
     def stop_measuring(self) -> None:

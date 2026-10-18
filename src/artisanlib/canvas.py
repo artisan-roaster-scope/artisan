@@ -2206,7 +2206,7 @@ class tgraphcanvas(QObject):
         self.profile_upload_limit:float = 1 # maximum upload frequency in seconds
         self.last_profile_upload_times:float = 0
 
-        self.updategraphicsSignal.connect(self.updategraphics, type=Qt.ConnectionType.QueuedConnection)
+        self.updategraphicsSignal.connect(self.updategraphics, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
         self.updateLargeLCDsSignal.connect(self.updateLargeLCDs)
         self.updateLargeLCDsReadingsSignal.connect(self.updateLargeLCDsReadings)
         self.setTimerLargeLCDcolorSignal.connect(self.setTimerLargeLCDcolor)
@@ -2215,32 +2215,32 @@ class tgraphcanvas(QObject):
         self.fileDirtySignal.connect(self.fileDirty)
         self.fileCleanSignal.connect(self.fileClean)
         self.markChargeDelaySignal.connect(self.markChargeDelay)
-        self.markChargeSignal.connect(self.markCharge, type=Qt.ConnectionType.QueuedConnection)
-        self.markTPSignal.connect(self.markTPTrigger, type=Qt.ConnectionType.QueuedConnection)
-        self.markDRYSignal.connect(self.markDryEnd, type=Qt.ConnectionType.QueuedConnection)
-        self.markFCsSignal.connect(self.mark1Cstart, type=Qt.ConnectionType.QueuedConnection)
-        self.markFCeSignal.connect(self.mark1Cend, type=Qt.ConnectionType.QueuedConnection)
-        self.markSCsSignal.connect(self.mark2Cstart, type=Qt.ConnectionType.QueuedConnection)
-        self.markSCeSignal.connect(self.mark2Cend, type=Qt.ConnectionType.QueuedConnection)
-        self.markDropSignal.connect(self.markDrop, type=Qt.ConnectionType.QueuedConnection)
-        self.markCoolSignal.connect(self.markCoolEnd, type=Qt.ConnectionType.QueuedConnection)
-        self.onMonitorSignal.connect(self.OnMonitor, type=Qt.ConnectionType.QueuedConnection)
+        self.markChargeSignal.connect(self.markCharge, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
+        self.markTPSignal.connect(self.markTPTrigger, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
+        self.markDRYSignal.connect(self.markDryEnd, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
+        self.markFCsSignal.connect(self.mark1Cstart, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
+        self.markFCeSignal.connect(self.mark1Cend, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
+        self.markSCsSignal.connect(self.mark2Cstart, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
+        self.markSCeSignal.connect(self.mark2Cend, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
+        self.markDropSignal.connect(self.markDrop, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
+        self.markCoolSignal.connect(self.markCoolEnd, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
+        self.onMonitorSignal.connect(self.OnMonitor, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
         self.toggleMonitorSignal.connect(self.toggleMonitorTigger)
         self.toggleRecorderSignal.connect(self.toggleRecorderTigger)
-        self.processAlarmSignal.connect(self.processAlarm, type=Qt.ConnectionType.QueuedConnection) # queued to avoid deadlock between RampSoak processing and EventRecordAction, both accessing the same critical section protected by profileDataSemaphore
+        self.processAlarmSignal.connect(self.processAlarm, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg] # queued to avoid deadlock between RampSoak processing and EventRecordAction, both accessing the same critical section protected by profileDataSemaphore
         self.alarmsetSignal.connect(self.selectAlarmSet)
         self.moveBackgroundSignal.connect(self.moveBackgroundAndRedraw)
         self.eventRecordSignal.connect(self.EventRecordSlot)
         self.eventRecordOverwriteValueSignal.connect(self.EventRecordOverwriteValueSlot)
-        self.eventRecordActionSignal.connect(self.EventRecordActionSlot, type=Qt.ConnectionType.QueuedConnection) # queued to avoid deadlock between PID processing and EventRecordAction, both accessing the same critical section protected by profileDataSemaphore
+        self.eventRecordActionSignal.connect(self.EventRecordActionSlot, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg] # queued to avoid deadlock between PID processing and EventRecordAction, both accessing the same critical section protected by profileDataSemaphore
         self.showCurveSignal.connect(self.showCurve)
         self.showExtraCurveSignal.connect(self.showExtraCurve)
         self.showEventsSignal.connect(self.showEvents)
         self.showBackgroundEventsSignal.connect(self.showBackgroundEvents)
-        self.redrawSignal.connect(self.redraw, type=Qt.ConnectionType.QueuedConnection)
-        self.redrawKeepViewSignal.connect(self.redraw_keep_view, type=Qt.ConnectionType.QueuedConnection)
-        self.canvasZoomSignal.connect(self.canvas_zoom, type=Qt.ConnectionType.QueuedConnection)
-        self.canvasPanSignal.connect(self.canvas_pan, type=Qt.ConnectionType.QueuedConnection)
+        self.redrawSignal.connect(self.redraw, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
+        self.redrawKeepViewSignal.connect(self.redraw_keep_view, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
+        self.canvasZoomSignal.connect(self.canvas_zoom, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
+        self.canvasPanSignal.connect(self.canvas_pan, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
 
     #NOTE: empty Figure is initially drawn at the end of self.awsettingsload()
     #################################    FUNCTIONS    ###################################
@@ -4004,20 +4004,20 @@ class tgraphcanvas(QObject):
 
     @pyqtSlot('QAction*')
     def event_popup_action(self, action:QAction) -> None:
-        if action.key[0] >= 0:
+        if action.key[0] >= 0: # Xtype: ignore[attr-defined]
             # we check if this is the first DROP mark on this roast
-            firstDROP = (action.key[0] == 6 and self.timeindex[6] == 0)
-            timeindex_before = self.timeindex[action.key[0]]
-            self.timeindex[action.key[0]] = action.key[1]
+            firstDROP = (action.key[0] == 6 and self.timeindex[6] == 0) # Xtype: ignore[attr-defined]
+            timeindex_before = self.timeindex[action.key[0]] # Xtype: ignore[attr-defined]
+            self.timeindex[action.key[0]] = action.key[1] # Xtype: ignore[attr-defined]
             # clear custom label positions cache entry
-            if action.key[0] in self.l_annotations_dict:
-                del self.l_annotations_dict[action.key[0]]
+            if action.key[0] in self.l_annotations_dict: # Xtype: ignore[attr-defined]
+                del self.l_annotations_dict[action.key[0]] # Xtype: ignore[attr-defined]
             try:
                 # clear the event mark position cache
-                self.l_annotations_dict.pop(action.key[0])
+                self.l_annotations_dict.pop(action.key[0]) # Xtype: ignore[attr-defined]
             except Exception: # pylint: disable=broad-except
                 pass
-            if action.key[0] == 0: # CHARGE
+            if action.key[0] == 0: # Xtype: ignore[attr-defined] # CHARGE
                 try:
                     # clear the TP mark position cache (TP depends on CHARGE!)
                     self.l_annotations_dict.pop(-1)
@@ -4047,7 +4047,7 @@ class tgraphcanvas(QObject):
                         self.startofx += self.timex[self.timeindex[0]]
                     self.aw.autoAdjustAxis(deltas=False)
                 self.timealign(redraw=True,recompute=False,force=True) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
-            elif action.key[0] == 6: # DROP
+            elif action.key[0] == 6: # Xtype: ignore[attr-defined] # DROP
                 try:
                     # clear the TP mark position cache (TP depends on DROP!)
                     self.l_annotations_dict.pop(-1)
@@ -4088,26 +4088,26 @@ class tgraphcanvas(QObject):
 
 
             # update phases
-            elif action.key[0] == 1 and self.phasesbuttonflag:  # DRY
+            elif action.key[0] == 1 and self.phasesbuttonflag: # Xtype: ignore[attr-defined] # DRY
                 self.phases[1] = int(round(self.temp2[self.timeindex[1]]))
-            elif action.key[0] == 2 and self.phasesbuttonflag:  # FCs
+            elif action.key[0] == 2 and self.phasesbuttonflag: # Xtype: ignore[attr-defined] # FCs
                 self.phases[2] = int(round(self.temp2[self.timeindex[2]]))
 
             self.fileDirtySignal.emit()
-            self.redraw_keep_view(recomputeAllDeltas=(action.key[0] in {0, 6}))  # on moving CHARGE or DROP, we have to recompute the Deltas
+            self.redraw_keep_view(recomputeAllDeltas=(action.key[0] in {0, 6})) # Xtype: ignore[attr-defined] # on moving CHARGE or DROP, we have to recompute the Deltas
         else:
             # add a special event at the current timepoint
             from artisanlib.events import customEventDlg
-            dlg = customEventDlg(self.aw, self.aw, action.key[1], value=action.key[2], event_type=self.custom_event_dlg_default_type)
+            dlg = customEventDlg(self.aw, self.aw, action.key[1], value=action.key[2], event_type=self.custom_event_dlg_default_type) # Xtype: ignore[attr-defined]
             if dlg.exec():
-                self.addEvent(action.key[1], # absolute time index
+                self.addEvent(action.key[1], # Xtype: ignore[attr-defined] # absolute time index
                     dlg.type, # default: "--"
                     dlg.description, # pyright:ignore[reportUnknownArgumentType]
                     dlg.value)
                 self.custom_event_dlg_default_type = dlg.type
                 self.aw.orderEvents()
                 self.fileDirtySignal.emit()
-                self.redraw_keep_view(recomputeAllDeltas=(action.key[0] in {0, 6})) # on moving CHARGE or DROP, we have to recompute the Deltas
+                self.redraw_keep_view(recomputeAllDeltas=(action.key[0] in {0, 6})) # Xtype: ignore[attr-defined] # on moving CHARGE or DROP, we have to recompute the Deltas
                 # redraw minieditor event selection line
                 currentevent = self.aw.eNumberSpinBox.value()
                 if currentevent:
@@ -6018,7 +6018,7 @@ class tgraphcanvas(QObject):
 
                 elif action == 7:
                     # START
-                    if self.aw.buttonSTARTSTOP.isEnabled():
+                    if self.aw.buttonSTARTSTOP.isEnabled() and not self.flagstart:
                         self.ToggleRecorder()
                 elif action == 8 and self.timeindex[1] == 0:
                     # DRY
@@ -11464,7 +11464,7 @@ class tgraphcanvas(QObject):
         width = img.width()
         height = img.height()
         imgsize = img.bits()
-        if imgsize is not None:
+        if imgsize is not None: # pyright:ignore[reportUnnecessaryComparison]
             imgsize.setsize(img.sizeInBytes())
         return numpy.array(imgsize).reshape((height, width, int(32/8)))
 
@@ -12935,10 +12935,12 @@ class tgraphcanvas(QObject):
 
     @pyqtSlot()
     def OnMonitor(self) -> None:
+        _log.debug('PRINT OnMonitor')
         try:
             self.generateNoneTempHints()
             self.block_update = True # block the updating of the bitblit canvas (unblocked at the end of this function to avoid multiple redraws)
-            res = self.reset(redraw=False, soundOn=False, keepProperties=True, onMonitor=True, showDashboard=not self.flagstart and self.flagKeepON)
+            # only show dashboard if flagON if no alarm is defined (which might auto START on ON and cause a "dashboard flicker"
+            res = self.reset(redraw=False, soundOn=False, keepProperties=True, onMonitor=True, showDashboard=not self.flagstart and len(self.alarmflag)== 0 and self.flagKeepON)
             if not res: # reset canceled
                 return
 
