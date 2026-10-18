@@ -215,7 +215,7 @@ class Lebrew_RoastSeeNEXT:
                 self._yellow = data[17]
 #            if len(data)>19L
 #                roast_nr = int.from_bytes(data[18:20], "little") # nr of roast
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
     # asyncio read implementation
@@ -249,7 +249,7 @@ class Lebrew_RoastSeeNEXT:
 
             self.register_reading(data)
 
-        except Exception as e:
+        except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
 
@@ -286,5 +286,22 @@ class Lebrew_RoastSeeNEXT:
         self.send_message('stop')
 
 # further commands
+#  back
 #  agtron
 #  zeroing
+#  history
+#  readlog
+#  yellow
+#
+# and the following (which have to given in quotes in an Artisan Command):
+#  NEXT:PAGE.ROASTING_LIVE
+#  NEXT:PAGE.AGTRON_LIVE
+#  NEXT:PAGE.ZEROING_CONFIRM
+#  NEXT:PAGE.HISTORY
+#  NEXT:PAGE.BACK
+#  NEXT:ROASTING.START
+#  NEXT:ROASTING.STOP
+#  NEXT:AGTRON.START
+#  NEXT:AGTRON.STOP
+#  NEXT:HISTORY.READ
+#  NEXT:SETTING.YELLOW <1-50>

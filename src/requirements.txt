@@ -29,7 +29,7 @@
 setuptools==84.0.0
 wheel==0.48.0
 pyserial==3.5
-pymodbus==3.15.0
+pymodbus==3.16.1
 python-snap7==2.1.0
 Phidget22==1.26.20260821
 Unidecode==1.4.0
