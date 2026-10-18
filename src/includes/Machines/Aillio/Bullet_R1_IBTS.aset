@@ -32,6 +32,8 @@ extratimeout=1, 1, 1, 0.5
 [ExtraDev]
 extraCurveVisibility1=false, false, false, false, true, true, true, true, true, true
 extraCurveVisibility2=false, false, false, false, true, true, true, true, true, true
+extraDelta1=false, true, false, false, false, false, false, false, false, false
+extraDelta2=false, false, false, false, false, false, false, false, false, false
 extraLCDvisibility1=false, true, true, false, false, false, false, false, false, false
 extraLCDvisibility2=false, false, true, true, false, false, false, false, false, false
 extradevicecolor1=black, black, black, black

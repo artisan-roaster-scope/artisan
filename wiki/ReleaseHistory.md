@@ -13,6 +13,7 @@ v5.0.0
   - adds device setup for Lebrews online-color sensor [RoastSee NEXT](https://artisan-scope.org/devices/lebrew/) and `lebrew(<msg>)` IO Command
   - improved support for [Orbiter](https://artisan-scope.org/machines/orbiter/) smart roasters
   - adds configuration to use the artisan internal software PID instead of the [Kaleido machines](https://artisan-scope.org/machines/kaleido/) internal one
+  - adds [Aillio Bullet R2](https://artisan-scope.org/machines/aillio/) CSV import
   - adds [Catppuccin](https://github.com/catppuccin) and some more new themes
   - adds UI scaling factor
   - adds a dashboard

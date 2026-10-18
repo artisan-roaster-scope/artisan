@@ -41,7 +41,7 @@ extratimeout=1, 1, 1, 0.5
 [ExtraDev]
 extraCurveVisibility1=false, false, false, false, true, true, true, true, true, true
 extraCurveVisibility2=false, false, false, false, true, true, true, true, true, true
-extraDelta1=false, false, false, false, false, false, false, false, false, false
+extraDelta1=false, true, false, false, false, false, false, false, false, false
 extraDelta2=false, false, false, false, false, false, false, false, false, false
 extraFill1=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 extraFill2=0, 0, 0, 0, 0, 0, 0, 0, 0, 0

@@ -2076,15 +2076,9 @@ class ApplicationWindow(QMainWindow):
 
         self.importMenu.addSeparator()
 
-#        importBulletAction = QAction('Aillio RoasTime...', self)
-#        #importBulletAction.triggered.connect(self.importBullet)
-#        self.importMenu.addAction(importBulletAction)
-#        importBulletAction.setEnabled(False)
-#
-#        importBulletAction = QAction('Aillio Roast.World URL...', self)
-#        #importBulletAction.triggered.connect(self.importBulletURL)
-#        self.importMenu.addAction(importBulletAction)
-#        importBulletAction.setEnabled(False)
+        importAillioAction = QAction('Aillio CSV...', self)
+        importAillioAction.triggered.connect(self.importAillio)
+        self.importMenu.addAction(importAillioAction)
 
         importCropsterAction = QAction('Cropster XLS...', self)
         importCropsterAction.triggered.connect(self.importCropster)
@@ -2164,27 +2158,32 @@ class ApplicationWindow(QMainWindow):
         self.importMenu.addAction(importStrongholdAction)
 
         self.convFromMenu:QMenu = QMenu(QApplication.translate('Menu', 'Convert From'))
-        fileConvertFromCropsterAction = QAction(QApplication.translate('Menu', 'Cropster XLS...'), self)
+
+        fileConvertFromAillioAction = QAction('Aillio CSV...', self)
+        fileConvertFromAillioAction.triggered.connect(self.convertFromAillio)
+        self.convFromMenu.addAction(fileConvertFromAillioAction)
+
+        fileConvertFromCropsterAction = QAction('Cropster XLS...', self)
         fileConvertFromCropsterAction.triggered.connect(self.convertFromCropster)
         self.convFromMenu.addAction(fileConvertFromCropsterAction)
 
-        fileConvertFromGiesenAction = QAction(QApplication.translate('Menu', 'Giesen CSV...'), self)
+        fileConvertFromGiesenAction = QAction('Giesen CSV...', self)
         fileConvertFromGiesenAction.triggered.connect(self.convertFromGiesen)
         self.convFromMenu.addAction(fileConvertFromGiesenAction)
 
-        fileConvertFromHiBeanAction = QAction(QApplication.translate('Menu', 'HiBean JSON...'), self)
+        fileConvertFromHiBeanAction = QAction('HiBean JSON...', self)
         fileConvertFromHiBeanAction.triggered.connect(self.convertFromHiBean)
         self.convFromMenu.addAction(fileConvertFromHiBeanAction)
 
-        fileConvertFromIKAWAAction = QAction(QApplication.translate('Menu', 'IKAWA CSV...'), self)
+        fileConvertFromIKAWAAction = QAction('IKAWA CSV...', self)
         fileConvertFromIKAWAAction.triggered.connect(self.convertFromIKAWA)
         self.convFromMenu.addAction(fileConvertFromIKAWAAction)
 
-        fileConvertFromKaleidoAction = QAction(QApplication.translate('Menu', 'Kaleido CSV...'), self)
+        fileConvertFromKaleidoAction = QAction('Kaleido CSV...', self)
         fileConvertFromKaleidoAction.triggered.connect(self.convertFromKaleido)
         self.convFromMenu.addAction(fileConvertFromKaleidoAction)
 
-        fileConvertFromLoringAction = QAction(QApplication.translate('Menu', 'Loring CSV...'), self)
+        fileConvertFromLoringAction = QAction('Loring CSV...', self)
         fileConvertFromLoringAction.triggered.connect(self.convertFromLoring)
         self.convFromMenu.addAction(fileConvertFromLoringAction)
 
@@ -2192,19 +2191,19 @@ class ApplicationWindow(QMainWindow):
         fileConvertFromOrbiterAction.triggered.connect(self.convertFromOrbiter)
         self.convFromMenu.addAction(fileConvertFromOrbiterAction)
 
-        fileConvertFromPetronciniAction = QAction(QApplication.translate('Menu', 'Petroncini CSV...'), self)
+        fileConvertFromPetronciniAction = QAction('Petroncini CSV...', self)
         fileConvertFromPetronciniAction.triggered.connect(self.convertFromPetroncini)
         self.convFromMenu.addAction(fileConvertFromPetronciniAction)
 
-        fileConvertFromROESTAction = QAction(QApplication.translate('Menu', 'ROEST CSV...'), self)
+        fileConvertFromROESTAction = QAction('ROEST CSV...', self)
         fileConvertFromROESTAction.triggered.connect(self.convertFromROEST)
         self.convFromMenu.addAction(fileConvertFromROESTAction)
 
-        fileConvertFromRubaseAction = QAction(QApplication.translate('Menu', 'Rubase CSV...'), self)
+        fileConvertFromRubaseAction = QAction('Rubase CSV...', self)
         fileConvertFromRubaseAction.triggered.connect(self.convertFromRubase)
         self.convFromMenu.addAction(fileConvertFromRubaseAction)
 
-        fileConvertFromStrongholdAction = QAction(QApplication.translate('Menu', 'Stronghold XLSX...'), self)
+        fileConvertFromStrongholdAction = QAction('Stronghold XLSX...', self)
         fileConvertFromStrongholdAction.triggered.connect(self.convertFromStronghold)
         self.convFromMenu.addAction(fileConvertFromStrongholdAction)
 
@@ -12937,7 +12936,7 @@ class ApplicationWindow(QMainWindow):
                         self.sendmessage(f"{QApplication.translate('Label','Event button')}", append=False)
                     elif no_modifier and not self.app.artisanviewerMode and not self.qmc.designerflag and not self.qmc.wheelflag:
                         self.toggleextraeventrows()
-# dangerous if you accidentially hit this and don't know how to make those visible again during a running roast!
+# dangerous if you accidentally hit this and don't know how to make those visible again during a running roast!
 #                elif k == Qt.Key.Key_M and no_modifier: # 77:          #M (hides/shows standard buttons row)
 #                    if self.qmc.flagstart:
 #                        self.standardButtonsVisibility()
@@ -17415,6 +17414,12 @@ class ApplicationWindow(QMainWindow):
 #        self.fileExport(QApplication.translate('Message', 'Export Probat Pilot'),'*.xml',self.exportPilot)
 
 #--
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def convertFromAillio(self, _:bool = False) -> None:
+        from artisanlib.aillio_r1 import extractProfileAillioCSV
+        self.fileConvertFrom('*.csv', extractProfileAillioCSV)
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -26518,6 +26523,13 @@ class ApplicationWindow(QMainWindow):
             _, _, exc_tb = sys.exc_info()
             self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' {1} {0}').format(str(ex),message),getattr(exc_tb, 'tb_lineno', '?'))
 
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def importAillio(self, _:bool = False) -> None:
+        from artisanlib.aillio_r1 import extractProfileAillioCSV
+        self.importExternal(extractProfileAillioCSV,QApplication.translate('Message','Import {}').format('Aillio CSV'),'*.csv')
+
     @pyqtSlot()
     @pyqtSlot(bool)
     def importCropster(self, _:bool = False) -> None:
@@ -26535,12 +26547,6 @@ class ApplicationWindow(QMainWindow):
     def importRoastLog(self, _:bool = False) -> None:
         from artisanlib.roastlog import extractProfileRoastLog
         self.importExternalURL(extractProfileRoastLog,QApplication.translate('Message','Import {}').format('RoastLog URL'))
-
-#    @pyqtSlot()
-#    @pyqtSlot(bool)
-#    def importRoastPATH(self, _:bool = False) -> None:
-#        from artisanlib.roastpath import extractProfileRoastPathHTML
-#        self.importExternalURL(extractProfileRoastPathHTML,QApplication.translate('Message','Import {}').format('RoastPath URL'))
 
     @pyqtSlot()
     @pyqtSlot(bool)
