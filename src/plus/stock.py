@@ -303,6 +303,7 @@ def getWorker() -> 'Worker|None':
             worker.startSignal.connect(worker.update_blocking)
             worker.replySignal.connect(util.updateLimits)
             worker.updatedSignal.connect(util.updateSchedule)
+            worker.updatedSignal.connect(util.updateDashboardInventory)
             worker.upToDateSignal.connect(util.updateSchedule)
         return worker
     except Exception as e:  # pylint: disable=broad-except

@@ -371,6 +371,12 @@ def updateSchedule() -> None:
     if aw is not None:
         aw.updateSchedule()
 
+@pyqtSlot()
+def updateDashboardInventory() -> None:
+    aw = config.app_window
+    if aw is not None:
+        aw.dashboard.update_inventory_section()
+
 # takes the JSON response dict and returns the account state as tuple
 # rlimit:float, rused:float, pu:str, notifications:int
 def extractAccountState(response: dict[str,Any]) -> tuple[float, float, str, int, list[str]]:

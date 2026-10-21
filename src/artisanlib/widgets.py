@@ -57,6 +57,23 @@ def wait_cursor() -> Generator[None]:
     finally:
         QApplication.restoreOverrideCursor()
 
+
+def adjust_combobox_dropdown_width(combobox:QComboBox) -> None:
+    # Find the maximum width needed for the items
+    max_width = 0
+    font_metrics = combobox.fontMetrics()
+
+    for i in range(combobox.count()):
+        item_text = combobox.itemText(i)
+        # Add a small padding (e.g., 30px) for the scrollbar and text margins
+        item_width = font_metrics.horizontalAdvance(item_text) + 30
+        max_width = max(max_width, item_width)
+
+    # Apply the width to the dropdown view container
+    view = combobox.view()
+    if view is not None:
+        view.setMinimumWidth(max_width)
+
 class MyQComboBox(QComboBox):
     def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[Any,Any]) -> None:
         super().__init__(parent, **kwargs)

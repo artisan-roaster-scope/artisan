@@ -600,9 +600,12 @@ def toDim(color:str) -> str:
     return gray.name(QColor.NameFormat.HexRgb)
 
 # creates QLinearGradient style from light to dark by default, or from dark to light if reverse is True
+# xalpha can be given as a hex value of two letters
 @functools.cache
-def createGradient(rgb:QColor|str, tint_factor:float = 0.1, shade_factor:float = 0.1, reverse:bool = False, left_to_right:bool = False) -> str:
+def createGradient(rgb:QColor|str, tint_factor:float = 0.1, shade_factor:float = 0.1, reverse:bool = False, left_to_right:bool = False, alpha:str = '') -> str:
     light_grad,dark_grad = createRGBGradient(rgb,tint_factor,shade_factor)
+    light_grad = f'#{alpha}{light_grad[1:]}'
+    dark_grad = f'#{alpha}{dark_grad[1:]}'
     if reverse:
         # dark to light
         if left_to_right:

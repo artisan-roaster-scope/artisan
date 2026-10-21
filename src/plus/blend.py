@@ -47,7 +47,7 @@ from artisanlib.util import comma2dot, float2floatWeightVolume, getStyleIconPath
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox
 from artisanlib.styles import (tool_button_icon_style, line_edit_style, table_style, horizontal_header_style,
-    vertical_header_style, artisan_dialog_button_style, artisan_push_button_style)
+    vertical_header_style, artisan_dialog_button_style, artisan_push_button_style, combobox_style)
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -164,7 +164,7 @@ class CustomBlendDialog(ArtisanDialog):
             cancelButton.setIcon(QIcon())
         self.setButtonTranslations(cancelButton, 'Cancel', QApplication.translate('Button','Cancel'))
 
-        self.ui.pushButton_add.setFixedSize(QSize(26,26))
+        self.ui.pushButton_add.setFixedSize(QSize(28,28))
         self.ui.pushButton_add.setText('')
         self.ui.pushButton_add.setIconSize(QSize(20,20))
         self.ui.pushButton_add.setIcon(QIcon(getStyleIconPath('add-01-stroke-rounded-white.svg')))
@@ -416,8 +416,8 @@ class CustomBlendDialog(ArtisanDialog):
                 #ratio
                 ratioedit = QLineEdit(f'{c.ratio*100:.1f}'.rstrip('0').rstrip('.'))
                 ratioedit.setAlignment(Qt.AlignmentFlag.AlignRight)
-                ratioedit.setMinimumWidth(40)
-                ratioedit.setMaximumWidth(40)
+                ratioedit.setMinimumWidth(50)
+                ratioedit.setMaximumWidth(50)
                 ratioedit.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 1, ratioedit))  # the max limit has to be high enough otherwise the connected signals are not send!
                 if not ratio_correct:
 #                    ratioedit.setStyleSheet('QLineEdit { color: #CC0F50; }')
@@ -440,6 +440,10 @@ class CustomBlendDialog(ArtisanDialog):
 
                 #beans
                 beansComboBox = MyQComboBox()
+                beansComboBox.setStyleSheet(combobox_style(
+                    self.aw.app.darkmode,
+                    getStyleIconPath('arrow-down-01-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'arrow-down-01-stroke-rounded-light.svg')))
+
                 beansComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
                 # the popup contains all available coffees but the ones used already in the blend, but always contains the components coffee
                 coffees_tuples = [(n, hr_id) for (n, hr_id) in self.sorted_coffees if hr_id == c.coffee or hr_id not in blend_coffees]

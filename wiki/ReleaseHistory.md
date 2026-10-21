@@ -6,17 +6,17 @@ v5.0.0
 ------------------
 
 * ADDITIONS
+  - adds roast dashboard
   - adds support for [Dutch Master Roasters](https://artisan-scope.org/machines/dmr/)
   - adds support for [FreshRoast SR900](https://artisan-scope.org/machines/freshroast/) including the IO Command `sr900(<target>[,<value>])` ([PR #2240](../../../pull/2240) contributed by [Brian Schmitt](https://github.com/brianschmitt))
-  - adds autoCHARGE/DROP and drum speed control to the [Schuilenburg](https://artisan-scope.org/machines/schuilenburg/) PLC machine setup
   - adds autoCHARGE/autoDROP recognition for [IMF](https://artisan-scope.org/machines/imf/) as 'auto' setup which picks up CHARGE and DROP events from the machine
+  - adds autoCHARGE/DROP and drum speed control to the [Schuilenburg](https://artisan-scope.org/machines/schuilenburg/) PLC machine setup
   - adds device setup for Lebrews online-color sensor [RoastSee NEXT](https://artisan-scope.org/devices/lebrew/) and `lebrew(<msg>)` IO Command
   - improved support for [Orbiter](https://artisan-scope.org/machines/orbiter/) smart roasters
   - adds configuration to use the artisan internal software PID instead of the [Kaleido machines](https://artisan-scope.org/machines/kaleido/) internal one
   - adds [Aillio Bullet R2](https://artisan-scope.org/machines/aillio/) CSV import
   - adds [Catppuccin](https://github.com/catppuccin) and some more new themes
   - adds UI scaling factor
-  - adds a dashboard
   - adds two more MODBUS device channels
   - adds Artisan Commands `pidDerivativeFilter(<n>)`, `pidDerivativeLimit(<n>)`, `pidILF(<n>)`, `pidIWP(<bool>)`, and `pidIRoC(<bool>)` to configure the internal PID (for John)
   - adds Artisan Commands `zoom(<x>[,<y>])`, `pan(<x>[,<y>])`, `center(<x>,<y>[,<clamp>])`, `clamp(<n>)`, `followMode(<bool>)`, and `followModePanning(<x>[,<y>])` to update the canvas perspective
@@ -27,6 +27,7 @@ v5.0.0
   - smaller builds by replacing headless Chromium engine by Rust-based [fulgur lib](https://github.com/fulgur-rs/fulgur) for HTML2PDF conversion (size reduced by ~45%)
   - faster app start (startup time redued by ~50% on macOS)
   - refreshed UI
+  - improved translations
 * FIXES
   - fixes faulty hash generation on files created using `Save As` causing `modified file` warnings on load ([Issue #2205](../../../issues/2205))
   - fixes regression causing canvas color not being applied correctly ([Issue #2212](../../../issues/2212))

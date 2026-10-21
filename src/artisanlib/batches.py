@@ -77,7 +77,7 @@ class batchDlg(ArtisanDialog):
             self.neverOverwriteCheckbox.setChecked(False)
 
         if self.aw.qmc.batchcounter > -1:
-            self.counterSpinBox.setValue(int(round(self.aw.qmc.batchcounter)))
+            self.counterSpinBox.setValue(self.aw.qmc.batchcounter)
             self.counterSpinBox.setEnabled(True)
             self.prefixEdit.setEnabled(True)
             self.neverOverwriteCheckbox.setEnabled(True)
@@ -150,6 +150,8 @@ class batchDlg(ArtisanDialog):
     @pyqtSlot()
     @override
     def close(self) -> bool:
+        # update dashboard which might display the reserved batch number
+        self.aw.dashboard.update_dashboard()
         #save window position (only; not size!)
         settings = QSettings()
         settings.setValue('BatchPosition',self.frameGeometry().topLeft())

@@ -94,7 +94,7 @@ def artisan_push_button_style(dark:bool=False) -> str:
             background-color: #4c97c3;
             color: #FFFFFF;
             border: 0px solid;
-            border-radius: 12px;
+            border-radius: 14px;
             padding: 6px 10px;
         }}
         QPushButton#plus_button {{
@@ -110,29 +110,29 @@ def artisan_push_button_style(dark:bool=False) -> str:
             background-color: #1985ba;
         }}
         QPushButton:disabled {{
-            background-color: {'#5F5F5F' if dark else '#DFDFDF'};
+            background-color: {'#555F5F5F' if dark else '#DFDFDF'};
             color: {'#AEAEA3' if dark else '#8E8E93'};
         }}
     """
 
 @functools.lru_cache
-def artisan_minor_push_button_style(dark:bool=False) -> str:
+def artisan_minor_push_button_style(dark:bool=False, large:bool=False) -> str:
     return f"""
         QPushButton {{
-            background-color: {'#3B3B3B' if dark else '#B7B7B7'};
+            background-color: {'#52525250' if dark else '#B7B7B7'};
             color: {'#DEDEDE' if dark else '#FFFFFF'};
             border: {'1px solid #4A4A4A' if dark else '0px solid'};
-            border-radius: 12px;
+            border-radius: {'14px' if large else '12px'};
             padding: {'3px' if dark else '4px'} 10px;
         }}
         QPushButton:hover {{
-            background-color: {'#4B4B4B' if dark else '#C7C7C7'};
+            background-color: {'#AA5B5B5B' if dark else '#C7C7C7'};
         }}
         QPushButton:pressed {{
-            background-color: {'#5B5B5B' if dark else '#979797'};
+            background-color: {'#AA6B6B6B' if dark else '#979797'};
         }}
         QPushButton:disabled {{
-            background-color: {'#303030' if dark else '#E8E8E8'};
+            background-color: {'#55303030' if dark else '#E8E8E8'};
             color: {'#8F8F8F' if dark else '#8E8E93'};
         }}
     """
@@ -141,10 +141,10 @@ def artisan_minor_push_button_style(dark:bool=False) -> str:
 def link_push_button_style(dark:bool=False) -> str:
     return f"""
         QPushButton {{
-            background-color: {'#3B3B3B' if dark else '#B7B7B7'};
+            background-color: {'#52525250' if dark else '#B7B7B7'};
             color: {'#DEDEDE' if dark else '#FFFFFF'};
             border: 0px solid;
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 4px 0px;
             max-height: 10px;
             text-align: left;
@@ -152,13 +152,13 @@ def link_push_button_style(dark:bool=False) -> str:
             padding-left: 10px;
         }}
         QPushButton:hover {{
-            background-color: {'#4B4B4B' if dark else '#C7C7C7'};
+            background-color: {'#AA5B5B5B' if dark else '#C7C7C7'};
         }}
         QPushButton:pressed {{
-            background-color: {'#5B5B5B' if dark else '#979797'};
+            background-color: {'#AA6B6B6B' if dark else '#979797'};
         }}
         QPushButton:disabled {{
-            background-color: {'#383838' if dark else '#E8E8E8'};
+            background-color: {'#AA383838' if dark else '#E8E8E8'};
             color: {'#8F8F8F' if dark else '#8E8E93'};
         }}
     """
@@ -612,9 +612,6 @@ def horizontal_header_style(darkmode:bool) -> str:
                 border-top-right-radius: 10px;
             }}
     """
-#                background-color: {createGradient('#444444') if darkmode else createGradient('#FAFAFA')};
-#                background-color: {createGradient('#818181') if darkmode else createGradient('#E1E1E1')};
-
 
 @functools.lru_cache
 def vertical_header_style(darkmode:bool) -> str:
@@ -642,14 +639,9 @@ def vertical_header_style(darkmode:bool) -> str:
                 border-bottom-left-radius: 10px;
             }}
         """
-#                background-color: {createGradient('#444444', left_to_right=True) if darkmode else createGradient('#FAFAFA', left_to_right=True)};
-#                background-color: {createGradient('#818181', left_to_right=True) if darkmode else createGradient('#E1E1E1', left_to_right=True)};
-#                background-color: {createGradient('#515151', left_to_right=True) if darkmode else createGradient('#D1D1D1', left_to_right=True)};
-
 
 
 # Text edit styles
-
 
 @functools.lru_cache
 def text_edit_style(
@@ -848,7 +840,7 @@ def events_editor_style(dark:bool, background_color:str, line_edit_color:str) ->
         padding: 0px 5px;
     }}
     QPushButton#minieventleft {{
-        background-color: {createGradient('#494949') if dark else createGradient('#E9E9E9')};
+        background-color: {createGradient('#494949', alpha='55') if dark else createGradient('#E9E9E9')};
         color: { '#F3F3F3' if dark else '#333333' };
         border-top-left-radius: 10px;
         border-bottom-left-radius: 10px;
@@ -856,13 +848,13 @@ def events_editor_style(dark:bool, background_color:str, line_edit_color:str) ->
         min-height: 25px;
     }}
     QPushButton#minieventleft:pressed {{
-        background-color: {createGradient('#696969') if dark else createGradient('#C9C9C9')};
+        background-color: {createGradient('#696969', alpha='55') if dark else createGradient('#C9C9C9')};
     }}
     QPushButton#minieventleft:hover:!pressed {{
-        background-color: {createGradient('#393939') if dark else createGradient('#F0F0F0')};
+        background-color: {createGradient('#393939', alpha='55') if dark else createGradient('#F0F0F0')};
     }}
     QPushButton#minieventright {{
-        background-color: {createGradient('#494949') if dark else createGradient('#E9E9E9')};
+        background-color: {createGradient('#494949', alpha='55') if dark else createGradient('#E9E9E9')};
         color: { '#F3F3F3' if dark else '#333333' };
         border-width: 0;
         border-top-right-radius: 10px;
@@ -871,13 +863,13 @@ def events_editor_style(dark:bool, background_color:str, line_edit_color:str) ->
         min-height: 25px;
     }}
     QPushButton#minieventright:pressed {{
-        background-color: {createGradient('#696969') if dark else createGradient('#C9C9C9')};
+        background-color: {createGradient('#696969', alpha='55') if dark else createGradient('#C9C9C9')};
     }}
     QPushButton#minieventright:hover:!pressed {{
-        background-color: {createGradient('#393939') if dark else createGradient('#F0F0F0')};
+        background-color: {createGradient('#393939', alpha='55') if dark else createGradient('#F0F0F0')};
     }}
     QPushButton#buttonminiEvent {{
-        background-color: {createGradient('#494949') if dark else createGradient('#E9E9E9')};
+        background-color: {createGradient('#494949', alpha='55') if dark else createGradient('#E9E9E9')};
         border-radius: 6px;
         color: { '#F3F3F3' if dark else '#333333' };
         min-width: 100px;
@@ -885,10 +877,10 @@ def events_editor_style(dark:bool, background_color:str, line_edit_color:str) ->
         border-width: 0;
     }}
     QPushButton#buttonminiEvent:pressed {{
-        background-color: {createGradient('#696969') if dark else createGradient('#C9C9C9')};
+        background-color: {createGradient('#696969', alpha='55') if dark else createGradient('#C9C9C9')};
     }}
     QPushButton#buttonminiEvent:hover:!pressed {{
-        background-color: {createGradient('#393939') if dark else createGradient('#F0F0F0')};
+        background-color: {createGradient('#393939', alpha='55') if dark else createGradient('#F0F0F0')};
     }}
 """
 
@@ -933,7 +925,9 @@ def toolbar_style(color:str, background_color:str, border_color:str, selected_ba
 # ComboBox style
 
 @functools.lru_cache
-def combobox_style(dark:bool, down_arrow_icon_path:str, font_weight:str = 'normal', dark_background_color:str = '#393939') -> str:
+def combobox_style(dark:bool, down_arrow_icon_path:str, font_weight:str = 'normal',
+        dark_background_color:str = '#57393939',
+        view_dark_background_color:str = '#C7393939') -> str:
     return f"""
     QComboBox {{
         combobox-popup: 0;
@@ -947,7 +941,7 @@ def combobox_style(dark:bool, down_arrow_icon_path:str, font_weight:str = 'norma
         max-height: 22px;
     }}
     QComboBox:editable {{
-        background: {'#1e1e1e' if dark else '#ffffff'};
+        background: {'#882e2e2e' if dark else '#ffffff'};
     }}
     QComboBox:on {{
         border-color: palette(accent);
@@ -975,13 +969,16 @@ def combobox_style(dark:bool, down_arrow_icon_path:str, font_weight:str = 'norma
     QComboBox QAbstractItemView {{
         border: 1px solid {'#3a3a3a' if dark else '#D1D1D1'};
         border-radius: 6px;
-        background-color: {dark_background_color if dark else '#FFFFFF'};
+        background-color: {view_dark_background_color if dark else '#FFFFFF'};
         color: {'#f5f5f5' if dark else '#333333'};
         selection-background-color: palette(accent);
         selection-color: #FFFFFF;
         font-weight: normal;
         outline: 0px;
         padding: 4px 0px;
+    }}
+    QComboBox QAbstractItemView::item:!enabled {{
+        color: #CCCCCC;
     }}
     QComboBox QListView::item {{
         height: 24px;
@@ -1037,23 +1034,24 @@ def tool_button_frame_style(dark:bool) -> str:
             border-style: solid;
             border-color: {'rgb(65, 65, 65)' if dark else '#BBBBBB'};
             border-radius: 15px;
-            background-color: {'#404040' if dark else '#F3F3F3'};
+            background-color: {'#AA404040' if dark else '#F3F3F3'};
         }}
         QFrame:hover {{
-            background-color: {'#555555' if dark else '#E0E0E0'};
+            background-color: {'#AA555555' if dark else '#E0E0E0'};
         }}
         QFrame:pressed {{
-            background-color: {'#777777' if dark else '#D0D0D0'};
+            background-color: {'#AA777777' if dark else '#D0D0D0'};
         }}
         QFrame:disabled {{
-            background-color: {'#303030' if dark else '#E8E8E8'};
+            background-color: {'#AA303030' if dark else '#E8E8E8'};
         }}
     """
 
 # dashboard style
 
+# if group_border_class is True a background image is loaded
 @functools.lru_cache
-def dashboard_style(dark:bool, group_border_class:bool) -> str:
+def dashboard_style(dark:bool, group_border_class:bool, canvas_color:str) -> str:
     return f"""
     QLabel {{
         background-color: transparent;
@@ -1061,14 +1059,18 @@ def dashboard_style(dark:bool, group_border_class:bool) -> str:
         border-width: 0px;
         color: {'#EEEEEE' if dark else 'rgb(102, 102, 102)'};
     }}
+    QLabel:disabled {{
+        color: {'#8F8F8F' if dark else '#8E8E93'};
+    }}
     QGroupBox {{
         color: palette(buttontext);
         border-style:solid;
         border-width: 2px;
         border-radius: 18px;
-        border-color: {('rgb(35, 35, 35)' if group_border_class else 'rgb(65, 65, 65)') if dark else
+        border-color: {('rgb(35, 35, 35)' if group_border_class else 'rgba(65, 65, 65, 50%)') if dark else
             ('rgb(240, 240, 240)' if group_border_class else 'rgb(210, 210, 210)')};
-        background-color: {'rgba(41, 41, 41, 90%)' if dark else 'rgba(240, 240, 240, 90%)'};
+        background-color: {('rgba(41, 41, 41, 90%)' if dark else 'rgba(240, 240, 240, 90%)') if group_border_class
+            else ('rgba(41, 41, 41, 50%)' if dark else 'rgba(240, 240, 240, 80%)')};
     }}
     QGroupBox:title {{
         top: 7px;
@@ -1077,7 +1079,7 @@ def dashboard_style(dark:bool, group_border_class:bool) -> str:
     }}
 
     QStackedWidget {{
-        background-color: rgb(245, 245, 245);
+        background-color: {canvas_color if group_border_class else 'transparent'};
     }}
     QGroupBox#inventory_group {{
         padding-top: 10px;
@@ -1085,12 +1087,12 @@ def dashboard_style(dark:bool, group_border_class:bool) -> str:
         border-style:solid;
         border-color: {'rgb(65, 65, 65)' if dark else 'rgb(216, 216, 216)'};
         border-radius: 10px;
-        background-color: {'rgb(50, 50, 50)' if dark else 'rgb(245, 245, 245)'};
+        background-color: {'rgba(50, 50, 50, 60%)' if dark else 'rgb(245, 245, 245)'};
     }}
     QWidget#inventory_page {{
-        background-color: {'rgb(50, 50, 50)' if dark else 'rgb(245, 245, 245)'};
+        background-color: {('rgba(50, 50, 50, 98%)' if group_border_class else 'transparent') if dark else 'rgb(245, 245, 245)'};
     }}
     QWidget#no_inventory_page {{
-        background-color: {'rgb(50, 50, 50)' if dark else 'rgb(245, 245, 245)'};
+        background-color: {('rgba(50, 50, 50, 98%)' if group_border_class else 'transparent') if dark else 'rgb(245, 245, 245)'};
     }}
 """

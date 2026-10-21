@@ -30,7 +30,7 @@ import sys
 import platform
 import logging
 from pathlib import Path
-from typing import Final, TYPE_CHECKING
+from typing import Final, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
@@ -44,15 +44,30 @@ from uic import DashboardWidget # pyright: ignore[attr-defined] # pylint: disabl
 
 
 from artisanlib import __release_sponsor_url__
+from artisanlib.widgets import adjust_combobox_dropdown_width
 from artisanlib.styles import combobox_style, dashboard_style
 from artisanlib.util import (getStyleIconPath, float2floatWeightVolume, convertVolume, convertWeight, volume_units,
-    weight_units, weight_units_lower, toStringList, comma2dot, getResourcePath, open_link, toInt)
+    weight_units, weight_units_lower, toStringList, comma2dot, getResourcePath, open_link, toInt, abbrevString,
+    rgba_colorname2argb_colorname)
 from artisanlib.styles import (tool_button_icon_style, artisan_push_button_style, tool_button_frame_style,
     artisan_minor_push_button_style, link_push_button_style, line_edit_style, separator_line_style)
-from plus.util import plusLink
+
+import plus.stock
+import plus.blend
+from plus.util import plusLink, coffeeLink, storeLink
+
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
+
+
+# lineedits: specify colors explicitly as OS dark/light-mode defaults don't apply here
+LINE_EDIT_BACKGROUND_COLOR_DARK = '#70252525' #'#171717'
+LINE_EDIT_BACKGROUND_COLOR_LIGHT = '#FFFFFF'
+LINE_EDIT_COLOR_DARK = '#FFFFFF'
+LINE_EDIT_COLOR_LIGHT = '#000000'
+LINE_EDIT_BORDER_COLOR_DARK = '#555555'
+LINE_EDIT_BORDER_COLOR_LIGHT = '#D7D7D7'
 
 
 class Dashboard(QWidget):
@@ -73,15 +88,29 @@ class Dashboard(QWidget):
 
         self.recent_files:list[str] = []
 
+        # defaults
+
+        self.beans_default:str = self.aw.qmc.beans
+        self.density_default:float = self.aw.qmc.density[0]
+        self.moisture_default:float = self.aw.qmc.moisture_greens
+        self.screen_min_default:int = self.aw.qmc.beansize_min
+        self.screen_max_default:int = self.aw.qmc.beansize_max
+
+        # inventory section
+
+        # variables populated by stock data as rendered in the corresponding popups
+        self.plus_stores:list[tuple[str, str]]|None = None
+        self.plus_coffees:list[tuple[str, tuple[plus.stock.Coffee, plus.stock.StockItem]]]|None = None
+        self.plus_blends:list[plus.stock.BlendStructure]|None = None
+        #
+        self.plus_amount_selected:float|None = None # holds the max amount of the selected coffee/blend if known
+        self.plus_amount_replace_selected:float|None = None # holds the max amount of the selected coffee/blend incl. replacements if known
+
+
         self.setUpdatesEnabled(False) # disable display updates
         try:
             self.ui = DashboardWidget.Ui_Dashboard()
             self.ui.setupUi(self)
-
-            # TODO: remove
-            self.ui.beans_comboBox.addItems(['Brazil Santos [30,7kg]','some cool','items that look','different','all of them'])
-#            self.ui.blend_comboBox.addItems(['Brazil Santos [30,7kg]','some cool','items that look','different','all of them'])
-#            self.ui.space_comboBox.addItems(['Brazil Santos [30,7kg]','some cool','items that look','different','all of them'])
 
             # set static styles
             self.ui.login_pushButton.setStyleSheet(artisan_push_button_style())
@@ -100,7 +129,6 @@ class Dashboard(QWidget):
             # set label and tooltips with translations
             self.fill_labels_and_tooltips()
 
-            # font # TODO: (not: el, ar, zh, jp, he)
             artisan_font_semibold_file = os.path.join(getResourcePath(),'Nunito-SemiBold.ttf')
             artisan_font_semibold_id = QFontDatabase.addApplicationFont(artisan_font_semibold_file)
             artisan_font_semibold_families = QFontDatabase.applicationFontFamilies(artisan_font_semibold_id)
@@ -117,6 +145,11 @@ class Dashboard(QWidget):
             self.ui.links_label.setFont(QFont(artisan_font_normal_families[0], sub_header_font_size, QFont.Weight.Normal))
             self.ui.sponsor_label.setFont(QFont(artisan_font_normal_families[0], sub_header_font_size, QFont.Weight.Normal))
             self.ui.donate_label.setFont(QFont(artisan_font_normal_families[0], sub_header_font_size, QFont.Weight.Normal))
+
+            selected_label_font = self.ui.selected_line_label.font()
+            selected_label_font.setPointSize(selected_label_font.pointSize() -2)
+            self.ui.selected_line_label.setFont(selected_label_font)
+            self.ui.selected_line_label.setMaximumWidth(450) # prevent overflow into the INVENTORY group label
 
             # configure widgets
             self.ui.weight_unit_comboBox.addItems(weight_units_lower)
@@ -160,6 +193,8 @@ class Dashboard(QWidget):
             self.ui.platform_pushButton.setIconSize(QSize(10,10))
             self.ui.platform_pushButton.setIcon(QIcon(getStyleIconPath('external-link-stroke-rounded.svg')))
 
+            self.ui.weightinedit.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, self.ui.weightinedit))  # the max limit has to be high enough otherwise the connected signals are not send!
+
             # timers
             self.title_changed_timer = QTimer()
             self.title_changed_timer.setSingleShot(True)
@@ -183,6 +218,8 @@ class Dashboard(QWidget):
             self.ui.create_pushButton.clicked.connect(self.start_designer)
             self.ui.compare_pushButton.clicked.connect(self.aw.roastCompare)
 
+            self.ui.sync.clicked.connect(self.trigger_stock_update)
+
             self.ui.documentation_pushButton.clicked.connect(self.open_documentation_url)
             self.ui.forum_pushButton.clicked.connect(self.open_forum_url)
             self.ui.issue_pushButton.clicked.connect(self.open_issue_tracker_url)
@@ -190,17 +227,18 @@ class Dashboard(QWidget):
             self.ui.donate_pushButton.clicked.connect(self.open_donate_url)
             self.ui.sponsor_logo_toolButton.clicked.connect(self.open_sponsor_url)
 
-            #self.canvas_clicked.connect(self.hide_dashboard) # don't hide dashboard on a click to the canvas for now
-
-            self.set_style()
+            self.ui.beans_comboBox.currentIndexChanged.connect(self.coffeeSelectionChanged)
+            self.ui.blend_comboBox.currentIndexChanged.connect(self.blendSelectionChanged)
+            self.ui.space_comboBox.currentIndexChanged.connect(self.storeSelectionChanged)
+            self.ui.custom_blend.clicked.connect(self.customBlendButton_triggered)
 
         finally:
             self.setUpdatesEnabled(True) # re-enable display updates
 
+
     def fill_labels_and_tooltips(self) -> None:
 
         # ROAST
-#        self.ui.roast_label.setText(QApplication.translate('Label', 'ROAST')) # often translated wrongly!
         self.ui.roast_label.setText(QApplication.translate('Menu', 'Roast').upper())
         self.ui.batchsize_label.setText(QApplication.translate('Label', 'Batch size'))
         self.ui.beans_textEdit.setPlaceholderText(QApplication.translate('Label', 'Beans'))
@@ -271,21 +309,6 @@ class Dashboard(QWidget):
         self.ui.donate_pushButton.setToolTip(QApplication.translate('Tooltip','Send your donation'))
         self.ui.starts_label.setToolTip(QApplication.translate('Tooltip','Counts total number of recordings'))
 
-#  --- scheduler
-#   . create schedule link button
-#   . login plus button
-
-
-#    @override
-#    def mousePressEvent(self, a0:'QMouseEvent|None') -> None:
-#        # Check if it's a left click
-#        if a0 is not None and a0.button() == Qt.MouseButton.LeftButton and not (
-#                self.ui.groupBox_roast.underMouse() or
-#                self.ui.groupBox_profile.underMouse()):
-#            self.canvas_clicked.emit()
-#        # Call the base class implementation
-#        super().mousePressEvent(a0)
-
 
     def dashboard_active(self) -> bool:
         return self.aw.stack.currentIndex() == 1
@@ -312,22 +335,26 @@ class Dashboard(QWidget):
 
     def enable_dashboard_toggle_toolbutton(self) -> None:
         if self.aw.ntb.dashboard_tool is not None:
-#            self.aw.ntb.dashboard_tool.setEnabled(True)
             self.aw.ntb.dashboard_tool.setVisible(True)
 
     def disable_dashboard_toggle_toolbutton(self) -> None:
         if self.aw.ntb.dashboard_tool is not None:
-#            self.aw.ntb.dashboard_tool.setEnabled(False)
             self.aw.ntb.dashboard_tool.setVisible(False)
 
     def show_dashboard(self) -> None:
-        if not (self.aw.qmc.flagstart or self.aw.qmc.designerflag or self.aw.comparator is not None):
+        if not (self.aw.qmc.designerflag or self.aw.comparator is not None):
             self.update_dashboard(force=True)
-            # only open the dashboard if not recording!
             self.aw.stack.setCurrentIndex(1)
-            self.update_dashboard()
-            self.enable_dashboard_toggle_toolbutton()
+            # always update tool icons
+            self.update_tool_icons()
+            self.aw.ntb.update_tools() # as we updated the dashboard above before making it visible we have to update the tools again here
+#            self.enable_dashboard_toggle_toolbutton()
             self.disable_graph_tools()
+
+    @staticmethod
+    @pyqtSlot(bool)
+    def trigger_stock_update(_:bool = False) -> None:
+        QTimer.singleShot(10, plus.stock.update) # full stock update (returns data even if schedule did not change)
 
     @pyqtSlot()
     def hide_dashboard(self) -> None:
@@ -335,7 +362,7 @@ class Dashboard(QWidget):
         # always update tool icons
         self.update_tool_icons()
         self.aw.ntb.update_tools()
-        if (self.aw.qmc.flagstart or self.aw.qmc.designerflag or self.aw.comparator is not None):
+        if (self.aw.qmc.designerflag or self.aw.comparator is not None):
             # disable dashboard/graph toggle toolbar button
             # while recording or if designer or comparator is open
             self.disable_dashboard_toggle_toolbutton()
@@ -344,8 +371,8 @@ class Dashboard(QWidget):
     # if force, update even if not visible
     # if init_title, the title popup is re-initialized (only needed if the popup content changes, not if only the title changes)
     # if dark_canvas, the corresponding style matching a dark canvas is selected
-    def update_dashboard(self, force:bool=False, init_title:bool=True, dark_canvas:bool|None=None) -> None:
-        darkmode = self.aw.dark_canvas_p(dark_canvas)
+    def update_dashboard(self, force:bool=False, init_title:bool=True) -> None:
+        darkmode = self.aw.dark_canvas_p()
 
         if force or self.aw.stack.currentIndex() == 1:
             # only update if visible
@@ -356,8 +383,18 @@ class Dashboard(QWidget):
                 self.update_main_style(darkmode)
 
                 # batch number
-                roastpos = ('' if self.aw.qmc.roastbatchnr == 0 else f' ({self.aw.qmc.roastbatchpos})')
-                self.ui.batch_nr.setText('' if self.aw.qmc.roastbatchnr == 0 else f'{self.aw.qmc.roastbatchprefix}{self.aw.qmc.roastbatchnr}{roastpos}')
+                if self.aw.qmc.roastbatchnr == 0 and self.aw.curFile is None:
+                    # batch number reserved but not yet realized
+                    batch_pos = self.aw.qmc.batchsequence
+                    batch_nr = self.aw.qmc.batchcounter + 1
+                    self.ui.batch_nr.setEnabled(False)
+                else:
+                    # batch number set
+                    batch_pos = self.aw.qmc.roastbatchpos
+                    batch_nr = self.aw.qmc.roastbatchnr
+                    self.ui.batch_nr.setEnabled(True)
+                roastpos = ('' if batch_nr == 0 else f' ({batch_pos})')
+                self.ui.batch_nr.setText('' if batch_nr == 0 else f'{self.aw.qmc.roastbatchprefix}{batch_nr}{roastpos}')
 
                 # title
                 if init_title:
@@ -376,10 +413,20 @@ class Dashboard(QWidget):
                 self.ui.beans_textEdit.setNewPlainText(self.aw.qmc.beans)
 
                 # batchsize
-                self.ui.weightinedit.setText(f'{float2floatWeightVolume(self.aw.qmc.weight[0]):g}')
+                try:
+                    # prevent a call to self.weightin_edited() which should be called only on user input
+                    self.ui.weightinedit.blockSignals(True)
+                    self.ui.weightinedit.setText(f'{float2floatWeightVolume(self.aw.qmc.weight[0]):g}')
+                finally:
+                    self.ui.weightinedit.blockSignals(False)
 
                 # weight unit
-                self.ui.weight_unit_comboBox.setCurrentIndex(weight_units.index(self.aw.qmc.weight[2]))
+                try:
+                    # prevent a call to self.weight_unit_changed() which should be called only on user input
+                    self.ui.weight_unit_comboBox.blockSignals(True)
+                    self.ui.weight_unit_comboBox.setCurrentIndex(weight_units.index(self.aw.qmc.weight[2]))
+                finally:
+                    self.ui.weight_unit_comboBox.blockSignals(False)
 
                 # profile
                 self.update_profile_section()
@@ -397,7 +444,7 @@ class Dashboard(QWidget):
                 self.ui.recentFiles_comboBox.blockSignals(False)
 
         # always update tool icons
-        self.update_tool_icons(darkmode)
+        self.update_tool_icons()
         self.aw.ntb.update_tools()
 
     def update_release_sponsor(self, darkmode:bool) -> None:
@@ -413,8 +460,8 @@ class Dashboard(QWidget):
                         background-color: {'#414456' if darkmode else '#ffffff'};
                         border: 0px solid;
                         border-radius: 10px;
-                        min-width: 150px;
-                        max-width: 150px;
+                        min-width: 176px;
+                        max-width: 176px;
                     }}
                     FixedRatio2ToolButton:hover {{
                         background-color: {'#494D61' if darkmode else '#fAfAfA'};
@@ -427,17 +474,17 @@ class Dashboard(QWidget):
                 self.ui.groupBox_sponsor.setVisible(False)
 
     def update_main_style(self, darkmode:bool) -> None:
-        self.setStyleSheet(dashboard_style(darkmode, self.aw.dashboard_background_image is not None))
+        self.setStyleSheet(dashboard_style(darkmode, self.aw.dashboard_background_image is not None, rgba_colorname2argb_colorname(self.aw.qmc.palette['canvas'])))
         # sponsor
         self.update_release_sponsor(darkmode)
         # push buttons
         self.ui.plus_button.setStyleSheet(artisan_push_button_style(darkmode))
         self.ui.minus_button.setStyleSheet(artisan_push_button_style(darkmode))
-        self.ui.properties_pushButton.setStyleSheet(artisan_minor_push_button_style(darkmode))
-        self.ui.compare_pushButton.setStyleSheet(artisan_minor_push_button_style(darkmode))
-        self.ui.load_pushButton.setStyleSheet(artisan_minor_push_button_style(darkmode))
-        self.ui.clear_pushButton.setStyleSheet(artisan_minor_push_button_style(darkmode))
-        self.ui.create_pushButton.setStyleSheet(artisan_minor_push_button_style(darkmode))
+        self.ui.properties_pushButton.setStyleSheet(artisan_minor_push_button_style(darkmode, True))
+        self.ui.compare_pushButton.setStyleSheet(artisan_minor_push_button_style(darkmode, True))
+        self.ui.load_pushButton.setStyleSheet(artisan_minor_push_button_style(darkmode, True))
+        self.ui.clear_pushButton.setStyleSheet(artisan_minor_push_button_style(darkmode, True))
+        self.ui.create_pushButton.setStyleSheet(artisan_minor_push_button_style(darkmode, True))
         # tool buttons
         self.ui.custom_blend.setStyleSheet(tool_button_icon_style(darkmode,
             'pencil-edit-02-stroke-rounded-light.svg', 'pencil-edit-02-stroke-rounded-dark.svg'))
@@ -445,7 +492,7 @@ class Dashboard(QWidget):
             'update-light.svg', 'update-dark.svg'))
         self.ui.scheduler_toolButton.setStyleSheet(tool_button_icon_style(darkmode,
             'calendar-03-stroke-rounded-blue.svg', 'calendar-03-stroke-rounded-blue.svg'))
-        self.update_schedule_toolbutton(darkmode)
+        self.update_schedule_toolbutton()
         #
         self.ui.roast_frame.setStyleSheet(separator_line_style(darkmode))
         self.ui.profile_frame.setStyleSheet(separator_line_style(darkmode))
@@ -466,24 +513,16 @@ class Dashboard(QWidget):
                 self.ui.beans_comboBox, self.ui.blend_comboBox, self.ui.space_comboBox]:
             combo_box.setStyleSheet(combobox_stylesheet)
         #
-        # lineedits: specify colors explicitly as OS dark/light-mode defaults don't apply here
-        line_edit_background_color_dark = '#171717'
-        line_edit_background_color_light = '#FFFFFF'
-        line_edit_color_dark = '#FFFFFF'
-        line_edit_color_light = '#000000'
-        line_edit_border_color_dark = '#555555'
-        line_edit_border_color_light = '#D7D7D7'
         #
         self.ui.weightinedit.setStyleSheet(
             line_edit_style(
                 darkmode,
-                color = (line_edit_color_dark if darkmode else line_edit_color_light),
-                background_color = (line_edit_background_color_dark if darkmode else line_edit_background_color_light)))
-        #
+                color = (LINE_EDIT_COLOR_DARK if darkmode else LINE_EDIT_COLOR_LIGHT),
+                background_color = (LINE_EDIT_BACKGROUND_COLOR_DARK if darkmode else LINE_EDIT_BACKGROUND_COLOR_LIGHT)))
         self.ui.beans_textEdit.update_style(darkmode,
-            background_color = (line_edit_background_color_dark if darkmode else line_edit_background_color_light),
-            border_color = (line_edit_border_color_dark if darkmode else line_edit_border_color_light),
-            color = (line_edit_color_dark if darkmode else line_edit_color_light))
+            background_color = (LINE_EDIT_BACKGROUND_COLOR_DARK if darkmode else LINE_EDIT_BACKGROUND_COLOR_LIGHT),
+            border_color = (LINE_EDIT_BORDER_COLOR_DARK if darkmode else LINE_EDIT_BORDER_COLOR_LIGHT),
+            color = (LINE_EDIT_COLOR_DARK if darkmode else LINE_EDIT_COLOR_LIGHT))
 
     def update_background(self) -> None:
         darkmode = self.aw.dark_canvas_p()
@@ -505,15 +544,15 @@ class Dashboard(QWidget):
 
 
 #---- move to main.py
-    def update_tool_icons(self, dark_canvas:bool|None=None) -> None:
-        self.update_image_tool_icon(dark_canvas)
-        self.update_exit_tool_icon(dark_canvas)
+    def update_tool_icons(self) -> None:
+        self.update_image_tool_icon()
+        self.update_exit_tool_icon()
 
-    def update_image_tool_icon(self, dark_canvas:bool|None=None) -> None:
+    def update_image_tool_icon(self) -> None:
         if self.aw.stack.currentIndex() == 1 and self.aw.inExpertMode():
             # dashboard visible
             self.aw.dashboardImageToolButton.setStyleSheet(tool_button_icon_style(
-                self.aw.dark_canvas_p(dark_canvas),
+                self.aw.dark_canvas_p(),
                 ('image-02-stroke-rounded-light.svg' if self.aw.dashboard_background_image is None else 'image-not-found-01-stroke-rounded-light.svg'),
                 ('image-02-stroke-rounded-dark.svg' if self.aw.dashboard_background_image is None else 'image-not-found-01-stroke-rounded-dark.svg')))
             self.aw.dashboardImageToolButton.setToolTip(QApplication.translate('Tooltip','Set background image') if self.aw.dashboard_background_image is None else
@@ -523,24 +562,22 @@ class Dashboard(QWidget):
             # dashboard hidden
             self.aw.dashboardImageToolButton.setVisible(False)
 
-    def update_exit_tool_icon(self, dark_canvas:bool|None=None) -> None:
+    def update_exit_tool_icon(self) -> None:
         if self.aw.qmc.designerflag or self.aw.qmc.wheelflag:
             # designer exit button visible
             self.aw.exitToolButton.setStyleSheet(tool_button_icon_style(
-                self.aw.dark_canvas_p(dark_canvas),
+                self.aw.dark_canvas_p(),
                 'cancel-square-stroke-rounded-light.svg',
                 'cancel-square-stroke-rounded-dark.svg'
                 ))
-#            self.aw.dashboardImageToolButton.setToolTip(QApplication.translate('Tooltip','Set background image') if self.aw.dashboard_background_image is None else
-#                QApplication.translate('Tooltip','Remove background image'))
             self.aw.exitToolButton.setVisible(True)
         else:
             # designer exit button hidden
             self.aw.exitToolButton.setVisible(False)
 #----
 
-    def update_schedule_toolbutton(self, dark:bool|None = None) -> None:
-        darkmode = (dark if dark is not None else self.aw.dark_canvas_p())
+    def update_schedule_toolbutton(self) -> None:
+        darkmode = self.aw.dark_canvas_p()
         self.ui.scheduler_toolButton.setStyleSheet(tool_button_icon_style(darkmode,
             ('calendar-03-stroke-rounded-dark.svg' if self.aw.plus_account is None or self.aw.app.artisanviewerMode else 'calendar-03-stroke-rounded-blue.svg'),
             ('calendar-03-stroke-rounded-dark.svg' if self.aw.plus_account is None or self.aw.app.artisanviewerMode else 'calendar-03-stroke-rounded-blue.svg')))
@@ -554,6 +591,540 @@ class Dashboard(QWidget):
             self.ui.scheduler_frame.setEnabled(self.aw.plus_account is not None and not self.aw.app.artisanviewerMode)  # no scheduler in ArtisanViewer mode
             # scheduler tool icon
             self.update_schedule_toolbutton()
+
+            # update inventory section content
+            if self.aw.plus_account is not None:
+                plus.stock.init() # we try to init the stock from the cache before populating the popups
+
+                self.populatePlusCoffeeBlendCombos()
+
+                # current selected stock/coffee/blend _id
+                # try to generate self.aw.qmc.plus_blend_spec_labels from self.aw.qmc.plus_blend_spec and current stock
+                # if any coffee is missing from current stock, we keep what we have stored in the alog file
+                if self.aw.qmc.plus_blend_spec is not None and 'ingredients' in self.aw.qmc.plus_blend_spec: # pyrefly: ignore
+                    generated_blend_spec_labels:list[str] = []
+                    for i in self.aw.qmc.plus_blend_spec['ingredients']: # pyrefly: ignore
+                        c = plus.stock.getCoffee(i['coffee'])
+                        if c is None:
+                            generated_blend_spec_labels = [] # clear the list
+                            break
+                        generated_blend_spec_labels.append(c.get('label', ''))
+                    if generated_blend_spec_labels:
+                        self.aw.qmc.plus_blend_spec_labels = generated_blend_spec_labels
+
+                self.updatePlusSelectedLine()
+
+            else:
+                self.ui.selected_line_label.setText('')
+
+
+    def updatePlusSelectedLine(self) -> None:
+        try:
+            darkmode = self.aw.dark_canvas_p()
+            if darkmode:
+                dark_mode_link_color = " style=\"color: #e5e9ec;\""
+            else:
+                dark_mode_link_color = ''
+            line = ''
+            if self.aw.qmc.plus_coffee is not None and self.aw.qmc.plus_coffee_label:
+                line = f'<a href="{coffeeLink(self.aw.qmc.plus_coffee)}"{dark_mode_link_color}>{self.aw.qmc.plus_coffee_label}</a>'
+            elif self.aw.qmc.plus_blend_spec and self.aw.qmc.plus_blend_spec_labels:
+                # limit to max 3 component links
+                line = f'{self.aw.qmc.plus_blend_label}: '
+                first_component = True
+                for i, ll in sorted(zip(self.aw.qmc.plus_blend_spec['ingredients'], self.aw.qmc.plus_blend_spec_labels, strict=True), key=lambda tup:tup[0]['ratio'],reverse = True)[:3]:
+                    if first_component:
+                        first_component = False
+                    else:
+                        line = line + ', '
+                    c = f"<a href=\"{coffeeLink(i['coffee'])}\"{dark_mode_link_color}>{abbrevString(ll, 18)}</a>"
+                    line = line + str(int(round(i['ratio']*100))) + '% ' + c
+            if line and len(line)>0 and self.aw.qmc.plus_store is not None and self.aw.qmc.plus_store_label is not None:
+                line = line + f'  (<a href="{storeLink(self.aw.qmc.plus_store)}"{dark_mode_link_color}>{self.aw.qmc.plus_store_label}</a>)'
+            if line == '':
+                # beans not specified
+                line = QApplication.translate('Label','Choose beans')
+
+            self.ui.selected_line_label.setText(line)
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+
+    def updateTitle(self, prev_coffee_label:str|None, prev_blend_label:str|None) -> None:
+        titles_to_be_overwritten = [ '', QApplication.translate('Scope Title', 'Roaster Scope') ]
+        if prev_coffee_label is not None:
+            titles_to_be_overwritten.append(prev_coffee_label)
+        if prev_blend_label is not None:
+            titles_to_be_overwritten.append(prev_blend_label)
+        if self.ui.title_comboBox.currentText() in titles_to_be_overwritten:
+            if self.aw.qmc.plus_blend_label is not None:
+                self.ui.title_comboBox.textEdited(self.aw.qmc.plus_blend_label)
+                self.ui.title_comboBox.setEditText(self.aw.qmc.plus_blend_label)
+            elif self.aw.qmc.plus_coffee_label is not None:
+                self.ui.title_comboBox.textEdited(self.aw.qmc.plus_coffee_label)
+                self.ui.title_comboBox.setEditText(self.aw.qmc.plus_coffee_label)
+            else:
+                default_title = QApplication.translate('Scope Title', 'Roaster Scope')
+                self.ui.title_comboBox.textEdited(default_title)
+                self.ui.title_comboBox.setEditText(default_title)
+
+    @pyqtSlot(int)
+    def storeSelectionChanged(self, n:int) -> None:
+        if n != -1:
+            prev_coffee_label = self.aw.qmc.plus_coffee_label
+            prev_blend_label = self.aw.qmc.plus_blend_label
+            self.populatePlusCoffeeBlendCombos(n)
+            self.updateTitle(prev_coffee_label, prev_blend_label)
+
+    def checkWeightIn(self) -> None:
+        enough = True
+        enough_replacement = False
+        weightIn = 0.0
+        try:
+            weightIn = float(comma2dot(self.ui.weightinedit.text()))
+        except Exception: # pylint: disable=broad-except
+            pass
+        if self.plus_amount_selected is not None:
+            try:
+                # convert weight to kg
+                weightUnit = self.ui.weight_unit_comboBox.currentText()
+                if weightUnit == 'kg':
+                    wc = weightIn
+                else:
+                    wc = convertWeight(weightIn,weight_units.index(weightUnit),weight_units.index('Kg'))
+                if wc > self.plus_amount_selected:
+                    enough = False
+            except Exception: # pylint: disable=broad-except
+                pass
+        if self.plus_amount_replace_selected is not None:
+            try:
+                # convert weight to kg
+                weightUnit = self.ui.weight_unit_comboBox.currentText()
+                if weightUnit == 'kg':
+                    wc = weightIn
+                else:
+                    wc = convertWeight(weightIn,weight_units.index(self.ui.weight_unit_comboBox.currentText()),weight_units.index('Kg'))
+                if wc <= self.plus_amount_replace_selected:
+                    enough_replacement = True
+            except Exception: # pylint: disable=broad-except
+                pass
+        darkmode = self.aw.dark_canvas_p()
+        if enough: # OK
+            self.ui.weightinedit.setStyleSheet(
+                line_edit_style(
+                    darkmode,
+                    color = (LINE_EDIT_COLOR_DARK if darkmode else LINE_EDIT_COLOR_LIGHT),
+                    background_color = (LINE_EDIT_BACKGROUND_COLOR_DARK if darkmode else LINE_EDIT_BACKGROUND_COLOR_LIGHT)))
+        elif self.aw.dark_canvas_p(): # OK
+            self.ui.weightinedit.setStyleSheet(
+                line_edit_style(
+                    darkmode,
+                    color = (LINE_EDIT_COLOR_DARK if darkmode else LINE_EDIT_COLOR_LIGHT),
+                    background_color = '#ad0427')) # dark red
+        elif enough_replacement:
+            self.ui.weightinedit.setStyleSheet(
+                line_edit_style(
+                    darkmode,
+                    color = '#0A5C90',
+                    background_color = (LINE_EDIT_BACKGROUND_COLOR_DARK if darkmode else LINE_EDIT_BACKGROUND_COLOR_LIGHT))) # dark blue
+        else: # ok
+            self.ui.weightinedit.setStyleSheet(
+                line_edit_style(
+                    darkmode,
+                    color = '#CC0F50',
+                    background_color = (LINE_EDIT_BACKGROUND_COLOR_DARK if darkmode else LINE_EDIT_BACKGROUND_COLOR_LIGHT))) # light red
+
+    @pyqtSlot(int)
+    def coffeeSelectionChanged(self, n:int) -> None:
+        # check for previously selected blend label
+        prev_coffee_label = self.aw.qmc.plus_coffee_label
+        prev_blend_label = self.aw.qmc.plus_blend_label
+        if n < 1 or self.plus_coffees is None:
+            self.defaultCoffeeData()
+            self.aw.qmc.plus_store = None
+            self.aw.qmc.plus_store_label = None
+            self.aw.qmc.plus_coffee = None
+            self.aw.qmc.plus_coffee_label = None
+            self.plus_amount_selected = None
+            self.plus_amount_replace_selected = None
+            self.updateTitle(prev_coffee_label,prev_blend_label)
+        else:
+            # reset blend and set new coffee
+            self.ui.blend_comboBox.setCurrentIndex(0)
+            selected_coffee = self.plus_coffees[n-1]
+            sd = plus.stock.getCoffeeStockDict(selected_coffee)
+            self.aw.qmc.plus_store = sd['location_hr_id']
+            self.aw.qmc.plus_store_label = sd['location_label']
+            cd = plus.stock.getCoffeeCoffeeDict(selected_coffee)
+            self.aw.qmc.plus_coffee = cd.get('hr_id','')
+            self.aw.qmc.plus_coffee_label = plus.stock.coffeeLabel(cd)
+            self.aw.qmc.plus_blend_label = None
+            self.aw.qmc.plus_blend_spec = None
+            self.aw.qmc.plus_blend_spec_labels = None
+            if 'amount' in plus.stock.getCoffeeStockDict(selected_coffee):
+                self.plus_amount_selected = plus.stock.getCoffeeStockDict(selected_coffee)['amount']
+            else:
+                self.plus_amount_selected = None
+            self.plus_amount_replace_selected = None
+            self.fillCoffeeData(selected_coffee,prev_coffee_label,prev_blend_label)
+        self.checkWeightIn()
+        self.updatePlusSelectedLine()
+
+    def getBlendDictCurrentWeight(self, blend:tuple[str, tuple[plus.stock.Blend, plus.stock.StockItem, float, dict[str, str], float, list[tuple[float, plus.stock.Blend]]]]) -> plus.stock.Blend:
+        if self.ui.weightinedit.text() != '':
+            weightIn = float(comma2dot(self.ui.weightinedit.text()))
+        else:
+            weightIn = 0.0
+        weight_unit_idx = self.ui.weight_unit_comboBox.currentIndex()
+        v = convertWeight(weightIn,weight_unit_idx,weight_units.index('Kg')) # v is weightIn converted to kg
+        return plus.stock.getBlendBlendDict(blend,v)
+
+    @pyqtSlot(int)
+    def blendSelectionChanged(self, n:int) -> None:
+        # check for previously selected blend label
+        prev_coffee_label = self.aw.qmc.plus_coffee_label
+        prev_blend_label = self.aw.qmc.plus_blend_label
+        if n < 1 or self.plus_blends is None:
+            self.defaultCoffeeData()
+            self.aw.qmc.plus_store = None
+            self.aw.qmc.plus_store_label = None
+            self.aw.qmc.plus_blend_label = None
+            self.aw.qmc.plus_blend_spec = None
+            self.aw.qmc.plus_blend_spec_labels = None
+            self.plus_amount_selected = None
+            self.updateTitle(prev_coffee_label,prev_blend_label)
+        else:
+            # reset coffee and set new blend
+            self.ui.beans_comboBox.setCurrentIndex(0)
+            selected_blend = self.plus_blends[n-1]
+            bsd:plus.stock.StockItem = plus.stock.getBlendStockDict(selected_blend)
+            self.aw.qmc.plus_store = bsd['location_hr_id']
+            self.aw.qmc.plus_store_label = bsd['location_label']
+
+            bd = self.getBlendDictCurrentWeight(selected_blend)
+            self.aw.qmc.plus_coffee = None
+            self.aw.qmc.plus_blend_label = bd['label']
+            self.aw.qmc.plus_blend_spec = cast(plus.stock.Blend, dict(bd)) # make a copy of the blend dict
+# UPDATE: we keep the hr_id in to be able to adjust the blend with its replacements if needed
+#            # we trim the blend_spec to the external from
+#            self.aw.qmc.plus_blend_spec.pop("hr_id", None) # remove the hr_id
+
+            self.aw.qmc.plus_blend_spec_labels = [i.get('label','') for i in self.aw.qmc.plus_blend_spec['ingredients']]
+            # remove labels from ingredients
+            ingredients = []
+            for i in self.aw.qmc.plus_blend_spec['ingredients']:
+                entry = plus.stock.BlendIngredient(ratio = i['ratio'], coffee = i['coffee'])
+                if 'ratio_num' in i:
+                    entry['ratio_num'] = i['ratio_num']
+                if 'ratio_denom' in i:
+                    entry['ratio_denom'] = i['ratio_denom']
+                ingredients.append(entry)
+            self.aw.qmc.plus_blend_spec['ingredients'] = ingredients
+            self.plus_amount_selected = plus.stock.getBlendMaxAmount(selected_blend)
+            self.plus_amount_replace_selected = plus.stock.getBlendReplaceMaxAmount(selected_blend)
+            self.fillBlendData(selected_blend,prev_coffee_label,prev_blend_label)
+        self.checkWeightIn()
+        self.updatePlusSelectedLine()
+
+
+    @pyqtSlot(bool)
+    def customBlendButton_triggered(self, _:bool = False) -> None:
+        inWeight = self.aw.qmc.weight[0]
+
+        coffees = plus.stock.getCoffeeLabels()
+
+        if len(coffees)>1:
+            if self.aw.qmc.plus_custom_blend is not None and self.aw.qmc.plus_custom_blend.isValid(coffees.values()):
+                blend = self.aw.qmc.plus_custom_blend
+            else:
+                coffee_tuples = sorted(coffees.items(), key=lambda x: x[0])
+                blend = plus.blend.CustomBlend(QApplication.translate('Form Caption','Custom Blend'),[
+                    plus.blend.Component(coffee_tuples[0][1], 0.5),
+                    plus.blend.Component(coffee_tuples[1][1], 0.5)
+                ])
+            # only entries of coffees with stock in the selected store or in all stores if no store is selected) should be enabled in blend component coffee popups
+            coffee_hr_ids_with_stock_in_store:set[str] = set()
+            if self.plus_coffees is not None:
+                coffee_hr_ids_with_stock_in_store = {plus.stock.getCoffeeId(c) for c in self.plus_coffees if
+                    # if there are multiple stores defined and non is selected, only coffees with stock in all stores are enabled in the blend component coffee popups
+                    self.plus_stores is None or len(self.plus_stores) < 2 or self.ui.space_comboBox.currentIndex() != 0 or len(plus.stock.getCoffeeCoffeeStocks(c)) == len(self.plus_stores)}
+
+            total_weight:float
+            res, total_weight = plus.blend.openCustomBlendDialog(self.aw, self.aw, inWeight, self.aw.qmc.weight[2],
+                    coffees, blend, coffee_hr_ids_with_stock_in_store)
+            if res is not None: # not canceled
+                self.aw.qmc.plus_custom_blend = res
+                self.populatePlusCoffeeBlendCombos() # we update the blend menu to reflect the current custom blend
+                if self.aw.qmc.plus_custom_blend.name.strip() == '' and self.aw.qmc.plus_blend_spec is not None and 'hr_id' in self.aw.qmc.plus_blend_spec and self.aw.qmc.plus_blend_spec['hr_id'] == '':
+                    # if the custom blend entry was selected before, which is now removed, we select the empty first entry
+                    self.ui.blend_comboBox.setCurrentIndex(0)
+                    self.blendSelectionChanged(0)
+                # update inweight
+                inw = f'{float2floatWeightVolume(total_weight):g}'
+                self.ui.weightinedit.setText(inw)
+                self.weightin_edited()
+
+    def plus_popups_set_enabled(self, b:bool) -> None:
+        for combo in [self.ui.beans_comboBox, self.ui.blend_comboBox, self.ui.space_comboBox]:
+            try:
+                combo.setEnabled(b)
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+
+    def plus_popups_block_signals(self, b:bool) -> None:
+        for combo in [self.ui.beans_comboBox, self.ui.blend_comboBox, self.ui.space_comboBox]:
+            try:
+                combo.blockSignals(b)
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+
+    def blends_popup_visible(self, visible:bool) -> None:
+        self.ui.blend_label.setVisible(visible)
+        self.ui.blend_comboBox.setVisible(visible)
+    def spaces_popup_visible(self, visible:bool) -> None:
+        self.ui.space_label.setVisible(visible)
+        self.ui.space_comboBox.setVisible(visible)
+
+
+    def markPlusCoffeeFields(self, b:bool) -> None:
+        darkmode = self.aw.dark_canvas_p()
+        if b:
+            if darkmode:
+                self.ui.beans_textEdit.update_style(
+                    darkmode,
+                    background_color = '#44333333',
+                    selection_background_color = 'darkgray',
+                    border_color = LINE_EDIT_BORDER_COLOR_DARK,
+                    color = LINE_EDIT_COLOR_DARK)
+            else:
+                self.ui.beans_textEdit.update_style(
+                    darkmode,
+                    background_color = '#e4f3f8',
+                    selection_background_color = '#E2E2E2',
+                    border_color = LINE_EDIT_BORDER_COLOR_LIGHT,
+                    color = LINE_EDIT_COLOR_LIGHT)
+        elif darkmode:
+            self.ui.beans_textEdit.update_style(
+                darkmode,
+                background_color = LINE_EDIT_BACKGROUND_COLOR_DARK,
+                border_color = LINE_EDIT_BORDER_COLOR_DARK,
+                color = LINE_EDIT_COLOR_DARK)
+        else:
+            self.ui.beans_textEdit.update_style(
+                darkmode,
+                background_color = LINE_EDIT_BACKGROUND_COLOR_LIGHT,
+                border_color = LINE_EDIT_BORDER_COLOR_LIGHT,
+                color = LINE_EDIT_COLOR_LIGHT)
+
+    def updateBlendLines(self, blend:plus.stock.BlendStructure) -> None:
+        if self.ui.weightinedit.text() != '':
+            weightIn = float(comma2dot(self.ui.weightinedit.text()))
+        else:
+            weightIn = 0.0
+        weight_unit_idx = self.ui.weight_unit_comboBox.currentIndex()
+        blend_lines = plus.stock.blend2beans(blend,weight_unit_idx,weightIn)
+        self.ui.beans_textEdit.clear()
+        for ll in blend_lines:
+            self.ui.beans_textEdit.appendPlainText(ll)
+
+    def fillBlendData(self, blend:plus.stock.BlendStructure, prev_coffee_label:str|None, prev_blend_label:str|None) -> None:
+        try:
+            self.updateBlendLines(blend)
+            blend_dict = self.getBlendDictCurrentWeight(blend)
+            # moisture
+            self.aw.qmc.moisture_greens = blend_dict.get('moisture', 0)
+            # density
+            self.aw.qmc.density = ((blend_dict['density'], 'g', 1, 'l') if 'density' in blend_dict else (0, 'g', 1, 'l'))
+            # screen size
+            if 'screen_min' in blend_dict:
+                self.aw.qmc.beansize_min = blend_dict['screen_min']
+            if 'screen_max' in blend_dict:
+                self.aw.qmc.beansize_max = blend_dict['screen_max']
+            # check if title should be changed (if still default, or equal to the previous selection:
+            self.updateTitle(prev_coffee_label,prev_blend_label)
+            self.markPlusCoffeeFields(True)
+        except Exception as e:  # pylint: disable=broad-except
+            _log.exception(e)
+
+    def fillCoffeeData(self, coffee:tuple[str, tuple[plus.stock.Coffee, plus.stock.StockItem]],
+            prev_coffee_label:str|None, prev_blend_label:str|None) -> None:
+        try:
+            if not self.aw.qmc.safesaveflag:
+                # update defaults
+                self.beans_default = self.aw.qmc.beans
+                self.density_default = self.aw.qmc.density[0]
+                self.moisture_default = self.aw.qmc.moisture_greens
+                self.screen_min_default = self.aw.qmc.beansize_min
+                self.screen_max_default = self.aw.qmc.beansize_max
+
+            cd = plus.stock.getCoffeeCoffeeDict(coffee)
+            # beans description (only attribute which has a widget)
+            self.aw.qmc.beans = plus.stock.coffee2beans(cd)
+            self.ui.beans_textEdit.setPlainText(self.aw.qmc.beans)
+            # moisture
+            self.aw.qmc.moisture_greens = cd.get('moisture', 0)
+            # density
+            self.aw.qmc.density = ((cd['density'], 'g', 1, 'l') if 'density' in cd else (0, 'g', 1, 'l'))
+            # screen size
+            if 'screen_size' in cd:
+                screen = cd['screen_size']
+                self.aw.qmc.beansize_min = screen.get('min', 0)
+                self.aw.qmc.beansize_max = screen.get('max', 0)
+            else:
+                self.aw.qmc.beansize_min = 0
+                self.aw.qmc.beansize_max = 0
+            #
+            self.updateTitle(prev_coffee_label,prev_blend_label)
+            self.markPlusCoffeeFields(True)
+        except Exception as e:  # pylint: disable=broad-except
+            _log.exception(e)
+
+    def defaultCoffeeData(self) -> None:
+        # beans description (only attribute which has a widget)
+        self.aw.qmc.beans = self.beans_default
+        self.ui.beans_textEdit.setPlainText(self.aw.qmc.beans)
+        self.aw.qmc.moisture_greens = self.moisture_default
+        self.aw.qmc.density = (self.density_default, 'g', 1, 'l')
+        self.aw.qmc.beansize_min = self.screen_min_default
+        self.aw.qmc.beansize_max = self.screen_max_default
+        #
+        self.markPlusCoffeeFields(False)
+
+
+    # storeIndex is the index of the selected store entry in the popup
+    @pyqtSlot()
+    @pyqtSlot(int)
+    def populatePlusCoffeeBlendCombos(self, storeIndex:int|None = None) -> None:
+        if self.aw.plus_account is not None:
+            try: # this can crash if dialog got closed while this is processed in a different thread!
+                self.plus_popups_set_enabled(False)
+
+                #---- Stores
+
+                if storeIndex is None or storeIndex == -1:
+                    self.plus_stores = plus.stock.getStores()
+                    try:
+                        if len(self.plus_stores) == 1:
+                            self.aw.qmc.plus_default_store = plus.stock.getStoreId(self.plus_stores[0])
+                        self.spaces_popup_visible(len(self.plus_stores) > 1)
+                    except Exception as e:  # pylint: disable=broad-except
+                        _log.exception(e)
+                    self.ui.space_comboBox.blockSignals(True)
+                    self.ui.space_comboBox.clear()
+                    store_items = plus.stock.getStoreLabels(self.plus_stores)
+                    self.ui.space_comboBox.addItems([''] + store_items)
+                    adjust_combobox_dropdown_width(self.ui.space_comboBox)
+                    p = (plus.stock.getStorePosition(self.aw.qmc.plus_default_store,self.plus_stores) if self.aw.qmc.plus_default_store is not None else None)
+                    if p is None:
+                        self.ui.space_comboBox.setCurrentIndex(0)
+                    else:
+                        # we set to the default_store if available
+                        self.ui.space_comboBox.setCurrentIndex(p+1)
+                    self.ui.space_comboBox.blockSignals(False)
+
+                storeIdx = self.ui.space_comboBox.currentIndex()
+
+                # we reset the store if a coffee or blend is selected and the selected store is not equal to the default store
+                # we clean the coffee/blend selection as it does not fit
+                if storeIdx > 0 and self.plus_stores is not None and len(self.plus_stores)>storeIdx-1:
+                    selected_store = self.plus_stores[storeIdx-1]
+                    selected_store_id = plus.stock.getStoreId(selected_store)
+                    if (self.aw.qmc.plus_coffee or self.aw.qmc.plus_blend_spec) and self.aw.qmc.plus_store != selected_store_id:
+                        self.defaultCoffeeData()
+                        self.plus_amount_selected = None
+                        self.aw.qmc.plus_store_label = None
+                        # we keep the plus_coffee_selected/label or plus_blend_selected_spec/labels to store and display them
+                    self.aw.qmc.plus_default_store = selected_store_id
+                else:
+                    self.aw.qmc.plus_default_store = None
+
+                mark_coffee_fields = False
+
+
+                #---- Coffees
+
+                self.plus_coffees = plus.stock.getCoffees(self.ui.weight_unit_comboBox.currentIndex(),self.aw.qmc.plus_default_store)
+                self.ui.beans_comboBox.blockSignals(True)
+                nr_previous_coffees = self.ui.beans_comboBox.count()
+                self.ui.beans_comboBox.clear()
+    #            self.ui.beans_comboBox.resetInverted() # not unit inversion yet implemented for dashboard
+                coffee_items = plus.stock.getCoffeesLabels(self.plus_coffees)
+                self.ui.beans_comboBox.addItems([''] + coffee_items)
+                adjust_combobox_dropdown_width(self.ui.beans_comboBox)
+
+                p = None
+                if self.aw.qmc.plus_coffee is not None and self.aw.qmc.plus_store is not None:
+                    p = plus.stock.getCoffeeStockPosition(self.aw.qmc.plus_coffee,self.aw.qmc.plus_store,self.plus_coffees)
+                if p is None:
+                    # not in the current stock
+                    self.ui.beans_comboBox.setCurrentIndex(0)
+                    #self.aw.qmc.plus_coffee = None # we don't "deselect" a coffee just because it is not in the popup!
+                    self.ui.beans_comboBox.blockSignals(False)
+                else:
+                    # if roast is complete (charge and drop are set)
+                    if nr_previous_coffees == 0 or (self.aw.qmc.timeindex[0] > -1 and self.aw.qmc.timeindex[6] > 0):
+                        # we first change the index and then unblock signals to avoid properties being overwritten from the selected coffee
+                        self.ui.beans_comboBox.setCurrentIndex(p+1)
+                        self.ui.beans_comboBox.blockSignals(False)
+                    else:
+                        # if roast is not yet complete we unblock the signals before changing the index to get the coffee data be filled in
+                        self.ui.beans_comboBox.blockSignals(False)
+                        self.ui.beans_comboBox.setCurrentIndex(p+1)
+                    mark_coffee_fields = True
+
+
+                #---- Blends
+
+                custom_blend:plus.stock.Blend|None = None
+                # if a valid custom_blend with a non-empty name exists, we add it to the blend popups
+                coffees = plus.stock.getCoffeeLabels()
+                self.ui.custom_blend.setEnabled(len(coffees)>1) # there need at least to be two different coffes with stock in some warehouse
+                if (self.aw.qmc.plus_custom_blend is not None and self.aw.qmc.plus_custom_blend.name.strip() != '' and
+                        len(coffees)>1 and self.aw.qmc.plus_custom_blend.isValid(coffees.values())):
+                    custom_blend = plus.stock.Blend(
+                        hr_id = '',
+                        label = self.aw.qmc.plus_custom_blend.name.strip(),
+                        ingredients = [plus.stock.BlendIngredient(ratio = c.ratio, coffee = c.coffee) for c in self.aw.qmc.plus_custom_blend.components])
+                self.plus_blends = plus.stock.getBlends(self.ui.weight_unit_comboBox.currentIndex(),self.aw.qmc.plus_default_store, custom_blend)
+                self.ui.blend_comboBox.blockSignals(True)
+                nr_previous_blends = self.ui.blend_comboBox.count()
+                self.ui.blend_comboBox.clear()
+    #            self.ui.blend_comboBox.resetInverted()
+                blend_items = plus.stock.getBlendLabels(self.plus_blends)
+
+                self.ui.blend_comboBox.addItems([''] + blend_items)
+                adjust_combobox_dropdown_width(self.ui.blend_comboBox)
+
+                self.blends_popup_visible(len(self.plus_blends) != 0)
+
+                p = None
+                if self.aw.qmc.plus_blend_spec is not None and self.aw.qmc.plus_store is not None:
+                    p = plus.stock.getBlendSpecStockPosition(self.aw.qmc.plus_blend_spec, self.aw.qmc.plus_store, self.plus_blends)
+                if p is None:
+                    self.ui.blend_comboBox.setCurrentIndex(0)
+                    #self.aw.qmc.plus_blend_spec = None # we don't deselect a blend just because it is not in the popup
+                    self.ui.blend_comboBox.blockSignals(False)
+                else:
+                    # if roast is complete (charge and drop are set)
+                    if nr_previous_blends == 0 or (self.aw.qmc.timeindex[0] > -1 and self.aw.qmc.timeindex[6] > 0):
+                        # we first change the index and then unblock signals to avoid properties being overwritten from the selected blend
+                        self.ui.blend_comboBox.setCurrentIndex(p+1)
+                        self.ui.blend_comboBox.blockSignals(False)
+                    else:
+                        # if roast is not yet complete we unblock the signals before changing the index to get the blend data be filled in
+                        self.ui.blend_comboBox.blockSignals(False)
+                        self.ui.blend_comboBox.setCurrentIndex(p+1)
+                    mark_coffee_fields = True
+
+                self.markPlusCoffeeFields(mark_coffee_fields)
+                self.updatePlusSelectedLine()
+
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+            finally:
+                self.plus_popups_set_enabled(True)
+                self.plus_popups_block_signals(False)
+
+################
 
     def clearPushButtonSetEnabled(self) -> None:
         self.ui.clear_pushButton.setEnabled(True)
@@ -593,9 +1164,10 @@ class Dashboard(QWidget):
             self.ui.recentFiles_comboBox.blockSignals(False)
 
 
-    def set_style(self) -> None:
-        self.ui.title_comboBox.setStyleSheet(combobox_style(self.aw.app.darkmode, getStyleIconPath('arrow-down-01-stroke-rounded-light.svg'), 'bold'))
-        self.ui.beans_textEdit.update_style(self.aw.app.darkmode)
+#    def set_style(self) -> None:
+#        darkmode = self.aw.dark_canvas_p()
+#        self.ui.title_comboBox.setStyleSheet(combobox_style(darkmode, getStyleIconPath('arrow-down-01-stroke-rounded-light.svg'), 'bold'))
+#        self.ui.beans_textEdit.update_style(darkmode)
 
     def update_recent_roast_buttons(self) -> None:
         if self.aw.qmc.title != QApplication.translate('Scope Title', 'Roaster Scope') and self.aw.qmc.weight[0] != 0:
@@ -629,6 +1201,11 @@ class Dashboard(QWidget):
     @pyqtSlot(bool)
     def login_clicked(self, b:bool) -> None:
         del b
+        # we clear all combos to ensure that on populating them beans data is not overwritten (see populatePlusCoffeeBlendCombos())
+        self.ui.beans_comboBox.clear()
+        self.ui.blend_comboBox.clear()
+        self.ui.space_comboBox.clear()
+        #
         import plus.controller as plus_controller
         plus_controller.toggle(self.aw)
 
@@ -718,7 +1295,9 @@ class Dashboard(QWidget):
     @pyqtSlot()
     def beans_edited(self) -> None:
         self.aw.qmc.beans = self.ui.beans_textEdit.toPlainText()
-        self.aw.qmc.fileDirtySignal.emit()
+        if not self.aw.qmc.safesaveflag:
+            self.beans_default = self.aw.qmc.beans
+            self.aw.qmc.fileDirtySignal.emit()
 
     @pyqtSlot()
     def weightin_edited(self) -> None:
@@ -731,20 +1310,22 @@ class Dashboard(QWidget):
             try:
                 self.aw.qmc.weight = (float(weight_in),self.aw.qmc.weight[1],self.aw.qmc.weight[2])
             except Exception: # pylint: disable=broad-except
-                pass
+                self.ui.weightinedit.setText(f'{float2floatWeightVolume(self.aw.qmc.weight[0]):g}')
             if self.aw.qmc.weight[0] != 0 and self.aw.qmc.density[0] != 0:
                 weight_in_g = convertWeight(self.aw.qmc.weight[0],weight_units.index(self.aw.qmc.weight[2]),weight_units.index('g'))
                 volume_in = weight_in_g / self.aw.qmc.density[0] # in g/l
                 # convert to selected volume unit
                 volume_in = convertVolume(volume_in,volume_units.index('l'),volume_units.index(self.aw.qmc.volume[2]))
                 self.aw.qmc.volume = (volume_in, self.aw.qmc.volume[1], self.aw.qmc.volume[2])
-
+            if self.aw.plus_account is not None:
+                blend_idx = self.ui.blend_comboBox.currentIndex()
+                if blend_idx > 0:
+                    self.blendSelectionChanged(blend_idx)
+                coffee_idx = self.ui.beans_comboBox.currentIndex()
+                if coffee_idx > 0:
+                    self.coffeeSelectionChanged(coffee_idx)
+            self.update_recent_roast_buttons()
             self.aw.qmc.fileDirtySignal.emit()
-            # TODO (see roast_properties.py:weightineditChanged() :
-            # + updated volume-in if green-density is set
-            # - recentRoastEnabled() +/- buttons
-            # - update plus popups => might also trigger an update on the beans edit
-            # - check if enough stock, otherwise mark red!
 
     @pyqtSlot(int)
     def weight_unit_changed(self, i:int) -> None:
@@ -756,7 +1337,7 @@ class Dashboard(QWidget):
         new_weight_out = convertWeight(self.aw.qmc.weight[1],previous_weight_unit_idx,i)
         self.ui.weightinedit.setText(f'{float2floatWeightVolume(new_weight_in):g}')
         self.aw.qmc.weight = (new_weight_in,new_weight_out,weightUnit)
-        # TODO: update inventory popups like in roast_properties.py:changeWeightUnit
+        self.weightin_edited()
 
     @pyqtSlot(int)
     def recent_files_index_changed(self, i:int) -> None:

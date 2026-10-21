@@ -201,7 +201,7 @@ class Login(ArtisanDialog):
         layout.addWidget(credentialsGroup)
         layout.addSpacing(5)
         layout.addLayout(buttonLayout)
-        layout.setSpacing(10)
+        layout.setSpacing(20)
         layout.addWidget(registerGroup)
 #        layout.setContentsMargins(15, 15, 15, 15) # (left, top, right, bottom)
 

@@ -217,7 +217,6 @@ from artisanlib.util import (appFrozen, uchr, decodeLocal, decodeLocalStrict, en
         eventtime2string, toDim, signature_message, rec_int_to_float, smooth_list, getStyleIconPath)
 from artisanlib.device_registry import DEVICE_ID_MIN, DEVICE_ID_MAX, DEVICE_ID_NONE, DEVICE_ID_VIRTUAL, get_device_name
 from artisanlib.qtsingleapplication import QtSingleApplication
-from artisanlib.dashboard import Dashboard
 from artisanlib.styles import toolbar_style, combobox_style
 
 
@@ -274,7 +273,6 @@ class Artisan(QtSingleApplication):
             aw:ApplicationWindow|None = self.activationWindow()
             if aw is not None and self.darkmode != bool(colorScheme == Qt.ColorScheme.Dark):
                 self.darkmode = bool(colorScheme == Qt.ColorScheme.Dark)
-#                aw.updateCanvasColors()
                 QTimer.singleShot(500, aw.updateScheduleSignal.emit) # only redraw scheduler window # to adjust the colors of its items (QWidgets are updated automatically)
     except Exception: # pylint: disable=broad-except
         pass
@@ -293,8 +291,8 @@ class Artisan(QtSingleApplication):
                               aw.plus_account is not None and aw.qmc.roastUUID is not None and aw.curFile is not None):
                             plus.sync.getUpdate(aw.qmc.roastUUID, aw.curFile) # sync the loaded profile data if any
 
-                        if aw.schedule_window is not None and aw.plus_account is not None and not aw.qmc.flagstart:
-                            # only if not recording, scheduler is active and plus connected we update the stock on app raise which triggers a scheduler redraw implicitly
+                        if aw.plus_account is not None and (aw.dashboard.dashboard_active() or (aw.schedule_window is not None and not aw.qmc.flagstart)):
+                            # only if plus connected and either dashboard is visible or (not recording and scheduler is active) we update the stock on app raise which triggers a scheduler redraw implicitly
                             # NOTE the scheduler redraw is also happening if stock was not updated due to the update request time limit
                             plus.stock.update() # stock update (frequency limited by plus/config.py:stock_cache_expiration)
 
@@ -683,6 +681,7 @@ from artisanlib.notifications import Notification, NotificationManager, Notifica
 from artisanlib.canvas import tgraphcanvas
 from artisanlib.phases_canvas import tphasescanvas
 from artisanlib.scale import ScaleManager
+from artisanlib.dashboard import Dashboard
 
 
 # import artisan.plus module
@@ -1500,7 +1499,7 @@ class ApplicationWindow(QMainWindow):
         'qt_scale_factor', 'automatic_registration_period', 'mqtt', 'orbiter', 'machineNameAction', 'main_button_min_width', 'main_button_min_width',
         'pidbuttonFrame', 'phasesLCDsFrame', 'machineNameAction', 'automatic_registration_period', 'label_fmt', 'lcd_label_fmt', 'button_border_radius',
         'dashboard', 'stack', 'line_bottom', 'dashboard_background_image', 'dashboardImageToolButton', 'lcd1widget', 'buttonCONTROLwidget', 'extra_lcd_label_fmt',
-        'exitToolButton', 'status_bar'
+        'exitToolButton', 'status_bar', 'dark_canvas'
          ]
 
     nLCDS: Final[int] = 10 # maximum number of LCDs and extra devices (2x10 => 20 in total!)
@@ -1525,6 +1524,8 @@ class ApplicationWindow(QMainWindow):
         self.artisanviewerFirstStart:bool = artisanviewerFirstStart
 
         self.profile_data_type_adapter:TypeAdapter[ProfileData]|None = None
+
+        self.dark_canvas:bool = False
 
 #PLUS
         self.plus_account:str|None = None # if set to a login string, Artisan plus features are enabled
@@ -4859,8 +4860,23 @@ class ApplicationWindow(QMainWindow):
                     if urls and len(urls)>0:
                         if self.dashboard.dashboard_active():
                             filename = urls[0].toLocalFile()
-                            self.dashboard_background_image = filename
-                            QTimer.singleShot(10, self.dashboard.update_background)
+                            valid_image = False
+                            if self.inExpertMode():
+                                # changing dashboard background images only in Expert mode
+                                try:
+                                    from PIL import Image
+                                    img = Image.open(filename)
+                                    img_format = img.format
+                                    if img_format is not None and img_format.lower() in {'png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif', 'webp'}:
+                                        valid_image = True
+                                except Exception: # pylint: disable=broad-except
+                                    pass
+                            if valid_image:
+                                self.dashboard_background_image = filename
+                                QTimer.singleShot(10, self.dashboard.update_background)
+                            else:
+                                # allow dragging an .alog file while dashboard is shown
+                                self.app.open_url(urls[0])
                         else:
                             self.app.open_url(urls[0])
                     if self.comparator is not None:
@@ -6265,6 +6281,10 @@ class ApplicationWindow(QMainWindow):
         background_color = self.qmc.palette['background']
         return self.colorDifference('#ffffff', background_color) < self.colorDifference('#000000',background_color)
 
+    def dark_canvas_p(self) -> bool:
+        return self.dark_canvas
+
+    # updateCanvasColors updates the flag self.dark_canvas which can be accessed via dark_canvas_p()
     def updateCanvasColors(self, checkColors:bool=True) -> None:
         self.setUpdatesEnabled(False) # disable display updates on main application window until the background color has been set on all sub widgets to gain performance
         canvas_color = self.qmc.palette['canvas']
@@ -6308,14 +6328,14 @@ class ApplicationWindow(QMainWindow):
         except Exception: # pylint: disable=broad-except
             pass
 
-        # whitep = True in darkmode (dark canvas)
+        # self.dark_canvas = True if canvas color is dark
         if str(canvas_color) == 'None':
             if sys.platform.startswith('darwin'):
-                whitep = self.app.darkmode
+                self.dark_canvas = self.app.darkmode
             else:
-                whitep = False
+                self.dark_canvas = False
         else:
-            whitep = self.colorDifference('#ffffff',canvas_color) > self.colorDifference('#000000',canvas_color)
+            self.dark_canvas = self.colorDifference('#ffffff',canvas_color) > self.colorDifference('#000000',canvas_color)
 
         self.qmc.fig.patch.set_facecolor(str(canvas_color))
 
@@ -6323,18 +6343,18 @@ class ApplicationWindow(QMainWindow):
 #        self.setStyleSheet(f'QMainWindow{{background-color:{rgba_colorname2argb_colorname(canvas_color)}; border-width: 0px;}}')
 # thus it got replaced by setting that background to all direct children:
 
-        line_edit_color = ('#ffffff' if whitep else '#000000')
+        line_edit_color = ('#ffffff' if self.dark_canvas else '#000000')
         self.main_widget.setStyleSheet(f'* {{background-color:{rgba_colorname2argb_colorname(canvas_color)}; color: {rgba_colorname2argb_colorname(line_edit_color)};}}')
         self.EventsGroupLayout.setStyleSheet(events_editor_style(
-            whitep,
-            background_color = rgba_colorname2argb_colorname(QColor(self.qmc.palette['background'][:7]).lighter(110 if whitep else 90).name()),
+            self.dark_canvas,
+            background_color = rgba_colorname2argb_colorname(QColor(self.qmc.palette['background'][:7]).lighter(110 if self.dark_canvas else 90).name()),
             line_edit_color = line_edit_color) +
-                combobox_style(whitep,
-                    getStyleIconPath('arrow-down-01-stroke-rounded-dark.svg' if whitep else 'arrow-down-01-stroke-rounded-light.svg'),
+                combobox_style(self.dark_canvas,
+                    getStyleIconPath('arrow-down-01-stroke-rounded-dark.svg' if self.dark_canvas else 'arrow-down-01-stroke-rounded-light.svg'),
                     dark_background_color = rgba_colorname2argb_colorname(self.qmc.palette['background'])))
 
 
-        if current_background_color is None or current_background_color != str(canvas_color) or (whitep and self.qmc.palette['messages'] != '#ffffff'): # canvas color did not change, we do not need to redo the navigation bar
+        if current_background_color is None or current_background_color != str(canvas_color) or (self.dark_canvas and self.qmc.palette['messages'] != '#ffffff'): # canvas color did not change, we do not need to redo the navigation bar
             # update navigationbar
             self.level1layout.removeWidget(self.ntb) # remove current bar
 
@@ -6344,14 +6364,14 @@ class ApplicationWindow(QMainWindow):
                 self.ntb.zoom() # type:ignore[no-untyped-call] # ZOOM is active, we deactivate it before changing the ToolBar
             self.removeToolBar(self.ntb)
             self.ntb.destroy()
-            self.ntb = VMToolbar(self.qmc.canvas, self.main_widget, whitep)
+            self.ntb = VMToolbar(self.qmc.canvas, self.main_widget, self.dark_canvas)
             self.set_toolbar(self.ui_mode)
 
 
-#        self.line_top.setStyleSheet(f"QFrame {{ border-top: 0px; border-bottom: 1px solid {'#555555' if whitep else 'lightgray'}; background: none; }}")
-        self.line_bottom.setStyleSheet(f"QFrame {{ border-bottom: 0px; border-top: 1px solid {'#555555' if whitep else 'lightgray'}; background: none; }}")
+#        self.line_top.setStyleSheet(f"QFrame {{ border-top: 0px; border-bottom: 1px solid {'#555555' if self.dark_canvas else 'lightgray'}; background: none; }}")
+        self.line_bottom.setStyleSheet(f"QFrame {{ border-bottom: 0px; border-top: 1px solid {'#555555' if self.dark_canvas else 'lightgray'}; background: none; }}")
 
-        if whitep:
+        if self.dark_canvas:
             self.qmc.palette['messages'] = '#E0E0E0' #'#ffffff'
         else:
             self.qmc.palette['messages'] = '#585656' #'#000000'
@@ -6369,7 +6389,7 @@ class ApplicationWindow(QMainWindow):
 
         # on black we start with (1,1,1) for lighter
         selected_canvas_color = QColor('#222222' if canvas_color == '#000000' else canvas_color)
-        if whitep:
+        if self.dark_canvas:
             selected_canvas_color = selected_canvas_color.lighter(250)
             border_color = '#dcdcdc'
         else:
@@ -6398,7 +6418,7 @@ class ApplicationWindow(QMainWindow):
         self.updateSliderColors()
         self.updatePhasesLCDsLabelColors()
 
-        self.dashboard.update_dashboard(dark_canvas=whitep)
+        self.dashboard.update_dashboard()
 
         if checkColors:
             colorPairsToCheck = self.getcolorPairsToCheck()
@@ -12456,15 +12476,6 @@ class ApplicationWindow(QMainWindow):
         else:
             self.sendmessage(QApplication.translate('ComboBox','Playback OFF'))
         self.updatePlaybackIndicatorSignal.emit()
-
-    def dark_canvas_p(self, dark_canvas:bool|None=None) -> bool:
-        if dark_canvas is not None:
-            return dark_canvas
-        if str(self.qmc.palette['canvas']) == 'None':
-            if sys.platform.startswith('darwin'):
-                return self.app.darkmode
-            return False # type:ignore[unreachable, unused-ignore]
-        return self.colorDifference('#ffffff',self.qmc.palette['canvas']) > self.colorDifference('#000000',self.qmc.palette['canvas'])
 
     def slideStyle(self, n:int) -> str:
         dark = self.dark_canvas_p()
