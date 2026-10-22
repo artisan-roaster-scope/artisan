@@ -1067,6 +1067,8 @@ Section Uninstall
     Delete "$INSTDIR\dijkstra.ttf"
     Delete "$INSTDIR\xkcd-script.ttf"
     Delete "$INSTDIR\Nunito-Regular.ttf"
+    Delete "$INSTDIR\Nunito-SemiBold.ttf"
+    Delete "$INSTDIR\Nunito-ExtraBold.ttf"
     Delete "$INSTDIR\NotoSansMono-Regular.ttf"
     Delete "$INSTDIR\ComicNeue-Regular.ttf"
     Delete "$INSTDIR\WenQuanYiZenHei-01.ttf"

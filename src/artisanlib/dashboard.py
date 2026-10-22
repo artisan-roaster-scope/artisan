@@ -34,7 +34,6 @@ from typing import Final, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
-#    from PyQt6.QtGui import QMouseEvent # pylint: disable=unused-import
 
 from PyQt6.QtWidgets import QApplication, QWidget, QComboBox
 from PyQt6.QtCore import Qt, QSettings, pyqtSlot, QTimer, pyqtSignal, QSize
@@ -111,6 +110,12 @@ class Dashboard(QWidget):
         try:
             self.ui = DashboardWidget.Ui_Dashboard()
             self.ui.setupUi(self)
+
+            # configure inventory combos to allow for displaying stock in alternative unit on ALT/OPTION modifiers
+            self.ui.beans_comboBox.set_get_current_unit(self.get_current_unit)
+            self.ui.beans_comboBox.set_get_items(self.get_coffee_items)
+            self.ui.blend_comboBox.set_get_current_unit(self.get_current_unit)
+            self.ui.blend_comboBox.set_get_items(self.get_blend_items)
 
             # set static styles
             self.ui.login_pushButton.setStyleSheet(artisan_push_button_style())
@@ -235,6 +240,33 @@ class Dashboard(QWidget):
         finally:
             self.setUpdatesEnabled(True) # re-enable display updates
 
+###
+
+
+    def get_current_unit(self) -> int:
+        try:
+            return weight_units.index(self.aw.qmc.weight[2])
+        except Exception:  # pylint: disable=broad-except
+            return 0
+
+    def get_coffee_items(self, unit:int) -> list[str]:
+        plus_coffees = plus.stock.getCoffees(unit, self.aw.qmc.plus_default_store)
+        return [''] + plus.stock.getCoffeesLabels(plus_coffees)
+
+    def get_blend_items(self, unit:int) -> list[str]:
+        custom_blend:plus.stock.Blend|None = None
+        if self.aw.qmc.plus_custom_blend is not None and self.aw.qmc.plus_custom_blend.name.strip() != '':
+            coffees = plus.stock.getCoffeeLabels()
+            if len(coffees)>1 and self.aw.qmc.plus_custom_blend.isValid(coffees.values()):
+                custom_blend = plus.stock.Blend(
+                    hr_id = '',
+                    label = self.aw.qmc.plus_custom_blend.name.strip(),
+                    ingredients = [plus.stock.BlendIngredient(ratio = c.ratio, coffee= c.coffee) for c in self.aw.qmc.plus_custom_blend.components])
+        plus_blends = plus.stock.getBlends(unit,self.aw.qmc.plus_default_store, custom_blend)
+        blend_items:list[str] = plus.stock.getBlendLabels(plus_blends)
+        return [''] + blend_items
+
+    ##
 
     def fill_labels_and_tooltips(self) -> None:
 
@@ -1046,7 +1078,7 @@ class Dashboard(QWidget):
                 self.ui.beans_comboBox.blockSignals(True)
                 nr_previous_coffees = self.ui.beans_comboBox.count()
                 self.ui.beans_comboBox.clear()
-    #            self.ui.beans_comboBox.resetInverted() # not unit inversion yet implemented for dashboard
+                self.ui.beans_comboBox.resetInverted() # not unit inversion yet implemented for dashboard
                 coffee_items = plus.stock.getCoffeesLabels(self.plus_coffees)
                 self.ui.beans_comboBox.addItems([''] + coffee_items)
                 adjust_combobox_dropdown_width(self.ui.beans_comboBox)
@@ -1088,7 +1120,7 @@ class Dashboard(QWidget):
                 self.ui.blend_comboBox.blockSignals(True)
                 nr_previous_blends = self.ui.blend_comboBox.count()
                 self.ui.blend_comboBox.clear()
-    #            self.ui.blend_comboBox.resetInverted()
+                self.ui.blend_comboBox.resetInverted()
                 blend_items = plus.stock.getBlendLabels(self.plus_blends)
 
                 self.ui.blend_comboBox.addItems([''] + blend_items)
@@ -1218,12 +1250,9 @@ class Dashboard(QWidget):
             if 'background' in rr and rr['background'] is not None and rr['background'] != '':
                 background_UUID = rr.get('roastUUID', None)
                 self.aw.qmc.resetlinecountcaches()
-                self.aw.loadAndRedrawBackgroundUUID(rr['background'],background_UUID)
-            self.ui.title_comboBox.textEdited(rr['title'])
-            self.ui.title_comboBox.setEditText(rr['title'])
-#            self.update_dashboard(init_title=False) # not needed as this is done in loadAndRedraw
-            self.aw.sendmessage(QApplication.translate('Message',f"Recent roast properties '{self.aw.recentRoastLabel(rr)}' set"))
-
+                self.aw.loadAndRedrawBackgroundUUIDSignal.emit(rr['background'],background_UUID)
+            self.ui.title_comboBox.textEdited(rr['title']) # internal use in widget
+#            self.ui.title_comboBox.setEditText(rr['title']) # seems not to be needed
 
     @pyqtSlot(str)
     def recent_roast_enabled(self, s:str) -> None:

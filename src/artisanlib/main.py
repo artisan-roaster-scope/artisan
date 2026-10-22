@@ -118,7 +118,7 @@ from PyQt6.QtWidgets import (QApplication, QWidget, QMessageBox, QLabel, QMainWi
                          QStyleFactory, QMenuBar, QMenu, QLayout, QDockWidget)
 from PyQt6.QtGui import (QScreen, QPageLayout, QAction, QWindow,
                             QKeySequence, QShortcut, QPalette,
-                            QPixmap,QColor,QDesktopServices, QIcon,
+                            QPixmap,QColor,QDesktopServices, QIcon, QFontDatabase,
                             QRegularExpressionValidator, QDoubleValidator, QPainter, QCursor)
 from PyQt6.QtPrintSupport import (QPrinter,QPrintDialog)
 from PyQt6.QtCore import (QStandardPaths, QLibraryInfo, QTranslator, QLocale, QFileInfo, pyqtSignal, pyqtSlot, QtMsgType,
@@ -760,7 +760,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         self.pan_tool:QAction|None = next(tool for tool in cast(list[QAction], self.findChildren(QAction)) if tool.text() == QApplication.translate('Toolbar', 'Pan'))
         self.zoom_tool:QAction|None = next(tool for tool in cast(list[QAction], self.findChildren(QAction)) if tool.text() == QApplication.translate('Toolbar', 'Zoom'))
 
-        self.setIconSize(QSize(35,35))
+        self.setIconSize(QSize(40,40))
 
         self.aw.updatePlusStatus(self)
 
@@ -1420,6 +1420,7 @@ class ApplicationWindow(QMainWindow):
     toggleDashboardSignal = pyqtSignal()
     showDashboardSignal = pyqtSignal()
     hideDashboardSignal = pyqtSignal()
+    loadAndRedrawBackgroundUUIDSignal = pyqtSignal(str,str)
 
     __slots__ = [ 'locale_str', 'app', 'superusermode', 'sample_loop_running', 'time_stopped', 'plus_account', 'plus_account_id', 'plus_remember_credentials', 'plus_email', 'plus_language', 'plus_subscription', 'percent_decimals',
         'plus_paidUntil', 'plus_rlimit', 'plus_used', 'plus_readonly', 'plus_user_id', 'appearance', 'mpl_fontproperties', 'full_screen_mode_active', 'processingKeyEvent', 'quickEventShortCut',
@@ -1605,7 +1606,7 @@ class ApplicationWindow(QMainWindow):
         self.scheduleFlag:bool = False
         self.schedule_day_filter:bool = True
         self.schedule_user_filter:bool = True
-        self.schedule_machine_filter:bool = True
+        self.schedule_machine_filter:bool = False
         self.schedule_visible_filter:bool = True
         self.scheduler_tasks_visible:bool = False # scheduler tasks pane visible?
         self.scheduler_completed_details_visible:bool = False # scheduler completed items details pane visible?
@@ -2810,6 +2811,9 @@ class ApplicationWindow(QMainWindow):
         ]
 
 
+        # register Nunito ExtraBold to be used for main control buttons
+        QFontDatabase.addApplicationFont(os.path.join(getResourcePath(),'Nunito-ExtraBold.ttf'))
+
         ############################## WIDGETS SECTION ########################################
 
         #create a Label object to display program status information
@@ -3035,7 +3039,8 @@ class ApplicationWindow(QMainWindow):
         self.lcd1: MyQLCDNumber = MyQLCDNumber() # time
         self.lcd1.setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
         self.lcd1.setMinimumHeight(40)
-        self.lcd1.setMinimumWidth(140)
+        self.lcd1.setMaximumHeight(45)
+        self.lcd1.setMinimumWidth(120)
         self.lcd1.setFrameStyle(QFrame.Shadow.Plain)
 
         lcd1widgetLayout = QHBoxLayout()
@@ -3971,6 +3976,7 @@ class ApplicationWindow(QMainWindow):
         self.toggleDashboardSignal.connect(self.dashboard.toggle_dashboard, type=Qt.ConnectionType.QueuedConnection)  # Xtype: ignore[call-arg]
         self.showDashboardSignal.connect(self.dashboard.show_dashboard, type=Qt.ConnectionType.QueuedConnection)  # Xtype: ignore[call-arg]
         self.hideDashboardSignal.connect(self.dashboard.hide_dashboard, type=Qt.ConnectionType.QueuedConnection)  # Xtype: ignore[call-arg]
+        self.loadAndRedrawBackgroundUUIDSignal.connect(self.loadAndRedrawBackgroundUUIDslot, type=Qt.ConnectionType.QueuedConnection)  # Xtype: ignore[call-arg]
 
         self.notificationManager:NotificationManager|None = None
         if not self.app.artisanviewerMode:
@@ -4002,7 +4008,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def update_dashboard_background(self, _:bool = False) -> None:
         if self.dashboard_background_image is None:
-            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load background image'), ext='Images (*.png *.jpeg *.jpg)')
+            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load background image'), ext='Images (*.png *.jpeg *.jpg *.tiff, *.bmp, *.gif, *.webp)')
             if len(filename) != 0:
                 self.dashboard_background_image = filename
                 QTimer.singleShot(10, self.dashboard.update_background)
@@ -14299,6 +14305,9 @@ class ApplicationWindow(QMainWindow):
             self.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' calcVirtualdevices() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         return False
 
+    def loadAndRedrawBackgroundUUIDslot(self, filename:str, UUID:str) -> None:
+        self.loadAndRedrawBackgroundUUID(filename, UUID)
+
     def loadAndRedrawBackgroundUUID(self, filename:str|None = None, UUID:str|None = None, force_reload:bool=True, verbose:bool=False) -> None:
         if self.loadbackgroundUUID(filename, UUID, force_reload, verbose):
             try:
@@ -14691,8 +14700,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.backgroundUUID = profile.get('roastUUID', None)
                 _log.info('background profile loaded: %s', filename)
 
-                # update dashboard
-                self.dashboard.update_dashboard()
+                # update profile section of dashboard
+                self.dashboard.update_profile_section()
             except OSError as e:
                 _, _, exc_tb = sys.exc_info()
                 self.qmc.adderror((QApplication.translate('Error Message', 'IO Error:') + ' loadbackground() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))

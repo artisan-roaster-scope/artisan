@@ -135,6 +135,7 @@ DATA_FILES = [
         (r'includes/xkcd-script.ttf', '.'),
         (r'includes/Nunito-Regular.ttf', '.'),
         (r'includes/Nunito-SemiBold.ttf', '.'),
+        (r'includes/Nunito-ExtraBold.ttf', '.'),
         (r'includes/NotoSansMono-Regular.ttf', '.'),
         (r'includes/artisan_public_key.pem', '.'),
         (r'includes/Machines', './Machines'),

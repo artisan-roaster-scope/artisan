@@ -38,7 +38,7 @@ if TYPE_CHECKING:
     from artisanlib.atypes import RecentRoast, BTU
     from plus.stock import Blend # noqa: F401  # pylint: disable=unused-import
     from PyQt6.QtWidgets import QLayout, QAbstractItemView # pylint: disable=unused-import
-    from PyQt6.QtGui import QClipboard, QCloseEvent, QKeyEvent, QMouseEvent # pylint: disable=unused-import
+    from PyQt6.QtGui import QClipboard, QCloseEvent, QKeyEvent # pylint: disable=unused-import
     from PyQt6.QtCore import QMetaObject # pylint: disable=unused-import
 
 from artisanlib.main import UI_MODE
@@ -48,7 +48,7 @@ from artisanlib.util import (deltaLabelUTF8, stringfromseconds,stringtoseconds, 
         convertWeight, convertVolume, float2str, getStyleIconPath)
 from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog, tareDlg
 from artisanlib.widgets import (MyQComboBox, ClickableQLabel, ClickableTextEdit, MyTableWidgetItemNumber,
-    ArtisanPlainTextEdit, RoastsComboBox, ArtisanMinorPushButton, ArtisanQTabWidget)
+    ArtisanPlainTextEdit, RoastsComboBox, ArtisanMinorPushButton, ArtisanQTabWidget, StockComboBox)
 from artisanlib.styles import (artisan_push_button_style, tool_button_icon_style, combobox_style, line_edit_style, artisan_dialog_button_style,
     artisan_minor_push_button_style, spin_box_style, table_style, horizontal_header_style, vertical_header_style)
 
@@ -6030,60 +6030,44 @@ class editGraphDlg(ArtisanResizeablDialog):
         dialog.setFixedHeight(dialog.sizeHint().height())
         return dialog.exec()
 
-class StockComboBox(MyQComboBox):
-    def __init__(self, unitsComboBox:QComboBox, *args:Any, **kwargs:Any) -> None:
-        super().__init__(*args, **kwargs)
-        self.inverted:bool = False # is True if the weight units were inverted before
-        self.unitsComboBox:QComboBox = unitsComboBox
 
-    # to be overwritten by subclasses
-    def getItems(self, unit:int) -> list[str]: # pylint: disable=no-self-use
-        del unit
-        return []
-
-    def resetInverted(self) -> None:
-        self.inverted = False
-
-    @override
-    def mousePressEvent(self, e:'QMouseEvent|None') -> None:
-        if QApplication.keyboardModifiers() == Qt.KeyboardModifier.AltModifier or self.inverted:
-            # with ALT (Win) / OPTION (macOS) pressed we rewrite the popup menu indicating weights in imperial units if metric units were selected and vice versa
-            default_unit:int = self.unitsComboBox.currentIndex()
-            unit:int = 0 # g
-            if self.inverted:
-                # we revert to the original units
-                unit = default_unit
-            elif default_unit < 2:
-                # if default unit is g or kg we convert to oz, otherwise to g
-                unit = 3
-            items = self.getItems(unit)
-            for i in range(self.count()):
-                if len(items) > i:
-                    self.setItemText(i, items[i])
-            self.inverted = not self.inverted
-        super().mousePressEvent(e)
 
 class CoffeesComboBox(StockComboBox):
-    def __init__(self, parent:editGraphDlg, *args:Any, **kwargs:Any) -> None:
-        super().__init__(parent.unitsComboBox, *args, **kwargs)
+    def __init__(self, parent:editGraphDlg) -> None:
+        super().__init__(parent.unitsComboBox)
         self.parentDialog = parent
+        self.set_get_current_unit(self.current_unit)
+        self.set_get_items(self.coffee_items)
 
-    @override
-    def getItems(self, unit:int) -> list[str]:
+    def current_unit(self) -> int:
+        try:
+            return int(self.unitsComboBox.currentIndex())
+        except Exception:  # pylint: disable=broad-except
+            return 0
+
+    def coffee_items(self, unit:int) -> list[str]:
         plus_coffees = plus.stock.getCoffees(unit, self.parentDialog.plus_default_store)
         return [''] + plus.stock.getCoffeesLabels(plus_coffees)
 
-class BlendsComboBox(StockComboBox):
-    def __init__(self, parent:editGraphDlg, *args:Any, **kwargs:Any) -> None:
-        super().__init__(parent.unitsComboBox, *args, **kwargs)
-        self.parentDialog:editGraphDlg = parent
 
-    @override
-    def getItems(self, unit:int) -> list[str]:
+class BlendsComboBox(StockComboBox):
+    def __init__(self, parent:editGraphDlg) -> None:
+        super().__init__(parent.unitsComboBox)
+        self.parentDialog:editGraphDlg = parent
+        self.set_get_current_unit(self.current_unit)
+        self.set_get_items(self.blend_items)
+
+    def current_unit(self) -> int:
+        try:
+            return int(self.unitsComboBox.currentIndex())
+        except Exception:  # pylint: disable=broad-except
+            return 0
+
+    def blend_items(self, unit:int) -> list[str]:
         custom_blend:plus.stock.Blend|None = None
         if self.parentDialog.aw.qmc.plus_custom_blend is not None and self.parentDialog.aw.qmc.plus_custom_blend.name.strip() != '':
             coffees = plus.stock.getCoffeeLabels()
-            if len(coffees)>2 and self.parentDialog.aw.qmc.plus_custom_blend.isValid(coffees.values()):
+            if len(coffees)>1 and self.parentDialog.aw.qmc.plus_custom_blend.isValid(coffees.values()):
                 custom_blend = plus.stock.Blend(
                     hr_id = '',
                     label = self.parentDialog.aw.qmc.plus_custom_blend.name.strip(),

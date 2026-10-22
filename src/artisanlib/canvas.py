@@ -3887,8 +3887,9 @@ class tgraphcanvas(QObject):
                         self.single_click_mpl_upperleft_corner_timer.stop()
                         QDesktopServices.openUrl(QUrl(roastLink(self.roastUUID), QUrl.ParsingMode.TolerantMode))
                         return
-                    # title not set => open Roast Properties dialog
-                    self.single_click_mpl_upperleft_corner_timer.start(self.single_click_mpl_upperleft_corner_TIMEOUT)
+# deactivated as now there is the dashboard
+#                    # title not set => open Roast Properties dialog
+#                    self.single_click_mpl_upperleft_corner_timer.start(self.single_click_mpl_upperleft_corner_TIMEOUT)
                     return
 
                 if event.dblclick and event.button == 1 and not self.designerflag and not self.wheelflag and event.inaxes:
@@ -7991,13 +7992,6 @@ class tgraphcanvas(QObject):
             self.currenty = 0               #used to add point when right click
             self.designertemp1init = []
             self.designertemp2init = []
-#            if self.mode == 'C':
-#                #CH, DE, FCs,FCe,SSs,SCe,DROP, COOL
-#                self.designertemp1init = [290.,290.,290.,290.,280.,270.,260.,250]
-#                self.designertemp2init = [230.,150.,190.,212.,218.,225.,230.,230.]
-#            elif self.mode == 'F':
-#                self.designertemp1init = [500,500,500,500,500,500,500]
-#                self.designertemp2init = [380,300,390,395,410,412,420]
             self.disconnect_designer()  #sets designer flag false
             self.canvas.setCursor(Qt.CursorShape.ArrowCursor)
 

@@ -2024,7 +2024,8 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.remaining_message.setTextFormat(Qt.TextFormat.RichText)
         self.remaining_message.setWordWrap(True)
         self.remaining_message.setTextInteractionFlags(Qt.TextInteractionFlag.LinksAccessibleByMouse)
-        self.remaining_message.setOpenExternalLinks(True)
+        self.remaining_message.setOpenExternalLinks(False)
+        self.remaining_message.linkActivated.connect(self.remaining_message_link_activated)
 
         remaining_message_layout = QVBoxLayout()
         remaining_message_layout.addStretch()
@@ -2419,7 +2420,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.TabWidget.addTab(self.completed_stacked_widget, QApplication.translate('Tab', 'Completed'))
         self.TabWidget.setStyleSheet(tooltip_style)
 
-        self.task_type = QLabel()
+        self.task_type = ClickableQLabel()
         self.task_position = QLabel()
         self.task_weight = ClickableQLabel()
         self.task_title = QElidedLabel(mode = Qt.TextElideMode.ElideRight)
@@ -2540,6 +2541,9 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         # a click to the weight in the task display completes it
         self.task_weight.clicked.connect(self.taskCompleted)
 
+        # a click on the task type label opens the corresponding BatchManager display in the browser if configured
+        self.task_type.clicked.connect(self.open_task_web_display)
+
         self.TabWidget.currentChanged.connect(self.tabSwitched)
 
 #        # we set the active tab with a QTimer after the tabbar has been rendered once, as otherwise
@@ -2575,6 +2579,13 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.completed_splitter.splitterMoved.connect(self.completedSplitterMoved)
 
         self.aw.sendmessage(QApplication.translate('Message','Scheduler started'))
+
+    @pyqtSlot(str)
+    def remaining_message_link_activated(self, link:str) -> None:
+        if link == '#open_filters':
+            self.remaining_filter_group.show()
+            self.remaining_splitter.setSizes([100,100])
+
 
     @pyqtSlot()
     def accept_updated_schedule(self) -> None:
@@ -2699,14 +2710,20 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             _log.exception(e)
 
     @pyqtSlot()
+    def open_task_web_display(self) -> None:
+        todo_tab_active:bool = self.TabWidget.currentIndex() == 0
+        if todo_tab_active:
+            self.open_green_task_web_display()
+        else:
+            self.open_roasted_task_web_display()
+
+    @pyqtSlot()
     def taskCompleted(self) -> None:
         todo_tab_active:bool = self.TabWidget.currentIndex() == 0
         if todo_tab_active:
             self.weight_manager.greenTaskCompleted()
         else:
             self.weight_manager.roastedTaskCompleted()
-
-
 
     @pyqtSlot(list)
     def update_order(self, l:list[ScheduledItem]) -> None:
@@ -4176,7 +4193,6 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                         # show empty schedule message
                         self.remaining_message.setVisible(False)
                         self.create_schedule_widget.setVisible(True)
-#                        self.remaining_message.setText(QApplication.translate('Plus', '{}Create your schedule{}').format(f'<center><a href="{schedulerLink()}">', '</a></center><BR><BR>'))
                         self.stacked_remaining_widget.setCurrentWidget(self.remaining_message_widget)
                         self.setAppBadge(0)
                     else:
@@ -4186,7 +4202,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                         else:
                             self.remaining_message.setVisible(True)
                             self.create_schedule_widget.setVisible(False)
-                            self.remaining_message.setText(f"{QApplication.translate('Plus', 'Nothing scheduled for you today!{}Deactivate filters to see all items.').format('<BR><BR>')}<br>")
+                            self.remaining_message.setText(f"{QApplication.translate('Plus', 'Nothing scheduled for you today!{}Deactivate filters to see all items.{}').format('<BR><BR><a href="#open_filters">','</a>')}<br>")
                             self.stacked_remaining_widget.setCurrentWidget(self.remaining_message_widget)
 
 

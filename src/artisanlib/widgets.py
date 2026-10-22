@@ -85,6 +85,43 @@ class MyQComboBox(QComboBox):
         if self.hasFocus():
             super().wheelEvent(e)
 
+# coffee and blend ComboBox which toggles the weight unit on holding the ALT/OPTION modifier key on open
+class StockComboBox(MyQComboBox):
+    def __init__(self, parent:'QWidget|None', get_current_unit:Callable[[], int]|None = None, get_items:Callable[[int], list[str]]|None = None) -> None:
+        super().__init__(parent)
+        self.inverted:bool = False # is True if the weight units were inverted before
+        self.get_current_unit:Callable[[], int]|None = get_current_unit
+        self.get_items:Callable[[int], list[str]]|None = get_items
+
+    def set_get_current_unit(self, f:Callable[[], int]) -> None:
+        self.get_current_unit = f
+
+    def set_get_items(self, f:Callable[[int], list[str]]) -> None:
+        self.get_items = f
+
+    def resetInverted(self) -> None:
+        self.inverted = False
+
+    @override
+    def mousePressEvent(self, e:'QMouseEvent|None') -> None:
+        modifier_pressed = QApplication.keyboardModifiers() == Qt.KeyboardModifier.AltModifier
+        if self.get_current_unit is not None and self.get_items is not None and (modifier_pressed or self.inverted):
+            # with ALT (Win) / OPTION (macOS) pressed we rewrite the popup menu indicating weights in imperial units if metric units were selected and vice versa
+            default_unit:int = self.get_current_unit()
+            unit:int = 0 # g
+            if self.inverted and not modifier_pressed:
+                # we revert to the original units
+                unit = default_unit
+            elif default_unit < 2:
+                # if default unit is g or kg we convert to oz, otherwise to g
+                unit = 3
+            items = self.get_items(unit)
+            for i in range(self.count()):
+                if len(items) > i:
+                    self.setItemText(i, items[i])
+            self.inverted = not self.inverted
+        super().mousePressEvent(e)
+
 
 class RoastsComboBox(MyQComboBox):
     def __init__(self, parent:'QWidget') -> None:

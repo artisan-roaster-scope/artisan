@@ -1727,8 +1727,14 @@
          </item>
          <item>
           <widget class="QGroupBox" name="meter1GroupBox">
+           <property name="toolTip">
+            <string notr="true"/>
+           </property>
+           <property name="accessibleDescription">
+            <string notr="true"/>
+           </property>
            <property name="title">
-            <string>Meter 1</string>
+            <string notr="true">Meter 1</string>
            </property>
            <layout class="QGridLayout" name="gridLayout_2">
             <property name="leftMargin">
@@ -1751,29 +1757,53 @@
             </property>
             <item row="0" column="0">
              <widget class="QLabel" name="meter1Label">
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
               <property name="text">
-               <string>Label</string>
+               <string notr="true">Label</string>
               </property>
              </widget>
             </item>
             <item row="0" column="1">
              <widget class="QLabel" name="meter1UnitLabel">
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
               <property name="text">
-               <string>Unit</string>
+               <string notr="true">Unit</string>
               </property>
              </widget>
             </item>
             <item row="0" column="2">
              <widget class="QLabel" name="meter1FuelLabel">
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
               <property name="text">
-               <string>Fuel</string>
+               <string notr="true">Fuel</string>
               </property>
              </widget>
             </item>
             <item row="0" column="3">
              <widget class="QLabel" name="meter1SourceLabel">
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
               <property name="text">
-               <string>Source</string>
+               <string notr="true">Source</string>
               </property>
              </widget>
             </item>
@@ -1846,8 +1876,14 @@
          </item>
          <item>
           <widget class="QGroupBox" name="meter2GroupBox">
+           <property name="toolTip">
+            <string notr="true"/>
+           </property>
+           <property name="accessibleDescription">
+            <string notr="true"/>
+           </property>
            <property name="title">
-            <string>Meter 2</string>
+            <string notr="true">Meter 2</string>
            </property>
            <layout class="QGridLayout" name="gridLayout_4">
             <property name="leftMargin">
@@ -1918,29 +1954,53 @@
             </item>
             <item row="0" column="0">
              <widget class="QLabel" name="meter2Label">
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
               <property name="text">
-               <string>Label</string>
+               <string notr="true">Label</string>
               </property>
              </widget>
             </item>
             <item row="0" column="1">
              <widget class="QLabel" name="meter2UnitLabel">
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
               <property name="text">
-               <string>Unit</string>
+               <string notr="true">Unit</string>
               </property>
              </widget>
             </item>
             <item row="0" column="2">
              <widget class="QLabel" name="meter2FuelLabel">
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
               <property name="text">
-               <string>Fuel</string>
+               <string notr="true">Fuel</string>
               </property>
              </widget>
             </item>
             <item row="0" column="3">
              <widget class="QLabel" name="meter2SourceLabel">
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
               <property name="text">
-               <string>Source</string>
+               <string notr="true">Source</string>
               </property>
              </widget>
             </item>

@@ -17,7 +17,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string notr="true">Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,2,1">
    <property name="leftMargin">
@@ -1165,7 +1165,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QComboBox" name="beans_comboBox">
+                  <widget class="StockComboBox" name="beans_comboBox">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -1219,7 +1219,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QComboBox" name="blend_comboBox">
+                  <widget class="StockComboBox" name="blend_comboBox">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -1287,7 +1287,7 @@
                     <string notr="true"/>
                    </property>
                    <property name="text">
-                    <string>Space</string>
+                    <string notr="true">Space</string>
                    </property>
                   </widget>
                  </item>
@@ -1837,6 +1837,11 @@
   <customwidget>
    <class>FixedRatio2ToolButton</class>
    <extends>QWidget</extends>
+   <header>artisanlib.widgets.h</header>
+  </customwidget>
+  <customwidget>
+   <class>StockComboBox</class>
+   <extends>QComboBox</extends>
    <header>artisanlib.widgets.h</header>
   </customwidget>
  </customwidgets>

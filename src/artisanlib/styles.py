@@ -347,7 +347,8 @@ def push_button_style(simulator:bool, button:str, min_width:int, font_size:int, 
             border-color: grey;
             border-width: 0;
             font-size: {font_size}px;
-            font-weight: bold;
+            font-family: 'Nunito';
+            font-weight: 800;
             color: {color};
             background-color: {background_color};
         }}

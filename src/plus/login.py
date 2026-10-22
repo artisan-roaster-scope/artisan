@@ -156,19 +156,19 @@ class Login(ArtisanDialog):
 
         registerIconLayout = QVBoxLayout()
         registerIconLayout.addStretch()
-        registerIconLayout.addWidget(self.register_icon)
+        registerIconLayout.addWidget(self.register_icon, Qt.AlignmentFlag.AlignCenter)
         registerIconLayout.addStretch()
-        registerIconLayout.setContentsMargins(0, 0, 0, 0) # (left, top, right, bottom)
+        registerIconLayout.setContentsMargins(0, 0, 0, 3) # (left, top, right, bottom)
 
         linkRegisterLayout = QHBoxLayout()
         linkRegisterLayout.addStretch()
         linkRegisterLayout.addLayout(registerIconLayout)
-        linkRegisterLayout.addWidget(self.linkRegister)
+        linkRegisterLayout.addWidget(self.linkRegister, Qt.AlignmentFlag.AlignCenter)
         linkRegisterLayout.addStretch()
 
         registerGroup:QGroupBox = QGroupBox()
         registerGroup.setLayout(linkRegisterLayout)
-        linkRegisterLayout.setContentsMargins(6, 0, 6, 3) # (left, top, right, bottom)
+        linkRegisterLayout.setContentsMargins(7, 6, 7, 4) # (left, top, right, bottom)
 
         linkResetLayout = QHBoxLayout()
         linkResetLayout.addStretch()
@@ -201,7 +201,7 @@ class Login(ArtisanDialog):
         layout.addWidget(credentialsGroup)
         layout.addSpacing(5)
         layout.addLayout(buttonLayout)
-        layout.setSpacing(20)
+        layout.setSpacing(15)
         layout.addWidget(registerGroup)
 #        layout.setContentsMargins(15, 15, 15, 15) # (left, top, right, bottom)
 

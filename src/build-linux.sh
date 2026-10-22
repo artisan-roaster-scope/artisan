@@ -100,6 +100,7 @@ cp includes/ComicNeue-Regular.ttf dist
 cp includes/xkcd-script.ttf dist
 cp includes/Nunito-Regular.ttf dist
 cp includes/Nunito-SemiBold.ttf dist
+cp includes/Nunito-ExtraBold.ttf dist
 cp includes/NotoSansMono-Regular.ttf dist
 cp includes/alarmclock.eot dist
 cp includes/alarmclock.svg dist
