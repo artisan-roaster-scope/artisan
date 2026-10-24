@@ -742,7 +742,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 
 
 # add green flag menu on matplotlib v2.0 and later
-        self.edit_curve_parameters_action = None
+        self.edit_curve_parameters_action:QAction|None = None
 
         self.setIconSize(QSize(35,35))
 
