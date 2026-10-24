@@ -437,6 +437,7 @@ class tgraphcanvas(QObject):
             'pow':math.pow,'exp':math.exp,'pi':math.pi,'e':math.e,
             'abs':abs,'acos':math.acos,'asin':math.asin,'atan':math.atan,
             'log':math.log,'radians':math.radians,
+            'round':round,
             'sqrt':math.sqrt,'degrees':math.degrees,'bit':lambda n,x:min(1,(int(x) & (1<<int(n))))} # pyright:ignore[reportUnknownArgumentType]
 
 

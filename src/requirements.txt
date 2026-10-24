@@ -19,55 +19,55 @@
 ######
 # the following commented package versions are read by appveyor.yml and downloaded outside of pip.
 #
-# pyinstaller==6.22.2; platform_system='Windows'
+# pyinstaller==6.22.3; platform_system='Windows'
 # libusb==1.0.26;  platform_system='Linux'
 # dotenv==2.8.1;   platform_system='Linux'  # v3.0.0 not compatible with fpm  # gem installed, not pip
 #
 ######
 # packages that are required on all platforms
 #
-setuptools==84.0.0
+setuptools==84.2.0
 wheel==0.48.0
 pyserial==3.5
-pymodbus==3.15.0
+pymodbus==3.16.1
 python-snap7==2.1.0
-Phidget22==1.25.20260408
+Phidget22==1.26.20260821
 Unidecode==1.4.0
 qrcode==8.2
 requests==2.34.2
 requests-file==3.0.1
 pyusb==1.3.1
 persist-queue==1.1.0
-portalocker==4.1.0
+portalocker==4.4.1
 xlrd==2.0.2
-websockets==17.0.1
+websockets==17.3
 psutil==7.2.2
-protobuf==7.35.1
-numpy==2.5.2
-scipy==1.18.0
+protobuf==7.36.2
+numpy==2.5.4
+scipy==1.18.1
 wquantiles==0.6
 colorspacious==1.1.2
 openpyxl==3.1.5
 keyring==25.7.0
 prettytable==3.18.0
-lxml==6.1.1
-matplotlib==3.11.1
+lxml==6.1.3
+matplotlib==3.11.2
 jinja2==3.1.6
-aiohttp==3.14.3
+aiohttp==3.14.5
 aiohttp_jinja2==1.6
-python-bidi==0.6.11
+python-bidi==0.6.12
 arabic-reshaper==3.0.1
 pillow==12.3.0
-pydantic==2.13.4
+pydantic==2.14.1
 babel==2.18.0
 bleak==3.0.2
-python-statemachine==3.2.1
-yoctopuce==2.1.15391
+python-statemachine==3.2.2
+yoctopuce==2.1.16635
 PyQt6==6.11.0
 paho-mqtt==2.1.0
 jmespath==1.1.0
 cryptography==48.0.1; sys_platform=='darwin' # last version with macOS Intel binaries: 48.0.1
-cryptography==50.0.0; sys_platform=='Linux' or platform_system=='Windows'
+cryptography==50.0.2; sys_platform=='Linux' or platform_system=='Windows'
 aiohttp-retry==2.9.1
 pyfulgur==0.40.0
 #
@@ -76,7 +76,7 @@ pyfulgur==0.40.0
 # packages that differ per platform
 #
 ###
-pyinstaller==6.22.2; platform_system=='Linux' or sys_platform=='darwin' # on Windows pyinstaller is separately installed (see above)
+pyinstaller==6.22.3; platform_system=='Linux' or sys_platform=='darwin' # on Windows pyinstaller is separately installed (see above)
 #
 ### Qt build tools not part of PyQt but required by build-derived
 qt5-tools==5.15.2.1.3; (platform_system=='Windows' and python_version<'3.9')
@@ -84,7 +84,7 @@ qt6-tools==6.5.0.1.3; (sys_platform=='darwin' and platform_release>='20.0') or (
 ########
 ### macOS specific packages
 ###
-appnope==0.1.4; sys_platform=='darwin'
+appnope==1.0.0; sys_platform=='darwin'
 pyobjc-core==12.2.2; sys_platform=='darwin'
 pyobjc-framework-Cocoa==12.2.2; sys_platform=='darwin'
 pyobjc-framework-CoreBluetooth==12.2.2; sys_platform=='darwin'
@@ -102,8 +102,8 @@ SecretStorage==3.5.0; platform_system=='Linux'
 ########
 ### Windows specific packages
 ###
-build==1.5.0; platform_system=='Windows'
+build==1.6.1; platform_system=='Windows'
 pywin32==312; platform_system=='Windows'
 pyinstaller-versionfile==3.1.0; platform_system=='Windows'
 libusb-package==1.0.26.4; platform_system=='Windows'
-tzdata==2026.3; platform_system=='Windows' # to prevent pyinstaller WARNING: Hidden import "tzdata" not found!
+tzdata==2026.5; platform_system=='Windows' # to prevent pyinstaller WARNING: Hidden import "tzdata" not found!
