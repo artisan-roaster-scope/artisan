@@ -85,6 +85,8 @@ from artisanlib.device_registry import is_special_device, is_non_temp_device, is
 from plus.util import roastLink
 from plus.queue import addRoast, sendLockSchedule
 from plus.sync import clearSyncRecordHash
+from plus.uploader import send_profile
+from plus.controller import is_synced, is_connected
 
 from PyQt6.QtWidgets import (QApplication, QWidget, QMessageBox,
                          QGraphicsEffect,
@@ -391,7 +393,8 @@ class tgraphcanvas(QObject):
         'CO2kg_per_BTU_default', 'CO2kg_per_BTU', 'Biogas_CO2_Reduction', 'Biogas_CO2_Reduction_default',
         'meterunitnames', 'meterreads_default', 'meterreads', 'meterlabels_setup', 'meterlabels', 'meterunits_setup', 'meterunits',
         'meterfuels_setup', 'meterfuels', 'metersources_setup', 'metersources', 'playbackdrop_min_roasttime', 'TP_max_roasttime',
-        'single_click_mpl_upperleft_corner_timer', 'single_click_mpl_upperleft_corner_TIMEOUT', 'profile_upload_limit', 'last_profile_upload_times',
+        'single_click_mpl_upperleft_corner_timer', 'single_click_mpl_upperleft_corner_TIMEOUT',
+        'automatic_profile_upload', 'profile_upload_limit', 'last_profile_upload_times',
         'zoom_follow_pan_x', 'zoom_follow_pan_y', 'main_event_buttons_undo_enabled', 'plus_beans_reminder_on_start',
         'last_fit_title_max_chars', 'designer_dashboard_was_active_on_open', 'designer_background_mode', 'designer_loaded_foreground_profile_file'
         ]
@@ -436,6 +439,7 @@ class tgraphcanvas(QObject):
             'pow':math.pow,'exp':math.exp,'pi':math.pi,'e':math.e,
             'abs':abs,'acos':math.acos,'asin':math.asin,'atan':math.atan,
             'log':math.log,'radians':math.radians,
+            'round':round,
             'sqrt':math.sqrt,'degrees':math.degrees,'bit':lambda n,x:min(1,(int(x) & (1<<int(n))))} # pyright:ignore[reportUnknownArgumentType]
 
 
@@ -2203,6 +2207,7 @@ class tgraphcanvas(QObject):
         self.xlabel_artist:Text|None = None
         self.xlabel_width:float|None = None
 
+        self.automatic_profile_upload:bool = False
         self.profile_upload_limit:float = 1 # maximum upload frequency in seconds
         self.last_profile_upload_times:float = 0
 
@@ -13206,8 +13211,9 @@ class tgraphcanvas(QObject):
             else:
                 self.threadserver.terminatingSignal.disconnect(self.OffMonitorCloseDownIgnoreAlwaysON)
 
-            if self.aw.roasthubs_token and len(self.timex) > 20: # RoastHubs configured and some data recorded
-                QTimer.singleShot(100, self.uploadRoastHubs) # must happen before QTimer(300, onMonitorSignal) below is fired!
+            if self.automatic_profile_upload and self.aw.qmc.roastUUID and len(self.timex) > 20 and self.aw.plus_subscription == 'MAX':
+                # automatic profile upload enabled, permitted and some data recorded
+                QTimer.singleShot(100, self.uploadProfile) # must happen before QTimer(300, onMonitorSignal) below is fired!
 
             # reset WebLCDs
             resLCD = '-.-' if self.LCDdecimalplaces else '--'
@@ -14926,25 +14932,28 @@ class tgraphcanvas(QObject):
                 self.aw.onMarkMoveToNext(self.aw.buttonSCe)
 
 
-    # to run within the main UI thread (best called via a QTimer)
+    # to run within the main UI thread (best called via a QTimer or from a signal)
     @pyqtSlot()
-    def uploadRoastHubs(self) -> None:
+    def uploadProfile(self) -> None:
         def on_upload_succeeded() -> None:
-            self.aw.sendmessageSignal.emit(QApplication.translate('Message','Uploaded to {}').format('RoastHubs'), True, None)
+            self.aw.sendmessageSignal.emit(QApplication.translate('Message','Uploaded to {} platform').format('artisan'), True, None)
         def on_upload_failure() -> None:
-            self.aw.sendmessageSignal.emit(QApplication.translate('Message','Upload to {} failed').format('RoastHubs'), True, None)
+            self.aw.sendmessageSignal.emit(QApplication.translate('Message','Upload to {} platform failed').format('artisan'), True, None)
 
-        if (self.aw.roasthubs_token != '' and
-                libtime.time() - self.last_profile_upload_times > self.profile_upload_limit and
+        if (self.aw.plus_subscription == 'MAX' and
+                self.aw.qmc.roastUUID and
+                (libtime.time() - self.last_profile_upload_time) > self.profile_upload_limit and
                 len(self.timex) > 20):
+
             self.last_profile_upload_times = libtime.time()
-            import artisanlib.roasthubs
             profile:ProfileData = self.aw.getProfile()
-            artisanlib.roasthubs.send_profile(
+
+            # we (manually) turn syncing for the current roast on if not yet under sync and user agrees
+            if is_connected() and not is_synced() and not self.flagon and self.checkSaved(allow_discard=False):
+                addRoast(unsynced=True)
+
+            send_profile(
                 profile,
-                self.aw.roasthubs_org_id,
-                self.aw.roasthubs_machine_id,
-                self.aw.roasthubs_token,
                 # filter conf
                 interpolate_drops = self.interpolateDropsflag,
                 curvefilter = self.curvefilter,

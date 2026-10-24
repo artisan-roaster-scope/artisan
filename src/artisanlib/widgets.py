@@ -57,6 +57,14 @@ def wait_cursor() -> Generator[None]:
     finally:
         QApplication.restoreOverrideCursor()
 
+# not used
+#def adjust_combobox_width(combo: QComboBox) -> None:
+#    fm = QFontMetrics(combo.font())
+#    text_width = fm.horizontalAdvance(combo.currentText())
+#    # Add padding for the arrow and borders
+#    padding = 35
+#    combo.setFixedWidth(text_width + padding)
+
 
 def adjust_combobox_dropdown_width(combobox:QComboBox) -> None:
     # Find the maximum width needed for the items

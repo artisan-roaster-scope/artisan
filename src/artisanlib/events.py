@@ -819,6 +819,7 @@ class EventsDlg(ArtisanResizeablDialog):
         actiontitlelabel.setFont(titlefont)
         commandtitlelabel = QLabel(QApplication.translate('Label','Command'))
         commandtitlelabel.setFont(titlefont)
+        commandtitlelabel.setToolTip('{} = x * factor + offset')
         offsettitlelabel = QLabel(QApplication.translate('Label','Offset'))
         offsettitlelabel.setFont(titlefont)
         factortitlelabel = QLabel(QApplication.translate('Label','Factor'))

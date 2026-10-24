@@ -1496,7 +1496,7 @@ class ApplicationWindow(QMainWindow):
         'schedule_visible_filter', 'scheduler_tasks_visible', 'scheduler_completed_details_visible', 'scheduler_filters_visible', 'scheduler_auto_open',
         'main_menu_actions_with_shortcuts', 'ui_mode', 'UIModeMenu',  'productionModeAction', 'defaultModeAction', 'expertModeAction', 'calculatorAction',
         'helpAboutAction', 'checkUpdateAction', 'errorAction', 'messageAction', 'serialAction', 'platformAction', 'aboutQtAction',
-        'helpDocumentationAction', 'KshortCAction', 'profile_data_type_adapter', 'official_build', 'roasthubs_org_id', 'roasthubs_machine_id', 'roasthubs_token',
+        'helpDocumentationAction', 'KshortCAction', 'profile_data_type_adapter', 'official_build',
         'qt_scale_factor', 'automatic_registration_period', 'mqtt', 'orbiter', 'machineNameAction', 'main_button_min_width', 'main_button_min_width',
         'pidbuttonFrame', 'phasesLCDsFrame', 'machineNameAction', 'automatic_registration_period', 'label_fmt', 'lcd_label_fmt', 'button_border_radius',
         'dashboard', 'stack', 'line_bottom', 'dashboard_background_image', 'dashboardImageToolButton', 'lcd1widget', 'buttonCONTROLwidget', 'extra_lcd_label_fmt',
@@ -1542,12 +1542,6 @@ class ApplicationWindow(QMainWindow):
         self.plus_used:float = 0   # account amount greens roasted within rlimit (kg); if 0 then considered as not valid
         self.plus_readonly:bool = False # True if the plus user has only read rights to the plus account (account might be deactivated, or user might be a read-only user)
 
-#ROSTHUBS
-
-        # if org_id and machine_id are empty string, the connector is inactive
-        self.roasthubs_org_id:str = ''
-        self.roasthubs_machine_id:str = ''
-        self.roasthubs_token:str = ''
 
 #OTHERS
 
@@ -2827,7 +2821,7 @@ class ApplicationWindow(QMainWindow):
 
         # set a few broad style parameters
 
-        self.button_border_radius = (15 if platform.system() == 'Linux' else 20)
+        self.button_border_radius = (17 if platform.system() == 'Linux' else (24 if platform.system() == 'Windows' else 21))
         self.button_font_size_pt = 13
 
 
@@ -17351,6 +17345,7 @@ class ApplicationWindow(QMainWindow):
                 pf = self.getProfile(copy, generate_hash=True)
                 # pf should not be modified before saving anymore this would break its hash
                 if pf:
+
                     # we save the file and set the filename
                     self.plusAddPath(cast(dict[str,Any], pf), filename)
                     serialize(filename, cast(dict[str,Any], pf))
@@ -18260,17 +18255,6 @@ class ApplicationWindow(QMainWindow):
                 self.splitter.restoreState(settings.value('MainSplitter'))
 
             #restore device
-
-#--- BEGIN GROUP RoastHubs
-            settings.beginGroup('RoastHubs')
-            self.roasthubs_org_id = settings.value('org_id',self.roasthubs_org_id)
-            self.roasthubs_machine_id = settings.value('machine_id',self.roasthubs_machine_id)
-            if self.roasthubs_org_id != '' and self.roasthubs_machine_id != '':
-                # self.roasthubs_token is persisted in the keychain
-                import artisanlib.roasthubs
-                self.roasthubs_token = artisanlib.roasthubs.get_token(self.roasthubs_org_id, self.roasthubs_machine_id)
-            settings.endGroup()
-#--- END GROUP RoastHubs
 
 #--- BEGIN GROUP Device
             settings.beginGroup('Device')
@@ -20382,14 +20366,6 @@ class ApplicationWindow(QMainWindow):
                 settings.setValue('artisan_os_arch',os_arch)
                 settings.endGroup()
 #--- END GROUP System
-
-#--- BEGIN GROUP RoastHubs
-            settings.beginGroup('RoastHubs')
-            self.settingsSetValue(settings, default_settings, 'org_id',self.roasthubs_org_id, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'machine_id',self.roasthubs_machine_id, read_defaults)
-            # self.roasthubs_token is persisted in the keychain
-            settings.endGroup()
-#--- END GROUP RoastHubs
 
 #--- BEGIN GROUP Device
             #save device

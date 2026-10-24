@@ -2030,7 +2030,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         remaining_message_layout = QVBoxLayout()
         remaining_message_layout.addStretch()
         remaining_message_layout.addWidget(self.remaining_message)
-        remaining_message_layout.addWidget(self.create_schedule_widget)
+        remaining_message_layout.addLayout(create_schedule_widget_layout)
         remaining_message_layout.addStretch()
         remaining_message_layout.setContentsMargins(15, 15, 15, 15) # left, top, right, bottom
 
@@ -2330,12 +2330,12 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.update_statusbars()
 
         self.status_bar = QStatusBar()
-        self.status_bar.setFixedHeight(20)
+        self.status_bar.setFixedHeight(22)
         self.status_bar.addWidget(self.task_display_green_button)
         self.status_bar.addPermanentWidget(self.sync_button)
 
         self.status_bar_completed = QStatusBar()
-        self.status_bar_completed.setFixedHeight(20)
+        self.status_bar_completed.setFixedHeight(22)
         self.status_bar_completed.addWidget(self.task_display_roasted_button)
 #----
 

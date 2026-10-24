@@ -182,10 +182,10 @@ def tool_button_icon_style(dark:bool, light_icon:str, dark_icon:str, border_widt
             image: url({disabled_icon_path});
         }}
         QToolButton:hover {{
-            background-color: {'#555555' if dark else '#E0E0E0'};
+            background-color: {'#AA555555' if dark else '#E0E0E0'};
         }}
         QToolButton:pressed {{
-            background-color: {'#777777' if dark else '#D0D0D0'};
+            background-color: {'#AA777777' if dark else '#D0D0D0'};
         }}
 """
 
@@ -1035,16 +1035,17 @@ def tool_button_frame_style(dark:bool) -> str:
             border-style: solid;
             border-color: {'rgb(65, 65, 65)' if dark else '#BBBBBB'};
             border-radius: 15px;
-            background-color: {'#AA404040' if dark else '#F3F3F3'};
+            background-color: {'#AA606060' if dark else '#F3F3F3'};
         }}
         QFrame:hover {{
-            background-color: {'#AA555555' if dark else '#E0E0E0'};
+            background-color: {'#AA707070' if dark else '#E0E0E0'};
         }}
         QFrame:pressed {{
             background-color: {'#AA777777' if dark else '#D0D0D0'};
         }}
         QFrame:disabled {{
-            background-color: {'#AA303030' if dark else '#E8E8E8'};
+            background-color: {'#555F5F5F' if dark else '#DFDFDF'};
+            border-color: {'#555F5F5F' if dark else '#DFDFDF'};
         }}
     """
 

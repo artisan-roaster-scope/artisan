@@ -361,7 +361,7 @@ def make_authentify() -> Authentifier:
 authentify = make_authentify()
 
 def getHeaders(
-    authorized: bool = True, decompress: bool = True) -> dict[str, str]:
+        authorized: bool = True, decompress: bool = True) -> dict[str, str]:
     aw = config.app_window
     if aw is not None:
         os, os_version, os_arch = aw.get_os()  # @UndefinedVariable

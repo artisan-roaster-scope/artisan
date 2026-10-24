@@ -35,9 +35,9 @@ from typing import Final, cast, TYPE_CHECKING
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
 
-from PyQt6.QtWidgets import QApplication, QWidget, QComboBox
-from PyQt6.QtCore import Qt, QSettings, pyqtSlot, QTimer, pyqtSignal, QSize
-from PyQt6.QtGui import QFont, QFontDatabase, QIcon
+from PyQt6.QtWidgets import QApplication, QWidget, QComboBox, QSizePolicy, QSpacerItem
+from PyQt6.QtCore import Qt, QSettings, pyqtSlot, QTimer, pyqtSignal, QSize, QUrl
+from PyQt6.QtGui import QFont, QFontDatabase, QIcon, QDesktopServices
 
 from uic import DashboardWidget # pyright: ignore[attr-defined] # pylint: disable=no-name-in-module
 
@@ -53,7 +53,8 @@ from artisanlib.styles import (tool_button_icon_style, artisan_push_button_style
 
 import plus.stock
 import plus.blend
-from plus.util import plusLink, coffeeLink, storeLink
+import plus.controller as plus_controller
+from plus.util import plusLink, coffeeLink, storeLink, roastLink
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -219,6 +220,10 @@ class Dashboard(QWidget):
             self.ui.load_pushButton.clicked.connect(self.profile_load_clicked)
             self.ui.clear_pushButton.clicked.connect(self.profile_clear_clicked)
             self.ui.scheduler_toolButton.clicked.connect(self.open_scheduler)
+            self.ui.upload_toolButton.clicked.connect(self.aw.qmc.uploadProfile)
+
+            self.ui.roast_link_toolButton.clicked.connect(self.open_roast_on_platform)
+            self.ui.template_link_toolButton.clicked.connect(self.open_template_on_platform)
 
             self.ui.create_pushButton.clicked.connect(self.start_designer)
             self.ui.compare_pushButton.clicked.connect(self.aw.roastCompare)
@@ -283,7 +288,9 @@ class Dashboard(QWidget):
         self.ui.space_label.setText(QApplication.translate('Label', 'Space'))
 
         self.ui.roast_label.setToolTip(QApplication.translate('Tooltip','Essential roast properties'))
+        self.ui.roast_link_toolButton.setToolTip(QApplication.translate('Tooltip','Open roast on platform'))
         self.ui.scheduler_frame.setToolTip(QApplication.translate('Tooltip','Open your roast schedule'))
+        self.ui.upload_frame.setToolTip(QApplication.translate('Tooltip','Upload this roast'))
         self.ui.title_comboBox.setToolTip(QApplication.translate('Tooltip','Enter the roast title or set properties by choosing from a recent roast'))
         self.ui.plus_button.setToolTip(QApplication.translate('Tooltip', 'Add roast properties to list of recent roasts'))
         self.ui.minus_button.setToolTip(QApplication.translate('Tooltip', 'Remove roast properties from list of recent roasts'))
@@ -308,6 +315,7 @@ class Dashboard(QWidget):
         self.ui.create_pushButton.setText(QApplication.translate('Button', 'Create'))
 
         self.ui.profile_label.setToolTip(QApplication.translate('Tooltip','Background roast template'))
+        self.ui.template_link_toolButton.setToolTip(QApplication.translate('Tooltip','Open template on platform'))
         self.ui.load_pushButton.setToolTip(QApplication.translate('Tooltip','Load a profile as template into the background'))
         self.ui.recentFiles_comboBox.setToolTip(QApplication.translate('Tooltip','Choose a recent roast and load as roast template'))
         self.ui.clear_pushButton.setToolTip(QApplication.translate('Tooltip','Remove the loaded background roast template'))
@@ -522,9 +530,14 @@ class Dashboard(QWidget):
             'pencil-edit-02-stroke-rounded-light.svg', 'pencil-edit-02-stroke-rounded-dark.svg'))
         self.ui.sync.setStyleSheet(tool_button_icon_style(darkmode,
             'update-light.svg', 'update-dark.svg'))
+        #
         self.ui.scheduler_toolButton.setStyleSheet(tool_button_icon_style(darkmode,
             'calendar-03-stroke-rounded-blue.svg', 'calendar-03-stroke-rounded-blue.svg'))
         self.update_schedule_toolbutton()
+        #
+        self.ui.upload_toolButton.setStyleSheet(tool_button_icon_style(darkmode,
+            'upload-01-stroke-rounded-blue.svg', 'upload-01-stroke-rounded-blue.svg'))
+        self.update_upload_toolButton()
         #
         self.ui.roast_frame.setStyleSheet(separator_line_style(darkmode))
         self.ui.profile_frame.setStyleSheet(separator_line_style(darkmode))
@@ -616,13 +629,71 @@ class Dashboard(QWidget):
         # scheduler tool button frame
         self.ui.scheduler_frame.setStyleSheet(tool_button_frame_style(darkmode))
 
+    # visible only if logged in as MAX
+    # enabled only if no roastUID or not long enough
+    def update_upload_toolButton(self) -> None:
+        if self.aw.plus_account is None or self.aw.plus_subscription != 'MAX':
+            self.ui.upload_frame.setVisible(False)
+            # hide spacer
+            item = self.ui.horizontalLayout.itemAt(4)
+            if isinstance(item, QSpacerItem):
+                item.changeSize(0, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
+                self.ui.horizontalLayout.invalidate()
+        else:
+            darkmode = self.aw.dark_canvas_p()
+            enabled = bool(self.aw.qmc.roastUUID and len(self.aw.qmc.timex) > 20)
+            self.ui.upload_toolButton.setEnabled(enabled)
+            self.ui.upload_frame.setEnabled(enabled)
+            self.ui.upload_toolButton.setStyleSheet(tool_button_icon_style(darkmode,
+                ('upload-01-stroke-rounded-blue.svg' if enabled else 'upload-01-stroke-rounded-dark.svg'),
+                ('upload-01-stroke-rounded-blue.svg' if enabled else ('upload-01-stroke-rounded-white.svg' if darkmode else 'upload-01-stroke-rounded-dark.svg'))))
+            # upload tool button frame
+            self.ui.upload_frame.setStyleSheet(tool_button_frame_style(darkmode))
+            self.ui.upload_frame.setVisible(True)
+            # show spacer
+            item = self.ui.horizontalLayout.itemAt(4)
+            if isinstance(item, QSpacerItem):
+                item.changeSize(10, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+                self.ui.horizontalLayout.invalidate()
+
+    def update_roast_link_toolbutton(self) -> None:
+        darkmode = self.aw.dark_canvas_p()
+        if self.aw.plus_account is None or self.aw.app.artisanviewerMode or not self.aw.qmc.roastUUID or not plus_controller.is_synced():
+            self.ui.roast_link_toolButton.setVisible(False)
+        else:
+            self.ui.roast_link_toolButton.setVisible(True)
+            self.ui.roast_link_toolButton.setStyleSheet(tool_button_icon_style(darkmode,
+                'external-link-stroke-rounded-blue.svg',
+                'external-link-stroke-rounded-blue.svg'))
+
+    def update_template_link_toolbutton(self) -> None:
+        darkmode = self.aw.dark_canvas_p()
+        template_uuid:str|None = (self.aw.qmc.backgroundprofile['roastUUID'] if self.aw.qmc.backgroundprofile is not None and
+            'roastUUID' in self.aw.qmc.backgroundprofile else None)
+        if self.aw.plus_account is None or self.aw.app.artisanviewerMode or not template_uuid:
+            self.ui.template_link_toolButton.setVisible(False)
+        else:
+            self.ui.template_link_toolButton.setVisible(True)
+            self.ui.template_link_toolButton.setStyleSheet(tool_button_icon_style(darkmode,
+                'external-link-stroke-rounded-blue.svg',
+                'external-link-stroke-rounded-blue.svg'))
+
+
     def update_inventory_section(self, force:bool=False) -> None:
         if force or self.aw.stack.currentIndex() == 1:
             self.ui.inventory_stackedWidget.setCurrentIndex(0 if self.aw.plus_account is None else 1)
+
             # enable/disable scheduler tool button
             self.ui.scheduler_frame.setEnabled(self.aw.plus_account is not None and not self.aw.app.artisanviewerMode)  # no scheduler in ArtisanViewer mode
             # scheduler tool icon
             self.update_schedule_toolbutton()
+
+            # enable/disable upload tool button
+            self.ui.upload_frame.setEnabled(self.aw.plus_account is not None and not self.aw.app.artisanviewerMode)
+            # upload tool icon
+            self.update_upload_toolButton()
+
+            self.update_roast_link_toolbutton()
 
             # update inventory section content
             if self.aw.plus_account is not None:
@@ -673,9 +744,9 @@ class Dashboard(QWidget):
                     line = line + str(int(round(i['ratio']*100))) + '% ' + c
             if line and len(line)>0 and self.aw.qmc.plus_store is not None and self.aw.qmc.plus_store_label is not None:
                 line = line + f'  (<a href="{storeLink(self.aw.qmc.plus_store)}"{dark_mode_link_color}>{self.aw.qmc.plus_store_label}</a>)'
-            if line == '':
-                # beans not specified
-                line = QApplication.translate('Label','Choose beans')
+#            if line == '':
+#                # beans not specified
+#                line = QApplication.translate('Label','Choose beans')
 
             self.ui.selected_line_label.setText(line)
         except Exception as e: # pylint: disable=broad-except
@@ -698,6 +769,7 @@ class Dashboard(QWidget):
                 default_title = QApplication.translate('Scope Title', 'Roaster Scope')
                 self.ui.title_comboBox.textEdited(default_title)
                 self.ui.title_comboBox.setEditText(default_title)
+
 
     @pyqtSlot(int)
     def storeSelectionChanged(self, n:int) -> None:
@@ -1192,18 +1264,14 @@ class Dashboard(QWidget):
             else:
                 self.ui.background_profile_label.setText('')
                 self.clearPushButtonSetDisabled()
+            self.update_template_link_toolbutton()
         finally:
             self.ui.recentFiles_comboBox.blockSignals(False)
 
 
-#    def set_style(self) -> None:
-#        darkmode = self.aw.dark_canvas_p()
-#        self.ui.title_comboBox.setStyleSheet(combobox_style(darkmode, getStyleIconPath('arrow-down-01-stroke-rounded-light.svg'), 'bold'))
-#        self.ui.beans_textEdit.update_style(darkmode)
-
     def update_recent_roast_buttons(self) -> None:
-        if self.aw.qmc.title != QApplication.translate('Scope Title', 'Roaster Scope') and self.aw.qmc.weight[0] != 0:
-            # enable "+" addRecentRoast button
+        if self.aw.qmc.title not in {'', QApplication.translate('Scope Title', 'Roaster Scope')} and self.aw.qmc.weight[0] != 0:
+            # enable "+" addRecentRoast and '-' removeRecentRoast button
             self.ui.plus_button.setEnabled(True)
             self.ui.plus_button.setIcon(QIcon(getStyleIconPath('add-01-stroke-rounded-white.svg')))
             self.ui.minus_button.setEnabled(True)
@@ -1238,7 +1306,6 @@ class Dashboard(QWidget):
         self.ui.blend_comboBox.clear()
         self.ui.space_comboBox.clear()
         #
-        import plus.controller as plus_controller
         plus_controller.toggle(self.aw)
 
     @pyqtSlot(int)
@@ -1399,6 +1466,17 @@ class Dashboard(QWidget):
             else:
                 self.aw.schedule_window.activateWindow()
 
+    @pyqtSlot(bool)
+    def open_roast_on_platform(self, _b:bool) -> None:
+        if self.aw.qmc.roastUUID:
+            QDesktopServices.openUrl(QUrl(roastLink(self.aw.qmc.roastUUID), QUrl.ParsingMode.TolerantMode))
+
+    @pyqtSlot(bool)
+    def open_template_on_platform(self, _b:bool) -> None:
+        template_uuid:str|None = (self.aw.qmc.backgroundprofile['roastUUID'] if self.aw.qmc.backgroundprofile is not None and
+            'roastUUID' in self.aw.qmc.backgroundprofile else None)
+        if template_uuid:
+            QDesktopServices.openUrl(QUrl(roastLink(template_uuid), QUrl.ParsingMode.TolerantMode))
 
     @pyqtSlot(bool)
     def open_documentation_url(self, _b:bool) -> None:

@@ -62,7 +62,7 @@ pydantic==2.14.1
 babel==2.18.0
 bleak==3.0.2
 python-statemachine==3.2.2
-yoctopuce==2.1.16087
+yoctopuce==2.1.16635
 PyQt6==6.11.0
 paho-mqtt==2.1.0
 jmespath==1.1.0
