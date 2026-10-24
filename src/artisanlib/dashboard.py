@@ -69,6 +69,14 @@ LINE_EDIT_COLOR_LIGHT = '#000000'
 LINE_EDIT_BORDER_COLOR_DARK = '#555555'
 LINE_EDIT_BORDER_COLOR_LIGHT = '#D7D7D7'
 
+# sponsor logo background
+SPONSOR_LOGO_BACKGROUND_COLOR_LIGHT = '#ffffff'
+SPONSOR_LOGO_BACKGROUND_COLOR_DARK = '#4c97c3' #'#414456'
+SPONSOR_LOGO_BACKGROUND_COLOR_HOVER_LIGHT = '#fAfAfA'
+SPONSOR_LOGO_BACKGROUND_COLOR_HOVER_DARK = '#43a7cf' #'#494D61'
+SPONSOR_LOGO_BACKGROUND_COLOR_PRESSED_LIGHT = '#f5f5f5'
+SPONSOR_LOGO_BACKGROUND_COLOR_PRESSED_DARK = '#1985ba' #'#3A3C4C'
+
 
 class Dashboard(QWidget):
 
@@ -497,17 +505,20 @@ class Dashboard(QWidget):
                 self.ui.sponsor_logo_toolButton.setIconSize(QSize(150,75))
                 self.ui.sponsor_logo_toolButton.setStyleSheet(f"""
                     FixedRatio2ToolButton {{
-                        background-color: {'#414456' if darkmode else '#ffffff'};
+                        background-color: {SPONSOR_LOGO_BACKGROUND_COLOR_DARK
+                            if darkmode else SPONSOR_LOGO_BACKGROUND_COLOR_LIGHT};
                         border: 0px solid;
                         border-radius: 10px;
                         min-width: 176px;
                         max-width: 176px;
                     }}
                     FixedRatio2ToolButton:hover {{
-                        background-color: {'#494D61' if darkmode else '#fAfAfA'};
+                        background-color: {SPONSOR_LOGO_BACKGROUND_COLOR_HOVER_DARK
+                            if darkmode else SPONSOR_LOGO_BACKGROUND_COLOR_HOVER_LIGHT};
                     }}
                     FixedRatio2ToolButton:pressed {{
-                        background-color: {'#3A3C4C' if darkmode else '#f5f5f5'};
+                        background-color: {SPONSOR_LOGO_BACKGROUND_COLOR_PRESSED_DARK
+                            if darkmode else SPONSOR_LOGO_BACKGROUND_COLOR_PRESSED_LIGHT};
                     }}
                 """)
             except Exception: # pylint: disable=broad-except
