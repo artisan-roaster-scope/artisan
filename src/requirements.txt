@@ -29,9 +29,9 @@
 setuptools==84.2.0
 wheel==0.48.0
 pyserial==3.5
-pymodbus==3.16.1
+pymodbus==3.15.0
 python-snap7==2.1.0
-Phidget22==1.26.20260821
+Phidget22==1.25.20260408
 Unidecode==1.4.0
 qrcode==8.2
 requests==2.34.2
