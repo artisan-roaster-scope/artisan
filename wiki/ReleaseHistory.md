@@ -15,7 +15,8 @@ v5.0.0
   - improved support for [Orbiter](https://artisan-scope.org/machines/orbiter/) smart roasters
   - adds configuration to use the artisan internal software PID instead of the [Kaleido machines](https://artisan-scope.org/machines/kaleido/) internal one
   - adds [Aillio Bullet R2](https://artisan-scope.org/machines/aillio/) CSV import
-  - adds [Catppuccin](https://github.com/catppuccin) and some more new themes
+  - adds [Mill City Roasters](https://artisan-scope.org/machines/mcr/) RoastPATH `.rpath` import
+  - adds [Catppuccin](https://github.com/catppuccin) and Chalkboard themes
   - adds UI scaling factor
   - adds two more MODBUS device channels
   - adds Artisan Commands `pidDerivativeFilter(<n>)`, `pidDerivativeLimit(<n>)`, `pidILF(<n>)`, `pidIWP(<bool>)`, and `pidIRoC(<bool>)` to configure the internal PID (for John)
@@ -28,6 +29,7 @@ v5.0.0
   - faster app start (startup time redued by ~50% on macOS)
   - refreshed UI
   - improved translations
+  - automatic restart on switching the language and on Factory Reset
 * FIXES
   - fixes faulty hash generation on files created using `Save As` causing `modified file` warnings on load ([Issue #2205](../../../issues/2205))
   - fixes regression causing canvas color not being applied correctly ([Issue #2212](../../../issues/2212))

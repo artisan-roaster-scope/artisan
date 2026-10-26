@@ -41,17 +41,20 @@ if TYPE_CHECKING:
 
 from artisanlib.util import roast_message
 from plus.connection import getHeaders
-from plus.config import upload_url
+from plus.config import upload_url, verify_ssl
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 POST_RETRIES:Final[int] = 4
-RETRY_STATUSES:Final[set[int]] = {x for x in range(100, 600) if x not in {200,401,403}}
+RETRY_STATUSES:Final[set[int]] = {x for x in range(100, 600) if x not in {200,201,400,401,403}}
 START_TIMEOUT:Final[float] = 0.5   # Base timeout time, then it exponentially grow (default: 0.1s)
 #don't retry:
 #  200: OK
+#  201: Created
+#  400: Bad Request
 #  401: Unauthorized (wrong token)
 #  403: Forbidden
+#  500: Internal Server Error
 
 async def send_roast(roast_id:str, roast:'artisan_roast_pb2.Roast',
         on_success:Callable[[], None] | None = None,
@@ -66,7 +69,7 @@ async def send_roast(roast_id:str, roast:'artisan_roast_pb2.Roast',
             payload = roast.SerializeToString()
             retry_options = ExponentialRetry(
                 attempts=POST_RETRIES,
-                statuses=RETRY_STATUSES,
+                statuses=RETRY_STATUSES, # will be retried
                 start_timeout=START_TIMEOUT,
                 retry_all_server_errors=True) # retry on return code higher than 500 (internal server errors, gateway timeouts,..)
             retry_client = RetryClient(
@@ -74,8 +77,9 @@ async def send_roast(roast_id:str, roast:'artisan_roast_pb2.Roast',
                 raise_for_status=False, # don't raise an exception for return codes higher than 400 (client request errors)
                 retry_options=retry_options)
             try:
-                async with retry_client.post(url, data=payload, headers=headers, compress=True, timeout=1) as response:
-                    if response.status == 200:
+                async with retry_client.post(url, data=payload,
+                        ssl=verify_ssl, headers=headers, compress=True, timeout=1) as response:
+                    if response.status in {200, 201}:
                         _log.debug('profile uploaded successful to artisan platform')
                         if on_success is not None:
                             on_success()
@@ -86,7 +90,7 @@ async def send_roast(roast_id:str, roast:'artisan_roast_pb2.Roast',
             except TimeoutError as e:
                 _log.debug('TimeoutError: %s',e)
     except Exception as e:  # pylint: disable=broad-except
-        _log.error('exception in roasthubs:send_roast: %s', e)
+        _log.error('exception in send_roast: %s', e)
 
 
 def send_profile(

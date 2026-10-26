@@ -394,7 +394,7 @@ class tgraphcanvas(QObject):
         'meterunitnames', 'meterreads_default', 'meterreads', 'meterlabels_setup', 'meterlabels', 'meterunits_setup', 'meterunits',
         'meterfuels_setup', 'meterfuels', 'metersources_setup', 'metersources', 'playbackdrop_min_roasttime', 'TP_max_roasttime',
         'single_click_mpl_upperleft_corner_timer', 'single_click_mpl_upperleft_corner_TIMEOUT',
-        'automatic_profile_upload', 'profile_upload_limit', 'last_profile_upload_times',
+        'profile_upload_limit', 'last_profile_upload_times',
         'zoom_follow_pan_x', 'zoom_follow_pan_y', 'main_event_buttons_undo_enabled', 'plus_beans_reminder_on_start',
         'last_fit_title_max_chars', 'designer_dashboard_was_active_on_open', 'designer_background_mode', 'designer_loaded_foreground_profile_file'
         ]
@@ -2207,7 +2207,6 @@ class tgraphcanvas(QObject):
         self.xlabel_artist:Text|None = None
         self.xlabel_width:float|None = None
 
-        self.automatic_profile_upload:bool = False
         self.profile_upload_limit:float = 1 # maximum upload frequency in seconds
         self.last_profile_upload_times:float = 0
 
@@ -8688,7 +8687,9 @@ class tgraphcanvas(QObject):
             # this one seems not to work for titles, subtitles and axis!?
             self.title_artist.set_in_layout(False) # remove title from tight_layout calculation
             try:
-                self.title_width = self.title_artist.get_window_extent(renderer=self.fig.canvas.get_renderer()).width # type: ignore[attr-defined]
+                with warnings.catch_warnings():
+                    warnings.simplefilter('ignore') # ignore missing Glyph warnings
+                    self.title_width = self.title_artist.get_window_extent(renderer=self.fig.canvas.get_renderer()).width # type: ignore[attr-defined]
             except Exception: # pylint: disable=broad-except
                 pass
 
@@ -13211,7 +13212,7 @@ class tgraphcanvas(QObject):
             else:
                 self.threadserver.terminatingSignal.disconnect(self.OffMonitorCloseDownIgnoreAlwaysON)
 
-            if self.automatic_profile_upload and self.aw.qmc.roastUUID and len(self.timex) > 20 and self.aw.plus_subscription == 'MAX':
+            if self.aw.plus_automatic_profile_upload and self.aw.qmc.roastUUID and len(self.timex) > 20 and self.aw.plus_subscription == 'MAX':
                 # automatic profile upload enabled, permitted and some data recorded
                 QTimer.singleShot(100, self.uploadProfile) # must happen before QTimer(300, onMonitorSignal) below is fired!
 
@@ -14942,7 +14943,7 @@ class tgraphcanvas(QObject):
 
         if (self.aw.plus_subscription == 'MAX' and
                 self.aw.qmc.roastUUID and
-                (libtime.time() - self.last_profile_upload_time) > self.profile_upload_limit and
+                (libtime.time() - self.last_profile_upload_times) > self.profile_upload_limit and
                 len(self.timex) > 20):
 
             self.last_profile_upload_times = libtime.time()

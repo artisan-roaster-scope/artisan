@@ -64,7 +64,7 @@ YTbackmarkersize=6
 
 [Style]
 glow=0
-graphfont=9
+graphfont=0
 graphstyle=1
 patheffects=0
 

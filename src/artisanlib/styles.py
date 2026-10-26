@@ -895,7 +895,8 @@ def toolbar_style(color:str, background_color:str, border_color:str, selected_ba
             background-color: {background_color};
             border: 0px solid;
             color: {color};
-            spacing: 2px;
+            spacing: 0px;
+            margin: 0px;
         }}
         QToolBar::separator {{
             background-color: transparent;
@@ -916,7 +917,7 @@ def toolbar_style(color:str, background_color:str, border_color:str, selected_ba
             border-radius: 5px;
             border-color: transparent;
             margin: 0px;
-            padding: 0px;
+            padding: 1px;
             background-color: transparent;
         }}
     """

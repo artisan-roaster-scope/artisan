@@ -142,7 +142,7 @@ with suppress_stdout_stderr():
 
 from matplotlib.backend_bases import _Mode as MPL_Mode # type:ignore[untyped-import,unused-ignore] # pylint: disable=import-private-name,unknown-option-value # @UnresolvedImport
 
-#svgsupport = next((x for x in QImageReader.supportedImageFormats() if x == b'svg'),None)
+RESTART_ON_QUIT:bool = False
 
 from matplotlib.figure import Figure # type:ignore[untyped-import,unused-ignore]
 from matplotlib import rcParams, ticker # type:ignore[untyped-import,unused-ignore]
@@ -760,7 +760,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         self.pan_tool:QAction|None = next(tool for tool in cast(list[QAction], self.findChildren(QAction)) if tool.text() == QApplication.translate('Toolbar', 'Pan'))
         self.zoom_tool:QAction|None = next(tool for tool in cast(list[QAction], self.findChildren(QAction)) if tool.text() == QApplication.translate('Toolbar', 'Zoom'))
 
-        self.setIconSize(QSize(40,40))
+        self.setIconSize(QSize(38,38)) # max: 40x40, default:32x32
 
         self.aw.updatePlusStatus(self)
 
@@ -1423,7 +1423,8 @@ class ApplicationWindow(QMainWindow):
     loadAndRedrawBackgroundUUIDSignal = pyqtSignal(str,str)
 
     __slots__ = [ 'locale_str', 'app', 'superusermode', 'sample_loop_running', 'time_stopped', 'plus_account', 'plus_account_id', 'plus_remember_credentials', 'plus_email', 'plus_language', 'plus_subscription', 'percent_decimals',
-        'plus_paidUntil', 'plus_rlimit', 'plus_used', 'plus_readonly', 'plus_user_id', 'appearance', 'mpl_fontproperties', 'full_screen_mode_active', 'processingKeyEvent', 'quickEventShortCut',
+        'plus_paidUntil', 'plus_rlimit', 'plus_used', 'plus_readonly', 'plus_user_id', 'plus_automatic_profile_upload', 'appearance',
+        'mpl_fontproperties', 'full_screen_mode_active', 'processingKeyEvent', 'quickEventShortCut',
         'eventaction_running_threads', 'curFile', 'MaxRecentFiles', 'recentFileActs', 'recentSettingActs',
         'recentThemeActs', 'applicationDirectory', 'helpdialog', 'redrawTimer', 'lastLoadedProfile', 'lastLoadedBackground', 'LargeScaleLCDsFlag', 'largeScaleLCDs_dialog',
         'analysisresultsanno', 'segmentresultsanno', 'schedule_window', 'scheduleFlag', 'scheduled_items_uuids', 'largeLCDs_dialog', 'LargeLCDsFlag', 'largeDeltaLCDs_dialog', 'LargeDeltaLCDsFlag', 'largePIDLCDs_dialog',
@@ -1533,6 +1534,7 @@ class ApplicationWindow(QMainWindow):
         self.plus_account_id:str|None = None # holds last used account_id; not reset on loggout
         self.plus_user_id:str|None = None # holds the UUID of the last logged in user; preserved over restart
         self.plus_remember_credentials:bool = True # store plus account credentials in systems keychain
+        self.plus_automatic_profile_upload:bool = False
         self.plus_email:str|None = None # if self.plus_remember_credentials is ticked, we remember here the login to be pre-set as plus_account in the dialog
         self.plus_language:str = 'en' # one of ["en", "de", "it", ..] indicates the language setting of the plus_account used on the artisan.plus platform,
                 # used in links back to objects on the platform (see plus/util.py#storeLink() and similars)
@@ -2132,22 +2134,13 @@ class ApplicationWindow(QMainWindow):
         importRubasseAction.triggered.connect(self.importRubasse)
         self.importMenu.addAction(importRubasseAction)
 
-#        importPilotAction = QAction('Probat Pilot...', self)
-#        importPilotAction.triggered.connect(self.importPilot)
-#        self.importMenu.addAction(importPilotAction)
-
-#        fileImportRoastLoggerAction = QAction('RoastLogger...', self)
-#        fileImportRoastLoggerAction.triggered.connect(self.fileImportRoastLogger)
-#        self.importMenu.addAction(fileImportRoastLoggerAction)
-
         importRoastLogAction = QAction('RoastLog URL...',self)
         importRoastLogAction.triggered.connect(self.importRoastLog)
         self.importMenu.addAction(importRoastLogAction)
 
-#        importRoastPathAction = QAction('RoastPATH URL...',self)
-#        #importRoastPathAction.triggered.connect(self.importRoastPATH)
-#        self.importMenu.addAction(importRoastPathAction)
-#        importRoastPathAction.setEnabled(False)
+        importRoastPathAction = QAction('RoastPATH rpath...',self)
+        importRoastPathAction.triggered.connect(self.importRoastPATH)
+        self.importMenu.addAction(importRoastPathAction)
 
         importStrongholdAction = QAction('Stronghold XLSX...', self)
         importStrongholdAction.triggered.connect(self.importStronghold)
@@ -2198,6 +2191,10 @@ class ApplicationWindow(QMainWindow):
         fileConvertFromRubaseAction = QAction('Rubase CSV...', self)
         fileConvertFromRubaseAction.triggered.connect(self.convertFromRubase)
         self.convFromMenu.addAction(fileConvertFromRubaseAction)
+
+        fileConvertFromRoastPathAction = QAction('RoastPATH rpath...', self)
+        fileConvertFromRoastPathAction.triggered.connect(self.convertFromRoastPath)
+        self.convFromMenu.addAction(fileConvertFromRoastPathAction)
 
         fileConvertFromStrongholdAction = QAction('Stronghold XLSX...', self)
         fileConvertFromStrongholdAction.triggered.connect(self.convertFromStronghold)
@@ -11726,6 +11723,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def resetApplication(self, _:bool = False) -> None:
+        global RESTART_ON_QUIT # pylint:disable=global-statement
         if self.app.artisanviewerMode:
             string = QApplication.translate('Message','Do you want to reset all settings?\nArtisanViewer has to be restarted!')
         else:
@@ -11749,6 +11747,7 @@ class ApplicationWindow(QMainWindow):
 #        if reply == QMessageBox.StandardButton.Reset:
 
         if artisan_question(self,self, string, QApplication.translate('Message','Factory Reset'), True):
+            RESTART_ON_QUIT = True
             #raise flag. Next time app will open, the settings (bad settings) will not be loaded.
             self.resetqsettings = 1  # zuban:ignore[unreachable]
             self.clearExtraDeviceSettingsBackup()
@@ -14926,20 +14925,6 @@ class ApplicationWindow(QMainWindow):
             self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' importCSV() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         return False
 
-#    def importRoastLogger(self, filename:str) -> None:
-#        self.resetExtraDevices()
-#        # the RoastLogger file might be in utf-8 or latin1 encoding, we cannot know so let's test both
-#        try:
-#            try:
-#                self.importRoastLoggerEnc(filename,'utf-8')
-#            except Exception: # pylint: disable=broad-except
-#                self.importRoastLoggerEnc(filename,'latin1')
-#            self.qmc.fileDirtySignal.emit()
-#            self.sendmessage(f"{QApplication.translate('Message','RoastLogger file loaded successfully')} ({filename})")
-#        except Exception as ex: # pylint: disable=broad-except
-#            _log.exception(ex)
-#            _, _, exc_tb = sys.exc_info()
-#            self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' importRoastLogger() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def resetExtraDevices(self) -> None:
         try:
@@ -17498,6 +17483,12 @@ class ApplicationWindow(QMainWindow):
 
     @pyqtSlot()
     @pyqtSlot(bool)
+    def convertFromRoastPath(self, _:bool = False) -> None:
+        from artisanlib.roastpath import extractProfileRoastPath
+        self.fileConvertFrom('*.xlsx', extractProfileRoastPath)
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
     def convertFromStronghold(self, _:bool = False) -> None:
         from artisanlib.stronghold import extractProfileStrongholdXLSX
         self.fileConvertFrom('*.xlsx', extractProfileStrongholdXLSX)
@@ -17905,11 +17896,6 @@ class ApplicationWindow(QMainWindow):
     def fileImportJSON(self, _:bool = False) -> None:
         self.fileImport(QApplication.translate('Message', 'Import {}').format('JSON'),self.importJSON,True)
 
-#    @pyqtSlot()
-#    @pyqtSlot(bool)
-#    def fileImportRoastLogger(self, _:bool = False) -> None:
-#        self.fileImport(QApplication.translate('Message', 'Import {}').format('RoastLogger'),self.importRoastLogger,True)
-
     @pyqtSlot(bool)
     def notificationsSetEnabled(self, enabled:bool) -> None:
         if self.notificationsflag != enabled:
@@ -18211,6 +18197,7 @@ class ApplicationWindow(QMainWindow):
                 self.full_screen_mode_active = toBool(settings.value('fullscreen',self.full_screen_mode_active))
                 self.plus_account = settings.value('plus_account',self.plus_account)
             self.plus_remember_credentials = toBool(settings.value('plus_remember_credentials',self.plus_remember_credentials))
+            self.plus_automatic_profile_upload = toBool(settings.value('plus_automatic_profile_upload',self.plus_automatic_profile_upload))
             self.plus_email = settings.value('plus_email',self.plus_email)
             self.plus_language = settings.value('plus_language',self.plus_language)
             self.plus_user_id = settings.value('plus_user_id',self.plus_user_id)
@@ -20319,6 +20306,7 @@ class ApplicationWindow(QMainWindow):
                     else:
                         settings.setValue('plus_account', self.plus_account)
                 self.settingsSetValue(settings, default_settings, 'plus_remember_credentials', self.plus_remember_credentials, read_defaults)
+                self.settingsSetValue(settings, default_settings, 'plus_automatic_profile_upload', self.plus_automatic_profile_upload, read_defaults)
                 self.settingsSetValue(settings, default_settings, 'plus_email', self.plus_email, read_defaults)
                 self.settingsSetValue(settings, default_settings, 'plus_language', self.plus_language, read_defaults)
                 self.settingsSetValue(settings, default_settings, 'plus_user_id', self.plus_user_id, read_defaults)
@@ -25979,6 +25967,7 @@ class ApplicationWindow(QMainWindow):
         self.changelocale(new_locale)
 
     def changelocale(self, languagelocale:str) -> None:
+        global RESTART_ON_QUIT # pylint:disable=global-statement
         if self.locale_str != languagelocale:
 #            string = QApplication.translate('Message','Switching the language needs a restart. Restart now?')
 #            reply = QMessageBox.warning(None, self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
@@ -25989,6 +25978,7 @@ class ApplicationWindow(QMainWindow):
                 QApplication.translate('Message','Switching the language needs a restart. Restart now?'),
                 QApplication.translate('Message','Restart'))
             if res:
+                RESTART_ON_QUIT = True
                 # switch old flag off
                 self.switchLanguageFlag(self.locale_str, False)
                 # check if etypes are unmodified by user and in that case, remove etypes from settings to avoid overwriting of translations:
@@ -26543,6 +26533,12 @@ class ApplicationWindow(QMainWindow):
     def importRoastLog(self, _:bool = False) -> None:
         from artisanlib.roastlog import extractProfileRoastLog
         self.importExternalURL(extractProfileRoastLog,QApplication.translate('Message','Import {}').format('RoastLog URL'))
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def importRoastPATH(self, _:bool = False) -> None:
+        from artisanlib.roastpath import extractProfileRoastPath
+        self.importExternal(extractProfileRoastPath, QApplication.translate('Message','Import {}').format('RoastPath rpath'),'*.rpath')
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -28524,6 +28520,17 @@ def main() -> None:
         # ret = app.exec()
         # app = None
         # sys.exit()
+
+    if RESTART_ON_QUIT and appFrozen():
+        executable = sys.executable
+        arguments = sys.argv
+        env = os.environ.copy()
+        env['PYINSTALLER_RESET_ENVIRONMENT'] = '1'
+        try:
+            os.execve(executable, arguments, env)
+        except Exception as e:
+            print(f"Failed to restart: {e}")
+            sys.exit(1)
 
 # the following seems to create issue on Mac and Windows builds on exit
 #    del aw

@@ -53,11 +53,19 @@ class SamplingDlg(ArtisanDialog):
         self.keepOnFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.keepOnFlag.setChecked(self.aw.qmc.flagKeepON)
         self.keepOnFlag.stateChanged.connect(self.keepOn_flag_changed)
+        self.keepOnFlag.setToolTip(QApplication.translate('Tooltip', 'Automatically trigger ON after ending a recording'))
 
-        self.openCompletedFlag = QCheckBox(QApplication.translate('Label','Open Completed Roast in Viewer'))
+        self.openCompletedFlag = QCheckBox(QApplication.translate('Label','Open completed roasts in viewer'))
         self.openCompletedFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.openCompletedFlag.setChecked(self.aw.qmc.flagOpenCompleted)
         self.openCompletedFlag.setEnabled(self.aw.qmc.flagKeepON)
+        self.openCompletedFlag.setToolTip(QApplication.translate('Tooltip', 'Open roasts in ArtisanViewer upon completion'))
+
+        self.automatiUploadFlag = QCheckBox(QApplication.translate('Label','Upload completed roasts'))
+        self.automatiUploadFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.automatiUploadFlag.setChecked(self.aw.plus_automatic_profile_upload)
+        self.automatiUploadFlag.setEnabled(self.aw.plus_account is not None and self.aw.plus_subscription == 'MAX')
+        self.automatiUploadFlag.setToolTip(QApplication.translate('Tooltip', 'Upload completed roast profiles to the artisan platform'))
 
         self.interval = MyQDoubleSpinBox()
         self.interval.setStyleSheet(spin_box_style(self.aw.app.darkmode))
@@ -87,6 +95,8 @@ class SamplingDlg(ArtisanDialog):
         flagGrid = QGridLayout()
         flagGrid.addWidget(self.keepOnFlag,0,0)
         flagGrid.addWidget(self.openCompletedFlag,1,0)
+        flagGrid.addWidget(self.automatiUploadFlag,2,0)
+        flagGrid.setVerticalSpacing(15)
 
         flagLayout = QHBoxLayout()
         flagLayout.addStretch()
@@ -103,7 +113,7 @@ class SamplingDlg(ArtisanDialog):
         layout.addLayout(intervalLayout)
         layout.addSpacing(5)
         layout.addLayout(flagLayout)
-        layout.addSpacing(15)
+        layout.addSpacing(8)
         layout.addStretch()
         layout.addLayout(buttonsLayout)
         self.setLayout(layout)
@@ -146,6 +156,7 @@ class SamplingDlg(ArtisanDialog):
     def ok(self) -> None:
         self.aw.qmc.flagKeepON = bool(self.keepOnFlag.isChecked())
         self.aw.qmc.flagOpenCompleted = bool(self.openCompletedFlag.isChecked())
+        self.aw.plus_automatic_profile_upload = bool(self.automatiUploadFlag.isChecked())
         interval = self.interval.value()*1000.
         if self.aw.qmc.xgrid >= 3600:
             interval = interval * 60
