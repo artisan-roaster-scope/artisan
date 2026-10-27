@@ -4009,20 +4009,20 @@ class tgraphcanvas(QObject):
 
     @pyqtSlot('QAction*')
     def event_popup_action(self, action:QAction) -> None:
-        if action.key[0] >= 0: # Xtype: ignore[attr-defined]
+        if action.key[0] >= 0: # type: ignore[attr-defined]
             # we check if this is the first DROP mark on this roast
-            firstDROP = (action.key[0] == 6 and self.timeindex[6] == 0) # Xtype: ignore[attr-defined]
-            timeindex_before = self.timeindex[action.key[0]] # Xtype: ignore[attr-defined]
-            self.timeindex[action.key[0]] = action.key[1] # Xtype: ignore[attr-defined]
+            firstDROP = (action.key[0] == 6 and self.timeindex[6] == 0) # type: ignore[attr-defined]
+            timeindex_before = self.timeindex[action.key[0]] # type: ignore[attr-defined]
+            self.timeindex[action.key[0]] = action.key[1] # type: ignore[attr-defined]
             # clear custom label positions cache entry
-            if action.key[0] in self.l_annotations_dict: # Xtype: ignore[attr-defined]
-                del self.l_annotations_dict[action.key[0]] # Xtype: ignore[attr-defined]
+            if action.key[0] in self.l_annotations_dict: # type: ignore[attr-defined]
+                del self.l_annotations_dict[action.key[0]] # type: ignore[attr-defined]
             try:
                 # clear the event mark position cache
-                self.l_annotations_dict.pop(action.key[0]) # Xtype: ignore[attr-defined]
+                self.l_annotations_dict.pop(action.key[0]) # type: ignore[attr-defined]
             except Exception: # pylint: disable=broad-except
                 pass
-            if action.key[0] == 0: # Xtype: ignore[attr-defined] # CHARGE
+            if action.key[0] == 0: # type: ignore[attr-defined] # CHARGE
                 try:
                     # clear the TP mark position cache (TP depends on CHARGE!)
                     self.l_annotations_dict.pop(-1)
@@ -4052,7 +4052,7 @@ class tgraphcanvas(QObject):
                         self.startofx += self.timex[self.timeindex[0]]
                     self.aw.autoAdjustAxis(deltas=False)
                 self.timealign(redraw=True,recompute=False,force=True) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
-            elif action.key[0] == 6: # Xtype: ignore[attr-defined] # DROP
+            elif action.key[0] == 6: # type: ignore[attr-defined] # DROP
                 try:
                     # clear the TP mark position cache (TP depends on DROP!)
                     self.l_annotations_dict.pop(-1)
@@ -4093,26 +4093,26 @@ class tgraphcanvas(QObject):
 
 
             # update phases
-            elif action.key[0] == 1 and self.phasesbuttonflag: # Xtype: ignore[attr-defined] # DRY
+            elif action.key[0] == 1 and self.phasesbuttonflag: # type: ignore[attr-defined] # DRY
                 self.phases[1] = int(round(self.temp2[self.timeindex[1]]))
-            elif action.key[0] == 2 and self.phasesbuttonflag: # Xtype: ignore[attr-defined] # FCs
+            elif action.key[0] == 2 and self.phasesbuttonflag: # type: ignore[attr-defined] # FCs
                 self.phases[2] = int(round(self.temp2[self.timeindex[2]]))
 
             self.fileDirtySignal.emit()
-            self.redraw_keep_view(recomputeAllDeltas=(action.key[0] in {0, 6})) # Xtype: ignore[attr-defined] # on moving CHARGE or DROP, we have to recompute the Deltas
+            self.redraw_keep_view(recomputeAllDeltas=(action.key[0] in {0, 6})) # type: ignore[attr-defined] # on moving CHARGE or DROP, we have to recompute the Deltas
         else:
             # add a special event at the current timepoint
             from artisanlib.events import customEventDlg
-            dlg = customEventDlg(self.aw, self.aw, action.key[1], value=action.key[2], event_type=self.custom_event_dlg_default_type) # Xtype: ignore[attr-defined]
+            dlg = customEventDlg(self.aw, self.aw, action.key[1], value=action.key[2], event_type=self.custom_event_dlg_default_type) # type: ignore[attr-defined]
             if dlg.exec():
-                self.addEvent(action.key[1], # Xtype: ignore[attr-defined] # absolute time index
+                self.addEvent(action.key[1], # type: ignore[attr-defined] # absolute time index
                     dlg.type, # default: "--"
                     dlg.description, # pyright:ignore[reportUnknownArgumentType]
                     dlg.value)
                 self.custom_event_dlg_default_type = dlg.type
                 self.aw.orderEvents()
                 self.fileDirtySignal.emit()
-                self.redraw_keep_view(recomputeAllDeltas=(action.key[0] in {0, 6})) # Xtype: ignore[attr-defined] # on moving CHARGE or DROP, we have to recompute the Deltas
+                self.redraw_keep_view(recomputeAllDeltas=(action.key[0] in {0, 6})) # type: ignore[attr-defined] # on moving CHARGE or DROP, we have to recompute the Deltas
                 # redraw minieditor event selection line
                 currentevent = self.aw.eNumberSpinBox.value()
                 if currentevent:

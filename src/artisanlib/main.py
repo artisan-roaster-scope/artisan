@@ -11764,7 +11764,7 @@ class ApplicationWindow(QMainWindow):
             if active_window is not None:
                 fw = active_window.focusWidget()
                 if fw is not None and hasattr(fw, 'cut') and callable(getattr(fw, 'cut')): # noqa: B009
-                    fw.cut() # pyright: ignore[reportAttributeAccessIssue]
+                    fw.cut() # pyright: ignore[reportAttributeAccessIssue] # ty: ignore[call-non-callable]
         except Exception: # pylint: disable=broad-except
             pass # not every QWidget has a cut method
 
@@ -11776,7 +11776,7 @@ class ApplicationWindow(QMainWindow):
             if active_window is not None:
                 fw = active_window.focusWidget()
                 if fw is not None and hasattr(fw, 'copy') and callable(getattr(fw, 'copy')): # noqa: B009
-                    fw.copy() # pyright: ignore[reportAttributeAccessIssue]
+                    fw.copy() # pyright: ignore[reportAttributeAccessIssue] # ty: ignore[call-non-callable]
         except Exception: # pylint: disable=broad-except
             pass # not every QWidget has a copy method
 
@@ -11788,7 +11788,7 @@ class ApplicationWindow(QMainWindow):
             if active_window is not None:
                 fw = active_window.focusWidget()
                 if fw is not None and hasattr(fw, 'paste') and callable(getattr(fw, 'paste')): # noqa: B009
-                    fw.paste() # pyright: ignore[reportAttributeAccessIssue]
+                    fw.paste() # pyright: ignore[reportAttributeAccessIssue] # ty: ignore[call-non-callable]
         except Exception: # pylint: disable=broad-except
             pass # not every QWidget has a paste method
 

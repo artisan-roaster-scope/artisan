@@ -175,58 +175,6 @@
 </context><context>
     <name>Button</name>
     <message>
-        <location filename="../artisanlib/transposer.py" line="147" />
-        <location filename="../artisanlib/designer.py" line="296" />
-        <location filename="../artisanlib/roast_properties.py" line="6108" />
-        <location filename="../artisanlib/events.py" line="4132" />
-        <location filename="../artisanlib/events.py" line="1311" />
-        <location filename="../plus/blend.py" line="147" />
-        <source>Apply</source>
-        <translation>Застосувати</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/dialogs.py" line="1247" />
-        <location filename="../artisanlib/dialogs.py" line="980" />
-        <location filename="../artisanlib/dialogs.py" line="915" />
-        <location filename="../artisanlib/dialogs.py" line="826" />
-        <location filename="../artisanlib/dialogs.py" line="760" />
-        <location filename="../artisanlib/dialogs.py" line="655" />
-        <location filename="../artisanlib/dialogs.py" line="616" />
-        <location filename="../artisanlib/dialogs.py" line="124" />
-        <location filename="../artisanlib/comm.py" line="219" />
-        <location filename="../artisanlib/pid_dialogs.py" line="3180" />
-        <location filename="../plus/blend.py" line="165" />
-        <source>Cancel</source>
-        <translation>Скасувати</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2010" />
-        <source>CREATE SCHEDULE</source>
-        <translation>СТВОРИТИ РОЗКЛАД</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/dialogs.py" line="1569" />
-        <location filename="../artisanlib/dialogs.py" line="1246" />
-        <location filename="../artisanlib/dialogs.py" line="752" />
-        <location filename="../artisanlib/dialogs.py" line="654" />
-        <location filename="../artisanlib/dialogs.py" line="605" />
-        <location filename="../artisanlib/dialogs.py" line="196" />
-        <location filename="../artisanlib/dialogs.py" line="123" />
-        <location filename="../artisanlib/comm.py" line="218" />
-        <location filename="../artisanlib/pid_dialogs.py" line="2928" />
-        <location filename="../artisanlib/pid_dialogs.py" line="2028" />
-        <location filename="../artisanlib/pid_dialogs.py" line="991" />
-        <location filename="../plus/schedule.py" line="2386" />
-        <source>OK</source>
-        <translation>гаразд</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/dashboard.py" line="293" />
-        <location filename="../plus/schedule.py" line="2477" />
-        <source>LOGIN TO UNLOCK</source>
-        <translation>УВІЙДИ, ЩОБ РОЗБЛОКУВАТИ</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/colors.py" line="594" />
         <location filename="../artisanlib/designer.py" line="304" />
         <location filename="../artisanlib/phases.py" line="138" />
@@ -299,7 +247,7 @@
         <translation>відчинено</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="291" />
+        <location filename="../artisanlib/dashboard.py" line="292" />
         <location filename="../artisanlib/wheels.py" line="598" />
         <source>Properties</source>
         <translation type="unfinished">Властивості</translation>
@@ -325,7 +273,7 @@
     <message>
         <location filename="../artisanlib/alarms.py" line="131" />
         <location filename="../artisanlib/curves.py" line="1485" />
-        <location filename="../artisanlib/dashboard.py" line="321" />
+        <location filename="../artisanlib/dashboard.py" line="327" />
         <location filename="../artisanlib/background.py" line="95" />
         <location filename="../artisanlib/events.py" line="804" />
         <location filename="../artisanlib/pid_dialogs.py" line="2903" />
@@ -341,6 +289,22 @@
         <location filename="../artisanlib/pid_dialogs.py" line="968" />
         <source>Save</source>
         <translation>Зберегти</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2386" />
+        <location filename="../artisanlib/dialogs.py" line="1569" />
+        <location filename="../artisanlib/dialogs.py" line="1246" />
+        <location filename="../artisanlib/dialogs.py" line="752" />
+        <location filename="../artisanlib/dialogs.py" line="654" />
+        <location filename="../artisanlib/dialogs.py" line="605" />
+        <location filename="../artisanlib/dialogs.py" line="196" />
+        <location filename="../artisanlib/dialogs.py" line="123" />
+        <location filename="../artisanlib/comm.py" line="218" />
+        <location filename="../artisanlib/pid_dialogs.py" line="2928" />
+        <location filename="../artisanlib/pid_dialogs.py" line="2028" />
+        <location filename="../artisanlib/pid_dialogs.py" line="991" />
+        <source>OK</source>
+        <translation>гаразд</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="993" />
@@ -555,6 +519,21 @@
         <translation>Напишіть PID</translation>
     </message>
     <message>
+        <location filename="../plus/blend.py" line="165" />
+        <location filename="../artisanlib/dialogs.py" line="1247" />
+        <location filename="../artisanlib/dialogs.py" line="980" />
+        <location filename="../artisanlib/dialogs.py" line="915" />
+        <location filename="../artisanlib/dialogs.py" line="826" />
+        <location filename="../artisanlib/dialogs.py" line="760" />
+        <location filename="../artisanlib/dialogs.py" line="655" />
+        <location filename="../artisanlib/dialogs.py" line="616" />
+        <location filename="../artisanlib/dialogs.py" line="124" />
+        <location filename="../artisanlib/comm.py" line="219" />
+        <location filename="../artisanlib/pid_dialogs.py" line="3180" />
+        <source>Cancel</source>
+        <translation>Скасувати</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3262" />
         <source>Set ET PID to MM:SS time units</source>
         <translation>Встановіть ET PID на MM:SS одиниці часу</translation>
@@ -617,6 +596,16 @@
         <translation>Активувати палітру</translation>
     </message>
     <message>
+        <location filename="../plus/blend.py" line="147" />
+        <location filename="../artisanlib/transposer.py" line="147" />
+        <location filename="../artisanlib/designer.py" line="296" />
+        <location filename="../artisanlib/roast_properties.py" line="6108" />
+        <location filename="../artisanlib/events.py" line="4132" />
+        <location filename="../artisanlib/events.py" line="1311" />
+        <source>Apply</source>
+        <translation>Застосувати</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/ports.py" line="384" />
         <location filename="../artisanlib/ports.py" line="334" />
         <location filename="../artisanlib/ports.py" line="294" />
@@ -642,7 +631,7 @@
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1490" />
-        <location filename="../artisanlib/dashboard.py" line="322" />
+        <location filename="../artisanlib/dashboard.py" line="328" />
         <location filename="../artisanlib/roast_properties.py" line="774" />
         <location filename="../artisanlib/background.py" line="100" />
         <source>Clear</source>
@@ -718,37 +707,43 @@
         <translation>Зберегти параметри за замовчуванням</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="290" />
+        <location filename="../artisanlib/dashboard.py" line="291" />
         <source>Compare</source>
         <translation>Порівняти</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="323" />
+        <location filename="../plus/schedule.py" line="2477" />
+        <location filename="../artisanlib/dashboard.py" line="294" />
+        <source>LOGIN TO UNLOCK</source>
+        <translation>УВІЙДИ, ЩОБ РОЗБЛОКУВАТИ</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/dashboard.py" line="329" />
         <source>Create</source>
         <translation>Створити</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="334" />
+        <location filename="../artisanlib/dashboard.py" line="341" />
         <source>Documentation</source>
         <translation type="unfinished">Документація</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="335" />
+        <location filename="../artisanlib/dashboard.py" line="342" />
         <source>User Forum</source>
         <translation>Форум користувачів</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="336" />
+        <location filename="../artisanlib/dashboard.py" line="343" />
         <source>Report an Issue</source>
         <translation>Повідомити про проблему</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="337" />
+        <location filename="../artisanlib/dashboard.py" line="344" />
         <source>Web Platform</source>
         <translation>Веб-платформа</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="354" />
+        <location filename="../artisanlib/dashboard.py" line="361" />
         <source>DONATE</source>
         <translation>ПОЖЕРТВУВАТИ</translation>
     </message>
@@ -1180,6 +1175,11 @@ END</source>
         <translation>Зберегти PDF</translation>
     </message>
     <message>
+        <location filename="../plus/schedule.py" line="2010" />
+        <source>CREATE SCHEDULE</source>
+        <translation>СТВОРИТИ РОЗКЛАД</translation>
+    </message>
+    <message>
         <source>Activate Palette &gt;&gt;</source>
         <translation type="vanished">Активувати палітру &gt;&gt;</translation>
     </message>
@@ -1245,17 +1245,6 @@ END</source>
     </message>
 </context><context>
     <name>CheckBox</name>
-    <message>
-        <location filename="../artisanlib/curves.py" line="1128" />
-        <location filename="../artisanlib/curves.py" line="1033" />
-        <location filename="../artisanlib/curves.py" line="1027" />
-        <location filename="../artisanlib/curves.py" line="1017" />
-        <location filename="../artisanlib/curves.py" line="999" />
-        <location filename="../artisanlib/background.py" line="74" />
-        <location filename="../plus/schedule.py" line="1603" />
-        <source>Show</source>
-        <translation>Показати</translation>
-    </message>
     <message>
         <location filename="../artisanlib/axis.py" line="187" />
         <source>Expand</source>
@@ -1450,6 +1439,17 @@ END</source>
         <location filename="../artisanlib/ports.py" line="1472" />
         <source>OFF on DROP</source>
         <translation>ВИМКНЕНО на DROP</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1603" />
+        <location filename="../artisanlib/curves.py" line="1128" />
+        <location filename="../artisanlib/curves.py" line="1033" />
+        <location filename="../artisanlib/curves.py" line="1027" />
+        <location filename="../artisanlib/curves.py" line="1017" />
+        <location filename="../artisanlib/curves.py" line="999" />
+        <location filename="../artisanlib/background.py" line="74" />
+        <source>Show</source>
+        <translation>Показати</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="431" />
@@ -2555,36 +2555,6 @@ END</source>
 </context><context>
     <name>Contextual Menu</name>
     <message>
-        <location filename="../plus/schedule.py" line="1577" />
-        <source>All batches prepared</source>
-        <translation>Всі партії готові</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1580" />
-        <source>One more batch prepared</source>
-        <translation>Ще одна партія готова</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1584" />
-        <source>One less batch prepared</source>
-        <translation>На одну партію менше підготовлено</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1587" />
-        <source>No batch prepared</source>
-        <translation>Партія не підготовлена</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1599" />
-        <source>Register roast</source>
-        <translation>Зареєструвати печеню</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1607" />
-        <source>Hide</source>
-        <translation>Сховати</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/canvas.py" line="18265" />
         <source>Add point</source>
         <translation>Додайте точку</translation>
@@ -2634,6 +2604,36 @@ END</source>
         <location filename="../artisanlib/canvas.py" line="19097" />
         <source>Edit</source>
         <translation>Редагувати</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1577" />
+        <source>All batches prepared</source>
+        <translation>Всі партії готові</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1580" />
+        <source>One more batch prepared</source>
+        <translation>Ще одна партія готова</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1584" />
+        <source>One less batch prepared</source>
+        <translation>На одну партію менше підготовлено</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1587" />
+        <source>No batch prepared</source>
+        <translation>Партія не підготовлена</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1599" />
+        <source>Register roast</source>
+        <translation>Зареєструвати печеню</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1607" />
+        <source>Hide</source>
+        <translation>Сховати</translation>
     </message>
     <message>
         <source>Reset Designer</source>
@@ -4178,7 +4178,7 @@ END</source>
         <location filename="../artisanlib/pid_control.py" line="817" />
         <location filename="../artisanlib/pid_control.py" line="793" />
         <location filename="../artisanlib/pid_control.py" line="725" />
-        <location filename="../artisanlib/dashboard.py" line="1395" />
+        <location filename="../artisanlib/dashboard.py" line="1412" />
         <location filename="../artisanlib/roast_properties.py" line="3798" />
         <location filename="../artisanlib/roast_properties.py" line="2724" />
         <location filename="../artisanlib/ports.py" line="2051" />
@@ -4654,13 +4654,6 @@ END</source>
 </context><context>
     <name>Form Caption</name>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="955" />
-        <location filename="../artisanlib/roast_properties.py" line="1859" />
-        <location filename="../plus/blend.py" line="140" />
-        <source>Custom Blend</source>
-        <translation>Спеціальна суміш</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/axis.py" line="81" />
         <source>Axes</source>
         <translation>сокири</translation>
@@ -4822,6 +4815,13 @@ END</source>
         <location filename="../artisanlib/roast_properties.py" line="519" />
         <source>Roast Properties</source>
         <translation>Властивості смаження</translation>
+    </message>
+    <message>
+        <location filename="../plus/blend.py" line="140" />
+        <location filename="../artisanlib/dashboard.py" line="972" />
+        <location filename="../artisanlib/roast_properties.py" line="1859" />
+        <source>Custom Blend</source>
+        <translation>Спеціальна суміш</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="4399" />
@@ -5138,7 +5138,7 @@ END</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="292" />
+        <location filename="../artisanlib/dashboard.py" line="293" />
         <source>INVENTORY</source>
         <translation>ІНВЕНТАРИЗАЦІЯ</translation>
     </message>
@@ -12057,108 +12057,6 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
 </context><context>
     <name>Label</name>
     <message>
-        <location filename="../artisanlib/canvas.py" line="11655" />
-        <location filename="../artisanlib/roast_properties.py" line="892" />
-        <location filename="../artisanlib/roast_properties.py" line="242" />
-        <location filename="../artisanlib/roast_properties.py" line="162" />
-        <location filename="../plus/schedule.py" line="2092" />
-        <location filename="../plus/blend.py" line="210" />
-        <source>Weight</source>
-        <translation>Вага</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/statistics.py" line="217" />
-        <location filename="../artisanlib/dashboard.py" line="294" />
-        <location filename="../artisanlib/dashboard.py" line="289" />
-        <location filename="../artisanlib/roast_properties.py" line="1127" />
-        <location filename="../artisanlib/roast_properties.py" line="881" />
-        <location filename="../plus/blend.py" line="401" />
-        <source>Beans</source>
-        <translation>Квасоля</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/statistics.py" line="246" />
-        <location filename="../artisanlib/roast_properties.py" line="1815" />
-        <location filename="../plus/schedule.py" line="2116" />
-        <source>Yield</source>
-        <translation>Врожайність</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="24003" />
-        <location filename="../artisanlib/roast_properties.py" line="1814" />
-        <location filename="../plus/schedule.py" line="2127" />
-        <source>Defects</source>
-        <translation type="unfinished">дефекти</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/canvas.py" line="11599" />
-        <location filename="../artisanlib/roast_properties.py" line="1006" />
-        <location filename="../plus/schedule.py" line="2138" />
-        <source>Density</source>
-        <translation>Щільність</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/roast_properties.py" line="1100" />
-        <location filename="../artisanlib/events.py" line="476" />
-        <location filename="../plus/schedule.py" line="2149" />
-        <source>Color</source>
-        <translation>Колір</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/canvas.py" line="11604" />
-        <location filename="../artisanlib/roast_properties.py" line="1140" />
-        <location filename="../plus/schedule.py" line="2160" />
-        <source>Moisture</source>
-        <translation>Вологість</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/statistics.py" line="228" />
-        <location filename="../artisanlib/roast_properties.py" line="1219" />
-        <location filename="../plus/schedule.py" line="2171" />
-        <location filename="../plus/schedule.py" line="2170" />
-        <source>Roasting Notes</source>
-        <translation>Нотатки про смаження</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2176" />
-        <source>Score</source>
-        <translation>Оцінка</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/statistics.py" line="229" />
-        <location filename="../plus/schedule.py" line="2177" />
-        <source>Cupping Score</source>
-        <translation>Оцінка купінгу</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/statistics.py" line="230" />
-        <location filename="../artisanlib/roast_properties.py" line="1226" />
-        <location filename="../plus/schedule.py" line="2184" />
-        <location filename="../plus/schedule.py" line="2183" />
-        <source>Cupping Notes</source>
-        <translation>Примітки для купірування</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/devices.py" line="2122" />
-        <location filename="../artisanlib/roast_properties.py" line="891" />
-        <location filename="../artisanlib/roast_properties.py" line="306" />
-        <location filename="../plus/schedule.py" line="4276" />
-        <location filename="../plus/schedule.py" line="2273" />
-        <source>Roasted</source>
-        <translation>Смажені</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/canvas.py" line="11655" />
-        <location filename="../artisanlib/canvas.py" line="11604" />
-        <location filename="../artisanlib/canvas.py" line="11599" />
-        <location filename="../artisanlib/devices.py" line="2111" />
-        <location filename="../artisanlib/roast_properties.py" line="890" />
-        <location filename="../artisanlib/roast_properties.py" line="226" />
-        <location filename="../plus/schedule.py" line="4274" />
-        <source>Green</source>
-        <translation>Зелений</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/events.py" line="4076" />
         <location filename="../artisanlib/events.py" line="1148" />
         <location filename="../artisanlib/events.py" line="829" />
@@ -12964,6 +12862,13 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>Маркери</translation>
     </message>
     <message>
+        <location filename="../plus/schedule.py" line="2149" />
+        <location filename="../artisanlib/roast_properties.py" line="1100" />
+        <location filename="../artisanlib/events.py" line="476" />
+        <source>Color</source>
+        <translation>Колір</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/events.py" line="478" />
         <source>Text Color</source>
         <translation>Колір тексту</translation>
@@ -13480,11 +13385,41 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation />
     </message>
     <message>
+        <location filename="../plus/schedule.py" line="2092" />
+        <location filename="../plus/blend.py" line="210" />
+        <location filename="../artisanlib/canvas.py" line="11655" />
+        <location filename="../artisanlib/roast_properties.py" line="892" />
+        <location filename="../artisanlib/roast_properties.py" line="242" />
+        <location filename="../artisanlib/roast_properties.py" line="162" />
+        <source>Weight</source>
+        <translation>Вага</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/roast_properties.py" line="967" />
         <location filename="../artisanlib/roast_properties.py" line="259" />
         <location filename="../artisanlib/roast_properties.py" line="179" />
         <source>Volume</source>
         <translation>Обсяг</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="4274" />
+        <location filename="../artisanlib/canvas.py" line="11655" />
+        <location filename="../artisanlib/canvas.py" line="11604" />
+        <location filename="../artisanlib/canvas.py" line="11599" />
+        <location filename="../artisanlib/devices.py" line="2111" />
+        <location filename="../artisanlib/roast_properties.py" line="890" />
+        <location filename="../artisanlib/roast_properties.py" line="226" />
+        <source>Green</source>
+        <translation>Зелений</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="4276" />
+        <location filename="../plus/schedule.py" line="2273" />
+        <location filename="../artisanlib/devices.py" line="2122" />
+        <location filename="../artisanlib/roast_properties.py" line="891" />
+        <location filename="../artisanlib/roast_properties.py" line="306" />
+        <source>Roasted</source>
+        <translation>Смажені</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="850" />
@@ -13496,6 +13431,23 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/roast_properties.py" line="855" />
         <source>Batch</source>
         <translation>Партія</translation>
+    </message>
+    <message>
+        <location filename="../plus/blend.py" line="401" />
+        <location filename="../artisanlib/statistics.py" line="217" />
+        <location filename="../artisanlib/dashboard.py" line="295" />
+        <location filename="../artisanlib/dashboard.py" line="290" />
+        <location filename="../artisanlib/roast_properties.py" line="1127" />
+        <location filename="../artisanlib/roast_properties.py" line="881" />
+        <source>Beans</source>
+        <translation>Квасоля</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2138" />
+        <location filename="../artisanlib/canvas.py" line="11599" />
+        <location filename="../artisanlib/roast_properties.py" line="1006" />
+        <source>Density</source>
+        <translation>Щільність</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1080" />
@@ -13513,6 +13465,13 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>Земля</translation>
     </message>
     <message>
+        <location filename="../plus/schedule.py" line="2160" />
+        <location filename="../artisanlib/canvas.py" line="11604" />
+        <location filename="../artisanlib/roast_properties.py" line="1140" />
+        <source>Moisture</source>
+        <translation>Вологість</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/roast_properties.py" line="1170" />
         <location filename="../artisanlib/roast_properties.py" line="1141" />
         <source>%</source>
@@ -13524,21 +13483,51 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>Умови навколишнього середовища</translation>
     </message>
     <message>
+        <location filename="../plus/schedule.py" line="2171" />
+        <location filename="../plus/schedule.py" line="2170" />
+        <location filename="../artisanlib/statistics.py" line="228" />
+        <location filename="../artisanlib/roast_properties.py" line="1219" />
+        <source>Roasting Notes</source>
+        <translation>Нотатки про смаження</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2184" />
+        <location filename="../plus/schedule.py" line="2183" />
+        <location filename="../artisanlib/statistics.py" line="230" />
+        <location filename="../artisanlib/roast_properties.py" line="1226" />
+        <source>Cupping Notes</source>
+        <translation>Примітки для купірування</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/roast_properties.py" line="1427" />
         <source>Stock</source>
         <translation>Запас</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="296" />
+        <location filename="../artisanlib/dashboard.py" line="297" />
         <location filename="../artisanlib/roast_properties.py" line="1429" />
         <source>Space</source>
         <translation>Магазин</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="295" />
+        <location filename="../artisanlib/dashboard.py" line="296" />
         <location filename="../artisanlib/roast_properties.py" line="1431" />
         <source>Blend</source>
         <translation>Змішайте</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2127" />
+        <location filename="../artisanlib/main.py" line="24003" />
+        <location filename="../artisanlib/roast_properties.py" line="1814" />
+        <source>Defects</source>
+        <translation type="unfinished">дефекти</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2116" />
+        <location filename="../artisanlib/statistics.py" line="246" />
+        <location filename="../artisanlib/roast_properties.py" line="1815" />
+        <source>Yield</source>
+        <translation>Врожайність</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2051" />
@@ -13755,34 +13744,39 @@ LCDs All</source>
 РК-дисплеї Усі</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="288" />
+        <location filename="../artisanlib/dashboard.py" line="289" />
         <source>Batch size</source>
         <translation>Розмір партії</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="320" />
+        <location filename="../artisanlib/dashboard.py" line="326" />
         <source>TEMPLATE</source>
         <translation>ШАБЛОН</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="333" />
+        <location filename="../artisanlib/dashboard.py" line="340" />
         <source>QUICK LINKS</source>
         <translation>ШВИДКІ ПОСИЛАННЯ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="347" />
+        <location filename="../artisanlib/dashboard.py" line="354" />
         <source>RELEASE SPONSOR</source>
         <translation>СПОНСОР РЕЛІЗУ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="353" />
+        <location filename="../artisanlib/dashboard.py" line="360" />
         <source>SUPPORT ARTISAN</source>
         <translation>Підтримайте ARTISAN</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="490" />
+        <location filename="../artisanlib/dashboard.py" line="498" />
         <source>You've roasted {} batches</source>
         <translation>Ви смажили {} партій</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/dashboard.py" line="656" />
+        <source>Hello {}!</source>
+        <translation>Привіт {}!</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="126" />
@@ -14070,6 +14064,12 @@ LCDs All</source>
         <location filename="../artisanlib/statistics.py" line="215" />
         <source>Roaster</source>
         <translation>жаровня</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2177" />
+        <location filename="../artisanlib/statistics.py" line="229" />
+        <source>Cupping Score</source>
+        <translation>Оцінка купінгу</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="243" />
@@ -15129,6 +15129,11 @@ Fewer nodes: simpler curve but may lose detail</source>
         <translation>Співвідношення сторін</translation>
     </message>
     <message>
+        <location filename="../plus/schedule.py" line="2176" />
+        <source>Score</source>
+        <translation>Оцінка</translation>
+    </message>
+    <message>
         <source>Open Completed Roast in Viewer</source>
         <translation type="vanished">Відкрийте Завершене обсмажування у програмі Viewer</translation>
     </message>
@@ -15271,12 +15276,6 @@ Fewer nodes: simpler curve but may lose detail</source>
 </context><context>
     <name>Menu</name>
     <message>
-        <location filename="../artisanlib/main.py" line="2661" />
-        <location filename="../plus/schedule.py" line="2524" />
-        <source>Schedule</source>
-        <translation>План</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/main.py" line="4074" />
         <location filename="../artisanlib/pid_dialogs.py" line="807" />
         <source>Config</source>
@@ -15285,19 +15284,19 @@ Fewer nodes: simpler curve but may lose detail</source>
     <message>
         <location filename="../artisanlib/main.py" line="4062" />
         <location filename="../artisanlib/main.py" line="2330" />
-        <location filename="../artisanlib/dashboard.py" line="287" />
+        <location filename="../artisanlib/dashboard.py" line="288" />
         <source>Roast</source>
         <translation>Смаження</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2588" />
-        <location filename="../artisanlib/dashboard.py" line="317" />
+        <location filename="../artisanlib/dashboard.py" line="323" />
         <source>Comparator</source>
         <translation>Компаратор</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2593" />
-        <location filename="../artisanlib/dashboard.py" line="330" />
+        <location filename="../artisanlib/dashboard.py" line="337" />
         <source>Designer</source>
         <translation>Дизайнер</translation>
     </message>
@@ -15733,6 +15732,12 @@ Fewer nodes: simpler curve but may lose detail</source>
         <translation>Повзунки</translation>
     </message>
     <message>
+        <location filename="../plus/schedule.py" line="2524" />
+        <location filename="../artisanlib/main.py" line="2661" />
+        <source>Schedule</source>
+        <translation>План</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/main.py" line="2699" />
         <source>Full Screen</source>
         <translation>Повноекранний</translation>
@@ -15884,63 +15889,6 @@ Fewer nodes: simpler curve but may lose detail</source>
     </message>
 </context><context>
     <name>Message</name>
-    <message>
-        <location filename="../plus/schedule.py" line="1561" />
-        <source>Register the currently loaded roast profile in the selected entry.
-This will overwrite some roast properties.</source>
-        <translation>Зареєструйте поточний завантажений профіль обсмаження у вибраному записі.
-Це перезапише деякі властивості обсмаження.</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1562" />
-        <source>Register Roast</source>
-        <translation>Зареєструвати Roast</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2581" />
-        <source>Scheduler started</source>
-        <translation>Планувальник запущено</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2954" />
-        <source>Roasts will not adjust the schedule while the schedule window is closed</source>
-        <translation>Розклад смаження не буде змінено, поки вікно розкладу закрите.</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2955" />
-        <source>Close Scheduler</source>
-        <translation>Закрити планувальник</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3013" />
-        <source>Scheduler stopped</source>
-        <translation>Планувальник зупинено</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3745" />
-        <location filename="../plus/schedule.py" line="3324" />
-        <source>Updating completed roast properties failed</source>
-        <translation>Не вдалося оновити готові властивості смаження</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3917" />
-        <location filename="../plus/schedule.py" line="3443" />
-        <source>1 batch</source>
-        <translation>1 партія</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3932" />
-        <location filename="../plus/schedule.py" line="3923" />
-        <location filename="../plus/schedule.py" line="3451" />
-        <location filename="../plus/schedule.py" line="3445" />
-        <source>{} batches</source>
-        <translation>{} партій</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3811" />
-        <source>Fetching completed roast properties failed</source>
-        <translation>Не вдалося отримати готові властивості смаження</translation>
-    </message>
     <message>
         <location filename="../artisanlib/axis.py" line="924" />
         <source>xlimit = ({2},{3}) ylimit = ({0},{1}) zlimit = ({4},{5})</source>
@@ -16656,7 +16604,7 @@ ATTENTION: Recorded data will get cleared without confirmation</source>
         <translation>Фази змінено на {0} за умовчанням: {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="1462" />
+        <location filename="../artisanlib/dashboard.py" line="1479" />
         <source>Load roast template</source>
         <translation>Завантажити шаблон для смаження</translation>
     </message>
@@ -18522,6 +18470,63 @@ Profile missing [CHARGE] or [DROP]</source>
         <translation>Фоновий профіль не знайдено</translation>
     </message>
     <message>
+        <location filename="../plus/schedule.py" line="1561" />
+        <source>Register the currently loaded roast profile in the selected entry.
+This will overwrite some roast properties.</source>
+        <translation>Зареєструйте поточний завантажений профіль обсмаження у вибраному записі.
+Це перезапише деякі властивості обсмаження.</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1562" />
+        <source>Register Roast</source>
+        <translation>Зареєструвати Roast</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2581" />
+        <source>Scheduler started</source>
+        <translation>Планувальник запущено</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2954" />
+        <source>Roasts will not adjust the schedule while the schedule window is closed</source>
+        <translation>Розклад смаження не буде змінено, поки вікно розкладу закрите.</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2955" />
+        <source>Close Scheduler</source>
+        <translation>Закрити планувальник</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3013" />
+        <source>Scheduler stopped</source>
+        <translation>Планувальник зупинено</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3745" />
+        <location filename="../plus/schedule.py" line="3324" />
+        <source>Updating completed roast properties failed</source>
+        <translation>Не вдалося оновити готові властивості смаження</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3917" />
+        <location filename="../plus/schedule.py" line="3443" />
+        <source>1 batch</source>
+        <translation>1 партія</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3932" />
+        <location filename="../plus/schedule.py" line="3923" />
+        <location filename="../plus/schedule.py" line="3451" />
+        <location filename="../plus/schedule.py" line="3445" />
+        <source>{} batches</source>
+        <translation>{} партій</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3811" />
+        <source>Fetching completed roast properties failed</source>
+        <translation>Не вдалося отримати готові властивості смаження</translation>
+    </message>
+    <message>
         <source>Uploaded to {}</source>
         <translation type="vanished">Завантажено до {}</translation>
     </message>
@@ -18914,6 +18919,69 @@ Continue?</source>
 </context><context>
     <name>Plus</name>
     <message>
+        <location filename="../artisanlib/mqttport.py" line="219" />
+        <source>Keyring Error: Ensure that gnome-keyring is installed.</source>
+        <translation>Помилка Keyring: Переконайтеся, що встановлено gnome-keyring.</translation>
+    </message>
+    <message>
+        <location filename="../plus/login.py" line="94" />
+        <location filename="../plus/schedule.py" line="2478" />
+        <location filename="../artisanlib/main.py" line="5109" />
+        <location filename="../artisanlib/dashboard.py" line="309" />
+        <source>Sign in to your artisan account</source>
+        <translation>Увійдіть до свого облікового запису ремісника</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/dashboard.py" line="310" />
+        <source>Links to selected beans, blend and space on the platform</source>
+        <translation>Посилання на вибрані зерна, купажі та місце на платформі</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1158" />
+        <source>debug logging ON</source>
+        <translation>ведення журналу налагодження УВІМКНЕНО</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1159" />
+        <source>debug logging OFF</source>
+        <translation>налагодження журналу ВИМКНЕНО</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1173" />
+        <source>1 day left</source>
+        <translation>Залишився 1 день</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1175" />
+        <source>{} days left</source>
+        <translation>{} Днів залишилось</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1177" />
+        <source>Paid until</source>
+        <translation>Оплачено до</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1205" />
+        <source>Please visit our {0}shop{1} to extend your subscription</source>
+        <translation>Щоб продовжити підписку, відвідайте наш {0}магазин{1}</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1222" />
+        <source>Do you want to extend your subscription?</source>
+        <translation>Бажаєте продовжити підписку?</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1223" />
+        <source>Your subscription ends on</source>
+        <translation>Ваша підписка закінчується</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1223" />
+        <source>Your subscription ended on</source>
+        <translation>Ваша підписка закінчилася</translation>
+    </message>
+    <message>
         <location filename="../plus/queue.py" line="147" />
         <source>Roast successfully uploaded to the artisan platform</source>
         <translation>Смаження успішно завантажено на платформу ремісників</translation>
@@ -19089,14 +19157,6 @@ Continue?</source>
         <translation>Графік смаження оновлено!</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="5109" />
-        <location filename="../artisanlib/dashboard.py" line="307" />
-        <location filename="../plus/login.py" line="94" />
-        <location filename="../plus/schedule.py" line="2478" />
-        <source>Sign in to your artisan account</source>
-        <translation>Увійдіть до свого облікового запису ремісника</translation>
-    </message>
-    <message>
         <location filename="../plus/schedule.py" line="3503" />
         <source>List only items scheduled for the current user {}</source>
         <translation>Показати лише елементи, заплановані для поточного користувача {}</translation>
@@ -19140,56 +19200,6 @@ Continue?</source>
         <location filename="../plus/login.py" line="137" />
         <source>Email</source>
         <translation>Електронна пошта</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/mqttport.py" line="219" />
-        <source>Keyring Error: Ensure that gnome-keyring is installed.</source>
-        <translation>Помилка Keyring: Переконайтеся, що встановлено gnome-keyring.</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1158" />
-        <source>debug logging ON</source>
-        <translation>ведення журналу налагодження УВІМКНЕНО</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1159" />
-        <source>debug logging OFF</source>
-        <translation>налагодження журналу ВИМКНЕНО</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1173" />
-        <source>1 day left</source>
-        <translation>Залишився 1 день</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1175" />
-        <source>{} days left</source>
-        <translation>{} Днів залишилось</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1177" />
-        <source>Paid until</source>
-        <translation>Оплачено до</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1205" />
-        <source>Please visit our {0}shop{1} to extend your subscription</source>
-        <translation>Щоб продовжити підписку, відвідайте наш {0}магазин{1}</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1222" />
-        <source>Do you want to extend your subscription?</source>
-        <translation>Бажаєте продовжити підписку?</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1223" />
-        <source>Your subscription ends on</source>
-        <translation>Ваша підписка закінчується</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1223" />
-        <source>Your subscription ended on</source>
-        <translation>Ваша підписка закінчилася</translation>
     </message>
     <message>
         <source>Nothing scheduled for you today!{}Deactivate filters to see all items.</source>
@@ -19342,16 +19352,17 @@ Continue?</source>
 </context><context>
     <name>Scope Title</name>
     <message>
+        <location filename="../plus/schedule.py" line="3122" />
         <location filename="../artisanlib/canvas.py" line="8676" />
         <location filename="../artisanlib/canvas.py" line="7867" />
         <location filename="../artisanlib/canvas.py" line="983" />
         <location filename="../artisanlib/main.py" line="15914" />
         <location filename="../artisanlib/main.py" line="14601" />
         <location filename="../artisanlib/main.py" line="13168" />
-        <location filename="../artisanlib/dashboard.py" line="1350" />
-        <location filename="../artisanlib/dashboard.py" line="1284" />
-        <location filename="../artisanlib/dashboard.py" line="780" />
-        <location filename="../artisanlib/dashboard.py" line="767" />
+        <location filename="../artisanlib/dashboard.py" line="1367" />
+        <location filename="../artisanlib/dashboard.py" line="1301" />
+        <location filename="../artisanlib/dashboard.py" line="797" />
+        <location filename="../artisanlib/dashboard.py" line="784" />
         <location filename="../artisanlib/roast_properties.py" line="2651" />
         <location filename="../artisanlib/roast_properties.py" line="2616" />
         <location filename="../artisanlib/roast_properties.py" line="2271" />
@@ -19359,7 +19370,6 @@ Continue?</source>
         <location filename="../artisanlib/orbiter.py" line="581" />
         <location filename="../artisanlib/hibean.py" line="76" />
         <location filename="../artisanlib/roastpath.py" line="56" />
-        <location filename="../plus/schedule.py" line="3122" />
         <source>Roaster Scope</source>
         <translation>Область жаровні</translation>
     </message>
@@ -19733,16 +19743,6 @@ Continue?</source>
 </context><context>
     <name>Tab</name>
     <message>
-        <location filename="../plus/schedule.py" line="2419" />
-        <source>To-Do</source>
-        <translation>Зробити</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2420" />
-        <source>Completed</source>
-        <translation>Виконано</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3428" />
         <location filename="../artisanlib/pid_dialogs.py" line="2275" />
         <location filename="../artisanlib/pid_dialogs.py" line="1023" />
@@ -19965,6 +19965,16 @@ Continue?</source>
         <location filename="../artisanlib/colors.py" line="583" />
         <source>LCDs</source>
         <translation>РК-дисплеї</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2419" />
+        <source>To-Do</source>
+        <translation>Зробити</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2420" />
+        <source>Completed</source>
+        <translation>Виконано</translation>
     </message>
     <message>
         <source>Color</source>
@@ -20689,26 +20699,6 @@ Continue?</source>
     </message>
 </context><context>
     <name>Tooltip</name>
-    <message>
-        <location filename="../plus/blend.py" line="204" />
-        <source>add a component</source>
-        <translation>додати компонент</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2316" />
-        <source>Update schedule</source>
-        <translation>Розклад оновлення</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2319" />
-        <source>Open scale task display green</source>
-        <translation>Відкрити масштаб завдання дисплей зелений</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2322" />
-        <source>Open scale task display roasted</source>
-        <translation>Відкритий масштаб завдання дисплей смажений</translation>
-    </message>
     <message>
         <location filename="../artisanlib/axis.py" line="95" />
         <source>100% event values in step mode are aligned with the given y-axis value or the lowest phases limit if left empty</source>
@@ -21558,7 +21548,7 @@ specified by the lookahead</source>
         <translation>Відкрити діалогове вікно властивостей обсмажування при ПЕРЕХОДІ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="302" />
+        <location filename="../artisanlib/dashboard.py" line="304" />
         <location filename="../artisanlib/roast_properties.py" line="836" />
         <source>Enter the roast title or set properties by choosing from a recent roast</source>
         <translation>Введіть назву обсмаження або встановіть властивості, вибравши з нещодавнього обсмаження</translation>
@@ -21575,7 +21565,7 @@ specified by the lookahead</source>
         <translation>Клацніть правою кнопкою миші, щоб редагувати</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="314" />
+        <location filename="../artisanlib/dashboard.py" line="320" />
         <location filename="../artisanlib/roast_properties.py" line="899" />
         <source>batch size</source>
         <translation>розмір партії</translation>
@@ -21591,7 +21581,7 @@ specified by the lookahead</source>
         <translation>втрата ваги, викликана смаженням</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="315" />
+        <location filename="../artisanlib/dashboard.py" line="321" />
         <location filename="../artisanlib/roast_properties.py" line="925" />
         <source>weight unit</source>
         <translation>одиниця ваги</translation>
@@ -21667,13 +21657,13 @@ specified by the lookahead</source>
         <translation>Калькулятор об’єму для визначення об’єму кави на основі ваги зразка, виміряної в контейнері відомого об’єму</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="303" />
+        <location filename="../artisanlib/dashboard.py" line="305" />
         <location filename="../artisanlib/roast_properties.py" line="1061" />
         <source>Add roast properties to list of recent roasts</source>
         <translation>Додати властивості смаження до списку останніх смажень</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="304" />
+        <location filename="../artisanlib/dashboard.py" line="306" />
         <location filename="../artisanlib/roast_properties.py" line="1073" />
         <source>Remove roast properties from list of recent roasts</source>
         <translation>Видалити властивості смаження зі списку останніх смажень</translation>
@@ -21780,7 +21770,8 @@ specified by the lookahead</source>
         <translation>отримати дані про навколишнє середовище з підключених пристроїв або обчислити за вибраною кривою профілю</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="308" />
+        <location filename="../artisanlib/dashboard.py" line="312" />
+        <location filename="../artisanlib/dashboard.py" line="311" />
         <location filename="../artisanlib/roast_properties.py" line="1436" />
         <location filename="../artisanlib/roast_properties.py" line="1428" />
         <source>Select beans from your inventory</source>
@@ -21792,20 +21783,22 @@ specified by the lookahead</source>
         <translation>Виберіть місце зберігання</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="309" />
+        <location filename="../artisanlib/dashboard.py" line="314" />
+        <location filename="../artisanlib/dashboard.py" line="313" />
         <location filename="../artisanlib/roast_properties.py" line="1438" />
         <location filename="../artisanlib/roast_properties.py" line="1432" />
         <source>Select a blend from your inventory</source>
         <translation>Виберіть суміш зі свого інвентарю</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="310" />
+        <location filename="../artisanlib/dashboard.py" line="316" />
+        <location filename="../artisanlib/dashboard.py" line="315" />
         <location filename="../artisanlib/roast_properties.py" line="1434" />
         <source>Select a storage space</source>
         <translation>Виберіть місце для зберігання</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="311" />
+        <location filename="../artisanlib/dashboard.py" line="317" />
         <location filename="../artisanlib/roast_properties.py" line="1443" />
         <source>Define a custom blend</source>
         <translation>Визначення власного поєднання</translation>
@@ -21866,137 +21859,147 @@ specified by the lookahead</source>
         <translation>Відображення всієї інформації (час, відсоток та температура) останньої фази на всіх 3 фазах РК-дисплеїв паралельно</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="298" />
+        <location filename="../artisanlib/dashboard.py" line="299" />
         <source>Essential roast properties</source>
         <translation>Основні властивості обсмажування</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="299" />
+        <location filename="../artisanlib/dashboard.py" line="300" />
+        <source>Batch number</source>
+        <translation>Номер партії</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/dashboard.py" line="301" />
         <source>Open roast on platform</source>
         <translation>Відкрита смажка на платформі</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="300" />
+        <location filename="../artisanlib/dashboard.py" line="302" />
         <source>Open your roast schedule</source>
         <translation>Відкрийте свій графік смаження</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="301" />
+        <location filename="../artisanlib/dashboard.py" line="303" />
         <source>Upload this roast</source>
         <translation>Завантажте цю печеню</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="306" />
+        <location filename="../artisanlib/dashboard.py" line="308" />
         <source>Green beans inventory</source>
         <translation>Інвентаризація зеленої квасолі</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="312" />
+        <location filename="../artisanlib/dashboard.py" line="318" />
         <source>Update inventory from platform</source>
         <translation>Оновлення інвентарю з платформи</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="313" />
+        <location filename="../artisanlib/dashboard.py" line="319" />
         <source>Description of the green beans used</source>
         <translation>Опис використаної зеленої квасолі</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="316" />
+        <location filename="../artisanlib/dashboard.py" line="322" />
         <source>Open roast properties dialog</source>
         <translation>Відкрити діалогове вікно властивостей обсмажування</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="317" />
+        <location filename="../artisanlib/dashboard.py" line="323" />
         <source>Open roast in {}</source>
         <translation>Відкрите смаження в {}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="325" />
+        <location filename="../artisanlib/dashboard.py" line="331" />
         <source>Background roast template</source>
         <translation>Шаблон для смаження фону</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="326" />
+        <location filename="../artisanlib/dashboard.py" line="332" />
+        <source>Name of current background template</source>
+        <translation>Назва поточного шаблону фону</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/dashboard.py" line="333" />
         <source>Open template on platform</source>
         <translation>Відкрити шаблон на платформі</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="327" />
+        <location filename="../artisanlib/dashboard.py" line="334" />
         <source>Load a profile as template into the background</source>
         <translation>Завантажити профіль як шаблон у фоновий режим</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="328" />
+        <location filename="../artisanlib/dashboard.py" line="335" />
         <source>Choose a recent roast and load as roast template</source>
         <translation>Виберіть нещодавнє обсмаження та завантажте його як шаблон обсмаження</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="329" />
+        <location filename="../artisanlib/dashboard.py" line="336" />
         <source>Remove the loaded background roast template</source>
         <translation>Видалити завантажений шаблон фонового обсмаження</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="330" />
+        <location filename="../artisanlib/dashboard.py" line="337" />
         <source>Start the {} and create a background roast template</source>
         <translation>Запустіть {} та створіть шаблон фонового обсмаження</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="340" />
+        <location filename="../artisanlib/dashboard.py" line="347" />
         <source>Links to external information and services</source>
         <translation>Посилання на зовнішню інформацію та послуги</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="341" />
+        <location filename="../artisanlib/dashboard.py" line="348" />
         <source>Explore the documentation</source>
         <translation>Ознайомтеся з документацією</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="342" />
+        <location filename="../artisanlib/dashboard.py" line="349" />
         <source>Ask questions, share tips, and connect with the community</source>
         <translation>Задавайте запитання, діліться порадами та спілкуйтеся зі спільнотою</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="343" />
+        <location filename="../artisanlib/dashboard.py" line="350" />
         <source>Report a bug or request a feature</source>
         <translation>Повідомити про помилку або запросити функцію</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="344" />
+        <location filename="../artisanlib/dashboard.py" line="351" />
         <source>Browse to the artisan platform</source>
         <translation>Перейдіть на платформу для ремісників</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="349" />
+        <location filename="../artisanlib/dashboard.py" line="356" />
         <source>Sponsor of this release</source>
         <translation>Спонсор цього релізу</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="350" />
+        <location filename="../artisanlib/dashboard.py" line="357" />
         <source>Visit our sponsor</source>
         <translation>Відвідайте нашого спонсора</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="356" />
+        <location filename="../artisanlib/dashboard.py" line="363" />
         <source>Help to keep artisan going</source>
         <translation>Допоможіть реміснику продовжувати працювати</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="357" />
+        <location filename="../artisanlib/dashboard.py" line="364" />
         <source>Send your donation</source>
         <translation>Надішліть свою пожертву</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="358" />
+        <location filename="../artisanlib/dashboard.py" line="365" />
         <source>Counts total number of recordings</source>
         <translation>Підраховує загальну кількість записів</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="614" />
+        <location filename="../artisanlib/dashboard.py" line="622" />
         <source>Set background image</source>
         <translation>Встановити фонове зображення</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="615" />
+        <location filename="../artisanlib/dashboard.py" line="623" />
         <source>Remove background image</source>
         <translation>Видалити фонове зображення</translation>
     </message>
@@ -22814,6 +22817,26 @@ enabling the addition of more batches</source>
         <location filename="../artisanlib/cup_profile.py" line="163" />
         <source>Graph aspect ratio</source>
         <translation>Співвідношення сторін графіка</translation>
+    </message>
+    <message>
+        <location filename="../plus/blend.py" line="204" />
+        <source>add a component</source>
+        <translation>додати компонент</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2316" />
+        <source>Update schedule</source>
+        <translation>Розклад оновлення</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2319" />
+        <source>Open scale task display green</source>
+        <translation>Відкрити масштаб завдання дисплей зелений</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2322" />
+        <source>Open scale task display roasted</source>
+        <translation>Відкритий масштаб завдання дисплей смажений</translation>
     </message>
     <message>
         <source>ON/OFF logs serial communication</source>

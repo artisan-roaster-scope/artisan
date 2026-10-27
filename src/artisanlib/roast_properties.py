@@ -6041,7 +6041,7 @@ class CoffeesComboBox(StockComboBox):
 
     def current_unit(self) -> int:
         try:
-            return int(self.unitsComboBox.currentIndex())
+            return int(self.parentDialog.unitsComboBox.currentIndex())
         except Exception:  # pylint: disable=broad-except
             return 0
 
@@ -6059,7 +6059,7 @@ class BlendsComboBox(StockComboBox):
 
     def current_unit(self) -> int:
         try:
-            return int(self.unitsComboBox.currentIndex())
+            return int(self.parentDialog.unitsComboBox.currentIndex())
         except Exception:  # pylint: disable=broad-except
             return 0
 

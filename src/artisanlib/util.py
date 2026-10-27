@@ -529,7 +529,7 @@ def getDirectory(filename: str, ext: str|None = None, share: bool = False) -> st
     fn = filename
     if not share:
         app = QCoreApplication.instance()
-        if app is not None and app.artisanviewerMode: # Xtype:ignore[attr-defined]
+        if app is not None and app.artisanviewerMode: # type:ignore[attr-defined]
             fn = filename + '_viewer'
     dd = getDataDirectory()
     fp = Path(('' if dd is None else dd), fn)

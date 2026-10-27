@@ -53,6 +53,7 @@ from artisanlib.styles import (tool_button_icon_style, artisan_push_button_style
 
 import plus.stock
 import plus.blend
+import plus.connection
 import plus.controller as plus_controller
 from plus.util import plusLink, coffeeLink, storeLink, roastLink
 
@@ -296,6 +297,7 @@ class Dashboard(QWidget):
         self.ui.space_label.setText(QApplication.translate('Label', 'Space'))
 
         self.ui.roast_label.setToolTip(QApplication.translate('Tooltip','Essential roast properties'))
+        self.ui.batch_nr.setToolTip(QApplication.translate('Tooltip','Batch number'))
         self.ui.roast_link_toolButton.setToolTip(QApplication.translate('Tooltip','Open roast on platform'))
         self.ui.scheduler_frame.setToolTip(QApplication.translate('Tooltip','Open your roast schedule'))
         self.ui.upload_frame.setToolTip(QApplication.translate('Tooltip','Upload this roast'))
@@ -305,9 +307,13 @@ class Dashboard(QWidget):
 
         self.ui.inventory_group.setToolTip(QApplication.translate('Tooltip', 'Green beans inventory'))
         self.ui.login_pushButton.setToolTip(QApplication.translate('Plus', 'Sign in to your artisan account'))
+        self.ui.selected_line_label.setToolTip(QApplication.translate('Plus', 'Links to selected beans, blend and space on the platform'))
         self.ui.beans_comboBox.setToolTip(QApplication.translate('Tooltip', 'Select beans from your inventory'))
+        self.ui.beans_label.setToolTip(QApplication.translate('Tooltip', 'Select beans from your inventory'))
         self.ui.blend_comboBox.setToolTip(QApplication.translate('Tooltip', 'Select a blend from your inventory'))
+        self.ui.blend_label.setToolTip(QApplication.translate('Tooltip', 'Select a blend from your inventory'))
         self.ui.space_comboBox.setToolTip(QApplication.translate('Tooltip', 'Select a storage space'))
+        self.ui.space_label.setToolTip(QApplication.translate('Tooltip', 'Select a storage space'))
         self.ui.custom_blend.setToolTip(QApplication.translate('Tooltip', 'Define a custom blend'))
         self.ui.sync.setToolTip(QApplication.translate('Tooltip', 'Update inventory from platform'))
         self.ui.beans_textEdit.setToolTip(QApplication.translate('Tooltip', 'Description of the green beans used'))
@@ -323,6 +329,7 @@ class Dashboard(QWidget):
         self.ui.create_pushButton.setText(QApplication.translate('Button', 'Create'))
 
         self.ui.profile_label.setToolTip(QApplication.translate('Tooltip','Background roast template'))
+        self.ui.background_profile_label.setToolTip(QApplication.translate('Tooltip','Name of current background template'))
         self.ui.template_link_toolButton.setToolTip(QApplication.translate('Tooltip','Open template on platform'))
         self.ui.load_pushButton.setToolTip(QApplication.translate('Tooltip','Load a profile as template into the background'))
         self.ui.recentFiles_comboBox.setToolTip(QApplication.translate('Tooltip','Choose a recent roast and load as roast template'))
@@ -373,13 +380,14 @@ class Dashboard(QWidget):
                 self.aw.ntb.pan_tool, self.aw.ntb.zoom_tool, self.aw.ntb.edit_curve_parameters_action]:
             if graph_tool is not None:
                 graph_tool.setVisible(False)
-        self.aw.ntb.locLabel.setText('') # clear xy-mouse coordinates
+        self.update_hello_message()
 
     def enable_graph_tools(self) -> None:
         for graph_tool in [self.aw.ntb.home_tool, self.aw.ntb.back_tool, self.aw.ntb.forward_tool,
                 self.aw.ntb.pan_tool, self.aw.ntb.zoom_tool, self.aw.ntb.edit_curve_parameters_action]:
             if graph_tool is not None:
                 graph_tool.setVisible(True)
+        self.aw.ntb.locLabel.setText('')
 
     def enable_dashboard_toggle_toolbutton(self) -> None:
         if self.aw.ntb.dashboard_tool is not None:
@@ -640,6 +648,14 @@ class Dashboard(QWidget):
         # scheduler tool button frame
         self.ui.scheduler_frame.setStyleSheet(tool_button_frame_style(darkmode))
 
+    def update_hello_message(self) -> None:
+        hello_message:str = ''
+        if self.aw.plus_account is not None and plus_controller.is_connected():
+            nickname = plus.connection.getNickname()
+            if nickname:
+                hello_message = QApplication.translate('Label','Hello {}!').format(nickname)
+        self.aw.ntb.locLabel.setText(hello_message)
+
     # visible only if logged in as MAX
     # enabled only if no roastUID or not long enough
     def update_upload_toolButton(self) -> None:
@@ -730,6 +746,7 @@ class Dashboard(QWidget):
 
             else:
                 self.ui.selected_line_label.setText('')
+            self.update_hello_message()
 
 
     def updatePlusSelectedLine(self) -> None:
