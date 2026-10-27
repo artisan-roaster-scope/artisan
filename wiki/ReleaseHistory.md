@@ -6,7 +6,7 @@ v5.0.0
 ------------------
 
 * ADDITIONS
-  - adds roast dashboard
+  - adds dashboard
   - adds support for [Dutch Master Roasters](https://artisan-scope.org/machines/dmr/)
   - adds support for [FreshRoast SR900](https://artisan-scope.org/machines/freshroast/) including the IO Command `sr900(<target>[,<value>])` ([PR #2240](../../../pull/2240) contributed by [Brian Schmitt](https://github.com/brianschmitt))
   - adds autoCHARGE/autoDROP recognition for [IMF](https://artisan-scope.org/machines/imf/) as 'auto' setup which picks up CHARGE and DROP events from the machine

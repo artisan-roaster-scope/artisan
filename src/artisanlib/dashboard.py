@@ -286,6 +286,7 @@ class Dashboard(QWidget):
 
         # ROAST
         self.ui.roast_label.setText(QApplication.translate('Menu', 'Roast').upper())
+        self.ui.title_label.setText(QApplication.translate('Label', 'Title'))
         self.ui.batchsize_label.setText(QApplication.translate('Label', 'Batch size'))
         self.ui.beans_textEdit.setPlaceholderText(QApplication.translate('Label', 'Beans'))
         self.ui.compare_pushButton.setText(QApplication.translate('Button', 'Compare'))
@@ -662,7 +663,7 @@ class Dashboard(QWidget):
         if self.aw.plus_account is None or self.aw.plus_subscription != 'MAX':
             self.ui.upload_frame.setVisible(False)
             # hide spacer
-            item = self.ui.horizontalLayout.itemAt(4)
+            item = self.ui.horizontalLayout.itemAt(5)
             if isinstance(item, QSpacerItem):
                 item.changeSize(0, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
                 self.ui.horizontalLayout.invalidate()
@@ -678,7 +679,7 @@ class Dashboard(QWidget):
             self.ui.upload_frame.setStyleSheet(tool_button_frame_style(darkmode))
             self.ui.upload_frame.setVisible(True)
             # show spacer
-            item = self.ui.horizontalLayout.itemAt(4)
+            item = self.ui.horizontalLayout.itemAt(5)
             if isinstance(item, QSpacerItem):
                 item.changeSize(10, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
                 self.ui.horizontalLayout.invalidate()
@@ -1348,6 +1349,24 @@ class Dashboard(QWidget):
                 self.aw.loadAndRedrawBackgroundUUIDSignal.emit(rr['background'],background_UUID)
             self.ui.title_comboBox.textEdited(rr['title']) # internal use in widget
 #            self.ui.title_comboBox.setEditText(rr['title']) # seems not to be needed
+
+
+            # we now set the actual values from the stock
+            self.populatePlusCoffeeBlendCombos()
+            if self.aw.qmc.plus_blend_spec is not None and self.plus_blends is not None and 'hr_id' in self.aw.qmc.plus_blend_spec:
+                # try to apply blend replacement (blend recipe might have been updated on the server since this recent roast blend entry was established
+                # search for the position of blend/location hr_id combo in self.plus_blends and call blendSelectionChanged with pos+1
+                try:
+                    pos_in_blends = next(i for i, b in enumerate(self.plus_blends) if \
+                        plus.stock.getBlendId(b) == self.aw.qmc.plus_blend_spec['hr_id'] and
+                        plus.stock.getBlendStockDict(b)['location_hr_id'] == self.aw.qmc.plus_store)
+                    self.blendSelectionChanged(pos_in_blends+1)
+                except Exception:  # pylint: disable=broad-except
+                    self.updatePlusSelectedLine()
+            else:
+                # blend replacements not applied
+                self.updatePlusSelectedLine()
+
 
     @pyqtSlot(str)
     def recent_roast_enabled(self, s:str) -> None:

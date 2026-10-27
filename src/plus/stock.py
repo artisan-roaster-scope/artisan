@@ -696,8 +696,8 @@ def coffee2beans(c:Coffee) -> str:
         return f'{label}{bean}, {year}'
     if coffee_label_normal_order:
         if year == '':
-            return f'{origin}, {label}{bean}'
-        return f'{origin}, {label}{bean}, {year}'
+            return f'{origin} {label}{bean}'
+        return f'{origin} {label}{bean}, {year}'
     if year == '':
         return f'{label}{bean}, {origin}'
     return f'{label}{bean}, {origin} {year}'
@@ -731,7 +731,7 @@ def coffeeLabel(c:Coffee) -> str:
     if origin == '':
         return c.get('label', '')
     if coffee_label_normal_order:
-        return f"{origin}, {c.get('label', '')}"
+        return f"{origin} {c.get('label', '')}"
     return f"{c.get('label', '')}, {origin}"
 
 # returns a dict with all coffees with stock associated as string of the form

@@ -882,6 +882,19 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout">
             <item>
+             <widget class="QLabel" name="title_label">
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
+              <property name="text">
+               <string notr="true">Title</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="RoastsComboBox" name="title_comboBox">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">

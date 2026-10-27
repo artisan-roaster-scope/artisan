@@ -139,6 +139,9 @@ class RoastsComboBox(MyQComboBox):
         self.edited:str|None = None
         self.editTextChanged.connect(self.textEdited)
         self.setEditable(True)
+        line_edit = self.lineEdit()
+        if line_edit:
+            line_edit.setClearButtonEnabled(True)
         completer: QCompleter|None = self.completer()
         if completer is not None:
             completer.setCaseSensitivity(Qt.CaseSensitivity.CaseSensitive)
