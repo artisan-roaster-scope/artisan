@@ -14083,7 +14083,6 @@ class tgraphcanvas(QObject):
             self.aw.phasesLCDs.hide()
             self.aw.AUCLCD.hide()
             self.aw.hideEventsMinieditor()
-            self.aw.dashboard.enable_dashboard_toggle_toolbutton()
 
             # enable "green flag" menu:
             try:

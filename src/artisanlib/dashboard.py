@@ -404,7 +404,7 @@ class Dashboard(QWidget):
             # always update tool icons
             self.update_tool_icons()
             self.aw.ntb.update_tools() # as we updated the dashboard above before making it visible we have to update the tools again here
-#            self.enable_dashboard_toggle_toolbutton()
+            self.enable_dashboard_toggle_toolbutton()
             self.disable_graph_tools()
 
     @staticmethod
@@ -420,7 +420,7 @@ class Dashboard(QWidget):
         self.aw.ntb.update_tools()
         if (self.aw.qmc.designerflag or self.aw.comparator is not None):
             # disable dashboard/graph toggle toolbar button
-            # while recording or if designer or comparator is open
+            # if designer or comparator is open
             self.disable_dashboard_toggle_toolbutton()
         self.enable_graph_tools()
 
