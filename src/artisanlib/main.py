@@ -217,7 +217,7 @@ from artisanlib.util import (appFrozen, uchr, decodeLocal, decodeLocalStrict, en
         eventtime2string, toDim, signature_message, rec_int_to_float, smooth_list, getStyleIconPath)
 from artisanlib.device_registry import DEVICE_ID_MIN, DEVICE_ID_MAX, DEVICE_ID_NONE, DEVICE_ID_VIRTUAL, get_device_name
 from artisanlib.qtsingleapplication import QtSingleApplication
-from artisanlib.styles import toolbar_style, combobox_style
+from artisanlib.styles import toolbar_style, tool_button_icon_style, combobox_style
 
 
 
@@ -3994,6 +3994,8 @@ class ApplicationWindow(QMainWindow):
         cw = self.centralWidget()
         if cw is not None:
             cw.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+
+#        self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
 
 
     @pyqtSlot(bool)
@@ -25713,8 +25715,41 @@ class ApplicationWindow(QMainWindow):
         if self.wheeldialog is not None and self.wheeldialog.dashboard_was_active_on_open:
             self.dashboard.show_dashboard()
         else:
-            self.dashboard.update_tool_icons()
+            self.update_tool_icons()
         self.wheeldialog = None
+
+
+    def update_tool_icons(self) -> None:
+        self.update_image_tool_icon()
+        self.update_exit_tool_icon()
+
+    def update_image_tool_icon(self) -> None:
+        if self.stack.currentIndex() == 1 and self.inExpertMode():
+            # dashboard visible
+            self.dashboardImageToolButton.setStyleSheet(tool_button_icon_style(
+                self.dark_canvas_p(),
+                ('image-02-stroke-rounded-light.svg' if self.dashboard_background_image is None else 'image-not-found-01-stroke-rounded-light.svg'),
+                ('image-02-stroke-rounded-dark.svg' if self.dashboard_background_image is None else 'image-not-found-01-stroke-rounded-dark.svg')))
+            self.dashboardImageToolButton.setToolTip(QApplication.translate('Tooltip','Set background image') if self.dashboard_background_image is None else
+                QApplication.translate('Tooltip','Remove background image'))
+            self.dashboardImageToolButton.setVisible(True)
+        else:
+            # dashboard hidden
+            self.dashboardImageToolButton.setVisible(False)
+
+    def update_exit_tool_icon(self) -> None:
+        if self.qmc.designerflag or self.qmc.wheelflag:
+            # designer exit button visible
+            self.exitToolButton.setStyleSheet(tool_button_icon_style(
+                self.dark_canvas_p(),
+                'cancel-square-stroke-rounded-light.svg',
+                'cancel-square-stroke-rounded-dark.svg'
+                ))
+            self.exitToolButton.setVisible(True)
+        else:
+            # designer exit button hidden
+            self.exitToolButton.setVisible(False)
+
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -25888,6 +25923,7 @@ class ApplicationWindow(QMainWindow):
         self.hideSliders(False)
         self.hide_minieventline(False)
         self.hideExtraButtons(False)
+        self.dashboard.disable_dashboard_toggle_toolbutton()
         self.qmc.designer(background_mode)
 
     def stopdesigner(self) -> None:
@@ -25908,6 +25944,7 @@ class ApplicationWindow(QMainWindow):
                     return
 
         self.enableEditMenus()
+        self.dashboard.enable_dashboard_toggle_toolbutton()
         self.qmc.clear_designer()
         self.qmc.convert_designer(filename)
 #        self.updateControlsVisibility()
@@ -25915,7 +25952,7 @@ class ApplicationWindow(QMainWindow):
         self.updateSlidersVisibility()
         self.update_minieventline_visibility()
         self.updateExtraButtonsVisibility()
-        self.dashboard.update_tool_icons()
+        self.update_tool_icons()
         self.qmc.designer_background_mode = False
 
     @pyqtSlot()

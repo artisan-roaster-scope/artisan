@@ -2613,7 +2613,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             title = self.titleedit.currentText()
             weightIn = float(comma2dot(self.weightinedit.text()))
             # add new recent roast entry only if title is not default, beans is not empty and weight-in is not 0
-            if title != QApplication.translate('Scope Title', 'Roaster Scope') and weightIn != 0:
+            if title not in {'', QApplication.translate('Scope Title', 'Roaster Scope')} and weightIn != 0:
                 # enable "+" addRecentRoast button
                 self.addRecentButton.setEnabled(True)
                 self.addRecentButton.setIcon(QIcon(getStyleIconPath('add-01-stroke-rounded-white.svg')))

@@ -1313,7 +1313,7 @@
                 <property name="accessibleDescription">
                  <string notr="true"/>
                 </property>
-                <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="0,20,10,1,20,0,10,1,20,10,0">
+                <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="0,100,10,1,50,0,10,1,25,10,0">
                  <property name="spacing">
                   <number>7</number>
                  </property>

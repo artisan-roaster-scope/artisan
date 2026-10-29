@@ -37,7 +37,7 @@ if TYPE_CHECKING:
 
 from PyQt6.QtWidgets import QApplication, QWidget, QComboBox, QSizePolicy, QSpacerItem
 from PyQt6.QtCore import Qt, QSettings, pyqtSlot, QTimer, pyqtSignal, QSize, QUrl
-from PyQt6.QtGui import QFont, QFontDatabase, QIcon, QDesktopServices
+from PyQt6.QtGui import QFont, QFontDatabase, QIcon, QDesktopServices, QCursor
 
 from uic import DashboardWidget # pyright: ignore[attr-defined] # pylint: disable=no-name-in-module
 
@@ -72,11 +72,14 @@ LINE_EDIT_BORDER_COLOR_LIGHT = '#D7D7D7'
 
 # sponsor logo background
 SPONSOR_LOGO_BACKGROUND_COLOR_LIGHT = '#ffffff'
-SPONSOR_LOGO_BACKGROUND_COLOR_DARK = '#4c97c3' #'#414456'
+#SPONSOR_LOGO_BACKGROUND_COLOR_DARK = '#4c97c3' # artisan
+SPONSOR_LOGO_BACKGROUND_COLOR_DARK = '#99303030'
 SPONSOR_LOGO_BACKGROUND_COLOR_HOVER_LIGHT = '#fBfBfB'
-SPONSOR_LOGO_BACKGROUND_COLOR_HOVER_DARK = '#43a7cf' #'#494D61'
+#SPONSOR_LOGO_BACKGROUND_COLOR_HOVER_DARK = '#43a7cf' # artisan
+SPONSOR_LOGO_BACKGROUND_COLOR_HOVER_DARK = '#99404040'
 SPONSOR_LOGO_BACKGROUND_COLOR_PRESSED_LIGHT = '#f8f8f8'
-SPONSOR_LOGO_BACKGROUND_COLOR_PRESSED_DARK = '#1985ba' #'#3A3C4C'
+#SPONSOR_LOGO_BACKGROUND_COLOR_PRESSED_DARK = '#1985ba' # artisan
+SPONSOR_LOGO_BACKGROUND_COLOR_PRESSED_DARK = '#99505050'
 
 
 class Dashboard(QWidget):
@@ -144,6 +147,9 @@ class Dashboard(QWidget):
             # set label and tooltips with translations
             self.fill_labels_and_tooltips()
 
+            # hide the title label as it breaks the layout
+            self.ui.title_label.setVisible(False)
+
             artisan_font_semibold_file = os.path.join(getResourcePath(),'Nunito-SemiBold.ttf')
             artisan_font_semibold_id = QFontDatabase.addApplicationFont(artisan_font_semibold_file)
             artisan_font_semibold_families = QFontDatabase.applicationFontFamilies(artisan_font_semibold_id)
@@ -209,6 +215,13 @@ class Dashboard(QWidget):
             self.ui.platform_pushButton.setIcon(QIcon(getStyleIconPath('external-link-stroke-rounded.svg')))
 
             self.ui.weightinedit.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, self.ui.weightinedit))  # the max limit has to be high enough otherwise the connected signals are not send!
+
+            self.ui.documentation_pushButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+            self.ui.forum_pushButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+            self.ui.issue_pushButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+            self.ui.platform_pushButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+            self.ui.sponsor_logo_toolButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+            self.ui.donate_pushButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
             # timers
             self.title_changed_timer = QTimer()
@@ -288,7 +301,7 @@ class Dashboard(QWidget):
         self.ui.roast_label.setText(QApplication.translate('Menu', 'Roast').upper())
         self.ui.title_label.setText(QApplication.translate('Label', 'Title'))
         self.ui.batchsize_label.setText(QApplication.translate('Label', 'Batch size'))
-        self.ui.beans_textEdit.setPlaceholderText(QApplication.translate('Label', 'Beans'))
+        self.ui.beans_textEdit.setPlaceholderText(QApplication.translate('Label', 'Beans description'))
         self.ui.compare_pushButton.setText(QApplication.translate('Button', 'Compare'))
         self.ui.properties_pushButton.setText(QApplication.translate('Button', 'Properties'))
         self.ui.inventory_group.setTitle(QApplication.translate('GroupBox', 'INVENTORY'))
@@ -395,6 +408,7 @@ class Dashboard(QWidget):
             self.aw.ntb.dashboard_tool.setVisible(True)
 
     def disable_dashboard_toggle_toolbutton(self) -> None:
+        _log.debug('PRINT disable_dashboard_toggle_toolbutton')
         if self.aw.ntb.dashboard_tool is not None:
             self.aw.ntb.dashboard_tool.setVisible(False)
 
@@ -403,7 +417,7 @@ class Dashboard(QWidget):
             self.update_dashboard(force=True)
             self.aw.stack.setCurrentIndex(1)
             # always update tool icons
-            self.update_tool_icons()
+            self.aw.update_tool_icons()
             self.aw.ntb.update_tools() # as we updated the dashboard above before making it visible we have to update the tools again here
             self.enable_dashboard_toggle_toolbutton()
             self.disable_graph_tools()
@@ -417,7 +431,7 @@ class Dashboard(QWidget):
     def hide_dashboard(self) -> None:
         self.aw.stack.setCurrentIndex(0)
         # always update tool icons
-        self.update_tool_icons()
+        self.aw.update_tool_icons()
         self.aw.ntb.update_tools()
         if (self.aw.qmc.designerflag or self.aw.comparator is not None):
             # disable dashboard/graph toggle toolbar button
@@ -501,7 +515,7 @@ class Dashboard(QWidget):
                 self.ui.recentFiles_comboBox.blockSignals(False)
 
         # always update tool icons
-        self.update_tool_icons()
+        self.aw.update_tool_icons()
         self.aw.ntb.update_tools()
 
     def update_release_sponsor(self, darkmode:bool) -> None:
@@ -603,43 +617,10 @@ class Dashboard(QWidget):
             for pane in [self.ui.groupBox_roast, self.ui.groupBox_profile, self.ui.groupBox_links,
                     self.ui.groupBox_links, self.ui.groupBox_donation]:
                 pane.setGraphicsEffect(self.aw.makeShadow(strong=True))
-        self.update_image_tool_icon()
+        self.aw.update_image_tool_icon()
         # update overall style to get the border color of the panes right
         self.update_main_style(darkmode)
 
-
-#---- move to main.py
-    def update_tool_icons(self) -> None:
-        self.update_image_tool_icon()
-        self.update_exit_tool_icon()
-
-    def update_image_tool_icon(self) -> None:
-        if self.aw.stack.currentIndex() == 1 and self.aw.inExpertMode():
-            # dashboard visible
-            self.aw.dashboardImageToolButton.setStyleSheet(tool_button_icon_style(
-                self.aw.dark_canvas_p(),
-                ('image-02-stroke-rounded-light.svg' if self.aw.dashboard_background_image is None else 'image-not-found-01-stroke-rounded-light.svg'),
-                ('image-02-stroke-rounded-dark.svg' if self.aw.dashboard_background_image is None else 'image-not-found-01-stroke-rounded-dark.svg')))
-            self.aw.dashboardImageToolButton.setToolTip(QApplication.translate('Tooltip','Set background image') if self.aw.dashboard_background_image is None else
-                QApplication.translate('Tooltip','Remove background image'))
-            self.aw.dashboardImageToolButton.setVisible(True)
-        else:
-            # dashboard hidden
-            self.aw.dashboardImageToolButton.setVisible(False)
-
-    def update_exit_tool_icon(self) -> None:
-        if self.aw.qmc.designerflag or self.aw.qmc.wheelflag:
-            # designer exit button visible
-            self.aw.exitToolButton.setStyleSheet(tool_button_icon_style(
-                self.aw.dark_canvas_p(),
-                'cancel-square-stroke-rounded-light.svg',
-                'cancel-square-stroke-rounded-dark.svg'
-                ))
-            self.aw.exitToolButton.setVisible(True)
-        else:
-            # designer exit button hidden
-            self.aw.exitToolButton.setVisible(False)
-#----
 
     def update_schedule_toolbutton(self) -> None:
         darkmode = self.aw.dark_canvas_p()
@@ -1256,6 +1237,7 @@ class Dashboard(QWidget):
             finally:
                 self.plus_popups_set_enabled(True)
                 self.plus_popups_block_signals(False)
+
 
 ################
 

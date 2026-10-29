@@ -2,7 +2,7 @@ Detailed Release History
 ========================
 
 ----
-v5.0.0
+v5.0.0 (Nov 5, 2026)
 ------------------
 
 * ADDITIONS
@@ -36,6 +36,7 @@ v5.0.0
   - fixes wrong time formatting in Artisan CSV export ([Issue #2233](../../../issues/2233))
   - fixes incorrect BT/ET readings on newer Santoker R machines ([Discussion #2232](../../../discussions/2232) and [Discussion #2085](../../../discussions/2085))
   - fixes the image export of profiles with very long titles that could result in compressed time axis ([Discussion #2231](../../../discussions/2231))
+  - fixes random crashes of v4.2 on latest macOS versions (26.7.2 and 27.2) caused by issues in the bundled Qt 6.11.0 version ([Issue #2245](../../../issues/2245) and [Issue #2246](../../../issues/2246))
 
 
 ----

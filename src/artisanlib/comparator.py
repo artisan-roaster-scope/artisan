@@ -2208,6 +2208,7 @@ class roastCompareDlg(ArtisanDialog):
             _log.exception(e)
         if self.aw.qpc is not None:
             self.aw.qpc.update_phases(None)
-        # show dashboard again if it was shown on starting the Comparator
+        self.aw.dashboard.enable_dashboard_toggle_toolbutton()
+        # show dashboard again if it was shown on starting the Comparato
         if self.dashboard_was_active_on_open:
             self.aw.dashboard.show_dashboard()
