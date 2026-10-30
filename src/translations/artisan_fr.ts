@@ -247,7 +247,7 @@
         <translation>Ouvrir</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="306" />
+        <location filename="../artisanlib/dashboard.py" line="307" />
         <location filename="../artisanlib/wheels.py" line="598" />
         <source>Properties</source>
         <translation>Propriétés</translation>
@@ -273,7 +273,7 @@
     <message>
         <location filename="../artisanlib/alarms.py" line="131" />
         <location filename="../artisanlib/curves.py" line="1485" />
-        <location filename="../artisanlib/dashboard.py" line="341" />
+        <location filename="../artisanlib/dashboard.py" line="342" />
         <location filename="../artisanlib/background.py" line="95" />
         <location filename="../artisanlib/events.py" line="804" />
         <location filename="../artisanlib/pid_dialogs.py" line="2903" />
@@ -631,7 +631,7 @@
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1490" />
-        <location filename="../artisanlib/dashboard.py" line="342" />
+        <location filename="../artisanlib/dashboard.py" line="343" />
         <location filename="../artisanlib/roast_properties.py" line="774" />
         <location filename="../artisanlib/background.py" line="100" />
         <source>Clear</source>
@@ -707,43 +707,43 @@
         <translation>Enregistrer les valeurs par défaut</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="305" />
+        <location filename="../artisanlib/dashboard.py" line="306" />
         <source>Compare</source>
         <translation>Comparer</translation>
     </message>
     <message>
         <location filename="../plus/schedule.py" line="2477" />
-        <location filename="../artisanlib/dashboard.py" line="308" />
+        <location filename="../artisanlib/dashboard.py" line="309" />
         <source>LOGIN TO UNLOCK</source>
         <translation>CONNECTEZ-VOUS POUR DÉVERROUILLER</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="343" />
+        <location filename="../artisanlib/dashboard.py" line="344" />
         <source>Create</source>
         <translation>Créer</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="355" />
+        <location filename="../artisanlib/dashboard.py" line="356" />
         <source>Documentation</source>
         <translation>Documentation</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="356" />
+        <location filename="../artisanlib/dashboard.py" line="357" />
         <source>User Forum</source>
         <translation>Forum des utilisateurs</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="357" />
+        <location filename="../artisanlib/dashboard.py" line="358" />
         <source>Report an Issue</source>
         <translation>Signaler un problème</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="358" />
+        <location filename="../artisanlib/dashboard.py" line="359" />
         <source>Web Platform</source>
         <translation>Plateforme Web</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="375" />
+        <location filename="../artisanlib/dashboard.py" line="376" />
         <source>DONATE</source>
         <translation>FAIRE UN DON</translation>
     </message>
@@ -4201,7 +4201,7 @@ REFROIDISSEMENT</translation>
         <location filename="../artisanlib/pid_control.py" line="817" />
         <location filename="../artisanlib/pid_control.py" line="793" />
         <location filename="../artisanlib/pid_control.py" line="725" />
-        <location filename="../artisanlib/dashboard.py" line="1435" />
+        <location filename="../artisanlib/dashboard.py" line="1418" />
         <location filename="../artisanlib/roast_properties.py" line="3798" />
         <location filename="../artisanlib/roast_properties.py" line="2724" />
         <location filename="../artisanlib/ports.py" line="2051" />
@@ -4841,7 +4841,7 @@ REFROIDISSEMENT</translation>
     </message>
     <message>
         <location filename="../plus/blend.py" line="140" />
-        <location filename="../artisanlib/dashboard.py" line="954" />
+        <location filename="../artisanlib/dashboard.py" line="955" />
         <location filename="../artisanlib/roast_properties.py" line="1859" />
         <source>Custom Blend</source>
         <translation>Mélange personnalisé</translation>
@@ -5161,7 +5161,7 @@ REFROIDISSEMENT</translation>
         <translation>CO2</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="307" />
+        <location filename="../artisanlib/dashboard.py" line="308" />
         <source>INVENTORY</source>
         <translation>INVENTAIRE</translation>
     </message>
@@ -12432,7 +12432,7 @@ Les raccourcis clavier doivent être désactivés (ENTER)</translation>
         <location filename="../artisanlib/main.py" line="22110" />
         <location filename="../artisanlib/main.py" line="6038" />
         <location filename="../artisanlib/statistics.py" line="211" />
-        <location filename="../artisanlib/dashboard.py" line="302" />
+        <location filename="../artisanlib/dashboard.py" line="303" />
         <location filename="../artisanlib/roast_properties.py" line="834" />
         <location filename="../artisanlib/comparator.py" line="1601" />
         <source>Title</source>
@@ -13488,7 +13488,7 @@ Les raccourcis clavier doivent être désactivés (ENTER)</translation>
     <message>
         <location filename="../plus/blend.py" line="401" />
         <location filename="../artisanlib/statistics.py" line="217" />
-        <location filename="../artisanlib/dashboard.py" line="309" />
+        <location filename="../artisanlib/dashboard.py" line="310" />
         <location filename="../artisanlib/roast_properties.py" line="1127" />
         <location filename="../artisanlib/roast_properties.py" line="881" />
         <source>Beans</source>
@@ -13556,13 +13556,13 @@ Les raccourcis clavier doivent être désactivés (ENTER)</translation>
         <translation>Stock</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="311" />
+        <location filename="../artisanlib/dashboard.py" line="312" />
         <location filename="../artisanlib/roast_properties.py" line="1429" />
         <source>Space</source>
         <translation>Magasin</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="310" />
+        <location filename="../artisanlib/dashboard.py" line="311" />
         <location filename="../artisanlib/roast_properties.py" line="1431" />
         <source>Blend</source>
         <translation>Mélange</translation>
@@ -13795,42 +13795,42 @@ LCDs All</source>
 Tous les LCDs</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="303" />
+        <location filename="../artisanlib/dashboard.py" line="304" />
         <source>Batch size</source>
         <translation>Taille du lot</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="304" />
+        <location filename="../artisanlib/dashboard.py" line="305" />
         <source>Beans description</source>
         <translation>Description des haricots</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="340" />
+        <location filename="../artisanlib/dashboard.py" line="341" />
         <source>TEMPLATE</source>
         <translation>MODÈLE</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="354" />
+        <location filename="../artisanlib/dashboard.py" line="355" />
         <source>QUICK LINKS</source>
         <translation>LIENS RAPIDES</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="368" />
+        <location filename="../artisanlib/dashboard.py" line="369" />
         <source>RELEASE SPONSOR</source>
         <translation>SPONSOR</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="374" />
+        <location filename="../artisanlib/dashboard.py" line="375" />
         <source>SUPPORT ARTISAN</source>
         <translation>SOUTENIR ARTISAN</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="513" />
+        <location filename="../artisanlib/dashboard.py" line="514" />
         <source>You've roasted {} batches</source>
         <translation>Vous avez torréfié {} lots</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="638" />
+        <location filename="../artisanlib/dashboard.py" line="639" />
         <source>Hello {}!</source>
         <translation>Bonjour {}!</translation>
     </message>
@@ -15340,19 +15340,19 @@ Moins de nœuds : courbe plus simple, mais risque de perte de détails</transla
     <message>
         <location filename="../artisanlib/main.py" line="4064" />
         <location filename="../artisanlib/main.py" line="2330" />
-        <location filename="../artisanlib/dashboard.py" line="301" />
+        <location filename="../artisanlib/dashboard.py" line="302" />
         <source>Roast</source>
         <translation>Torréfaction</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2588" />
-        <location filename="../artisanlib/dashboard.py" line="337" />
+        <location filename="../artisanlib/dashboard.py" line="338" />
         <source>Comparator</source>
         <translation>Comparateur</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2593" />
-        <location filename="../artisanlib/dashboard.py" line="351" />
+        <location filename="../artisanlib/dashboard.py" line="352" />
         <source>Designer</source>
         <translation>Designer</translation>
     </message>
@@ -16680,7 +16680,7 @@ ATTENTION : Les données enregistrées seront effacées sans confirmation</tran
         <translation>Phases modifiées à {0} par défaut: {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="1502" />
+        <location filename="../artisanlib/dashboard.py" line="1485" />
         <source>Load roast template</source>
         <translation>Charger le modèle de rôti</translation>
     </message>
@@ -19007,12 +19007,12 @@ Continuez?</translation>
         <location filename="../plus/login.py" line="94" />
         <location filename="../plus/schedule.py" line="2478" />
         <location filename="../artisanlib/main.py" line="5111" />
-        <location filename="../artisanlib/dashboard.py" line="323" />
+        <location filename="../artisanlib/dashboard.py" line="324" />
         <source>Sign in to your artisan account</source>
         <translation>Connectez-vous à votre compte artisan</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="324" />
+        <location filename="../artisanlib/dashboard.py" line="325" />
         <source>Links to selected beans, blend and space on the platform</source>
         <translation>Liens vers les grains sélectionnés, le mélange et l'espace sur la plateforme</translation>
     </message>
@@ -19439,10 +19439,10 @@ Continuez?</translation>
         <location filename="../artisanlib/main.py" line="15916" />
         <location filename="../artisanlib/main.py" line="14603" />
         <location filename="../artisanlib/main.py" line="13170" />
-        <location filename="../artisanlib/dashboard.py" line="1390" />
-        <location filename="../artisanlib/dashboard.py" line="1306" />
-        <location filename="../artisanlib/dashboard.py" line="779" />
-        <location filename="../artisanlib/dashboard.py" line="766" />
+        <location filename="../artisanlib/dashboard.py" line="1373" />
+        <location filename="../artisanlib/dashboard.py" line="1285" />
+        <location filename="../artisanlib/dashboard.py" line="780" />
+        <location filename="../artisanlib/dashboard.py" line="767" />
         <location filename="../artisanlib/roast_properties.py" line="2651" />
         <location filename="../artisanlib/roast_properties.py" line="2616" />
         <location filename="../artisanlib/roast_properties.py" line="2271" />
@@ -19451,7 +19451,7 @@ Continuez?</translation>
         <location filename="../artisanlib/hibean.py" line="76" />
         <location filename="../artisanlib/roastpath.py" line="56" />
         <source>Roaster Scope</source>
-        <translation>Roaster Scope</translation>
+        <translation>Analyseur de torréfaction</translation>
     </message>
 </context><context>
     <name>StatusBar</name>
@@ -21635,7 +21635,7 @@ specified by the lookahead</source>
         <translation>Ouvrir la boîte de dialogue des propriétés de torréfaction sur DROP</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="318" />
+        <location filename="../artisanlib/dashboard.py" line="319" />
         <location filename="../artisanlib/roast_properties.py" line="836" />
         <source>Enter the roast title or set properties by choosing from a recent roast</source>
         <translation>Saisissez le titre du torréfaction ou définissez ses propriétés en choisissant parmi les torréfactions récentes</translation>
@@ -21652,7 +21652,7 @@ specified by the lookahead</source>
         <translation>Faites un clic droit pour modifier</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="334" />
+        <location filename="../artisanlib/dashboard.py" line="335" />
         <location filename="../artisanlib/roast_properties.py" line="899" />
         <source>batch size</source>
         <translation>taille du lot</translation>
@@ -21668,7 +21668,7 @@ specified by the lookahead</source>
         <translation>perte de poids causée par la torréfaction</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="335" />
+        <location filename="../artisanlib/dashboard.py" line="336" />
         <location filename="../artisanlib/roast_properties.py" line="925" />
         <source>weight unit</source>
         <translation>unité de poids</translation>
@@ -21744,13 +21744,13 @@ specified by the lookahead</source>
         <translation>Calculateur de volume pour déterminer le volume de café à partir du poids de l'échantillon mesuré dans un récipient de volume connu</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="319" />
+        <location filename="../artisanlib/dashboard.py" line="320" />
         <location filename="../artisanlib/roast_properties.py" line="1061" />
         <source>Add roast properties to list of recent roasts</source>
         <translation>Ajouter les propriétés de torréfaction à la liste des torréfactions récentes</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="320" />
+        <location filename="../artisanlib/dashboard.py" line="321" />
         <location filename="../artisanlib/roast_properties.py" line="1073" />
         <source>Remove roast properties from list of recent roasts</source>
         <translation>Supprimer les propriétés de torréfaction de la liste des torréfactions récentes</translation>
@@ -21857,8 +21857,8 @@ specified by the lookahead</source>
         <translation>récupérer les données ambiantes des appareils connectés ou calculer à partir de la courbe de profil sélectionnée</translation>
     </message>
     <message>
+        <location filename="../artisanlib/dashboard.py" line="327" />
         <location filename="../artisanlib/dashboard.py" line="326" />
-        <location filename="../artisanlib/dashboard.py" line="325" />
         <location filename="../artisanlib/roast_properties.py" line="1436" />
         <location filename="../artisanlib/roast_properties.py" line="1428" />
         <source>Select beans from your inventory</source>
@@ -21870,22 +21870,22 @@ specified by the lookahead</source>
         <translation>Sélectionnez un emplacement de stockage</translation>
     </message>
     <message>
+        <location filename="../artisanlib/dashboard.py" line="329" />
         <location filename="../artisanlib/dashboard.py" line="328" />
-        <location filename="../artisanlib/dashboard.py" line="327" />
         <location filename="../artisanlib/roast_properties.py" line="1438" />
         <location filename="../artisanlib/roast_properties.py" line="1432" />
         <source>Select a blend from your inventory</source>
         <translation>Sélectionnez un mélange dans votre inventaire</translation>
     </message>
     <message>
+        <location filename="../artisanlib/dashboard.py" line="331" />
         <location filename="../artisanlib/dashboard.py" line="330" />
-        <location filename="../artisanlib/dashboard.py" line="329" />
         <location filename="../artisanlib/roast_properties.py" line="1434" />
         <source>Select a storage space</source>
         <translation>Sélectionnez un espace de stockage</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="331" />
+        <location filename="../artisanlib/dashboard.py" line="332" />
         <location filename="../artisanlib/roast_properties.py" line="1443" />
         <source>Define a custom blend</source>
         <translation>Définissez un mélange personnalisé</translation>
@@ -21946,137 +21946,137 @@ specified by the lookahead</source>
         <translation>Afficher en parallèle toutes les informations (temps, pourcentage et température) de la dernière phase sur les 3 écrans LCD de phase</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="313" />
+        <location filename="../artisanlib/dashboard.py" line="314" />
         <source>Essential roast properties</source>
         <translation>propriétés essentielles de la torréfaction</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="314" />
+        <location filename="../artisanlib/dashboard.py" line="315" />
         <source>Batch number</source>
         <translation>Numéro de lot</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="315" />
+        <location filename="../artisanlib/dashboard.py" line="316" />
         <source>Open roast on platform</source>
         <translation>Torréfaction ouverte sur la plateforme</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="316" />
+        <location filename="../artisanlib/dashboard.py" line="317" />
         <source>Open your roast schedule</source>
         <translation>Ouvrez votre programme de torréfaction</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="317" />
+        <location filename="../artisanlib/dashboard.py" line="318" />
         <source>Upload this roast</source>
         <translation>Télécharge cette photo de rôti</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="322" />
+        <location filename="../artisanlib/dashboard.py" line="323" />
         <source>Green beans inventory</source>
         <translation>Inventaire des haricots verts</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="332" />
+        <location filename="../artisanlib/dashboard.py" line="333" />
         <source>Update inventory from platform</source>
         <translation>Mise à jour de l'inventaire depuis la plateforme</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="333" />
+        <location filename="../artisanlib/dashboard.py" line="334" />
         <source>Description of the green beans used</source>
         <translation>Description des haricots verts utilisés</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="336" />
+        <location filename="../artisanlib/dashboard.py" line="337" />
         <source>Open roast properties dialog</source>
         <translation>Ouvrir la boîte de dialogue des propriétés du rôti</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="337" />
+        <location filename="../artisanlib/dashboard.py" line="338" />
         <source>Open roast in {}</source>
         <translation>Torréfaction ouverte dans {}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="345" />
+        <location filename="../artisanlib/dashboard.py" line="346" />
         <source>Background roast template</source>
         <translation>Modèle de rôtissage en arrière-plan</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="346" />
+        <location filename="../artisanlib/dashboard.py" line="347" />
         <source>Name of current background template</source>
         <translation>Nom du modèle d'arrière-plan actuel</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="347" />
+        <location filename="../artisanlib/dashboard.py" line="348" />
         <source>Open template on platform</source>
         <translation>Ouvrir le modèle sur la plateforme</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="348" />
+        <location filename="../artisanlib/dashboard.py" line="349" />
         <source>Load a profile as template into the background</source>
         <translation>Charger un profil comme modèle en arrière-plan</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="349" />
+        <location filename="../artisanlib/dashboard.py" line="350" />
         <source>Choose a recent roast and load as roast template</source>
         <translation>Choisissez un café torréfié récent et chargez-le comme modèle de café torréfié</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="350" />
+        <location filename="../artisanlib/dashboard.py" line="351" />
         <source>Remove the loaded background roast template</source>
         <translation>Supprimer le modèle de rôti en arrière-plan chargé</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="351" />
+        <location filename="../artisanlib/dashboard.py" line="352" />
         <source>Start the {} and create a background roast template</source>
         <translation>Commencez le {} et créez un modèle de rôtissage en arrière-plan</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="361" />
+        <location filename="../artisanlib/dashboard.py" line="362" />
         <source>Links to external information and services</source>
         <translation>Liens vers des informations et services externes</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="362" />
+        <location filename="../artisanlib/dashboard.py" line="363" />
         <source>Explore the documentation</source>
         <translation>Explorez la documentation</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="363" />
+        <location filename="../artisanlib/dashboard.py" line="364" />
         <source>Ask questions, share tips, and connect with the community</source>
         <translation>Posez des questions, partagez des conseils et connectez-vous avec la communauté</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="364" />
+        <location filename="../artisanlib/dashboard.py" line="365" />
         <source>Report a bug or request a feature</source>
         <translation>Signaler un bug ou suggérer une fonctionnalité</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="365" />
+        <location filename="../artisanlib/dashboard.py" line="366" />
         <source>Browse to the artisan platform</source>
         <translation>Accédez à la plateforme artisan</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="370" />
+        <location filename="../artisanlib/dashboard.py" line="371" />
         <source>Sponsor of this release</source>
         <translation>Sponsor de cette version</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="371" />
+        <location filename="../artisanlib/dashboard.py" line="372" />
         <source>Visit our sponsor</source>
         <translation>Visitez notre sponsor</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="377" />
+        <location filename="../artisanlib/dashboard.py" line="378" />
         <source>Help to keep artisan going</source>
         <translation>Contribuez à la pérennité d'artisan</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="378" />
+        <location filename="../artisanlib/dashboard.py" line="379" />
         <source>Send your donation</source>
         <translation>Envoyez votre don</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="379" />
+        <location filename="../artisanlib/dashboard.py" line="380" />
         <source>Counts total number of recordings</source>
         <translation>Compte le nombre total d'enregistrements</translation>
     </message>

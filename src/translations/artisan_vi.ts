@@ -247,7 +247,7 @@
         <translation>Mở file</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="306" />
+        <location filename="../artisanlib/dashboard.py" line="307" />
         <location filename="../artisanlib/wheels.py" line="598" />
         <source>Properties</source>
         <translation type="unfinished">Các thông số</translation>
@@ -273,7 +273,7 @@
     <message>
         <location filename="../artisanlib/alarms.py" line="131" />
         <location filename="../artisanlib/curves.py" line="1485" />
-        <location filename="../artisanlib/dashboard.py" line="341" />
+        <location filename="../artisanlib/dashboard.py" line="342" />
         <location filename="../artisanlib/background.py" line="95" />
         <location filename="../artisanlib/events.py" line="804" />
         <location filename="../artisanlib/pid_dialogs.py" line="2903" />
@@ -631,7 +631,7 @@
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1490" />
-        <location filename="../artisanlib/dashboard.py" line="342" />
+        <location filename="../artisanlib/dashboard.py" line="343" />
         <location filename="../artisanlib/roast_properties.py" line="774" />
         <location filename="../artisanlib/background.py" line="100" />
         <source>Clear</source>
@@ -707,43 +707,43 @@
         <translation type="unfinished">Lưu mặc định</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="305" />
+        <location filename="../artisanlib/dashboard.py" line="306" />
         <source>Compare</source>
         <translation>So sánh</translation>
     </message>
     <message>
         <location filename="../plus/schedule.py" line="2477" />
-        <location filename="../artisanlib/dashboard.py" line="308" />
+        <location filename="../artisanlib/dashboard.py" line="309" />
         <source>LOGIN TO UNLOCK</source>
         <translation>ĐĂNG NHẬP ĐỂ MỞ KHÓA</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="343" />
+        <location filename="../artisanlib/dashboard.py" line="344" />
         <source>Create</source>
         <translation>Tạo nên</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="355" />
+        <location filename="../artisanlib/dashboard.py" line="356" />
         <source>Documentation</source>
         <translation type="unfinished">Các tài liệu</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="356" />
+        <location filename="../artisanlib/dashboard.py" line="357" />
         <source>User Forum</source>
         <translation>Diễn đàn người dùng</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="357" />
+        <location filename="../artisanlib/dashboard.py" line="358" />
         <source>Report an Issue</source>
         <translation>Báo cáo sự cố</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="358" />
+        <location filename="../artisanlib/dashboard.py" line="359" />
         <source>Web Platform</source>
         <translation>Nền tảng web</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="375" />
+        <location filename="../artisanlib/dashboard.py" line="376" />
         <source>DONATE</source>
         <translation>QUYÊN TẶNG</translation>
     </message>
@@ -4196,7 +4196,7 @@ kết thúc</translation>
         <location filename="../artisanlib/pid_control.py" line="817" />
         <location filename="../artisanlib/pid_control.py" line="793" />
         <location filename="../artisanlib/pid_control.py" line="725" />
-        <location filename="../artisanlib/dashboard.py" line="1435" />
+        <location filename="../artisanlib/dashboard.py" line="1418" />
         <location filename="../artisanlib/roast_properties.py" line="3798" />
         <location filename="../artisanlib/roast_properties.py" line="2724" />
         <location filename="../artisanlib/ports.py" line="2051" />
@@ -4836,7 +4836,7 @@ kết thúc</translation>
     </message>
     <message>
         <location filename="../plus/blend.py" line="140" />
-        <location filename="../artisanlib/dashboard.py" line="954" />
+        <location filename="../artisanlib/dashboard.py" line="955" />
         <location filename="../artisanlib/roast_properties.py" line="1859" />
         <source>Custom Blend</source>
         <translation>Pha trộn tùy chỉnh</translation>
@@ -5156,7 +5156,7 @@ kết thúc</translation>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="307" />
+        <location filename="../artisanlib/dashboard.py" line="308" />
         <source>INVENTORY</source>
         <translation>HÀNG TỒN KHO</translation>
     </message>
@@ -12408,7 +12408,7 @@ Phím tắt phải được tắt (ENTER)</translation>
         <location filename="../artisanlib/main.py" line="22110" />
         <location filename="../artisanlib/main.py" line="6038" />
         <location filename="../artisanlib/statistics.py" line="211" />
-        <location filename="../artisanlib/dashboard.py" line="302" />
+        <location filename="../artisanlib/dashboard.py" line="303" />
         <location filename="../artisanlib/roast_properties.py" line="834" />
         <location filename="../artisanlib/comparator.py" line="1601" />
         <source>Title</source>
@@ -13464,7 +13464,7 @@ Phím tắt phải được tắt (ENTER)</translation>
     <message>
         <location filename="../plus/blend.py" line="401" />
         <location filename="../artisanlib/statistics.py" line="217" />
-        <location filename="../artisanlib/dashboard.py" line="309" />
+        <location filename="../artisanlib/dashboard.py" line="310" />
         <location filename="../artisanlib/roast_properties.py" line="1127" />
         <location filename="../artisanlib/roast_properties.py" line="881" />
         <source>Beans</source>
@@ -13532,13 +13532,13 @@ Phím tắt phải được tắt (ENTER)</translation>
         <translation>Tồn kho</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="311" />
+        <location filename="../artisanlib/dashboard.py" line="312" />
         <location filename="../artisanlib/roast_properties.py" line="1429" />
         <source>Space</source>
         <translation>Kho chứa hàng</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="310" />
+        <location filename="../artisanlib/dashboard.py" line="311" />
         <location filename="../artisanlib/roast_properties.py" line="1431" />
         <source>Blend</source>
         <translation>Trộn</translation>
@@ -13772,42 +13772,42 @@ LCDs All</source>
 LCDs All</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="303" />
+        <location filename="../artisanlib/dashboard.py" line="304" />
         <source>Batch size</source>
         <translation>Kích thước lô</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="304" />
+        <location filename="../artisanlib/dashboard.py" line="305" />
         <source>Beans description</source>
         <translation>Mô tả về đậu</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="340" />
+        <location filename="../artisanlib/dashboard.py" line="341" />
         <source>TEMPLATE</source>
         <translation>BẢN MẪU</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="354" />
+        <location filename="../artisanlib/dashboard.py" line="355" />
         <source>QUICK LINKS</source>
         <translation>LIÊN KẾT NHANH</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="368" />
+        <location filename="../artisanlib/dashboard.py" line="369" />
         <source>RELEASE SPONSOR</source>
         <translation>NHÀ TÀI TRỢ PHÁT HÀNH</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="374" />
+        <location filename="../artisanlib/dashboard.py" line="375" />
         <source>SUPPORT ARTISAN</source>
         <translation>Ủng hộ ARTISAN</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="513" />
+        <location filename="../artisanlib/dashboard.py" line="514" />
         <source>You've roasted {} batches</source>
         <translation>Bạn đã rang {} mẻ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="638" />
+        <location filename="../artisanlib/dashboard.py" line="639" />
         <source>Hello {}!</source>
         <translation>Xin chào {}!</translation>
     </message>
@@ -15317,19 +15317,19 @@ Fewer nodes: simpler curve but may lose detail</source>
     <message>
         <location filename="../artisanlib/main.py" line="4064" />
         <location filename="../artisanlib/main.py" line="2330" />
-        <location filename="../artisanlib/dashboard.py" line="301" />
+        <location filename="../artisanlib/dashboard.py" line="302" />
         <source>Roast</source>
         <translation>Rang</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2588" />
-        <location filename="../artisanlib/dashboard.py" line="337" />
+        <location filename="../artisanlib/dashboard.py" line="338" />
         <source>Comparator</source>
         <translation>Bộ so sánh</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2593" />
-        <location filename="../artisanlib/dashboard.py" line="351" />
+        <location filename="../artisanlib/dashboard.py" line="352" />
         <source>Designer</source>
         <translation>Thiết kế</translation>
     </message>
@@ -16617,7 +16617,7 @@ LƯU Ý: Dữ liệu đã lưu sẽ bị xóa mà không cần xác nhận</tran
         <translation>Các giai đoạn được thay đổi thành {0} mặc định: {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="1502" />
+        <location filename="../artisanlib/dashboard.py" line="1485" />
         <source>Load roast template</source>
         <translation>Tải mẫu rang</translation>
     </message>
@@ -18947,12 +18947,12 @@ Tiếp tục?</translation>
         <location filename="../plus/login.py" line="94" />
         <location filename="../plus/schedule.py" line="2478" />
         <location filename="../artisanlib/main.py" line="5111" />
-        <location filename="../artisanlib/dashboard.py" line="323" />
+        <location filename="../artisanlib/dashboard.py" line="324" />
         <source>Sign in to your artisan account</source>
         <translation>Đăng nhập vào tài khoản nghệ nhân của bạn</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="324" />
+        <location filename="../artisanlib/dashboard.py" line="325" />
         <source>Links to selected beans, blend and space on the platform</source>
         <translation>Liên kết đến các loại hạt cà phê, hỗn hợp và không gian trên nền tảng.</translation>
     </message>
@@ -19379,10 +19379,10 @@ Tiếp tục?</translation>
         <location filename="../artisanlib/main.py" line="15916" />
         <location filename="../artisanlib/main.py" line="14603" />
         <location filename="../artisanlib/main.py" line="13170" />
-        <location filename="../artisanlib/dashboard.py" line="1390" />
-        <location filename="../artisanlib/dashboard.py" line="1306" />
-        <location filename="../artisanlib/dashboard.py" line="779" />
-        <location filename="../artisanlib/dashboard.py" line="766" />
+        <location filename="../artisanlib/dashboard.py" line="1373" />
+        <location filename="../artisanlib/dashboard.py" line="1285" />
+        <location filename="../artisanlib/dashboard.py" line="780" />
+        <location filename="../artisanlib/dashboard.py" line="767" />
         <location filename="../artisanlib/roast_properties.py" line="2651" />
         <location filename="../artisanlib/roast_properties.py" line="2616" />
         <location filename="../artisanlib/roast_properties.py" line="2271" />
@@ -21576,7 +21576,7 @@ specified by the lookahead</source>
         <translation>Mở hộp thoại thuộc tính rang bằng cách nhấn DROP.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="318" />
+        <location filename="../artisanlib/dashboard.py" line="319" />
         <location filename="../artisanlib/roast_properties.py" line="836" />
         <source>Enter the roast title or set properties by choosing from a recent roast</source>
         <translation>Nhập tên món rang hoặc thiết lập thuộc tính bằng cách chọn từ một món rang gần đây.</translation>
@@ -21593,7 +21593,7 @@ specified by the lookahead</source>
         <translation>Nhấp chuột phải để chỉnh sửa</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="334" />
+        <location filename="../artisanlib/dashboard.py" line="335" />
         <location filename="../artisanlib/roast_properties.py" line="899" />
         <source>batch size</source>
         <translation>kích thước lô</translation>
@@ -21609,7 +21609,7 @@ specified by the lookahead</source>
         <translation>giảm cân do rang</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="335" />
+        <location filename="../artisanlib/dashboard.py" line="336" />
         <location filename="../artisanlib/roast_properties.py" line="925" />
         <source>weight unit</source>
         <translation>đơn vị trọng lượng</translation>
@@ -21685,13 +21685,13 @@ specified by the lookahead</source>
         <translation>Máy tính thể tích để xác định thể tích cà phê từ trọng lượng mẫu được đo trong thùng chứa có thể tích đã biết</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="319" />
+        <location filename="../artisanlib/dashboard.py" line="320" />
         <location filename="../artisanlib/roast_properties.py" line="1061" />
         <source>Add roast properties to list of recent roasts</source>
         <translation>Thêm thuộc tính rang vào danh sách rang gần đây</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="320" />
+        <location filename="../artisanlib/dashboard.py" line="321" />
         <location filename="../artisanlib/roast_properties.py" line="1073" />
         <source>Remove roast properties from list of recent roasts</source>
         <translation>Xóa thuộc tính rang khỏi danh sách rang gần đây</translation>
@@ -21798,8 +21798,8 @@ specified by the lookahead</source>
         <translation>lấy dữ liệu môi trường xung quanh từ các thiết bị được kết nối hoặc tính toán từ đường cong cấu hình đã chọn</translation>
     </message>
     <message>
+        <location filename="../artisanlib/dashboard.py" line="327" />
         <location filename="../artisanlib/dashboard.py" line="326" />
-        <location filename="../artisanlib/dashboard.py" line="325" />
         <location filename="../artisanlib/roast_properties.py" line="1436" />
         <location filename="../artisanlib/roast_properties.py" line="1428" />
         <source>Select beans from your inventory</source>
@@ -21811,22 +21811,22 @@ specified by the lookahead</source>
         <translation>Chọn vị trí lưu trữ</translation>
     </message>
     <message>
+        <location filename="../artisanlib/dashboard.py" line="329" />
         <location filename="../artisanlib/dashboard.py" line="328" />
-        <location filename="../artisanlib/dashboard.py" line="327" />
         <location filename="../artisanlib/roast_properties.py" line="1438" />
         <location filename="../artisanlib/roast_properties.py" line="1432" />
         <source>Select a blend from your inventory</source>
         <translation>Chọn một loại hỗn hợp từ kho của bạn</translation>
     </message>
     <message>
+        <location filename="../artisanlib/dashboard.py" line="331" />
         <location filename="../artisanlib/dashboard.py" line="330" />
-        <location filename="../artisanlib/dashboard.py" line="329" />
         <location filename="../artisanlib/roast_properties.py" line="1434" />
         <source>Select a storage space</source>
         <translation>Chọn không gian lưu trữ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="331" />
+        <location filename="../artisanlib/dashboard.py" line="332" />
         <location filename="../artisanlib/roast_properties.py" line="1443" />
         <source>Define a custom blend</source>
         <translation>Xác định hỗn hợp tùy chỉnh</translation>
@@ -21887,137 +21887,137 @@ specified by the lookahead</source>
         <translation>Hiển thị tất cả thông tin (thời gian, phần trăm và nhiệt độ) của giai đoạn cuối cùng trên cả 3 màn hình LCD song song.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="313" />
+        <location filename="../artisanlib/dashboard.py" line="314" />
         <source>Essential roast properties</source>
         <translation>Các đặc tính rang thiết yếu</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="314" />
+        <location filename="../artisanlib/dashboard.py" line="315" />
         <source>Batch number</source>
         <translation>Số lô</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="315" />
+        <location filename="../artisanlib/dashboard.py" line="316" />
         <source>Open roast on platform</source>
         <translation>Rang thịt trực tiếp trên sàn.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="316" />
+        <location filename="../artisanlib/dashboard.py" line="317" />
         <source>Open your roast schedule</source>
         <translation>Mở lịch rang cà phê của bạn</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="317" />
+        <location filename="../artisanlib/dashboard.py" line="318" />
         <source>Upload this roast</source>
         <translation>Tải lên món thịt nướng này</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="322" />
+        <location filename="../artisanlib/dashboard.py" line="323" />
         <source>Green beans inventory</source>
         <translation>tồn kho đậu xanh</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="332" />
+        <location filename="../artisanlib/dashboard.py" line="333" />
         <source>Update inventory from platform</source>
         <translation>Cập nhật kho hàng từ nền tảng</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="333" />
+        <location filename="../artisanlib/dashboard.py" line="334" />
         <source>Description of the green beans used</source>
         <translation>Mô tả về loại đậu xanh được sử dụng</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="336" />
+        <location filename="../artisanlib/dashboard.py" line="337" />
         <source>Open roast properties dialog</source>
         <translation>Mở hộp thoại thuộc tính rang</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="337" />
+        <location filename="../artisanlib/dashboard.py" line="338" />
         <source>Open roast in {}</source>
         <translation>Rang mở trong {}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="345" />
+        <location filename="../artisanlib/dashboard.py" line="346" />
         <source>Background roast template</source>
         <translation>Mẫu nền rang</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="346" />
+        <location filename="../artisanlib/dashboard.py" line="347" />
         <source>Name of current background template</source>
         <translation>Tên của mẫu nền hiện tại</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="347" />
+        <location filename="../artisanlib/dashboard.py" line="348" />
         <source>Open template on platform</source>
         <translation>Mở mẫu trên nền tảng</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="348" />
+        <location filename="../artisanlib/dashboard.py" line="349" />
         <source>Load a profile as template into the background</source>
         <translation>Tải hồ sơ dưới dạng mẫu vào chế độ nền</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="349" />
+        <location filename="../artisanlib/dashboard.py" line="350" />
         <source>Choose a recent roast and load as roast template</source>
         <translation>Chọn một mẻ rang gần đây và tải nó lên dưới dạng mẫu rang.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="350" />
+        <location filename="../artisanlib/dashboard.py" line="351" />
         <source>Remove the loaded background roast template</source>
         <translation>Xóa mẫu rang nền đã tải</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="351" />
+        <location filename="../artisanlib/dashboard.py" line="352" />
         <source>Start the {} and create a background roast template</source>
         <translation>Bắt đầu {} và tạo mẫu rang nền.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="361" />
+        <location filename="../artisanlib/dashboard.py" line="362" />
         <source>Links to external information and services</source>
         <translation>Liên kết đến thông tin và dịch vụ bên ngoài</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="362" />
+        <location filename="../artisanlib/dashboard.py" line="363" />
         <source>Explore the documentation</source>
         <translation>Hãy xem tài liệu hướng dẫn.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="363" />
+        <location filename="../artisanlib/dashboard.py" line="364" />
         <source>Ask questions, share tips, and connect with the community</source>
         <translation>Đặt câu hỏi, chia sẻ mẹo và kết nối với cộng đồng.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="364" />
+        <location filename="../artisanlib/dashboard.py" line="365" />
         <source>Report a bug or request a feature</source>
         <translation>Báo cáo lỗi hoặc yêu cầu tính năng</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="365" />
+        <location filename="../artisanlib/dashboard.py" line="366" />
         <source>Browse to the artisan platform</source>
         <translation>Truy cập vào nền tảng dành cho nghệ nhân</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="370" />
+        <location filename="../artisanlib/dashboard.py" line="371" />
         <source>Sponsor of this release</source>
         <translation>Nhà tài trợ cho thông cáo báo chí này</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="371" />
+        <location filename="../artisanlib/dashboard.py" line="372" />
         <source>Visit our sponsor</source>
         <translation>Hãy ghé thăm nhà tài trợ của chúng tôi.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="377" />
+        <location filename="../artisanlib/dashboard.py" line="378" />
         <source>Help to keep artisan going</source>
         <translation>Hãy giúp duy trì hoạt động của các nghệ nhân.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="378" />
+        <location filename="../artisanlib/dashboard.py" line="379" />
         <source>Send your donation</source>
         <translation>Gửi khoản quyên góp của bạn</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="379" />
+        <location filename="../artisanlib/dashboard.py" line="380" />
         <source>Counts total number of recordings</source>
         <translation>Đếm tổng số bản ghi</translation>
     </message>

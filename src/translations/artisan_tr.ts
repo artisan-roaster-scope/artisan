@@ -249,7 +249,7 @@ Kusurlu Çekirdek Ağırlığı</translation>
         <translation>Aç</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="306" />
+        <location filename="../artisanlib/dashboard.py" line="307" />
         <location filename="../artisanlib/wheels.py" line="598" />
         <source>Properties</source>
         <translation type="unfinished">Özellikler</translation>
@@ -275,7 +275,7 @@ Kusurlu Çekirdek Ağırlığı</translation>
     <message>
         <location filename="../artisanlib/alarms.py" line="131" />
         <location filename="../artisanlib/curves.py" line="1485" />
-        <location filename="../artisanlib/dashboard.py" line="341" />
+        <location filename="../artisanlib/dashboard.py" line="342" />
         <location filename="../artisanlib/background.py" line="95" />
         <location filename="../artisanlib/events.py" line="804" />
         <location filename="../artisanlib/pid_dialogs.py" line="2903" />
@@ -633,7 +633,7 @@ Kusurlu Çekirdek Ağırlığı</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1490" />
-        <location filename="../artisanlib/dashboard.py" line="342" />
+        <location filename="../artisanlib/dashboard.py" line="343" />
         <location filename="../artisanlib/roast_properties.py" line="774" />
         <location filename="../artisanlib/background.py" line="100" />
         <source>Clear</source>
@@ -710,43 +710,43 @@ Kusurlu Çekirdek Ağırlığı</translation>
         <translation>Varsayılanları Kaydet</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="305" />
+        <location filename="../artisanlib/dashboard.py" line="306" />
         <source>Compare</source>
         <translation>Karşılaştırmak</translation>
     </message>
     <message>
         <location filename="../plus/schedule.py" line="2477" />
-        <location filename="../artisanlib/dashboard.py" line="308" />
+        <location filename="../artisanlib/dashboard.py" line="309" />
         <source>LOGIN TO UNLOCK</source>
         <translation>KİLİDİ ​​AÇMAK İÇİN GİRİŞ YAPIN</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="343" />
+        <location filename="../artisanlib/dashboard.py" line="344" />
         <source>Create</source>
         <translation>Yaratmak</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="355" />
+        <location filename="../artisanlib/dashboard.py" line="356" />
         <source>Documentation</source>
         <translation type="unfinished">Doküman</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="356" />
+        <location filename="../artisanlib/dashboard.py" line="357" />
         <source>User Forum</source>
         <translation>Kullanıcı Forumu</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="357" />
+        <location filename="../artisanlib/dashboard.py" line="358" />
         <source>Report an Issue</source>
         <translation>Bir sorun bildirin</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="358" />
+        <location filename="../artisanlib/dashboard.py" line="359" />
         <source>Web Platform</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="375" />
+        <location filename="../artisanlib/dashboard.py" line="376" />
         <source>DONATE</source>
         <translation>BAĞIŞ YAPMAK</translation>
     </message>
@@ -4204,7 +4204,7 @@ END</source>
         <location filename="../artisanlib/pid_control.py" line="817" />
         <location filename="../artisanlib/pid_control.py" line="793" />
         <location filename="../artisanlib/pid_control.py" line="725" />
-        <location filename="../artisanlib/dashboard.py" line="1435" />
+        <location filename="../artisanlib/dashboard.py" line="1418" />
         <location filename="../artisanlib/roast_properties.py" line="3798" />
         <location filename="../artisanlib/roast_properties.py" line="2724" />
         <location filename="../artisanlib/ports.py" line="2051" />
@@ -4844,7 +4844,7 @@ END</source>
     </message>
     <message>
         <location filename="../plus/blend.py" line="140" />
-        <location filename="../artisanlib/dashboard.py" line="954" />
+        <location filename="../artisanlib/dashboard.py" line="955" />
         <location filename="../artisanlib/roast_properties.py" line="1859" />
         <source>Custom Blend</source>
         <translation>Özel Harman</translation>
@@ -5164,7 +5164,7 @@ END</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="307" />
+        <location filename="../artisanlib/dashboard.py" line="308" />
         <source>INVENTORY</source>
         <translation>ENVANTER</translation>
     </message>
@@ -12418,7 +12418,7 @@ Klavye Kısayolları devre dışı bırakılmalıdır (ENTER)</translation>
         <location filename="../artisanlib/main.py" line="22110" />
         <location filename="../artisanlib/main.py" line="6038" />
         <location filename="../artisanlib/statistics.py" line="211" />
-        <location filename="../artisanlib/dashboard.py" line="302" />
+        <location filename="../artisanlib/dashboard.py" line="303" />
         <location filename="../artisanlib/roast_properties.py" line="834" />
         <location filename="../artisanlib/comparator.py" line="1601" />
         <source>Title</source>
@@ -13474,7 +13474,7 @@ Klavye Kısayolları devre dışı bırakılmalıdır (ENTER)</translation>
     <message>
         <location filename="../plus/blend.py" line="401" />
         <location filename="../artisanlib/statistics.py" line="217" />
-        <location filename="../artisanlib/dashboard.py" line="309" />
+        <location filename="../artisanlib/dashboard.py" line="310" />
         <location filename="../artisanlib/roast_properties.py" line="1127" />
         <location filename="../artisanlib/roast_properties.py" line="881" />
         <source>Beans</source>
@@ -13542,13 +13542,13 @@ Klavye Kısayolları devre dışı bırakılmalıdır (ENTER)</translation>
         <translation>Stok</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="311" />
+        <location filename="../artisanlib/dashboard.py" line="312" />
         <location filename="../artisanlib/roast_properties.py" line="1429" />
         <source>Space</source>
         <translation>Mağaza</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="310" />
+        <location filename="../artisanlib/dashboard.py" line="311" />
         <location filename="../artisanlib/roast_properties.py" line="1431" />
         <source>Blend</source>
         <translation>Harman</translation>
@@ -13782,42 +13782,42 @@ LCDs All</source>
 LCD'ler Tümü</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="303" />
+        <location filename="../artisanlib/dashboard.py" line="304" />
         <source>Batch size</source>
         <translation>Parti boyutu</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="304" />
+        <location filename="../artisanlib/dashboard.py" line="305" />
         <source>Beans description</source>
         <translation>Fasulye açıklaması</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="340" />
+        <location filename="../artisanlib/dashboard.py" line="341" />
         <source>TEMPLATE</source>
         <translation>ŞABLON</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="354" />
+        <location filename="../artisanlib/dashboard.py" line="355" />
         <source>QUICK LINKS</source>
         <translation>HIZLI BAĞLANTILAR</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="368" />
+        <location filename="../artisanlib/dashboard.py" line="369" />
         <source>RELEASE SPONSOR</source>
         <translation>SPONSORLUK YAYININI DESTEKLEYİN</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="374" />
+        <location filename="../artisanlib/dashboard.py" line="375" />
         <source>SUPPORT ARTISAN</source>
         <translation>ARTISAN'I DESTEKLEYIN</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="513" />
+        <location filename="../artisanlib/dashboard.py" line="514" />
         <source>You've roasted {} batches</source>
         <translation>{} parti kavurma işlemi gerçekleştirdiniz.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="638" />
+        <location filename="../artisanlib/dashboard.py" line="639" />
         <source>Hello {}!</source>
         <translation>Merhaba {}!</translation>
     </message>
@@ -15323,19 +15323,19 @@ Daha az düğüm: daha basit eğri ancak ayrıntı kaybı olabilir</translation>
     <message>
         <location filename="../artisanlib/main.py" line="4064" />
         <location filename="../artisanlib/main.py" line="2330" />
-        <location filename="../artisanlib/dashboard.py" line="301" />
+        <location filename="../artisanlib/dashboard.py" line="302" />
         <source>Roast</source>
         <translation>Kavur</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2588" />
-        <location filename="../artisanlib/dashboard.py" line="337" />
+        <location filename="../artisanlib/dashboard.py" line="338" />
         <source>Comparator</source>
         <translation>Karşılaştırıcı</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2593" />
-        <location filename="../artisanlib/dashboard.py" line="351" />
+        <location filename="../artisanlib/dashboard.py" line="352" />
         <source>Designer</source>
         <translation>Tasarım Modu</translation>
     </message>
@@ -16631,7 +16631,7 @@ DİKKAT: Kaydedilen veriler onay alınmadan silinecektir.</translation>
         <translation>Dönemler {0} ilk ayarlara: {1} değişti</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="1502" />
+        <location filename="../artisanlib/dashboard.py" line="1485" />
         <source>Load roast template</source>
         <translation>Kızartma şablonunu yükle</translation>
     </message>
@@ -18959,12 +18959,12 @@ Devam et?</translation>
         <location filename="../plus/login.py" line="94" />
         <location filename="../plus/schedule.py" line="2478" />
         <location filename="../artisanlib/main.py" line="5111" />
-        <location filename="../artisanlib/dashboard.py" line="323" />
+        <location filename="../artisanlib/dashboard.py" line="324" />
         <source>Sign in to your artisan account</source>
         <translation>Zanaatkar hesabınıza giriş yapın</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="324" />
+        <location filename="../artisanlib/dashboard.py" line="325" />
         <source>Links to selected beans, blend and space on the platform</source>
         <translation>Platformdaki seçili kahve çekirdeklerine, karışımlara ve alanlara ait bağlantılar.</translation>
     </message>
@@ -19391,10 +19391,10 @@ Devam et?</translation>
         <location filename="../artisanlib/main.py" line="15916" />
         <location filename="../artisanlib/main.py" line="14603" />
         <location filename="../artisanlib/main.py" line="13170" />
-        <location filename="../artisanlib/dashboard.py" line="1390" />
-        <location filename="../artisanlib/dashboard.py" line="1306" />
-        <location filename="../artisanlib/dashboard.py" line="779" />
-        <location filename="../artisanlib/dashboard.py" line="766" />
+        <location filename="../artisanlib/dashboard.py" line="1373" />
+        <location filename="../artisanlib/dashboard.py" line="1285" />
+        <location filename="../artisanlib/dashboard.py" line="780" />
+        <location filename="../artisanlib/dashboard.py" line="767" />
         <location filename="../artisanlib/roast_properties.py" line="2651" />
         <location filename="../artisanlib/roast_properties.py" line="2616" />
         <location filename="../artisanlib/roast_properties.py" line="2271" />
@@ -21581,7 +21581,7 @@ specified by the lookahead</source>
         <translation>DROP işleminde kavurma özellikleri iletişim kutusunu açın.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="318" />
+        <location filename="../artisanlib/dashboard.py" line="319" />
         <location filename="../artisanlib/roast_properties.py" line="836" />
         <source>Enter the roast title or set properties by choosing from a recent roast</source>
         <translation>Kavurma başlığını girin veya son kavurmalardan birini seçerek özellikleri ayarlayın.</translation>
@@ -21598,7 +21598,7 @@ specified by the lookahead</source>
         <translation>Düzenlemek için sağ tıklayın</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="334" />
+        <location filename="../artisanlib/dashboard.py" line="335" />
         <location filename="../artisanlib/roast_properties.py" line="899" />
         <source>batch size</source>
         <translation>toplu boyut</translation>
@@ -21614,7 +21614,7 @@ specified by the lookahead</source>
         <translation>kavurma sonucu oluşan kilo kaybı</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="335" />
+        <location filename="../artisanlib/dashboard.py" line="336" />
         <location filename="../artisanlib/roast_properties.py" line="925" />
         <source>weight unit</source>
         <translation>ağırlık birimi</translation>
@@ -21690,13 +21690,13 @@ specified by the lookahead</source>
         <translation>fBilinen hacimli kapta ölçülen numune ağırlığından kahve hacmini belirlemek için hacim hesaplayıcısı</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="319" />
+        <location filename="../artisanlib/dashboard.py" line="320" />
         <location filename="../artisanlib/roast_properties.py" line="1061" />
         <source>Add roast properties to list of recent roasts</source>
         <translation>Kavurma özelliklerini son kavurma listesine ekleyin</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="320" />
+        <location filename="../artisanlib/dashboard.py" line="321" />
         <location filename="../artisanlib/roast_properties.py" line="1073" />
         <source>Remove roast properties from list of recent roasts</source>
         <translation>Son kavurmaların listesinden kavurma özelliklerini kaldır</translation>
@@ -21803,8 +21803,8 @@ specified by the lookahead</source>
         <translation>Bağlı cihazlardan ortam verilerini alın veya seçili profil eğrisinden hesaplayın</translation>
     </message>
     <message>
+        <location filename="../artisanlib/dashboard.py" line="327" />
         <location filename="../artisanlib/dashboard.py" line="326" />
-        <location filename="../artisanlib/dashboard.py" line="325" />
         <location filename="../artisanlib/roast_properties.py" line="1436" />
         <location filename="../artisanlib/roast_properties.py" line="1428" />
         <source>Select beans from your inventory</source>
@@ -21816,22 +21816,22 @@ specified by the lookahead</source>
         <translation>Bir depolama yeri seçin</translation>
     </message>
     <message>
+        <location filename="../artisanlib/dashboard.py" line="329" />
         <location filename="../artisanlib/dashboard.py" line="328" />
-        <location filename="../artisanlib/dashboard.py" line="327" />
         <location filename="../artisanlib/roast_properties.py" line="1438" />
         <location filename="../artisanlib/roast_properties.py" line="1432" />
         <source>Select a blend from your inventory</source>
         <translation>Stokunuzdan bir karışım seçin.</translation>
     </message>
     <message>
+        <location filename="../artisanlib/dashboard.py" line="331" />
         <location filename="../artisanlib/dashboard.py" line="330" />
-        <location filename="../artisanlib/dashboard.py" line="329" />
         <location filename="../artisanlib/roast_properties.py" line="1434" />
         <source>Select a storage space</source>
         <translation>Bir depolama alanı seçin</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="331" />
+        <location filename="../artisanlib/dashboard.py" line="332" />
         <location filename="../artisanlib/roast_properties.py" line="1443" />
         <source>Define a custom blend</source>
         <translation>Özel bir karışım tanımlayın</translation>
@@ -21892,137 +21892,137 @@ specified by the lookahead</source>
         <translation>Son fazın tüm bilgilerini (zaman, yüzde ve sıcaklık) paralel olarak 3 fazın LCD ekranlarında görüntüleyin.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="313" />
+        <location filename="../artisanlib/dashboard.py" line="314" />
         <source>Essential roast properties</source>
         <translation>Temel kavurma özellikleri</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="314" />
+        <location filename="../artisanlib/dashboard.py" line="315" />
         <source>Batch number</source>
         <translation>Parti numarası</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="315" />
+        <location filename="../artisanlib/dashboard.py" line="316" />
         <source>Open roast on platform</source>
         <translation>Platformda açık fırın</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="316" />
+        <location filename="../artisanlib/dashboard.py" line="317" />
         <source>Open your roast schedule</source>
         <translation>Kavurma programınızı açın.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="317" />
+        <location filename="../artisanlib/dashboard.py" line="318" />
         <source>Upload this roast</source>
         <translation>Bu kızarmış eti yükle</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="322" />
+        <location filename="../artisanlib/dashboard.py" line="323" />
         <source>Green beans inventory</source>
         <translation>Yeşil fasulye stoğu</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="332" />
+        <location filename="../artisanlib/dashboard.py" line="333" />
         <source>Update inventory from platform</source>
         <translation>Platformdan envanteri güncelle</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="333" />
+        <location filename="../artisanlib/dashboard.py" line="334" />
         <source>Description of the green beans used</source>
         <translation>Kullanılan yeşil fasulyelerin açıklaması</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="336" />
+        <location filename="../artisanlib/dashboard.py" line="337" />
         <source>Open roast properties dialog</source>
         <translation>Kavurma özellikleri iletişim kutusunu açın.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="337" />
+        <location filename="../artisanlib/dashboard.py" line="338" />
         <source>Open roast in {}</source>
         <translation>Açık kavurma işlemi {} içinde gerçekleştirilir.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="345" />
+        <location filename="../artisanlib/dashboard.py" line="346" />
         <source>Background roast template</source>
         <translation>Arka plan kavurma şablonu</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="346" />
+        <location filename="../artisanlib/dashboard.py" line="347" />
         <source>Name of current background template</source>
         <translation>Mevcut arka plan şablonunun adı</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="347" />
+        <location filename="../artisanlib/dashboard.py" line="348" />
         <source>Open template on platform</source>
         <translation>Platformda şablonu açın</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="348" />
+        <location filename="../artisanlib/dashboard.py" line="349" />
         <source>Load a profile as template into the background</source>
         <translation>Profili şablon olarak arka plana yükle</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="349" />
+        <location filename="../artisanlib/dashboard.py" line="350" />
         <source>Choose a recent roast and load as roast template</source>
         <translation>Son kavrulmuş bir ürünü seçin ve kavrulma şablonu olarak yükleyin.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="350" />
+        <location filename="../artisanlib/dashboard.py" line="351" />
         <source>Remove the loaded background roast template</source>
         <translation>Yüklenen arka plan kavurma şablonunu kaldırın.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="351" />
+        <location filename="../artisanlib/dashboard.py" line="352" />
         <source>Start the {} and create a background roast template</source>
         <translation>{}'i başlatın ve arka plan kavurma şablonu oluşturun</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="361" />
+        <location filename="../artisanlib/dashboard.py" line="362" />
         <source>Links to external information and services</source>
         <translation>Harici bilgi ve hizmetlere bağlantılar</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="362" />
+        <location filename="../artisanlib/dashboard.py" line="363" />
         <source>Explore the documentation</source>
         <translation>Dokümantasyonu inceleyin</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="363" />
+        <location filename="../artisanlib/dashboard.py" line="364" />
         <source>Ask questions, share tips, and connect with the community</source>
         <translation>Sorular sorun, ipuçları paylaşın ve toplulukla bağlantı kurun.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="364" />
+        <location filename="../artisanlib/dashboard.py" line="365" />
         <source>Report a bug or request a feature</source>
         <translation>Bir hata bildirin veya bir özellik isteyin.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="365" />
+        <location filename="../artisanlib/dashboard.py" line="366" />
         <source>Browse to the artisan platform</source>
         <translation>El sanatları platformuna göz atın</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="370" />
+        <location filename="../artisanlib/dashboard.py" line="371" />
         <source>Sponsor of this release</source>
         <translation>Bu yayının sponsoru</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="371" />
+        <location filename="../artisanlib/dashboard.py" line="372" />
         <source>Visit our sponsor</source>
         <translation>Sponsorumuzu ziyaret edin</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="377" />
+        <location filename="../artisanlib/dashboard.py" line="378" />
         <source>Help to keep artisan going</source>
         <translation>Zanaatkârın geçimini sağlamasına yardımcı olun.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="378" />
+        <location filename="../artisanlib/dashboard.py" line="379" />
         <source>Send your donation</source>
         <translation>Bağışınızı gönderin</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="379" />
+        <location filename="../artisanlib/dashboard.py" line="380" />
         <source>Counts total number of recordings</source>
         <translation>Kayıtların toplam sayısını gösterir.</translation>
     </message>

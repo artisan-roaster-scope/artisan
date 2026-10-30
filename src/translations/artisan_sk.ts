@@ -247,7 +247,7 @@
         <translation>Otvorené</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="306" />
+        <location filename="../artisanlib/dashboard.py" line="307" />
         <location filename="../artisanlib/wheels.py" line="598" />
         <source>Properties</source>
         <translation type="unfinished">Vlastnosti</translation>
@@ -273,7 +273,7 @@
     <message>
         <location filename="../artisanlib/alarms.py" line="131" />
         <location filename="../artisanlib/curves.py" line="1485" />
-        <location filename="../artisanlib/dashboard.py" line="341" />
+        <location filename="../artisanlib/dashboard.py" line="342" />
         <location filename="../artisanlib/background.py" line="95" />
         <location filename="../artisanlib/events.py" line="804" />
         <location filename="../artisanlib/pid_dialogs.py" line="2903" />
@@ -631,7 +631,7 @@
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1490" />
-        <location filename="../artisanlib/dashboard.py" line="342" />
+        <location filename="../artisanlib/dashboard.py" line="343" />
         <location filename="../artisanlib/roast_properties.py" line="774" />
         <location filename="../artisanlib/background.py" line="100" />
         <source>Clear</source>
@@ -707,43 +707,43 @@
         <translation>Uložiť predvolené hodnoty</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="305" />
+        <location filename="../artisanlib/dashboard.py" line="306" />
         <source>Compare</source>
         <translation>Porovnať</translation>
     </message>
     <message>
         <location filename="../plus/schedule.py" line="2477" />
-        <location filename="../artisanlib/dashboard.py" line="308" />
+        <location filename="../artisanlib/dashboard.py" line="309" />
         <source>LOGIN TO UNLOCK</source>
         <translation>PRIHLÁSTE SA PRE ODOMKNUTIE</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="343" />
+        <location filename="../artisanlib/dashboard.py" line="344" />
         <source>Create</source>
         <translation>Vytvoriť</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="355" />
+        <location filename="../artisanlib/dashboard.py" line="356" />
         <source>Documentation</source>
         <translation type="unfinished">Dokumentácia</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="356" />
+        <location filename="../artisanlib/dashboard.py" line="357" />
         <source>User Forum</source>
         <translation>Používateľské fórum</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="357" />
+        <location filename="../artisanlib/dashboard.py" line="358" />
         <source>Report an Issue</source>
         <translation>Nahlásiť problém</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="358" />
+        <location filename="../artisanlib/dashboard.py" line="359" />
         <source>Web Platform</source>
         <translation>Webová platforma</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="375" />
+        <location filename="../artisanlib/dashboard.py" line="376" />
         <source>DONATE</source>
         <translation>DARUJTE</translation>
     </message>
@@ -4190,7 +4190,7 @@ KONIEC</translation>
         <location filename="../artisanlib/pid_control.py" line="817" />
         <location filename="../artisanlib/pid_control.py" line="793" />
         <location filename="../artisanlib/pid_control.py" line="725" />
-        <location filename="../artisanlib/dashboard.py" line="1435" />
+        <location filename="../artisanlib/dashboard.py" line="1418" />
         <location filename="../artisanlib/roast_properties.py" line="3798" />
         <location filename="../artisanlib/roast_properties.py" line="2724" />
         <location filename="../artisanlib/ports.py" line="2051" />
@@ -4830,7 +4830,7 @@ KONIEC</translation>
     </message>
     <message>
         <location filename="../plus/blend.py" line="140" />
-        <location filename="../artisanlib/dashboard.py" line="954" />
+        <location filename="../artisanlib/dashboard.py" line="955" />
         <location filename="../artisanlib/roast_properties.py" line="1859" />
         <source>Custom Blend</source>
         <translation>Vlastná zmes</translation>
@@ -5150,7 +5150,7 @@ KONIEC</translation>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="307" />
+        <location filename="../artisanlib/dashboard.py" line="308" />
         <source>INVENTORY</source>
         <translation>INVENTÁR</translation>
     </message>
@@ -12389,7 +12389,7 @@ Klávesové skratky musia byť zakázané (ENTER)</translation>
         <location filename="../artisanlib/main.py" line="22110" />
         <location filename="../artisanlib/main.py" line="6038" />
         <location filename="../artisanlib/statistics.py" line="211" />
-        <location filename="../artisanlib/dashboard.py" line="302" />
+        <location filename="../artisanlib/dashboard.py" line="303" />
         <location filename="../artisanlib/roast_properties.py" line="834" />
         <location filename="../artisanlib/comparator.py" line="1601" />
         <source>Title</source>
@@ -13445,7 +13445,7 @@ Klávesové skratky musia byť zakázané (ENTER)</translation>
     <message>
         <location filename="../plus/blend.py" line="401" />
         <location filename="../artisanlib/statistics.py" line="217" />
-        <location filename="../artisanlib/dashboard.py" line="309" />
+        <location filename="../artisanlib/dashboard.py" line="310" />
         <location filename="../artisanlib/roast_properties.py" line="1127" />
         <location filename="../artisanlib/roast_properties.py" line="881" />
         <source>Beans</source>
@@ -13513,13 +13513,13 @@ Klávesové skratky musia byť zakázané (ENTER)</translation>
         <translation>Skladom</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="311" />
+        <location filename="../artisanlib/dashboard.py" line="312" />
         <location filename="../artisanlib/roast_properties.py" line="1429" />
         <source>Space</source>
         <translation>Uložiť</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="310" />
+        <location filename="../artisanlib/dashboard.py" line="311" />
         <location filename="../artisanlib/roast_properties.py" line="1431" />
         <source>Blend</source>
         <translation>Zmes</translation>
@@ -13753,42 +13753,42 @@ LCDs All</source>
 LCD všetky</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="303" />
+        <location filename="../artisanlib/dashboard.py" line="304" />
         <source>Batch size</source>
         <translation>Veľkosť dávky</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="304" />
+        <location filename="../artisanlib/dashboard.py" line="305" />
         <source>Beans description</source>
         <translation>Popis fazule</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="340" />
+        <location filename="../artisanlib/dashboard.py" line="341" />
         <source>TEMPLATE</source>
         <translation>ŠABLÓNA</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="354" />
+        <location filename="../artisanlib/dashboard.py" line="355" />
         <source>QUICK LINKS</source>
         <translation>RÝCHLE ODKAZY</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="368" />
+        <location filename="../artisanlib/dashboard.py" line="369" />
         <source>RELEASE SPONSOR</source>
         <translation>SPONZOR VYDANIA</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="374" />
+        <location filename="../artisanlib/dashboard.py" line="375" />
         <source>SUPPORT ARTISAN</source>
         <translation>PODPORTE ARTISAN</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="513" />
+        <location filename="../artisanlib/dashboard.py" line="514" />
         <source>You've roasted {} batches</source>
         <translation>Upiekli ste {} dávok</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="638" />
+        <location filename="../artisanlib/dashboard.py" line="639" />
         <source>Hello {}!</source>
         <translation>Ahoj {}!</translation>
     </message>
@@ -15294,19 +15294,19 @@ Menej uzlov: jednoduchšia krivka, ale môže dôjsť k strate detailov</transla
     <message>
         <location filename="../artisanlib/main.py" line="4064" />
         <location filename="../artisanlib/main.py" line="2330" />
-        <location filename="../artisanlib/dashboard.py" line="301" />
+        <location filename="../artisanlib/dashboard.py" line="302" />
         <source>Roast</source>
         <translation>Praženicu</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2588" />
-        <location filename="../artisanlib/dashboard.py" line="337" />
+        <location filename="../artisanlib/dashboard.py" line="338" />
         <source>Comparator</source>
         <translation>Komparátor</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2593" />
-        <location filename="../artisanlib/dashboard.py" line="351" />
+        <location filename="../artisanlib/dashboard.py" line="352" />
         <source>Designer</source>
         <translation>Dizajnér</translation>
     </message>
@@ -16610,7 +16610,7 @@ POZOR: Zaznamenané údaje sa vymažú bez potvrdenia</translation>
         <translation>Fázy zmenené na predvolenú hodnotu {0}: {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="1502" />
+        <location filename="../artisanlib/dashboard.py" line="1485" />
         <source>Load roast template</source>
         <translation>Načítať šablónu na pečenie</translation>
     </message>
@@ -18937,12 +18937,12 @@ Continue?</source>
         <location filename="../plus/login.py" line="94" />
         <location filename="../plus/schedule.py" line="2478" />
         <location filename="../artisanlib/main.py" line="5111" />
-        <location filename="../artisanlib/dashboard.py" line="323" />
+        <location filename="../artisanlib/dashboard.py" line="324" />
         <source>Sign in to your artisan account</source>
         <translation>Prihláste sa do svojho remeselníckeho účtu</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="324" />
+        <location filename="../artisanlib/dashboard.py" line="325" />
         <source>Links to selected beans, blend and space on the platform</source>
         <translation>Odkazy na vybrané kávové zrná, zmesi a priestor na platforme</translation>
     </message>
@@ -19369,10 +19369,10 @@ Continue?</source>
         <location filename="../artisanlib/main.py" line="15916" />
         <location filename="../artisanlib/main.py" line="14603" />
         <location filename="../artisanlib/main.py" line="13170" />
-        <location filename="../artisanlib/dashboard.py" line="1390" />
-        <location filename="../artisanlib/dashboard.py" line="1306" />
-        <location filename="../artisanlib/dashboard.py" line="779" />
-        <location filename="../artisanlib/dashboard.py" line="766" />
+        <location filename="../artisanlib/dashboard.py" line="1373" />
+        <location filename="../artisanlib/dashboard.py" line="1285" />
+        <location filename="../artisanlib/dashboard.py" line="780" />
+        <location filename="../artisanlib/dashboard.py" line="767" />
         <location filename="../artisanlib/roast_properties.py" line="2651" />
         <location filename="../artisanlib/roast_properties.py" line="2616" />
         <location filename="../artisanlib/roast_properties.py" line="2271" />
@@ -21558,7 +21558,7 @@ specified by the lookahead</source>
         <translation>Otvoriť dialógové okno vlastností pečenia pri DROP</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="318" />
+        <location filename="../artisanlib/dashboard.py" line="319" />
         <location filename="../artisanlib/roast_properties.py" line="836" />
         <source>Enter the roast title or set properties by choosing from a recent roast</source>
         <translation>Zadajte názov pečenia alebo nastavte vlastnosti výberom z nedávneho pečenia</translation>
@@ -21575,7 +21575,7 @@ specified by the lookahead</source>
         <translation>Kliknite pravým tlačidlom myši pre úpravu</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="334" />
+        <location filename="../artisanlib/dashboard.py" line="335" />
         <location filename="../artisanlib/roast_properties.py" line="899" />
         <source>batch size</source>
         <translation>veľkosť dávky</translation>
@@ -21591,7 +21591,7 @@ specified by the lookahead</source>
         <translation>strata hmotnosti spôsobená pražením</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="335" />
+        <location filename="../artisanlib/dashboard.py" line="336" />
         <location filename="../artisanlib/roast_properties.py" line="925" />
         <source>weight unit</source>
         <translation>hmotnostná jednotka</translation>
@@ -21667,13 +21667,13 @@ specified by the lookahead</source>
         <translation>Objemová kalkulačka na určenie objemu kávy z hmotnosti vzorky nameranej v nádobe so známym objemom</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="319" />
+        <location filename="../artisanlib/dashboard.py" line="320" />
         <location filename="../artisanlib/roast_properties.py" line="1061" />
         <source>Add roast properties to list of recent roasts</source>
         <translation>Pridajte vlastnosti praženia do zoznamu nedávnych pražení</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="320" />
+        <location filename="../artisanlib/dashboard.py" line="321" />
         <location filename="../artisanlib/roast_properties.py" line="1073" />
         <source>Remove roast properties from list of recent roasts</source>
         <translation>Odstráňte vlastnosti praženia zo zoznamu nedávnych pražení</translation>
@@ -21780,8 +21780,8 @@ specified by the lookahead</source>
         <translation>načítať okolité dáta z pripojených zariadení alebo vypočítať zo zvolenej profilovej krivky</translation>
     </message>
     <message>
+        <location filename="../artisanlib/dashboard.py" line="327" />
         <location filename="../artisanlib/dashboard.py" line="326" />
-        <location filename="../artisanlib/dashboard.py" line="325" />
         <location filename="../artisanlib/roast_properties.py" line="1436" />
         <location filename="../artisanlib/roast_properties.py" line="1428" />
         <source>Select beans from your inventory</source>
@@ -21793,22 +21793,22 @@ specified by the lookahead</source>
         <translation>Vyberte miesto uloženia</translation>
     </message>
     <message>
+        <location filename="../artisanlib/dashboard.py" line="329" />
         <location filename="../artisanlib/dashboard.py" line="328" />
-        <location filename="../artisanlib/dashboard.py" line="327" />
         <location filename="../artisanlib/roast_properties.py" line="1438" />
         <location filename="../artisanlib/roast_properties.py" line="1432" />
         <source>Select a blend from your inventory</source>
         <translation>Vyberte si zmes z vášho inventára</translation>
     </message>
     <message>
+        <location filename="../artisanlib/dashboard.py" line="331" />
         <location filename="../artisanlib/dashboard.py" line="330" />
-        <location filename="../artisanlib/dashboard.py" line="329" />
         <location filename="../artisanlib/roast_properties.py" line="1434" />
         <source>Select a storage space</source>
         <translation>Vyberte úložný priestor</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="331" />
+        <location filename="../artisanlib/dashboard.py" line="332" />
         <location filename="../artisanlib/roast_properties.py" line="1443" />
         <source>Define a custom blend</source>
         <translation>Definovanie vlastnej zmesi</translation>
@@ -21869,137 +21869,137 @@ specified by the lookahead</source>
         <translation>Zobrazenie všetkých informácií (čas, percento a teplota) poslednej fázy na všetkých 3 fázových LCD displejoch paralelne</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="313" />
+        <location filename="../artisanlib/dashboard.py" line="314" />
         <source>Essential roast properties</source>
         <translation>Základné vlastnosti praženia</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="314" />
+        <location filename="../artisanlib/dashboard.py" line="315" />
         <source>Batch number</source>
         <translation>Číslo šarže</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="315" />
+        <location filename="../artisanlib/dashboard.py" line="316" />
         <source>Open roast on platform</source>
         <translation>Otvorená pečená na plošine</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="316" />
+        <location filename="../artisanlib/dashboard.py" line="317" />
         <source>Open your roast schedule</source>
         <translation>Otvorte si plán pečenia</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="317" />
+        <location filename="../artisanlib/dashboard.py" line="318" />
         <source>Upload this roast</source>
         <translation>Nahrať túto pečenú</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="322" />
+        <location filename="../artisanlib/dashboard.py" line="323" />
         <source>Green beans inventory</source>
         <translation>Zásoby zelených fazúľ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="332" />
+        <location filename="../artisanlib/dashboard.py" line="333" />
         <source>Update inventory from platform</source>
         <translation>Aktualizácia inventára z platformy</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="333" />
+        <location filename="../artisanlib/dashboard.py" line="334" />
         <source>Description of the green beans used</source>
         <translation>Opis použitej zelenej fazuľky</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="336" />
+        <location filename="../artisanlib/dashboard.py" line="337" />
         <source>Open roast properties dialog</source>
         <translation>Otvoriť dialógové okno vlastností pečenia</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="337" />
+        <location filename="../artisanlib/dashboard.py" line="338" />
         <source>Open roast in {}</source>
         <translation>Otvorené pečenie v {}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="345" />
+        <location filename="../artisanlib/dashboard.py" line="346" />
         <source>Background roast template</source>
         <translation>Šablóna na pečenie pozadia</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="346" />
+        <location filename="../artisanlib/dashboard.py" line="347" />
         <source>Name of current background template</source>
         <translation>Názov aktuálnej šablóny pozadia</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="347" />
+        <location filename="../artisanlib/dashboard.py" line="348" />
         <source>Open template on platform</source>
         <translation>Otvoriť šablónu na platforme</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="348" />
+        <location filename="../artisanlib/dashboard.py" line="349" />
         <source>Load a profile as template into the background</source>
         <translation>Načítať profil ako šablónu na pozadie</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="349" />
+        <location filename="../artisanlib/dashboard.py" line="350" />
         <source>Choose a recent roast and load as roast template</source>
         <translation>Vyberte nedávne pečenie a načítajte ho ako šablónu pečenia</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="350" />
+        <location filename="../artisanlib/dashboard.py" line="351" />
         <source>Remove the loaded background roast template</source>
         <translation>Odstránenie načítanej šablóny pečenia pozadia</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="351" />
+        <location filename="../artisanlib/dashboard.py" line="352" />
         <source>Start the {} and create a background roast template</source>
         <translation>Spustite {} a vytvorte šablónu na pečenie pozadia</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="361" />
+        <location filename="../artisanlib/dashboard.py" line="362" />
         <source>Links to external information and services</source>
         <translation>Odkazy na externé informácie a služby</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="362" />
+        <location filename="../artisanlib/dashboard.py" line="363" />
         <source>Explore the documentation</source>
         <translation>Preskúmajte dokumentáciu</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="363" />
+        <location filename="../artisanlib/dashboard.py" line="364" />
         <source>Ask questions, share tips, and connect with the community</source>
         <translation>Pýtajte sa, zdieľajte tipy a spojte sa s komunitou</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="364" />
+        <location filename="../artisanlib/dashboard.py" line="365" />
         <source>Report a bug or request a feature</source>
         <translation>Nahlásiť chybu alebo požiadať o funkciu</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="365" />
+        <location filename="../artisanlib/dashboard.py" line="366" />
         <source>Browse to the artisan platform</source>
         <translation>Prejdite na platformu pre remeselníkov</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="370" />
+        <location filename="../artisanlib/dashboard.py" line="371" />
         <source>Sponsor of this release</source>
         <translation>Sponzor tohto vydania</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="371" />
+        <location filename="../artisanlib/dashboard.py" line="372" />
         <source>Visit our sponsor</source>
         <translation>Navštívte nášho sponzora</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="377" />
+        <location filename="../artisanlib/dashboard.py" line="378" />
         <source>Help to keep artisan going</source>
         <translation>Pomôžte remeselníkovi udržať sa v chode</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="378" />
+        <location filename="../artisanlib/dashboard.py" line="379" />
         <source>Send your donation</source>
         <translation>Pošlite svoj dar</translation>
     </message>
     <message>
-        <location filename="../artisanlib/dashboard.py" line="379" />
+        <location filename="../artisanlib/dashboard.py" line="380" />
         <source>Counts total number of recordings</source>
         <translation>Počíta celkový počet nahrávok</translation>
     </message>

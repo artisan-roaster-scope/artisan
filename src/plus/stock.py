@@ -473,23 +473,23 @@ def list2blend(blend_list: BlendList|None) -> Blend|None:
 ###################
 # coffee and blend stock access and rendering
 
-unit_translations_singular = {
-    'bag': QApplication.translate('Plus', 'bag'),
-    'box': QApplication.translate('Plus', 'box'),
-    'barrel': QApplication.translate('Plus', 'barrel'),
-}
-unit_translations_plural = {
-    'bag': QApplication.translate('Plus', 'bags'),
-    'box': QApplication.translate('Plus', 'boxes'),
-    'barrel': QApplication.translate('Plus', 'barrels'),
-}
-
 
 def renderAmount(amount:float, default_unit:CoffeeUnit|None=None, target_unit_idx:int=0) -> str:
     res = ''
     # first try to convert to default_unit (like "bags")
     try:
         if default_unit is not None:
+
+            unit_translations_singular = {
+                'bag': QApplication.translate('Plus', 'bag'),
+                'box': QApplication.translate('Plus', 'box'),
+                'barrel': QApplication.translate('Plus', 'barrel'),
+            }
+            unit_translations_plural = {
+                'bag': QApplication.translate('Plus', 'bags'),
+                'box': QApplication.translate('Plus', 'boxes'),
+                'barrel': QApplication.translate('Plus', 'barrels'),
+            }
             unit_size = int(default_unit['size'])
             if amount > unit_size:
                 a = amount // unit_size
@@ -497,7 +497,7 @@ def renderAmount(amount:float, default_unit:CoffeeUnit|None=None, target_unit_id
                     u = unit_translations_plural[default_unit['name']]
                 else:
                     u = unit_translations_singular[default_unit['name']]
-                res = f'{int(round(a))}{u}'
+                res = f'{int(round(a))} {u}'
     except Exception:  # pylint: disable=broad-except
         pass
     # if we could not convert to default_unit type,

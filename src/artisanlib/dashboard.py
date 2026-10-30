@@ -28,6 +28,7 @@
 import os
 import sys
 import platform
+import warnings
 import logging
 from pathlib import Path
 from typing import Final, cast, TYPE_CHECKING
@@ -72,14 +73,14 @@ LINE_EDIT_BORDER_COLOR_LIGHT = '#D7D7D7'
 
 # sponsor logo background
 SPONSOR_LOGO_BACKGROUND_COLOR_LIGHT = '#ffffff'
-#SPONSOR_LOGO_BACKGROUND_COLOR_DARK = '#4c97c3' # artisan
-SPONSOR_LOGO_BACKGROUND_COLOR_DARK = '#99303030'
+SPONSOR_LOGO_BACKGROUND_COLOR_DARK = '#4c97c3' # artisan
+#SPONSOR_LOGO_BACKGROUND_COLOR_DARK = '#99303030'
 SPONSOR_LOGO_BACKGROUND_COLOR_HOVER_LIGHT = '#fBfBfB'
-#SPONSOR_LOGO_BACKGROUND_COLOR_HOVER_DARK = '#43a7cf' # artisan
-SPONSOR_LOGO_BACKGROUND_COLOR_HOVER_DARK = '#99404040'
+SPONSOR_LOGO_BACKGROUND_COLOR_HOVER_DARK = '#43a7cf' # artisan
+#SPONSOR_LOGO_BACKGROUND_COLOR_HOVER_DARK = '#99404040'
 SPONSOR_LOGO_BACKGROUND_COLOR_PRESSED_LIGHT = '#f8f8f8'
-#SPONSOR_LOGO_BACKGROUND_COLOR_PRESSED_DARK = '#1985ba' # artisan
-SPONSOR_LOGO_BACKGROUND_COLOR_PRESSED_DARK = '#99505050'
+SPONSOR_LOGO_BACKGROUND_COLOR_PRESSED_DARK = '#1985ba' # artisan
+#SPONSOR_LOGO_BACKGROUND_COLOR_PRESSED_DARK = '#99505050'
 
 
 class Dashboard(QWidget):
@@ -1360,6 +1361,10 @@ class Dashboard(QWidget):
     def title_changed(self) -> None:
         self.update_recent_roast_buttons()
         self.aw.qmc.setProfileTitle(self.aw.qmc.title)
+        # we need to explicitly trigger a redraw, otherwise the title is not always refreshed on display
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            self.aw.qmc.fig.canvas.draw_idle()
 
     @pyqtSlot(bool)
     def add_recent_roast(self, b:bool) -> None:
