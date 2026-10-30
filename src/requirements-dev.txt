@@ -19,7 +19,7 @@ pyright==1.1.414
 ruff>=0.17.3
 pylint==4.1.3
 pre-commit>=4.7.0
-pytest>=9.1.1 # the nested approx hack in test_load_save needs to be revised for 9.2
+pytest==9.1.1 # the nested approx hack in test_load_save needs to be revised for 9.2
 pytest-cov==7.1.0
 pytest-asyncio==1.4.1
 pytest-mock==3.17.0
