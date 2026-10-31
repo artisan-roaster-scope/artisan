@@ -8,11 +8,12 @@ v5.0.0 (Nov 5, 2026)
 * ADDITIONS
   - adds dashboard
   - adds support for [Dutch Master Roasters](https://artisan-scope.org/machines/dmr/)
+  - improved machine setups for [Sivetz](https://artisan-scope.org/machines/sivetz/) original fluid bed roasters
+  - improved support for [Orbiter](https://artisan-scope.org/machines/orbiter/) smart roasters
   - adds support for [FreshRoast SR900](https://artisan-scope.org/machines/freshroast/) including the IO Command `sr900(<target>[,<value>])` ([PR #2240](../../../pull/2240) contributed by [Brian Schmitt](https://github.com/brianschmitt))
   - adds autoCHARGE/autoDROP recognition for [IMF](https://artisan-scope.org/machines/imf/) as 'auto' setup which picks up CHARGE and DROP events from the machine
   - adds autoCHARGE/DROP and drum speed control to the [Schuilenburg](https://artisan-scope.org/machines/schuilenburg/) PLC machine setup
   - adds device setup for Lebrews online-color sensor [RoastSee NEXT](https://artisan-scope.org/devices/lebrew/) and `lebrew(<msg>)` IO Command
-  - improved support for [Orbiter](https://artisan-scope.org/machines/orbiter/) smart roasters
   - adds configuration to use the artisan internal software PID instead of the [Kaleido machines](https://artisan-scope.org/machines/kaleido/) internal one
   - adds [Aillio Bullet R2](https://artisan-scope.org/machines/aillio/) CSV import
   - adds [Mill City Roasters](https://artisan-scope.org/machines/mcr/) RoastPATH `.rpath` import

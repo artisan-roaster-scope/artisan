@@ -33,7 +33,7 @@ Donations
 
 This software is open-source and absolutely free to use, also in commercial settings.
 
-If you think artisan scope is useful to you, contribute financially to its further development. Send any amount via my [PayPal.Me page](https://www.paypal.me/MarkoLuther). Thanks!
+If you think artisan scope is useful to you, contribute financially to its further development: [Donate!](https://artisan-scope.org/donate/). Thanks.
 
 > *Home roasting enthusiasts often donate 10-100.- (in $ or EUR), while small roasting businesses and consultant that use Artisan in their daily work tend to donate 100-300.- (in $ or EUR). For extra tech support, please inquire.*
 
