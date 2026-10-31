@@ -7835,11 +7835,13 @@ class tgraphcanvas(QObject):
             self.aw.buttonCOOL.setFlat(False)
             self.aw.buttonONOFF.setText(QApplication.translate('Button', 'ON'))
             self.aw.buttonONOFF.setStyleSheet(push_button_style(bool(self.aw.simulator), 'OFF',
+                min_height=self.aw.main_button_min_height,
                 min_width=self.aw.main_button_min_width,
                 font_size=self.aw.button_font_size,
                 border_radius=self.aw.button_border_radius))
             self.aw.buttonSTARTSTOP.setText(QApplication.translate('Button', 'START'))
             self.aw.buttonSTARTSTOP.setStyleSheet(push_button_style(bool(self.aw.simulator), 'STOP',
+                min_height=self.aw.main_button_min_height,
                 min_width=self.aw.main_button_min_width,
                 font_size=self.aw.button_font_size,
                 border_radius=self.aw.button_border_radius))
@@ -13137,6 +13139,7 @@ class tgraphcanvas(QObject):
                 _log.exception(e)
 
             self.aw.buttonONOFF.setStyleSheet(push_button_style(bool(self.aw.simulator), 'ON',
+                min_height=self.aw.main_button_min_height,
                 min_width=self.aw.main_button_min_width,
                 font_size=self.aw.button_font_size,
                 border_radius=self.aw.button_border_radius))
@@ -13308,6 +13311,7 @@ class tgraphcanvas(QObject):
                 self.aw.updateCanvasColors(checkColors=False)
             #enable RESET button:
             self.aw.buttonRESET.setStyleSheet(push_button_style(bool(self.aw.simulator), 'RESET',
+                min_height=self.aw.main_button_min_height,
                 min_width=self.aw.main_button_min_width,
                 font_size=self.aw.button_font_size,
                 border_radius=self.aw.button_border_radius))
@@ -13325,6 +13329,7 @@ class tgraphcanvas(QObject):
                 _log.exception(e)
 
             self.aw.buttonONOFF.setStyleSheet(push_button_style(bool(self.aw.simulator), 'OFF',
+                min_height=self.aw.main_button_min_height,
                 min_width=self.aw.main_button_min_width,
                 font_size=self.aw.button_font_size,
                 border_radius=self.aw.button_border_radius))
@@ -14045,6 +14050,7 @@ class tgraphcanvas(QObject):
             self.aw.resetCurveVisibilities()
             self.flagstart = False
             self.aw.buttonSTARTSTOP.setStyleSheet(push_button_style(bool(self.aw.simulator), 'STOP',
+                min_height=self.aw.main_button_min_height,
                 min_width=self.aw.main_button_min_width,
                 font_size=self.aw.button_font_size,
                 border_radius=self.aw.button_border_radius))
@@ -14053,6 +14059,7 @@ class tgraphcanvas(QObject):
                 self.aw.buttonSTARTSTOP.setGraphicsEffect(self.aw.makeShadow())
             #enable RESET button:
             self.aw.buttonRESET.setStyleSheet(push_button_style(bool(self.aw.simulator), 'RESET',
+                min_height=self.aw.main_button_min_height,
                 min_width=self.aw.main_button_min_width,
                 font_size=self.aw.button_font_size,
                 border_radius=self.aw.button_border_radius))

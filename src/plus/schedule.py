@@ -2008,9 +2008,11 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.remaining_filter_group.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
 
         self.create_schedule_widget = QPushButton(f' {QApplication.translate('Button','CREATE SCHEDULE')} ')
+        self.create_schedule_widget.setMinimumSize(QSize(0, 28))
+        self.create_schedule_widget.setMaximumSize(QSize(16777215, 28))
         self.create_schedule_widget.setToolTip(QApplication.translate('Plus', 'Create roast schedule on the platform'))
         self.create_schedule_widget.setStyleSheet(artisan_push_button_style())
-        self.create_schedule_widget.setIconSize(QSize(14,14))
+        self.create_schedule_widget.setIconSize(QSize(18,18))
         self.create_schedule_widget.setIcon(QIcon(getStyleIconPath('external-link-stroke-rounded.svg')))
         self.create_schedule_widget.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
         self.create_schedule_widget.clicked.connect(self.open_scheduler_url)
@@ -2475,9 +2477,11 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.task_frame_hide = False # flag used by mainSplitterMoved()/hide_task_frame() to hide task frame again after closing the drawer
 
         disconnected_widget = QPushButton(QApplication.translate('Button','LOGIN TO UNLOCK'))
+        disconnected_widget.setMinimumSize(QSize(0, 28))
+        disconnected_widget.setMaximumSize(QSize(16777215, 28))
         disconnected_widget.setToolTip(QApplication.translate('Plus', 'Sign in to your artisan account'))
         disconnected_widget.setStyleSheet(artisan_push_button_style())
-        disconnected_widget.setIconSize(QSize(14,14))
+        disconnected_widget.setIconSize(QSize(18,18))
         disconnected_widget.setIcon(QIcon(getStyleIconPath('user-circle-stroke-rounded-dark.svg')))
         disconnected_widget.clicked.connect(self.disconnected_link_handler)
         disconnected_widget_layout = QHBoxLayout()

@@ -746,11 +746,11 @@ class ArtisanConfirmSaveDialog(ArtisanDialog):
         self.setFixedHeight(self.sizeHint().height())
 
         # translations
-        okButton: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
-        if okButton is not None:
-            okButton.setFocus()
-            self.setButtonTranslations(okButton,'OK',QApplication.translate('Button','OK'))
-            okButton.setIcon(QIcon()) # suppress standard button icons on Linux
+        saveButton: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Save)
+        if saveButton is not None:
+            saveButton.setFocus()
+            self.setButtonTranslations(saveButton,'Save',QApplication.translate('Button','Save'))
+            saveButton.setIcon(QIcon()) # suppress standard button icons on Linux
         discardButton: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Discard)
         if discardButton is not None:
             self.setButtonTranslations(discardButton,'Discard',QApplication.translate('Button','Discard'))

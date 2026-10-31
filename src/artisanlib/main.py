@@ -1498,7 +1498,7 @@ class ApplicationWindow(QMainWindow):
         'main_menu_actions_with_shortcuts', 'ui_mode', 'UIModeMenu',  'productionModeAction', 'defaultModeAction', 'expertModeAction', 'calculatorAction',
         'helpAboutAction', 'checkUpdateAction', 'errorAction', 'messageAction', 'serialAction', 'platformAction', 'aboutQtAction',
         'helpDocumentationAction', 'KshortCAction', 'profile_data_type_adapter', 'official_build',
-        'qt_scale_factor', 'automatic_registration_period', 'mqtt', 'orbiter', 'machineNameAction', 'main_button_min_width', 'main_button_min_width',
+        'qt_scale_factor', 'automatic_registration_period', 'mqtt', 'orbiter', 'machineNameAction', 'main_button_min_height', 'main_button_min_width',
         'pidbuttonFrame', 'phasesLCDsFrame', 'machineNameAction', 'automatic_registration_period', 'label_fmt', 'lcd_label_fmt', 'button_border_radius',
         'dashboard', 'stack', 'line_bottom', 'dashboard_background_image', 'dashboardImageToolButton', 'lcd1widget', 'buttonCONTROLwidget', 'extra_lcd_label_fmt',
         'exitToolButton', 'status_bar', 'dark_canvas'
@@ -2818,8 +2818,9 @@ class ApplicationWindow(QMainWindow):
 
         # set a few broad style parameters
 
-        self.button_border_radius = (17 if platform.system() == 'Linux' else (24 if platform.system() == 'Windows' else 21))
-        self.button_font_size_pt = 13
+        self.main_button_min_height:int = (34 if platform.system() == 'Linux' else (48 if platform.system() == 'Windows' else 42))
+        self.button_border_radius:int = (17 if platform.system() == 'Linux' else (24 if platform.system() == 'Windows' else 21))
+        self.button_font_size_pt:int = 13
 
 
         if platform.system() == 'Windows':
@@ -2869,6 +2870,7 @@ class ApplicationWindow(QMainWindow):
         self.buttonONOFF = QPushButton(QApplication.translate('Button', 'ON'))
         self.buttonONOFF.setToolTip(QApplication.translate('Tooltip', 'Start monitoring'))
         self.buttonONOFF.setStyleSheet(push_button_style(bool(self.simulator), 'OFF',
+            min_height=self.main_button_min_height,
             min_width=self.main_button_min_width,
             font_size=self.button_font_size,
             border_radius=self.button_border_radius))
@@ -2880,6 +2882,7 @@ class ApplicationWindow(QMainWindow):
         self.buttonSTARTSTOP = QPushButton(QApplication.translate('Button', 'START'))
         self.buttonSTARTSTOP.setToolTip(QApplication.translate('Tooltip', 'Start recording'))
         self.buttonSTARTSTOP.setStyleSheet(push_button_style(bool(self.simulator), 'STOP',
+            min_height=self.main_button_min_height,
             min_width=self.main_button_min_width,
             font_size=self.button_font_size,
             border_radius=self.button_border_radius))
@@ -2891,6 +2894,7 @@ class ApplicationWindow(QMainWindow):
         self.buttonRESET = QPushButton(QApplication.translate('Button', 'RESET'))
         self.buttonRESET.setToolTip(QApplication.translate('Tooltip', 'Reset'))
         self.buttonRESET.setStyleSheet(push_button_style(bool(self.simulator), 'RESET',
+            min_height=self.main_button_min_height,
             min_width=self.main_button_min_width,
             font_size=self.button_font_size,
             border_radius=self.button_border_radius))
@@ -2899,6 +2903,7 @@ class ApplicationWindow(QMainWindow):
         #create PID control button
         self.buttonCONTROL = QPushButton(QApplication.translate('Button', 'CONTROL'))
         self.buttonCONTROL.setStyleSheet(push_button_style(bool(self.simulator), 'PID',
+            min_height=self.main_button_min_height,
             min_width=self.main_button_min_width,
             font_size=self.button_font_size,
             border_radius=self.button_border_radius))
@@ -2988,7 +2993,8 @@ class ApplicationWindow(QMainWindow):
             button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             button.setStyleSheet(sv_plus_style)
             button.setMinimumWidth(90)
-            button.setMinimumHeight(self.standard_button_height)
+#            button.setMinimumHeight(self.standard_button_height)
+            button.setMinimumHeight(self.button_border_radius * 2)
             button.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
         sv_minus_style = artisan_sv_minus_push_button_style(
@@ -2999,7 +3005,8 @@ class ApplicationWindow(QMainWindow):
             button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             button.setStyleSheet(sv_minus_style)
             button.setMinimumWidth(90)
-            button.setMinimumHeight(self.standard_button_height)
+#            button.setMinimumHeight(self.standard_button_height)
+            button.setMinimumHeight(self.button_border_radius * 2)
             button.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
         #HUD button (button_18 was removed)
@@ -13027,11 +13034,13 @@ class ApplicationWindow(QMainWindow):
     def resetKeyboardButtonMarks(self) -> None:
         if self.qmc.flagon:
             self.buttonONOFF.setStyleSheet(push_button_style(bool(self.simulator), 'ON',
+                min_height=self.main_button_min_height,
                 min_width=self.main_button_min_width,
                 font_size=self.button_font_size,
                 border_radius=self.button_border_radius))
         else:
             self.buttonONOFF.setStyleSheet(push_button_style(bool(self.simulator), 'OFF',
+                min_height=self.main_button_min_height,
                 min_width=self.main_button_min_width,
                 font_size=self.button_font_size,
                 border_radius=self.button_border_radius))
@@ -25070,6 +25079,7 @@ class ApplicationWindow(QMainWindow):
                     # if not sampling we also stop the communication loop with the Hottop here completely
                     self.hottop.stop()
                 self.buttonCONTROL.setStyleSheet(push_button_style(bool(self.simulator), 'PID',
+                    min_height=self.main_button_min_height,
                     min_width=self.main_button_min_width,
                     font_size=self.button_font_size,
                     border_radius=self.button_border_radius))
@@ -25085,6 +25095,7 @@ class ApplicationWindow(QMainWindow):
                 if res:
                     self.hottop.setHottop(drum_motor=True)
                     self.buttonCONTROL.setStyleSheet(push_button_style(bool(self.simulator), 'PIDactive',
+                        min_height=self.main_button_min_height,
                         min_width=self.main_button_min_width,
                         font_size=self.button_font_size,
                         border_radius=self.button_border_radius))
@@ -27877,10 +27888,12 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.timeclock.setBase(1000)
                 self.sample_loop_running = True # we enable the sampling loop again that might have been stopped during the simulation via a timerLCD click
                 self.buttonONOFF.setStyleSheet(push_button_style(bool(self.simulator), 'OFF',
+                    min_height=self.main_button_min_height,
                     min_width=self.main_button_min_width,
                     font_size=self.button_font_size,
                     border_radius=self.button_border_radius))
                 self.buttonSTARTSTOP.setStyleSheet(push_button_style(bool(self.simulator), 'STOP',
+                    min_height=self.main_button_min_height,
                     min_width=self.main_button_min_width,
                     font_size=self.button_font_size,
                     border_radius=self.button_border_radius))
@@ -27917,10 +27930,12 @@ class ApplicationWindow(QMainWindow):
                         self.simulator = Simulator(self.qmc.mode, profile)
                         self.simulatorpath = filename
                         self.buttonONOFF.setStyleSheet(push_button_style(bool(self.simulator), 'OFF',
+                            min_height=self.main_button_min_height,
                             min_width=self.main_button_min_width,
                             font_size=self.button_font_size,
                             border_radius=self.button_border_radius))
                         self.buttonSTARTSTOP.setStyleSheet(push_button_style(bool(self.simulator), 'STOP',
+                            min_height=self.main_button_min_height,
                             min_width=self.main_button_min_width,
                             font_size=self.button_font_size,
                             border_radius=self.button_border_radius))

@@ -121,8 +121,9 @@ def artisan_minor_push_button_style(dark:bool=False, large:bool=False) -> str:
         QPushButton {{
             background-color: {'#52525250' if dark else '#B7B7B7'};
             color: {'#DEDEDE' if dark else '#FFFFFF'};
-            border: {'1px solid #4A4A4A' if dark else '0px solid'};
+            border: {'1px solid #4A4A4A' if dark else '1px solid #B7B7B7'};
             border-radius: {'14px' if large else '12px'};
+            height: {'18px' if large else '14px'};
             padding: {'3px' if dark else '4px'} 10px;
         }}
         QPushButton:hover {{
@@ -134,6 +135,7 @@ def artisan_minor_push_button_style(dark:bool=False, large:bool=False) -> str:
         QPushButton:disabled {{
             background-color: {'#55303030' if dark else '#E8E8E8'};
             color: {'#8F8F8F' if dark else '#8E8E93'};
+            border: {'1px solid #55303030' if dark else '1px solid #E8E8E8'};
         }}
     """
 
@@ -280,7 +282,7 @@ def artisan_event_button_style(min_width:int, min_height:int, padding:int, defau
 
 
 @functools.lru_cache
-def push_button_style(simulator:bool, button:str, min_width:int, font_size:int, border_radius:int) -> str:
+def push_button_style(simulator:bool, button:str, min_height:int, min_width:int, font_size:int, border_radius:int) -> str:
     # defaults for regular mode:
     color = '#FCFCFC'
     color_disabled = 'darkgrey'
@@ -339,6 +341,7 @@ def push_button_style(simulator:bool, button:str, min_width:int, font_size:int, 
         background_color_hovered = '#d4336a'
     return f"""
         QPushButton {{
+            min-height: {min_height}px;
             min-width: {min_width}px;
             padding-left: 8px;
             padding-right: 8px;

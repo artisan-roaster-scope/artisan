@@ -1532,6 +1532,7 @@ class PIDcontrol:
             self.aw.eventaction(4,self.aw.modbus.PID_ON_action)
             self.pidActive = True
             self.aw.buttonCONTROL.setStyleSheet(push_button_style(bool(self.aw.simulator), 'PIDactive',
+                min_height=self.aw.main_button_min_height,
                 min_width=self.aw.main_button_min_width,
                 font_size=self.aw.button_font_size,
                 border_radius=self.aw.button_border_radius))
@@ -1541,6 +1542,7 @@ class PIDcontrol:
             self.aw.eventaction(15,self.aw.s7.PID_ON_action)
             self.pidActive = True
             self.aw.buttonCONTROL.setStyleSheet(push_button_style(bool(self.aw.simulator), 'PIDactive',
+                min_height=self.aw.main_button_min_height,
                 min_width=self.aw.main_button_min_width,
                 font_size=self.aw.button_font_size,
                 border_radius=self.aw.button_border_radius))
@@ -1558,6 +1560,7 @@ class PIDcontrol:
                         self.aw.ser.SP.write(str2cmd('PID;ON\n'))
                         self.pidActive = True
                         self.aw.buttonCONTROL.setStyleSheet(push_button_style(bool(self.aw.simulator), 'PIDactive',
+                            min_height=self.aw.main_button_min_height,
                             min_width=self.aw.main_button_min_width,
                             font_size=self.aw.button_font_size,
                             border_radius=self.aw.button_border_radius))
@@ -1572,6 +1575,7 @@ class PIDcontrol:
             self.pidActive = True
             self.aw.qmc.pid.on()
             self.aw.buttonCONTROL.setStyleSheet(push_button_style(bool(self.aw.simulator), 'PIDactive',
+                min_height=self.aw.main_button_min_height,
                 min_width=self.aw.main_button_min_width,
                 font_size=self.aw.button_font_size,
                 border_radius=self.aw.button_border_radius))
@@ -1582,6 +1586,7 @@ class PIDcontrol:
                 self.pidActive = True
                 self.aw.qmc.pid.on()
                 self.aw.buttonCONTROL.setStyleSheet(push_button_style(bool(self.aw.simulator), 'PIDactive',
+                    min_height=self.aw.main_button_min_height,
                     min_width=self.aw.main_button_min_width,
                     font_size=self.aw.button_font_size,
                     border_radius=self.aw.button_border_radius))
@@ -1601,6 +1606,7 @@ class PIDcontrol:
             self.aw.eventaction(4,self.aw.modbus.PID_OFF_action)
             if not self.aw.HottopControlActive:
                 self.aw.buttonCONTROL.setStyleSheet(push_button_style(bool(self.aw.simulator), 'PID',
+                    min_height=self.aw.main_button_min_height,
                     min_width=self.aw.main_button_min_width,
                     font_size=self.aw.button_font_size,
                     border_radius=self.aw.button_border_radius))
@@ -1610,6 +1616,7 @@ class PIDcontrol:
             self.aw.eventaction(15,self.aw.s7.PID_OFF_action)
             if not self.aw.HottopControlActive:
                 self.aw.buttonCONTROL.setStyleSheet(push_button_style(bool(self.aw.simulator), 'PID',
+                    min_height=self.aw.main_button_min_height,
                     min_width=self.aw.main_button_min_width,
                     font_size=self.aw.button_font_size,
                     border_radius=self.aw.button_border_radius))
@@ -1630,6 +1637,7 @@ class PIDcontrol:
                         self.aw.ser.COMsemaphore.release(1)
                 if not self.aw.HottopControlActive:
                     self.aw.buttonCONTROL.setStyleSheet(push_button_style(bool(self.aw.simulator), 'PID',
+                        min_height=self.aw.main_button_min_height,
                         min_width=self.aw.main_button_min_width,
                         font_size=self.aw.button_font_size,
                         border_radius=self.aw.button_border_radius))
@@ -1641,6 +1649,7 @@ class PIDcontrol:
             self.pidActive = False
             self.aw.qmc.pid.off()
             self.aw.buttonCONTROL.setStyleSheet(push_button_style(bool(self.aw.simulator), 'PID',
+                min_height=self.aw.main_button_min_height,
                 min_width=self.aw.main_button_min_width,
                 font_size=self.aw.button_font_size,
                 border_radius=self.aw.button_border_radius))
@@ -1651,6 +1660,7 @@ class PIDcontrol:
             self.aw.qmc.pid.off()
             if not self.aw.HottopControlActive:
                 self.aw.buttonCONTROL.setStyleSheet(push_button_style(bool(self.aw.simulator), 'PID',
+                    min_height=self.aw.main_button_min_height,
                     min_width=self.aw.main_button_min_width,
                     font_size=self.aw.button_font_size,
                     border_radius=self.aw.button_border_radius))

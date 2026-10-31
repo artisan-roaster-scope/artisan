@@ -8,17 +8,17 @@ v5.0.0 (Nov 5, 2026)
 * ADDITIONS
   - adds dashboard
   - adds support for [Dutch Master Roasters](https://artisan-scope.org/machines/dmr/)
-  - improved machine setups for [Sivetz](https://artisan-scope.org/machines/sivetz/) original fluid bed roasters
-  - improved support for [Orbiter](https://artisan-scope.org/machines/orbiter/) smart roasters
   - adds support for [FreshRoast SR900](https://artisan-scope.org/machines/freshroast/) including the IO Command `sr900(<target>[,<value>])` ([PR #2240](../../../pull/2240) contributed by [Brian Schmitt](https://github.com/brianschmitt))
-  - adds autoCHARGE/autoDROP recognition for [IMF](https://artisan-scope.org/machines/imf/) as 'auto' setup which picks up CHARGE and DROP events from the machine
+  - adds improved machine setups for [Sivetz](https://artisan-scope.org/machines/sivetz/) original fluid bed roasters
+  - adds improved support for [Orbiter](https://artisan-scope.org/machines/orbiter/) smart roasters
+  - adds autoCHARGE/autoDROP synchronization for [IMF machines](https://artisan-scope.org/machines/imf/) as 'auto' setup which picks up CHARGE and DROP events from the machine
   - adds autoCHARGE/DROP and drum speed control to the [Schuilenburg](https://artisan-scope.org/machines/schuilenburg/) PLC machine setup
   - adds device setup for Lebrews online-color sensor [RoastSee NEXT](https://artisan-scope.org/devices/lebrew/) and `lebrew(<msg>)` IO Command
   - adds configuration to use the artisan internal software PID instead of the [Kaleido machines](https://artisan-scope.org/machines/kaleido/) internal one
-  - adds [Aillio Bullet R2](https://artisan-scope.org/machines/aillio/) CSV import
-  - adds [Mill City Roasters](https://artisan-scope.org/machines/mcr/) RoastPATH `.rpath` import
+  - adds [Aillio](https://artisan-scope.org/machines/aillio/) CSV import
+  - adds [MCR](https://artisan-scope.org/machines/mcr/) RoastPATH `.rpath` import
   - adds [Catppuccin](https://github.com/catppuccin) and Chalkboard themes
-  - adds UI scaling factor
+  - adds UI scaling
   - adds two more MODBUS device channels
   - adds Artisan Commands `pidDerivativeFilter(<n>)`, `pidDerivativeLimit(<n>)`, `pidILF(<n>)`, `pidIWP(<bool>)`, and `pidIRoC(<bool>)` to configure the internal PID (for John)
   - adds Artisan Commands `zoom(<x>[,<y>])`, `pan(<x>[,<y>])`, `center(<x>,<y>[,<clamp>])`, `clamp(<n>)`, `followMode(<bool>)`, and `followModePanning(<x>[,<y>])` to update the canvas perspective
@@ -27,7 +27,7 @@ v5.0.0 (Nov 5, 2026)
 * CHANGES
   - tightened license from [GPLv3](https://www.gnu.org/licenses/gpl-3.0.html) to [AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html) to prevent commercialization as headless engine
   - smaller builds by replacing headless Chromium engine by Rust-based [fulgur lib](https://github.com/fulgur-rs/fulgur) for HTML2PDF conversion (size reduced by ~45%)
-  - faster app start (startup time redued by ~50% on macOS)
+  - faster app start (startup time reduced by ~50% on macOS)
   - refreshed UI
   - improved translations
   - automatic restart on switching the language and on Factory Reset
