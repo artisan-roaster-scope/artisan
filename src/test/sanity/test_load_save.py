@@ -1,15 +1,17 @@
+from collections.abc import Sequence
+from decimal import Decimal
+from datetime import timedelta
 from pathlib import Path
 from json import load as json_load
 from typing import override, TypedDict, cast, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from _pytest.python_api import ApproxScalar
     from _pytest.python import Metafunc
 
 from artisanlib.atypes import ProfileData
 from artisanlib.util import serialize, deserialize, csv_load, exportProfile2CSV
 
-from _pytest.python_api import ApproxBase, ApproxMapping, ApproxSequenceLike
+from _pytest.approx import Approx, ApproxScalar, ApproxMapping, ApproxSequenceLike
 import pytest
 
 #######
@@ -75,12 +77,12 @@ values_to_ignore = [
 # see https://stackoverflow.com/questions/56046524/check-if-python-dictionaries-are-equal-allowing-small-difference-for-floats
 # by https://stackoverflow.com/users/8380999/iker
 
-class ApproxBaseReprMixin(ApproxBase):
+class ApproxBaseReprMixin(Approx[Any]):
 
     @override
     def __repr__(self) -> str:
 
-        def recur_repr_helper(obj:Any) -> dict[Any,Any]|tuple[Any,...]|list[Any]|ApproxScalar:
+        def recur_repr_helper(obj:Any) -> dict[Any,Any]|tuple[Any,...]|list[Any]|ApproxScalar[Any]:
             if isinstance(obj, dict):
                 return {k : recur_repr_helper(v) for k, v in obj.items()}
             if isinstance(obj, tuple):
@@ -91,8 +93,29 @@ class ApproxBaseReprMixin(ApproxBase):
 
         return f'approx({recur_repr_helper(self.expected)})'
 
+# overwrite init to prevent the trigger of "pytest.approx() does not support nested data structures:"
+# but ensure to __init__() the Approx
+class MyApproxSequenceLike(ApproxSequenceLike):
 
-class ApproxNestedSequenceLike(ApproxSequenceLike, ApproxBaseReprMixin):
+    def __init__(
+        self,
+        expected: Sequence[Any],
+        rel: float | Decimal | timedelta | None,
+        abs: float | Decimal | timedelta | None, # noqa: A002
+        nan_ok: bool,
+    ) -> None:
+        __tracebackhide__ = True
+
+        #: The expected value passed.
+        self.expected = expected
+        #: The relative tolerance.
+        self.rel = rel
+        #: The absolute tolerance.
+        self.abs = abs
+        #: Whether NaNs compare equal to NaN.
+        self.nan_ok = nan_ok
+
+class ApproxNestedSequenceLike(MyApproxSequenceLike, ApproxBaseReprMixin):
 
     @override
     def _yield_comparisons(self, actual:Any) -> Any:
@@ -106,10 +129,6 @@ class ApproxNestedSequenceLike(ApproxSequenceLike, ApproxBaseReprMixin):
                 yield from mapping._yield_comparisons(actual[k])
             else:
                 yield actual[k], self.expected[k]
-
-    @override
-    def _check_type(self) -> None:
-        pass
 
 
 
@@ -128,12 +147,9 @@ class ApproxNestedMapping(ApproxMapping, ApproxBaseReprMixin):
             else:
                 yield actual[k], self.expected[k]
 
-    @override
-    def _check_type(self) -> None:
-        pass
 
 
-def nested_approx(expected:Any, rel:float|None=None, absv:float|None=None, nan_ok:bool=False) -> ApproxBase:
+def nested_approx(expected:Any, rel:float|None=None, absv:float|None=None, nan_ok:bool=False) -> Approx[Any]:
     if isinstance(expected, dict):
         return ApproxNestedMapping(expected, rel, absv, nan_ok)
     if isinstance(expected, (tuple, list)):
