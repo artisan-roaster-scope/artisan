@@ -147,18 +147,6 @@ class Lebrew_RoastSeeNEXT:
             self._disconnected_handler()
 
 
-    # handlers
-
-    def connected_handler(self) -> None:
-        self.start_measuring()
-        if self._connected_handler is not None:
-            self._connected_handler()
-
-    def disconnected_handler(self) -> None:
-        if self._disconnected_handler is not None:
-            self._disconnected_handler()
-
-
     # external API to access sensor state
 
     def getAgtron(self) -> float:
@@ -263,14 +251,6 @@ class Lebrew_RoastSeeNEXT:
 
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-
-
-    def send_msg(self, message:bytes) -> None:
-        if hasattr(self, '_ble_client') and self._ble_client is not None:
-            # send via BLE
-            if self._logging:
-                _log.debug('send_msg(%s)',message)
-            self._ble_client.send(message, response=True)
 
     def send_msg(self, message:bytes) -> None:
         if hasattr(self, '_ble_client') and self._ble_client is not None:
