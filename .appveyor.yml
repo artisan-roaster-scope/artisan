@@ -154,7 +154,7 @@ for:
     PYTHON_UPGRADE_V: 3.14.9 # Upgrade to this version
     PYTHON_V: 3.12  # Override the stack key with latest Appveyor version
     ARTISAN_OS: macos
-    MACOSX_DEPLOYMENT_TARGET: 13.0
+    MACOSX_DEPLOYMENT_TARGET: 14.4
     PYUIC: pyuic6
     PYLUPDATE: ./pylupdate6pro.py  #the dot slash is necessary
 
