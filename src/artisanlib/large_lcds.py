@@ -46,8 +46,9 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 class LargeLCDs(ArtisanResizeablDialog):
 
-#    __slots__ = ['lcds1', 'lcds2', 'lcds1styles', 'lcds2styles', 'lcds1labelsUpper', 'lcds2labelsUpper', 'lcds1labelsLower', 'lcds2labelsLower',
-#        'lcds1frames', 'lcds2frames', 'visibleFrames', 'tight', 'layoutNr', 'swaplcds']
+    __slots__ = ['last_values1', 'last_values2', 'lcds1', 'lcds2', 'lcds1styles', 'lcds2styles', 'lcds1labelsUpper',
+        'lcds2labelsUpper', 'lcds1labelsLower', 'lcds2labelsLower',
+        'lcds1frames', 'lcds2frames', 'visibleFrames', 'tight', 'layoutNr', 'swaplcds']
 
     def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         if aw.get_os()[0] == 'RPi':
@@ -56,6 +57,8 @@ class LargeLCDs(ArtisanResizeablDialog):
             super().__init__(parent, aw) # if parent is set to None, largeLCD panels hide behind the main window in full screen mode on Windows!
         # it is assumed that both lists of lcds (lcd1 & lcd2) have the same length
         # the same is assumed for the other lists below:
+        self.last_values1:list[str|None] = []
+        self.last_values2:list[str|None] = []
         self.lcds1:list[QLCDNumber] = []
         self.lcds2:list[QLCDNumber] = []
         self.lcds1styles:list[str] = []
@@ -78,7 +81,7 @@ class LargeLCDs(ArtisanResizeablDialog):
         # we want minimize and close buttons, but no maximize buttons
         if not platform.system().startswith('Windows'):
             windowFlags = self.windowFlags()
-            windowFlags |= Qt.WindowType.Tool
+#            windowFlags |= Qt.WindowType.Tool # this keeps the window always on top which might not be what we want
             windowFlags |= Qt.WindowType.CustomizeWindowHint # needed to be able to customize the close/min/max controls (at least on macOS)
             windowFlags |= Qt.WindowType.WindowMinimizeButtonHint
             windowFlags |= Qt.WindowType.WindowCloseButtonHint # not needed on macOS, but maybe on Linux
@@ -97,8 +100,8 @@ class LargeLCDs(ArtisanResizeablDialog):
             w = a0.size().width()
             h = a0.size().height()
             self.chooseLayout(w,h)
-        super().resizeEvent(a0)
         self.setUpdatesEnabled(True)
+        super().resizeEvent(a0)
 
     def landscapeLayout(self) -> 'QLayout':
         self.tight = False
@@ -200,6 +203,7 @@ class LargeLCDs(ArtisanResizeablDialog):
             self.raise_()
             self.activateWindow()
             self.layoutNr = newLayoutNr
+            self.updateValues(self.last_values1, self.last_values2)
 
     def chooseLayout(self, w:int, h:int) -> None:
         if w > h:
@@ -314,12 +318,18 @@ class LargeLCDs(ArtisanResizeablDialog):
             try:
                 if v1 is not None:
                     self.lcds1[i].display(v1)
+                    if len(self.last_values1) != len(self.lcds1):
+                        self.last_values1 = ['']*len(self.lcds1)
+                    self.last_values1[i] = v1
             except Exception: # pylint: disable=broad-except
                 pass
         for i,v2 in enumerate(values2):
             try:
                 if v2 is not None:
                     self.lcds2[i].display(v2)
+                    if len(self.last_values2) != len(self.lcds2):
+                        self.last_values2 = ['']*len(self.lcds2)
+                    self.last_values2[i] = v2
             except Exception: # pylint: disable=broad-except
                 pass
 
@@ -781,7 +791,7 @@ class LargePhasesLCDs(LargeLCDs):
 
     @override
     def makeLCDs(self) -> None:
-        self.lcds1styles = ['sv','sv']
+        self.lcds1styles = ['phases','phases']
         self.lcds1 = [
             self.makeLCD(self.lcds1styles[0]), # Phase 1
             self.makeLCD(self.lcds1styles[1])  # Phase 3
@@ -797,7 +807,7 @@ class LargePhasesLCDs(LargeLCDs):
             f.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
             f.customContextMenuRequested.connect(self.aw.PhaseslcdClicked)
         #
-        self.lcds2styles = ['sv','sv']
+        self.lcds2styles = ['phases','phases']
         self.lcds2 = [
             self.makeLCD(self.lcds2styles[0]), # Phase 2
             self.makeLCD(self.lcds2styles[1])  # AUC
@@ -913,7 +923,7 @@ class LargeScaleLCDs(LargeLCDs):
 
     @override
     def makeLCDs(self) -> None:
-        self.lcds1styles = ['rstimer']
+        self.lcds1styles = ['scale']
         self.lcd1 = self.makeLCD(self.lcds1styles[0])
         self.lcd1.clicked.connect(self.aw.scale_manager.tare_scale1_slot)
         self.lcds1 = [self.lcd1] # Scale 1 weight
@@ -923,7 +933,7 @@ class LargeScaleLCDs(LargeLCDs):
         self.lcds1labelsLower = [label1Lower]
         self.lcds1frames = [self.makeLCDframe(label1Upper,self.lcds1[0],label1Lower)]
         #
-        self.lcds2styles = ['rstimer']
+        self.lcds2styles = ['scale']
         self.lcd2 = self.makeLCD(self.lcds2styles[0])
         self.lcd2.clicked.connect(self.aw.scale_manager.tare_scale2_slot)
         self.lcds2 = [self.lcd2] # Scale 2 weight
@@ -933,12 +943,17 @@ class LargeScaleLCDs(LargeLCDs):
         self.lcds2labelsLower = [label2Lower]
         self.lcds2frames = [self.makeLCDframe(label2Upper,self.lcds2[0],label2Lower)]
         ##
-        self.updateVisiblitiesScale()
+        self.setVisiblitiesScale() # calling updateVisibilitiesScales() instead would loop via relayout()
         self.updateStyles()
         self.updateDecimals()
 
+    def setVisiblitiesScale(self) -> None:
+        self.updateVisibilities([self.aw.scale1_model is not None],[self.aw.scale2_model is not None])
+
     def updateVisiblitiesScale(self) -> None:
-        self.updateVisibilities([True],[True])
+        self.setVisiblitiesScale()
+        self.reLayout() # should not be called from makeLCDs as this triggers a loop
+        self.updateValues(self.last_values1, self.last_values2)
 
     @override
     def updateDecimals(self) -> None:
@@ -958,6 +973,7 @@ class LargeScaleLCDs(LargeLCDs):
         settings = QSettings()
         #save window geometry
         settings.setValue('ScaleLCDGeometry',self.saveGeometry())
+        self.aw.closeLargeScaleLCDs()
         self.aw.largeScaleLCDs_dialog = None
         self.aw.LargeScaleLCDsFlag = False
         self.aw.scalelcdsAction.setChecked(False)

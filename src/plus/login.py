@@ -98,19 +98,6 @@ class Login(ArtisanDialog):
             }}
         """)
 
-        self.dialogbuttons = QDialogButtonBox(
-            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
-        )
-        self.setButtonTranslations(
-            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok),
-            'OK',
-            QApplication.translate('Button', 'OK'),
-        )
-        self.setButtonTranslations(
-            self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel),
-            'Cancel',
-            QApplication.translate('Button', 'Cancel'),
-        )
 
         self.dialogbuttons.accepted.connect(self.setCredentials)
         self.dialogbuttons.rejected.connect(self.reject)
@@ -118,9 +105,7 @@ class Login(ArtisanDialog):
         self.ok_button = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
         if self.ok_button is not None:
             self.ok_button.setEnabled(False)
-            self.ok_button.setFocusPolicy(
-                Qt.FocusPolicy.StrongFocus
-            )
+
         self.cancel_button = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel)
         if self.cancel_button is not None:
             self.cancel_button.setDefault(True)
@@ -171,19 +156,19 @@ class Login(ArtisanDialog):
 
         registerIconLayout = QVBoxLayout()
         registerIconLayout.addStretch()
-        registerIconLayout.addWidget(self.register_icon)
+        registerIconLayout.addWidget(self.register_icon, Qt.AlignmentFlag.AlignCenter)
         registerIconLayout.addStretch()
-        registerIconLayout.setContentsMargins(0, 0, 0, 0) # (left, top, right, bottom)
+        registerIconLayout.setContentsMargins(0, 0, 0, 3) # (left, top, right, bottom)
 
         linkRegisterLayout = QHBoxLayout()
         linkRegisterLayout.addStretch()
         linkRegisterLayout.addLayout(registerIconLayout)
-        linkRegisterLayout.addWidget(self.linkRegister)
+        linkRegisterLayout.addWidget(self.linkRegister, Qt.AlignmentFlag.AlignCenter)
         linkRegisterLayout.addStretch()
 
         registerGroup:QGroupBox = QGroupBox()
         registerGroup.setLayout(linkRegisterLayout)
-        linkRegisterLayout.setContentsMargins(6, 0, 6, 3) # (left, top, right, bottom)
+        linkRegisterLayout.setContentsMargins(7, 6, 7, 4) # (left, top, right, bottom)
 
         linkResetLayout = QHBoxLayout()
         linkResetLayout.addStretch()
@@ -216,7 +201,7 @@ class Login(ArtisanDialog):
         layout.addWidget(credentialsGroup)
         layout.addSpacing(5)
         layout.addLayout(buttonLayout)
-        layout.setSpacing(10)
+        layout.setSpacing(15)
         layout.addWidget(registerGroup)
 #        layout.setContentsMargins(15, 15, 15, 15) # (left, top, right, bottom)
 

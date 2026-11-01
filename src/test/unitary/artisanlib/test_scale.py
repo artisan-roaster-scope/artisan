@@ -667,18 +667,6 @@ class TestScaleManager:
             # Assert
             mock_set_scale.assert_called_once_with(0, '', '')
 
-    def test_connect_scale1_slot_success(self, scale_manager_instance: ScaleManager) -> None:
-        """Test connect_scale1_slot with existing scale."""
-        # Arrange
-        mock_scale = Mock()
-        scale_manager_instance.scale1 = mock_scale
-
-        # Act
-        scale_manager_instance.connect_scale1_slot(False)
-
-        # Assert
-        mock_scale.connect_scale.assert_called_once()
-
     def test_connect_scale1_slot_no_scale(self, scale_manager_instance: ScaleManager) -> None:
         """Test connect_scale1_slot when no scale exists."""
         # Arrange

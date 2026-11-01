@@ -1,3 +1,10 @@
+artisan (5.0.0-0) precise; urgency=low
+  * new upstream release
+  * changes since 4.2.0:
+   - adds support for Dutch Master Roaster, FreshRoast SR900, improved support for IMF, Schuilenburg, Sivetz, Orbiter, Lebrew RoastSee NEXT, adds dashboard and update UI. License tightened to AGPLv3.
+   - bug fixes
+ --  <marko.luther@gmx.net>  Thu, 5 Nov 2026 19:32:14 +0200
+
 artisan (4.2.0-1) precise; urgency=low
   * new upstream release
   * changes since 4.0.2:

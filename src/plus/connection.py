@@ -361,7 +361,7 @@ def make_authentify() -> Authentifier:
 authentify = make_authentify()
 
 def getHeaders(
-    authorized: bool = True, decompress: bool = True) -> dict[str, str]:
+        authorized: bool = True, decompress: bool = True) -> dict[str, str]:
     aw = config.app_window
     if aw is not None:
         os, os_version, os_arch = aw.get_os()  # @UndefinedVariable
@@ -478,7 +478,7 @@ def getData(url: str, authorized: bool = True, params:dict[str,str]|None = None)
         if not authentify():
             return None
     params = params or {}
-    #    _log.debug("-> request headers %s",headers)
+    # _log.debug("-> request headers %s",headers)
     try:
         r:requests.models.Response = requests.get(
             url,
@@ -514,7 +514,7 @@ def getData(url: str, authorized: bool = True, params:dict[str,str]|None = None)
                 )
         try:
             _log.debug('-> size %s', len(r.content))
-    #        _log.debug("-> data %s",r.json())
+#            _log.debug("-> data %s",r.json())
         except Exception:  # pylint: disable=broad-except
             pass
         return r

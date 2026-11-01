@@ -27,6 +27,7 @@ classifiers = [
     'Programming Language :: Python :: 3.12',
     'Programming Language :: Python :: 3.13',
     'Programming Language :: Python :: 3.14',
+    'Programming Language :: Python :: 3.15',
     'Programming Language :: Python :: 3 :: Only',
     'Programming Language :: Python :: Implementation :: CPython',
     'Topic :: Other/Nonlisted Topic'
@@ -395,7 +396,7 @@ directory = ".htmlcov"
 ## codespell
 
 [tool.codespell]
-skip = '*.ts,./coverage,./build,./dist*,./htmlcov,./*.spec,*.svg'
+skip = '*.ts,./coverage,./build,./nsis_includes,./dist*,./htmlcov,./*.spec,*.svg,*.eps,*.ai,./test/sanity/data/*/*'
 count = ''
 quiet-level = 3
 ignore-words-list = 'Abd,ser,alog,nd,iterm,dout,te,commandi,dout,exitt,currenty,exaust,controle,coment,controle,outweight,everytime,sade,weightIn,weightin,Caf,caf,Equil'

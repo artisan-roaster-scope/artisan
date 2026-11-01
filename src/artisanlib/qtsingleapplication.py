@@ -57,7 +57,7 @@ class QtSingleApplication(QApplication):
 
         super().__init__(*argv)
 
-        self.activateWindowSignal.connect(self.activateWindow, type=Qt.ConnectionType.QueuedConnection)  # type: ignore[call-arg]
+        self.activateWindowSignal.connect(self.activateWindow, type=Qt.ConnectionType.QueuedConnection) # Xtype: ignore[call-arg]
 
         self._id:str = _id
         self._viewer_id:str = _viewer_id

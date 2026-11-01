@@ -78,7 +78,25 @@ DATA_FILES = [
         (r'includes/roboto-600.woff2', '.'),
         (r'includes/roboto-regular.woff2', '.'),
         (r'includes/artisan.tpl', '.'),
-        (r'includes/scale_widget.tpl', '.'),
+        (r'includes/green_scale_widget.tpl', '.'),
+        (r'includes/green-android-chrome-192x192.png', '.'),
+        (r'includes/green-android-chrome-512x512.png', '.'),
+        (r'includes/green-apple-touch-icon.png', '.'),
+        (r'includes/green-favicon-16x16.png', '.'),
+        (r'includes/green-favicon-32x32.png', '.'),
+        (r'includes/green-favicon-48x48.png', '.'),
+        (r'includes/green-favicon.ico', '.'),
+        (r'includes/green-site.webmanifest', '.'),
+        (r'includes/roasted_scale_widget.tpl', '.'),
+        (r'includes/roasted-android-chrome-192x192.png', '.'),
+        (r'includes/roasted-android-chrome-512x512.png', '.'),
+        (r'includes/roasted-apple-touch-icon.png', '.'),
+        (r'includes/roasted-favicon-16x16.png', '.'),
+        (r'includes/roasted-favicon-32x32.png', '.'),
+        (r'includes/roasted-favicon-48x48.png', '.'),
+        (r'includes/roasted-favicon.ico', '.'),
+        (r'includes/roasted-site.webmanifest', '.'),
+        (r'includes/artisan-combo-mark-white.svg', '.'),
         (r'includes/fitty_patched.js', '.'),
         (r'includes/bigtext.js', '.'),
         (r'includes/fitty_patched.js', '.'),
@@ -89,7 +107,6 @@ DATA_FILES = [
         (r'includes/browserconfig.xml', '.'),
         (r'includes/favicon-16x16.png', '.'),
         (r'includes/favicon-32x32.png', '.'),
-        (r'includes/favicon-96x96.png', '.'),
         (r'includes/favicon.ico', '.'),
         (r'includes/favicon.svg', '.'),
         (r'includes/mstile-70x70.png', '.'),
@@ -117,12 +134,16 @@ DATA_FILES = [
         (r'includes/ComicNeue-Regular.ttf', '.'),
         (r'includes/xkcd-script.ttf', '.'),
         (r'includes/Nunito-Regular.ttf', '.'),
+        (r'includes/Nunito-SemiBold.ttf', '.'),
+        (r'includes/Nunito-ExtraBold.ttf', '.'),
         (r'includes/NotoSansMono-Regular.ttf', '.'),
         (r'includes/artisan_public_key.pem', '.'),
         (r'includes/Machines', './Machines'),
         (r'includes/Themes', './Themes'),
         (r'includes/Icons', './Icons'),
-        (r'includes/logging.json', '.')
+        (r'includes/logging.json', '.'),
+	(r'includes/release-sponsor-logo.svg', '.'),
+	(r'includes/release-sponsor-logo-dark.svg', '.')
 ]
 
 # add Artisan translations to DATA_FILES
@@ -191,7 +212,7 @@ exe = EXE(pyz,
 try:
     minimumSystemVersion = os.environ['MACOSX_DEPLOYMENT_TARGET']
 except Exception: # pylint: disable=broad-except
-    minimumSystemVersion = '13.0' # assuming the new-style numpy/scipy libs which define the minimum; Qt 6.10 requires >= 13.0
+    minimumSystemVersion = '14.4' # assuming the new-style numpy/scipy libs which define the minimum; Qt 6.12 requires >= 14.4
 
 plist = {}
 with open('Info.plist', 'rb') as infile:

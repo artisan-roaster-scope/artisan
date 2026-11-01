@@ -1828,8 +1828,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
         self.reset()
         self.sm_green.send('reset')
         self.sm_roasted.send('reset')
-#        self.scale_manager.disconnect_all_signal.emit() # closing via signal does not work on app quite for unknown reasons thus we make a direct call
-        self.scale_manager.disconnect_all_slot()
+        # disconnect scale manager signals
         try:
             # disconnect can fail if not connected
             self.scale_manager.available_signal.disconnect(self.scales_available)
@@ -1840,6 +1839,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
             self.scale_manager.unavailable_signal.disconnect(self.scales_unavailable)
         except Exception:   # pylint: disable=broad-except
             pass
+        # disconnect scale 1 signals
         try:
             # disconnect can fail if not connected
             self.scale_manager.scale1_stable_weight_changed_signal.disconnect(self.scale1_stable_weight_changed_slot)
@@ -1855,6 +1855,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
             self.scale_manager.scale1_tare_pressed_signal.disconnect(self.scale1_tare_pressed_slot)
         except Exception:   # pylint: disable=broad-except
             pass
+        # disconnect scale 2 signals
         try:
             # disconnect can fail if not connected
             self.scale_manager.scale2_stable_weight_changed_signal.disconnect(self.scale2_stable_weight_changed_slot)
@@ -1870,4 +1871,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
             self.scale_manager.scale2_tare_pressed_signal.disconnect(self.scale2_tare_pressed_slot)
         except Exception:   # pylint: disable=broad-except
             pass
+        # disconnect both scales only in case they are not in use (WeightManager:weight_changed_signal is no longer connected)
+        self.scale_manager.disconnect_scale1_signal.emit()
+        self.scale_manager.disconnect_scale2_signal.emit()
         _log.debug('BatchManager stopped')

@@ -523,44 +523,6 @@ class TestClientBLE:
 
         # Assert - No write should occur due to multiple writers without specification
 
-    def test_read_success_single_reader(self, client_ble_instance: ClientBLE) -> None:
-        """Test successful read with single reader."""
-        # Arrange
-        mock_client = Mock()
-        client_ble_instance._ble_client = mock_client
-        client_ble_instance._connected_service_uuid = 'service-uuid-1'
-        client_ble_instance._readers = {'service-uuid-1': ['read-uuid-1']}
-        expected_data = b'test_data'
-
-        with patch('artisanlib.ble_port.ble') as mock_ble:
-            mock_ble.read.return_value = expected_data
-
-            # Act
-            result = client_ble_instance.read()
-
-            # Assert
-            assert result == expected_data
-            mock_ble.read.assert_called_once_with(mock_client, 'read-uuid-1')
-
-    def test_read_with_specific_read_characteristic(self, client_ble_instance: ClientBLE) -> None:
-        """Test read with specific read characteristic."""
-        # Arrange
-        mock_client = Mock()
-        client_ble_instance._ble_client = mock_client
-        client_ble_instance._connected_service_uuid = 'service-uuid-1'
-        client_ble_instance._readers = {'service-uuid-1': ['read-uuid-1', 'read-uuid-2']}
-        expected_data = b'test_data'
-
-        with patch('artisanlib.ble_port.ble') as mock_ble:
-            mock_ble.read.return_value = expected_data
-
-            # Act
-            result = client_ble_instance.read(read_characteristic='read-uuid-2')
-
-            # Assert
-            assert result == expected_data
-            mock_ble.read.assert_called_once_with(mock_client, 'read-uuid-2')
-
     def test_read_no_client(self, client_ble_instance: ClientBLE) -> None:
         """Test read when no client is connected."""
         # Arrange

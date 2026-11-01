@@ -303,6 +303,7 @@ def getWorker() -> 'Worker|None':
             worker.startSignal.connect(worker.update_blocking)
             worker.replySignal.connect(util.updateLimits)
             worker.updatedSignal.connect(util.updateSchedule)
+            worker.updatedSignal.connect(util.updateDashboardInventory)
             worker.upToDateSignal.connect(util.updateSchedule)
         return worker
     except Exception as e:  # pylint: disable=broad-except
@@ -472,23 +473,23 @@ def list2blend(blend_list: BlendList|None) -> Blend|None:
 ###################
 # coffee and blend stock access and rendering
 
-unit_translations_singular = {
-    'bag': QApplication.translate('Plus', 'bag'),
-    'box': QApplication.translate('Plus', 'box'),
-    'barrel': QApplication.translate('Plus', 'barrel'),
-}
-unit_translations_plural = {
-    'bag': QApplication.translate('Plus', 'bags'),
-    'box': QApplication.translate('Plus', 'boxes'),
-    'barrel': QApplication.translate('Plus', 'barrels'),
-}
-
 
 def renderAmount(amount:float, default_unit:CoffeeUnit|None=None, target_unit_idx:int=0) -> str:
     res = ''
     # first try to convert to default_unit (like "bags")
     try:
         if default_unit is not None:
+
+            unit_translations_singular = {
+                'bag': QApplication.translate('Plus', 'bag'),
+                'box': QApplication.translate('Plus', 'box'),
+                'barrel': QApplication.translate('Plus', 'barrel'),
+            }
+            unit_translations_plural = {
+                'bag': QApplication.translate('Plus', 'bags'),
+                'box': QApplication.translate('Plus', 'boxes'),
+                'barrel': QApplication.translate('Plus', 'barrels'),
+            }
             unit_size = int(default_unit['size'])
             if amount > unit_size:
                 a = amount // unit_size
@@ -496,7 +497,7 @@ def renderAmount(amount:float, default_unit:CoffeeUnit|None=None, target_unit_id
                     u = unit_translations_plural[default_unit['name']]
                 else:
                     u = unit_translations_singular[default_unit['name']]
-                res = f'{int(round(a))}{u}'
+                res = f'{int(round(a))} {u}'
     except Exception:  # pylint: disable=broad-except
         pass
     # if we could not convert to default_unit type,
@@ -695,8 +696,8 @@ def coffee2beans(c:Coffee) -> str:
         return f'{label}{bean}, {year}'
     if coffee_label_normal_order:
         if year == '':
-            return f'{origin}, {label}{bean}'
-        return f'{origin}, {label}{bean}, {year}'
+            return f'{origin} {label}{bean}'
+        return f'{origin} {label}{bean}, {year}'
     if year == '':
         return f'{label}{bean}, {origin}'
     return f'{label}{bean}, {origin} {year}'
@@ -730,7 +731,7 @@ def coffeeLabel(c:Coffee) -> str:
     if origin == '':
         return c.get('label', '')
     if coffee_label_normal_order:
-        return f"{origin}, {c.get('label', '')}"
+        return f"{origin} {c.get('label', '')}"
     return f"{c.get('label', '')}, {origin}"
 
 # returns a dict with all coffees with stock associated as string of the form

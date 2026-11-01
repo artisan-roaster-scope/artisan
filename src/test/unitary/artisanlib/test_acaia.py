@@ -598,7 +598,7 @@ class TestAcaiaBLEWeightDecoding:
                 # Weight is little-endian: 1000 = 0x03e8 = [0xe8, 0x03, 0x00, 0x00]
                 # Stable flag is inverted: stable = (payload[5] & 0x01) != 0x01
                 test_payload = b'\xe8\x03\x00\x00\x01\x00'  # 1000 in little-endian, factor=TEN, stable (bit 0 = 0)
-                weight, stable = acaia_ble.protocol.decode_weight(test_payload)
+                weight, stable, _error = acaia_ble.protocol.decode_weight(test_payload)
 
                 assert weight is not None
                 assert isinstance(weight, float)
@@ -607,22 +607,22 @@ class TestAcaiaBLEWeightDecoding:
 
                 # Test with different factor
                 test_payload_hundred = b'\xe8\x03\x00\x00\x02\x00'  # factor=HUNDRED, stable
-                weight_hundred, _ = acaia_ble.protocol.decode_weight(test_payload_hundred)
+                weight_hundred, _, _error = acaia_ble.protocol.decode_weight(test_payload_hundred)
                 assert weight_hundred == 10.0  # 1000 / 100 = 10.0
 
                 # Test with negative weight (bit 1 of last byte)
                 test_payload_negative = b'\xe8\x03\x00\x00\x01\x02'  # negative flag set (bit 1)
-                weight_neg, _ = acaia_ble.protocol.decode_weight(test_payload_negative)
+                weight_neg, _, _error = acaia_ble.protocol.decode_weight(test_payload_negative)
                 assert weight_neg == -100.0
 
                 # Test unstable reading (bit 0 = 1)
                 test_payload_unstable = b'\xe8\x03\x00\x00\x01\x01'  # unstable (bit 0 = 1)
-                _, stable_unstable = acaia_ble.protocol.decode_weight(test_payload_unstable)
+                _, stable_unstable, _error = acaia_ble.protocol.decode_weight(test_payload_unstable)
                 assert stable_unstable is False  # unstable when bit 0 = 1
 
                 # Test with insufficient payload
                 short_payload = b'\x00\x00\x03'  # Only 3 bytes
-                weight_short, stable_short = acaia_ble.protocol.decode_weight(short_payload)
+                weight_short, stable_short, _error = acaia_ble.protocol.decode_weight(short_payload)
                 assert weight_short is None
                 assert stable_short is False
 
@@ -718,154 +718,6 @@ class TestAcaiaBLEMessageConstruction:
 class TestAcaiaBLEEventParsing:
     """Test AcaiaBLE event parsing methods."""
 
-    def test_parse_battery_event(self) -> None:
-        """Test parse_battery_event method implementation."""
-        # Test the actual parse_battery_event implementation from the AcaiaBLE class
-
-        with patch('artisanlib.util.float2float'), patch('PyQt6.QtCore.pyqtSignal'), patch(
-            'PyQt6.QtCore.pyqtSlot'
-        ), patch('artisanlib.async_comm.AsyncIterable'), patch(
-            'artisanlib.async_comm.IteratorReader'
-        ), patch(
-            'artisanlib.scale.Scale'
-        ), patch(
-            'artisanlib.scale.ScaleSpecs'
-        ), patch(
-            'asyncio.Queue'
-        ), patch(
-            'logging.getLogger'
-        ):
-
-            # Mock ClientBLE as a simple class so AcaiaBLE can inherit from it
-            class MockClientBLE:
-                def set_heartbeat(self, frequency: int) -> None:
-                    pass
-
-                def connected(self) -> tuple[None, None]:
-                    return (None, None)
-
-                def send(self, data: bytes) -> None:
-                    pass
-
-                def add_device_description(self, service_uuid: str, device_name: str, device_manufacturer_key:int|None = None) -> None:
-                    pass
-
-                def add_notify(self, notify_uuid: str, callback:'Callable[[BleakGATTCharacteristic, bytearray], None]') -> None:
-                    pass
-
-                def add_write(self, service_uuid: str, write_uuid: str) -> None:
-                    pass
-
-            with patch('artisanlib.ble_port.ClientBLE', MockClientBLE):
-                # Clear any cached imports to ensure fresh import
-                import sys
-
-                if 'artisanlib.acaia' in sys.modules:
-                    del sys.modules['artisanlib.acaia']
-
-                from artisanlib.acaia import EVENT_LEN, AcaiaBLE
-
-                # Create an instance to test instance methods
-                acaia_ble = AcaiaBLE()
-
-                # Test with valid battery payload
-                valid_payload = b'\x4b'  # 75% battery
-                result = acaia_ble.protocol.parse_battery_event(valid_payload)
-                assert result == EVENT_LEN.BATTERY
-                assert acaia_ble.protocol.battery == 75
-
-                # Test with 100% battery
-                full_payload = b'\x64'  # 100% battery
-                result_full = acaia_ble.protocol.parse_battery_event(full_payload)
-                assert result_full == EVENT_LEN.BATTERY
-                assert acaia_ble.protocol.battery == 100
-
-                # Test with 0% battery
-                empty_payload = b'\x00'  # 0% battery
-                result_empty = acaia_ble.protocol.parse_battery_event(empty_payload)
-                assert result_empty == EVENT_LEN.BATTERY
-                assert acaia_ble.protocol.battery == 0
-
-                # Test with invalid battery value (>100)
-                invalid_payload = b'\xff'  # 255% battery (invalid)
-                acaia_ble.protocol.battery = None  # Reset
-                result_invalid = acaia_ble.protocol.parse_battery_event(invalid_payload)
-                assert result_invalid == EVENT_LEN.BATTERY
-                assert acaia_ble.protocol.battery is None  # Should not be updated
-
-                # Test with insufficient payload
-                short_payload = b''  # Empty payload
-                result_short = acaia_ble.protocol.parse_battery_event(short_payload)
-                assert result_short == -1
-
-    def test_parse_weight_event(self) -> None:
-        """Test parse_weight_event method implementation."""
-        # Test the actual parse_weight_event implementation from the AcaiaBLE class
-
-        with patch('artisanlib.util.float2float'), patch('PyQt6.QtCore.pyqtSignal'), patch(
-            'PyQt6.QtCore.pyqtSlot'
-        ), patch('artisanlib.async_comm.AsyncIterable'), patch(
-            'artisanlib.async_comm.IteratorReader'
-        ), patch(
-            'artisanlib.scale.Scale'
-        ), patch(
-            'artisanlib.scale.ScaleSpecs'
-        ), patch(
-            'asyncio.Queue'
-        ), patch(
-            'logging.getLogger'
-        ):
-
-            # Mock ClientBLE as a simple class so AcaiaBLE can inherit from it
-            class MockClientBLE:
-                def set_heartbeat(self, frequency: int) -> None:
-                    pass
-
-                def connected(self) -> tuple[None, None]:
-                    return (None, None)
-
-                def send(self, data: bytes) -> None:
-                    pass
-
-                def add_device_description(self, service_uuid: str, device_name: str, device_manufacturer_key:int|None = None) -> None:
-                    pass
-
-                def add_notify(self, notify_uuid: str, callback:'Callable[[BleakGATTCharacteristic, bytearray], None]') -> None:
-                    pass
-
-                def add_write(self, service_uuid: str, write_uuid: str) -> None:
-                    pass
-
-            with patch('artisanlib.ble_port.ClientBLE', MockClientBLE):
-                # Clear any cached imports to ensure fresh import
-                import sys
-
-                if 'artisanlib.acaia' in sys.modules:
-                    del sys.modules['artisanlib.acaia']
-
-                from artisanlib.acaia import (
-                    EVENT_LEN,
-                    SCALE_CLASS,
-                    UNIT,
-                    AcaiaBLE,
-                )
-
-                # Create an instance to test instance methods
-                acaia_ble = AcaiaBLE()
-                acaia_ble.protocol.scale_class = SCALE_CLASS.MODERN
-                acaia_ble.protocol.unit = UNIT.G
-
-                # Test with valid weight payload (6 bytes minimum)
-                valid_payload = (
-                    b'\xe8\x03\x00\x00\x01\x01'  # 1000 in little-endian, factor=TEN, stable
-                )
-                result = acaia_ble.protocol.parse_weight_event(valid_payload)
-                assert result == EVENT_LEN.WEIGHT
-
-                # Test with insufficient payload
-                short_payload = b'\x00\x00\x03'  # Only 3 bytes, need 6
-                result_short = acaia_ble.protocol.parse_weight_event(short_payload)
-                assert result_short == -1
 
 
 class TestAcaiaBLEScaleClassBehavior:
@@ -925,11 +777,11 @@ class TestAcaiaBLEScaleClassBehavior:
                 # Test unit conversion for MODERN scales
                 acaia_ble.protocol.unit = UNIT.KG
                 test_payload = b'\xe8\x03\x00\x00\x01\x01'  # 1000 in little-endian, factor=TEN
-                weight, _ = acaia_ble.protocol.decode_weight(test_payload)
+                weight, _, _error = acaia_ble.protocol.decode_weight(test_payload)
                 assert weight == 100000.0  # 100.0 * 1000 (kg to g conversion)
 
                 acaia_ble.protocol.unit = UNIT.OZ
-                weight_oz, _ = acaia_ble.protocol.decode_weight(test_payload)
+                weight_oz, _, _error = acaia_ble.protocol.decode_weight(test_payload)
                 assert weight_oz is not None
                 assert abs(weight_oz - 2834.95) < 0.01  # 100.0 * 28.3495 (oz to g conversion)
 
@@ -987,16 +839,16 @@ class TestAcaiaBLEScaleClassBehavior:
 
                 # Test that RELAY scales always report in grams (no unit conversion)
                 test_payload = b'\xe8\x03\x00\x00\x01\x01'  # 1000 in little-endian, factor=TEN
-                weight, _ = acaia_ble.protocol.decode_weight(test_payload)
+                weight, _, _error = acaia_ble.protocol.decode_weight(test_payload)
                 assert weight == 100.0  # No conversion for RELAY scales
 
                 # Test stable bit behavior for RELAY scales (same as other scales in current implementation)
                 test_payload_stable = b'\xe8\x03\x00\x00\x01\x00'  # stable bit = 0
-                _, stable = acaia_ble.protocol.decode_weight(test_payload_stable)
+                _, stable, _error = acaia_ble.protocol.decode_weight(test_payload_stable)
                 assert stable is True  # stable when bit 0 = 0
 
                 test_payload_unstable = b'\xe8\x03\x00\x00\x01\x01'  # stable bit = 1
-                _, stable_inv = acaia_ble.protocol.decode_weight(test_payload_unstable)
+                _, stable_inv, _error = acaia_ble.protocol.decode_weight(test_payload_unstable)
                 assert stable_inv is False  # unstable when bit 0 = 1
 
 

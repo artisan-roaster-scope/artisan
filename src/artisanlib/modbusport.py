@@ -35,6 +35,7 @@ from pymodbus.client import AsyncModbusSerialClient, AsyncModbusUdpClient, Async
 from pymodbus.client.mixin import ModbusClientMixin
 from pymodbus.framer import FramerType
 
+from collections.abc import Sequence
 from typing import Final, Literal, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -209,35 +210,35 @@ class modbusport:
 ##############################
 
 
-    def convert_16bit_uint_from_registers(self, registers:list[int]) -> int:
+    def convert_16bit_uint_from_registers(self, registers:Sequence[int]) -> int:
         res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.UINT16, word_order=self.word_order())
         if isinstance(res, int):
             return res
         return -1
 
 
-    def convert_16bit_int_from_registers(self, registers:list[int]) -> int:
+    def convert_16bit_int_from_registers(self, registers:Sequence[int]) -> int:
         res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.INT16, word_order=self.word_order())
         if isinstance(res, int):
             return res
         return -1
 
 
-    def convert_32bit_uint_from_registers(self, registers:list[int]) -> int:
+    def convert_32bit_uint_from_registers(self, registers:Sequence[int]) -> int:
         res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.UINT32, word_order=self.word_order())
         if isinstance(res, int):
             return res
         return -1
 
 
-    def convert_32bit_int_from_registers(self, registers:list[int]) -> int:
+    def convert_32bit_int_from_registers(self, registers:Sequence[int]) -> int:
         res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.INT32, word_order=self.word_order())
         if isinstance(res, int):
             return res
         return -1
 
 
-    def convert_float_from_registers(self, registers:list[int]) -> float:
+    def convert_float_from_registers(self, registers:Sequence[int]) -> float:
         res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.FLOAT32, word_order=self.word_order())
         if isinstance(res, float):
             return res
@@ -414,7 +415,7 @@ class modbusport:
         _log.debug('clearReadingsCache()')
         self.readingsCache = {}
 
-    def cacheReadings(self, code:int, device_id:int, register:int, results:list[int]) -> None:
+    def cacheReadings(self, code:int, device_id:int, register:int, results:Sequence[int]) -> None:
         if code not in self.readingsCache:
             self.readingsCache[code] = {}
         if device_id not in self.readingsCache[code]:
@@ -798,9 +799,9 @@ class modbusport:
         return res, error_disconnect
 
     # returns register data from optimizer cache or from device_id
-    def read_registers(self, device_id:int, register:int, count:int, code:int, force:bool=False) -> tuple[list[int]|None,list[bool]|None,bool]:
-        res_registers:list[int]|None = None
-        res_bits:list[bool]|None = None
+    def read_registers(self, device_id:int, register:int, count:int, code:int, force:bool=False) -> tuple[Sequence[int]|None,Sequence[bool]|None,bool]:
+        res_registers:Sequence[int]|None = None
+        res_bits:Sequence[bool]|None = None
         error_disconnect:bool = False
         if count>0:
             if self.optimizer and not force and code not in {1,2}: # MODBUS function 1 and 2 are never optimized
@@ -846,7 +847,7 @@ class modbusport:
         error_disconnect:bool = False # set to True if a serious error requiring a disconnect was detected
         res:float|None = None
         try:
-            res_registers:list[int]|None
+            res_registers:Sequence[int]|None
             res_error_disconnect:bool
             res_registers, _, res_error_disconnect = self.read_registers(device_id, register, 2, code, force)
             error_disconnect = res_error_disconnect
@@ -887,7 +888,7 @@ class modbusport:
         error_disconnect:bool = False # set to True if a serious error requiring a disconnect was detected
         res:int|None = None
         try:
-            res_registers:list[int]|None
+            res_registers:Sequence[int]|None
             res_error_disconnect:bool
             res_registers, _, res_error_disconnect = self.read_registers(device_id, register, 2, code, force)
             error_disconnect = res_error_disconnect
@@ -964,8 +965,8 @@ class modbusport:
         error_disconnect:bool = False # set to True if a serious error requiring a disconnect was detected
         res:int|None = None
         try:
-            res_bits:list[bool]|None
-            res_registers:list[int]|None
+            res_bits:Sequence[bool]|None
+            res_registers:Sequence[int]|None
             res_error_disconnect:bool
             res_registers, res_bits, res_error_disconnect = self.read_registers(device_id, register, 1, code, force)
             error_disconnect = res_error_disconnect
@@ -1015,7 +1016,7 @@ class modbusport:
         res:int|None = None
 
         try:
-            res_registers:list[int]|None
+            res_registers:Sequence[int]|None
             res_error_disconnect:bool
             res_registers, _, res_error_disconnect = self.read_registers(device_id, register, 2, code, force)
             error_disconnect = res_error_disconnect
@@ -1063,7 +1064,7 @@ class modbusport:
         error_disconnect:bool = False # set to True if a serious error requiring a disconnect was detected
         res:int|None = None
         try:
-            res_registers:list[int]|None
+            res_registers:Sequence[int]|None
             res_error_disconnect:bool
             res_registers, _, res_error_disconnect = self.read_registers(device_id, register, 1, code, force)
             error_disconnect = res_error_disconnect

@@ -42,10 +42,10 @@ from platform import python_version
 from uuid import UUID
 from packaging.version import Version
 
-from PyQt6.QtCore import (Qt, QMimeData, QSettings, pyqtSlot, pyqtSignal, QPoint, QPointF, QLocale, QDate, QDateTime, QSemaphore, QTimer)
-from PyQt6.QtGui import (QDrag, QPixmap, QPainter, QTextLayout, QTextLine, QColor, QFontMetrics, QCursor, QAction, QIcon)
-from PyQt6.QtWidgets import (QDialogButtonBox, QMessageBox, QStackedWidget, QApplication, QWidget, QVBoxLayout, QHBoxLayout, QFrame, QTabWidget,
-        QCheckBox, QGroupBox, QScrollArea, QLabel, QSizePolicy,
+from PyQt6.QtCore import (Qt, QMimeData, QSettings, pyqtSlot, pyqtSignal, QPoint, QPointF, QLocale, QDate, QDateTime, QSemaphore, QTimer, QUrl, QSize)
+from PyQt6.QtGui import (QDrag, QPixmap, QPainter, QTextLayout, QTextLine, QColor, QFontMetrics, QCursor, QAction, QDesktopServices, QIcon, QPalette)
+from PyQt6.QtWidgets import (QDialogButtonBox, QStackedWidget, QApplication, QWidget, QVBoxLayout, QHBoxLayout, QFrame,
+        QCheckBox, QGroupBox, QScrollArea, QLabel, QSizePolicy, QPushButton,
         QGraphicsDropShadowEffect, QLineEdit, QMenu, QStatusBar, QToolButton)
 
 
@@ -70,13 +70,13 @@ import plus.stock
 import plus.config
 import plus.sync
 import plus.util
-from plus.util import datetime2epoch, epoch2datetime, schedulerLink, epoch2ISO8601, ISO86012epoch, plusLink
+from plus.util import datetime2epoch, epoch2datetime, schedulerLink, epoch2ISO8601, ISO86012epoch
 from plus.weight import Display, GreenDisplay, RoastedDisplay, PROCESS_STATE, WeightManager, GreenWeightItem, RoastedWeightItem
-from artisanlib.widgets import ClickableQLabel, ClickableQLineEdit, Splitter, ArtisanPlainTextEdit
-from artisanlib.dialogs import ArtisanResizeablDialog
+from artisanlib.widgets import ClickableQLabel, ClickableQLineEdit, Splitter, ArtisanPlainTextEdit, ArtisanQTabWidget
+from artisanlib.dialogs import ArtisanResizeablDialog, artisan_question
 from artisanlib.util import (float2float, float2str, convertWeight, weight_units, render_weight, comma2dot, float2floatWeightVolume, getDirectory,
-    getResourcePath, deserialize, roast_time, get_total_roast_time_from_profile, stringfromseconds)
-
+    deserialize, roast_time, get_total_roast_time_from_profile, stringfromseconds, getTaskURL, getStyleIconPath, open_link)
+from artisanlib.styles import tool_button_icon_style, artisan_push_button_style, line_edit_style, scroller_style, artisan_dialog_button_style
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -1537,24 +1537,30 @@ class DragItem(StandardItem):
         self.aw.updateScheduleSignal.emit()
 
     def addLoadedProfileToSelectedScheduleItem(self) -> None:
-        string = QApplication.translate('Message','Register the currently loaded roast profile<br>in the selected entry.<br>This will overwrite some roast properties.')
-        # native dialog
-        if platform.system() == 'Darwin':
-            mbox = QMessageBox() # only without super this one shows the native dialog on macOS under Qt 6.6.2
-            # for native dialogs, text and informativetext need to be plain strings, no RTF incl. HTML instructions like <br>
-            mbox.setText(QApplication.translate('Message','Register Roast'))
-            mbox.setInformativeText(string.replace('<br>',' '))
-            mbox.setWindowModality(Qt.WindowModality.ApplicationModal) # for native dialog it has to be ApplicationModal
-            mbox.setStandardButtons(QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
-            mbox.setDefaultButton(QMessageBox.StandardButton.Cancel)
-            reply = mbox.exec()
-        else:
-            # non-native dialog
-            reply = QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
-                            QApplication.translate('Message','Register Roast'),string,
-                            QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok, QMessageBox.StandardButton.Cancel)
-
-        if reply == int(QMessageBox.StandardButton.Ok):
+#        string = QApplication.translate('Message','Register the currently loaded roast profile<br>in the selected entry.<br>This will overwrite some roast properties.')
+#        # native dialog
+#        if platform.system() == 'Darwin':
+#            mbox = QMessageBox() # only without super this one shows the native dialog on macOS under Qt 6.6.2
+#            # for native dialogs, text and informativetext need to be plain strings, no RTF incl. HTML instructions like <br>
+#            mbox.setText(QApplication.translate('Message','Register Roast'))
+#            mbox.setInformativeText(string.replace('<br>',' '))
+#            mbox.setWindowModality(Qt.WindowModality.ApplicationModal) # for native dialog it has to be ApplicationModal
+#            mbox.setStandardButtons(QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
+#            mbox.setDefaultButton(QMessageBox.StandardButton.Cancel)
+#            reply = mbox.exec()
+#        else:
+#            # non-native dialog
+#            reply = QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+#                            QApplication.translate('Message','Register Roast'),string,
+#                            QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok, QMessageBox.StandardButton.Cancel)
+#
+#        if reply == int(QMessageBox.StandardButton.Ok):
+#            self.registerRoast.emit()
+#
+        res = artisan_question(self, self.aw,
+            QApplication.translate('Message','Register the currently loaded roast profile in the selected entry.\nThis will overwrite some roast properties.'),
+            QApplication.translate('Message','Register Roast'))
+        if res:
             self.registerRoast.emit()
 
 
@@ -1997,17 +2003,37 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.remaining_scrollarea.setWidgetResizable(True)
         self.remaining_scrollarea.setWidget(remaining_widget)
         self.remaining_scrollarea.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop)
+        self.remaining_scrollarea.setStyleSheet(scroller_style(self.aw.app.darkmode))
 
         self.remaining_filter_group.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
+
+        self.create_schedule_widget = QPushButton(f' {QApplication.translate('Button','CREATE SCHEDULE')} ')
+        self.create_schedule_widget.setMinimumSize(QSize(0, 28))
+        self.create_schedule_widget.setMaximumSize(QSize(16777215, 28))
+        self.create_schedule_widget.setToolTip(QApplication.translate('Plus', 'Create roast schedule on the platform'))
+        self.create_schedule_widget.setStyleSheet(artisan_push_button_style())
+        self.create_schedule_widget.setIconSize(QSize(18,18))
+        self.create_schedule_widget.setIcon(QIcon(getStyleIconPath('external-link-stroke-rounded.svg')))
+        self.create_schedule_widget.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
+        self.create_schedule_widget.clicked.connect(self.open_scheduler_url)
+
+        create_schedule_widget_layout = QHBoxLayout()
+        create_schedule_widget_layout.addStretch()
+        create_schedule_widget_layout.addWidget(self.create_schedule_widget)
+        create_schedule_widget_layout.addStretch()
 
         self.remaining_message = QLabel()
         self.remaining_message.setTextFormat(Qt.TextFormat.RichText)
         self.remaining_message.setWordWrap(True)
         self.remaining_message.setTextInteractionFlags(Qt.TextInteractionFlag.LinksAccessibleByMouse)
-        self.remaining_message.setOpenExternalLinks(True)
+        self.remaining_message.setOpenExternalLinks(False)
+        self.remaining_message.linkActivated.connect(self.remaining_message_link_activated)
 
         remaining_message_layout = QVBoxLayout()
+        remaining_message_layout.addStretch()
         remaining_message_layout.addWidget(self.remaining_message)
+        remaining_message_layout.addLayout(create_schedule_widget_layout)
+        remaining_message_layout.addStretch()
         remaining_message_layout.setContentsMargins(15, 15, 15, 15) # left, top, right, bottom
 
         self.remaining_message_widget = QWidget()
@@ -2048,14 +2074,15 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         roasted_widget.setLayout(layout_roasted)
         roasted_widget.setContentsMargins(0, 0, 0, 0)
 
-        completed_scrollarea = QScrollArea()
-        completed_scrollarea.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        completed_scrollarea.setWidgetResizable(True)
-        completed_scrollarea.setWidget(roasted_widget)
-        completed_scrollarea.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop)
-#        completed_scrollarea.setFrameShadow(QFrame.Shadow.Sunken)
-#        completed_scrollarea.setFrameShape(QFrame.Shape.Panel)
-        completed_scrollarea.setMinimumWidth(roasted_widget.minimumSizeHint().width())
+        self.completed_scrollarea = QScrollArea()
+        self.completed_scrollarea.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.completed_scrollarea.setWidgetResizable(True)
+        self.completed_scrollarea.setWidget(roasted_widget)
+        self.completed_scrollarea.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop)
+#        self.completed_scrollarea.setFrameShadow(QFrame.Shadow.Sunken)
+#        self.completed_scrollarea.setFrameShape(QFrame.Shape.Panel)
+        self.completed_scrollarea.setMinimumWidth(roasted_widget.minimumSizeHint().width())
+        self.completed_scrollarea.setStyleSheet(scroller_style(self.aw.app.darkmode))
 
         weight_unit_str:str = self.aw.qmc.weight[2].lower()
         density_unit_str:Final[str] = 'g/l'
@@ -2063,6 +2090,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         color_unit_str:Final[str] = '#'
 
         self.roasted_weight = ClickableQLineEdit()
+        self.roasted_weight.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.roasted_weight.setToolTip(QApplication.translate('Label','Weight'))
         self.roasted_weight.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, self.roasted_weight, ''))
         self.roasted_weight.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
@@ -2086,6 +2114,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.roasted_weight_suffix.clicked.connect(self.roasted_measured_toggle)
 
         self.roasted_yield = ClickableQLineEdit()
+        self.roasted_yield.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.roasted_yield.setToolTip(QApplication.translate('Label','Yield'))
         self.roasted_yield.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, self.roasted_yield, ''))
         self.roasted_yield.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
@@ -2096,6 +2125,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.roasted_yield_suffix.setAlignment (Qt.AlignmentFlag.AlignLeft)
 
         self.roasted_defects = ClickableQLineEdit()
+        self.roasted_defects.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.roasted_defects.setToolTip(QApplication.translate('Label','Defects'))
         self.roasted_defects.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, self.roasted_defects, ''))
         self.roasted_defects.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
@@ -2106,6 +2136,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.roasted_defects_suffix.setAlignment (Qt.AlignmentFlag.AlignLeft)
 
         self.roasted_density = QLineEdit()
+        self.roasted_density.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.roasted_density.setToolTip(QApplication.translate('Label','Density'))
         self.roasted_density.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 1, self.roasted_density))
         self.roasted_density.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
@@ -2116,6 +2147,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         roasted_density_suffix.setAlignment (Qt.AlignmentFlag.AlignLeft)
 
         self.roasted_color = QLineEdit()
+        self.roasted_color.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.roasted_color.setToolTip(QApplication.translate('Label','Color'))
         self.roasted_color.setValidator(self.aw.createCLocaleDoubleValidator(0., 255., 2, self.roasted_color))
         self.roasted_color.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
@@ -2126,6 +2158,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         roasted_color_suffix.setAlignment (Qt.AlignmentFlag.AlignLeft)
 
         self.roasted_moisture = QLineEdit()
+        self.roasted_moisture.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.roasted_moisture.setToolTip(QApplication.translate('Label','Moisture'))
         self.roasted_moisture.setValidator(self.aw.createCLocaleDoubleValidator(0., 100., 1, self.roasted_moisture))
         self.roasted_moisture.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
@@ -2135,11 +2168,12 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         roasted_moisture_suffix.setFixedWidth(color_density_moisture_suffix_width)
         roasted_moisture_suffix.setAlignment (Qt.AlignmentFlag.AlignLeft)
 
-        self.roasted_notes = ArtisanPlainTextEdit()
+        self.roasted_notes = ArtisanPlainTextEdit(self.aw.app.darkmode)
         self.roasted_notes.setPlaceholderText(QApplication.translate('Label', 'Roasting Notes'))
         self.roasted_notes.setToolTip(QApplication.translate('Label', 'Roasting Notes'))
 
         self.cupping_score = QLineEdit()
+        self.cupping_score.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.cupping_score.setFixedWidth(60)
         self.cupping_score.setPlaceholderText(QApplication.translate('Label', 'Score'))
         self.cupping_score.setToolTip(QApplication.translate('Label','Cupping Score'))
@@ -2147,7 +2181,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.cupping_score.setAlignment(Qt.AlignmentFlag.AlignCenter) #Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.cupping_score.editingFinished.connect(self.cupping_score_changed)
 
-        self.cupping_notes = ArtisanPlainTextEdit()
+        self.cupping_notes = ArtisanPlainTextEdit(self.aw.app.darkmode)
         self.cupping_notes.setPlaceholderText(QApplication.translate('Label', 'Cupping Notes'))
         self.cupping_notes.setToolTip(QApplication.translate('Label', 'Cupping Notes'))
 
@@ -2247,6 +2281,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.completed_details_scrollarea.setWidgetResizable(True)
         self.completed_details_scrollarea.setWidget(self.completed_details_group)
         self.completed_details_scrollarea.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum) # horizontal/vertical
+        self.completed_details_scrollarea.setStyleSheet(scroller_style(self.aw.app.darkmode))
 
         completed_details_layout2 =  QVBoxLayout()
         completed_details_layout2.addSpacing(1) # ensures a minimum height to keep the handle movable
@@ -2258,7 +2293,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.completed_frame.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
 
         self.completed_splitter = Splitter(Qt.Orientation.Vertical)
-        self.completed_splitter.addWidget(completed_scrollarea)
+        self.completed_splitter.addWidget(self.completed_scrollarea)
         self.completed_splitter.addWidget(self.completed_frame)
         self.completed_splitter.setSizes([100,0])
         self.completed_splitter_open_height: int = 0
@@ -2277,33 +2312,38 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.completed_message_widget = QWidget()
         self.completed_message_widget.setLayout(completed_message_layout)
 
+#---- status bar
         self.sync_button = QToolButton()
+        self.sync_button.setText('')
         self.sync_button.setToolTip(QApplication.translate('Tooltip','Update schedule'))
-        if self.aw.app.darkmode:
-            self.sync_button.setStyleSheet('''
-                QToolButton:hover:pressed {border:none;border-radius:3px;background-color:#C5C5C5;color: #EEEEEE;}
-                QToolButton:!hover {border:none;}
-                QToolButton:hover {border:none;border-radius: 3px;background-color: #8F8F8F;color: #EEEEEE;}
-                ''')
-        else:
-            self.sync_button.setStyleSheet('''
-                QToolButton:hover:pressed {border:none;border-radius:3px;background-color:#C5C5C5;color:#EEEEEE;}
-                QToolButton:!hover {border:none;}
-                QToolButton:hover {border:none;border-radius:3px;background-color:#CFCFCF;color:#EEEEEE;}
-                ''')
+        self.task_display_green_button = QToolButton()
+        self.task_display_green_button.setText('')
+        self.task_display_green_button.setToolTip(QApplication.translate('Tooltip','Open scale task display green'))
+        self.task_display_roasted_button = QToolButton()
+        self.task_display_roasted_button.setText('')
+        self.task_display_roasted_button.setToolTip(QApplication.translate('Tooltip','Open scale task display roasted'))
+
         self.sync_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.sync_button.clicked.connect(self.trigger_stock_update)
+        self.task_display_green_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.task_display_green_button.clicked.connect(self.open_green_task_web_display)
+        self.task_display_roasted_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.task_display_roasted_button.clicked.connect(self.open_roasted_task_web_display)
+        self.update_statusbars()
 
-        basedir = os.path.join(getResourcePath(),'Icons')
-        p = os.path.join(basedir, ('update_dark.svg' if self.aw.app.darkmode else 'update_light.svg'))
-        self.sync_button.setIcon(QIcon(p))
-        status_bar = QStatusBar()
-        status_bar.setFixedHeight(20)
-        status_bar.addPermanentWidget(self.sync_button)
+        self.status_bar = QStatusBar()
+        self.status_bar.setFixedHeight(22)
+        self.status_bar.addWidget(self.task_display_green_button)
+        self.status_bar.addPermanentWidget(self.sync_button)
+
+        self.status_bar_completed = QStatusBar()
+        self.status_bar_completed.setFixedHeight(22)
+        self.status_bar_completed.addWidget(self.task_display_roasted_button)
+#----
 
         remaining_splitter_layout = QVBoxLayout()
         remaining_splitter_layout.addWidget(self.remaining_splitter)
-        remaining_splitter_layout.addWidget(status_bar)
+        remaining_splitter_layout.addWidget(self.status_bar)
         remaining_splitter_layout.setContentsMargins(0, 0, 0, 0) # left, top, right, bottom
         remaining_splitter_layout.setSpacing(0)
 
@@ -2323,6 +2363,31 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.update_conf_button.setCenterButtons(True)
         self.update_conf_button.accepted.connect(self.accept_updated_schedule)
 
+        update_conf_button_ok_button = self.update_conf_button.button(QDialogButtonBox.StandardButton.Ok)
+        if update_conf_button_ok_button is not None:
+            update_conf_button_ok_button.setDefault(True)
+            update_conf_button_ok_button.setAutoDefault(True)
+            update_conf_button_ok_button.setFocusPolicy(Qt.FocusPolicy.StrongFocus) # to add to tab focus switch
+            okButton: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+            if okButton is not None:
+                update_conf_button_ok_button.setText(okButton.text())
+            # style
+            palette = self.palette()
+            accent_color = palette.color(QPalette.ColorRole.Accent)
+            if not accent_color.isValid() or platform.system() != 'darwin':
+                accent_color = QColor('#3979ae')  # Fallback artisan button blue if OS provides none (and on Windows/Linux)
+            # Generate math-driven lighting variants for the accent button
+            accent_name = accent_color.name()
+            accent_hover = accent_color.lighter(115).name() if self.aw.app.darkmode else accent_color.darker(115).name()
+            accent_pressed = accent_color.darker(110).name() if self.aw.app.darkmode else accent_color.darker(125).name()
+            update_conf_button_ok_button.setStyleSheet(artisan_dialog_button_style(
+                self.aw.app.darkmode,
+                accent_name,
+                accent_hover,
+                accent_pressed))
+            self.setButtonTranslations(update_conf_button_ok_button,'OK', QApplication.translate('Button','OK'))
+            update_conf_button_ok_button.setIcon(QIcon()) # suppress standard button icons on Linux
+
         update_conf_layout = QVBoxLayout()
         update_conf_layout.addStretch()
         update_conf_layout.addLayout(update_conf_message_layout)
@@ -2337,18 +2402,27 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.open_stacked_widget.addWidget(self.remaining_splitter_layout_widget)
         self.open_stacked_widget.addWidget(self.update_confirmation_widget)
 
+        completed_splitter_layout = QVBoxLayout()
+        completed_splitter_layout.addWidget(self.completed_splitter)
+        completed_splitter_layout.addWidget(self.status_bar_completed)
+        completed_splitter_layout.setContentsMargins(0, 0, 0, 0) # left, top, right, bottom
+        completed_splitter_layout.setSpacing(0)
+
+        self.completed_splitter_layout_widget = QWidget()
+        self.completed_splitter_layout_widget.setLayout(completed_splitter_layout)
+
         self.completed_stacked_widget = QStackedWidget()
-        self.completed_stacked_widget.addWidget(self.completed_splitter)
+        self.completed_stacked_widget.addWidget(self.completed_splitter_layout_widget)
         self.completed_stacked_widget.addWidget(self.completed_message_widget)
 
 #####
 
-        self.TabWidget = QTabWidget()
+        self.TabWidget = ArtisanQTabWidget()
         self.TabWidget.addTab(self.open_stacked_widget, QApplication.translate('Tab', 'To-Do'))
         self.TabWidget.addTab(self.completed_stacked_widget, QApplication.translate('Tab', 'Completed'))
         self.TabWidget.setStyleSheet(tooltip_style)
 
-        self.task_type = QLabel()
+        self.task_type = ClickableQLabel()
         self.task_position = QLabel()
         self.task_weight = ClickableQLabel()
         self.task_title = QElidedLabel(mode = Qt.TextElideMode.ElideRight)
@@ -2402,16 +2476,24 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             self.task_frame.hide()
         self.task_frame_hide = False # flag used by mainSplitterMoved()/hide_task_frame() to hide task frame again after closing the drawer
 
-
-        disconnected_widget = QLabel()
-        disconnected_widget.setTextFormat(Qt.TextFormat.RichText)
-        disconnected_widget.setText(QApplication.translate('Plus', 'Login to {} to receive your roast schedule').format(f'<a href="{plusLink()}">artisan platform</a>'))
-        disconnected_widget.setWordWrap(True)
-        disconnected_widget.setTextInteractionFlags(Qt.TextInteractionFlag.TextBrowserInteraction)
-        disconnected_widget.linkActivated.connect(self.disconnected_link_handler)
+        disconnected_widget = QPushButton(QApplication.translate('Button','LOGIN TO UNLOCK'))
+        disconnected_widget.setMinimumSize(QSize(0, 28))
+        disconnected_widget.setMaximumSize(QSize(16777215, 28))
+        disconnected_widget.setToolTip(QApplication.translate('Plus', 'Sign in to your artisan account'))
+        disconnected_widget.setStyleSheet(artisan_push_button_style())
+        disconnected_widget.setIconSize(QSize(18,18))
+        disconnected_widget.setIcon(QIcon(getStyleIconPath('user-circle-stroke-rounded-dark.svg')))
+        disconnected_widget.clicked.connect(self.disconnected_link_handler)
+        disconnected_widget_layout = QHBoxLayout()
+        disconnected_widget_layout.addStretch()
+        disconnected_widget_layout.addStretch()
+        disconnected_widget_layout.addWidget(disconnected_widget)
+        disconnected_widget_layout.addStretch()
 
         disconnected_layout = QVBoxLayout()
-        disconnected_layout.addWidget(disconnected_widget)
+        disconnected_widget_layout.addStretch()
+        disconnected_layout.addLayout(disconnected_widget_layout)
+        disconnected_widget_layout.addStretch()
         disconnected_layout.setContentsMargins(15, 15, 15, 15) # left, top, right, bottom
 
         self.message_widget = QWidget()
@@ -2450,7 +2532,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.weight_item_display:WeightItemDisplay = WeightItemDisplay(self)
         self.green_web_display:GreenWebDisplay = GreenWebDisplay(self)
         self.roasted_web_display:RoastedWebDisplay = RoastedWebDisplay(self)
-        self.weight_manager:WeightManager = WeightManager(self.aw, [self.weight_item_display, self.green_web_display, self.roasted_web_display], self.aw.scale_manager)
+        self.weight_manager = WeightManager(self.aw, [self.weight_item_display, self.green_web_display, self.roasted_web_display], self.aw.scale_manager)
 
         plus.stock.update() # explicit update stock on opening the scheduler
         self.updateScheduleWindow()
@@ -2462,6 +2544,9 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
 
         # a click to the weight in the task display completes it
         self.task_weight.clicked.connect(self.taskCompleted)
+
+        # a click on the task type label opens the corresponding BatchManager display in the browser if configured
+        self.task_type.clicked.connect(self.open_task_web_display)
 
         self.TabWidget.currentChanged.connect(self.tabSwitched)
 
@@ -2499,6 +2584,13 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
 
         self.aw.sendmessage(QApplication.translate('Message','Scheduler started'))
 
+    @pyqtSlot(str)
+    def remaining_message_link_activated(self, link:str) -> None:
+        if link == '#open_filters':
+            self.remaining_filter_group.show()
+            self.remaining_splitter.setSizes([100,100])
+
+
     @pyqtSlot()
     def accept_updated_schedule(self) -> None:
         self.open_stacked_widget.setCurrentWidget(self.remaining_splitter_layout_widget)
@@ -2510,6 +2602,28 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
     @pyqtSlot(bool)
     def trigger_stock_update(_:bool = False) -> None:
         QTimer.singleShot(10, plus.stock.update_schedule)
+
+    @pyqtSlot(bool)
+    def open_green_task_web_display(self, _:bool = False) -> None:
+        try:
+            if self.aw.taskWebDisplayGreenActive and self.aw.taskWebDisplayGreen_server is not None:
+                url = QUrl(getTaskURL(self.aw.taskWebDisplayGreenPort, self.aw.taskWebDisplayGreen_server.indexPath()))
+                QDesktopServices.openUrl(url)
+        except Exception as e: # pylint: disable=broad-except
+            _log.error(e)
+
+    @pyqtSlot(bool)
+    def open_roasted_task_web_display(self, _:bool = False) -> None:
+        try:
+            if self.aw.taskWebDisplayRoastedActive and self.aw.taskWebDisplayRoasted_server is not None:
+                url = QUrl(getTaskURL(self.aw.taskWebDisplayRoastedPort, self.aw.taskWebDisplayRoasted_server.indexPath()))
+                QDesktopServices.openUrl(url)
+        except Exception as e: # pylint: disable=broad-except
+            _log.error(e)
+
+    def update_statusbars(self) -> None:
+        self.task_display_green_button.setEnabled(self.aw.taskWebDisplayGreenActive)
+        self.task_display_roasted_button.setEnabled(self.aw.taskWebDisplayRoastedActive)
 
     def hide_task_frame(self) -> None:
         if self.task_frame_hide:
@@ -2577,9 +2691,14 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                     self.completed_details_scrollarea_hide = True
                     QTimer.singleShot(1000, self.hide_completed_frame)
 
-    @pyqtSlot(str)
-    def disconnected_link_handler(self, _link:str) -> None:
+    @pyqtSlot(bool)
+    def disconnected_link_handler(self, _b:bool) -> None:
         plus.controller.toggle(self.aw)
+
+    @staticmethod
+    @pyqtSlot(bool)
+    def open_scheduler_url(_b:bool) -> None:
+        open_link(schedulerLink())
 
     # by default only the next item of the active tab is set, only if update_both is True both next items are reset
     def set_next(self, update_both:bool = False) -> None:
@@ -2595,14 +2714,20 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             _log.exception(e)
 
     @pyqtSlot()
+    def open_task_web_display(self) -> None:
+        todo_tab_active:bool = self.TabWidget.currentIndex() == 0
+        if todo_tab_active:
+            self.open_green_task_web_display()
+        else:
+            self.open_roasted_task_web_display()
+
+    @pyqtSlot()
     def taskCompleted(self) -> None:
         todo_tab_active:bool = self.TabWidget.currentIndex() == 0
         if todo_tab_active:
             self.weight_manager.greenTaskCompleted()
         else:
             self.weight_manager.roastedTaskCompleted()
-
-
 
     @pyqtSlot(list)
     def update_order(self, l:list[ScheduledItem]) -> None:
@@ -2766,6 +2891,8 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
     def keyPressEvent(self, a0: 'QKeyEvent|None') -> None:
         if a0 is not None:
             k = int(a0.key())
+            if k == 16777216: # ESC
+                return # overwriting the close window action of the super class to prevent accidentally closing the scheduler
             if k == 16777235:    # UP
                 active_tab = self.TabWidget.currentIndex()
                 if active_tab == 0:
@@ -2804,24 +2931,34 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
     @override
     def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
         if self.aw.scheduler_auto_open and len(self.scheduled_items) > 0 and self.aw.plus_account is not None:
-            self.aw.scheduler_auto_open = False
-            string = QApplication.translate('Message','Roasts will not adjust the schedule<br>while the schedule window is closed')
-            # native dialog
-            if platform.system() == 'Darwin':
-                mbox = QMessageBox() # only without super this one shows the native dialog on macOS under Qt 6.6.2
-                # for native dialogs, text and informativetext need to be plain strings, no RTF incl. HTML instructions like <br>
-                mbox.setText(QApplication.translate('Message','Close Scheduler'))
-                mbox.setInformativeText(string.replace('<br>',' '))
-                mbox.setWindowModality(Qt.WindowModality.ApplicationModal) # for native dialog it has to be ApplicationModal
-                mbox.setStandardButtons(QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Close)
-                mbox.setDefaultButton(QMessageBox.StandardButton.Cancel)
-                reply = mbox.exec()
-            else:
-                # non-native dialog
-                reply = QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
-                                QApplication.translate('Message','Close Scheduler'),string,
-                                QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Close, QMessageBox.StandardButton.Cancel)
-            if reply == int(QMessageBox.StandardButton.Close):
+
+#            string = QApplication.translate('Message','Roasts will not adjust the schedule<br>while the schedule window is closed')
+#            # native dialog
+#            if platform.system() == 'Darwin':
+#                mbox = QMessageBox() # only without super this one shows the native dialog on macOS under Qt 6.6.2
+#                # for native dialogs, text and informativetext need to be plain strings, no RTF incl. HTML instructions like <br>
+#                mbox.setText(QApplication.translate('Message','Close Scheduler'))
+#                mbox.setInformativeText(string.replace('<br>',' '))
+#                mbox.setWindowModality(Qt.WindowModality.ApplicationModal) # for native dialog it has to be ApplicationModal
+#                mbox.setStandardButtons(QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Close)
+#                mbox.setDefaultButton(QMessageBox.StandardButton.Cancel)
+#                reply = mbox.exec()
+#            else:
+#                # non-native dialog
+#                reply = QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+#                                QApplication.translate('Message','Close Scheduler?'),string,
+#                                QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Close, QMessageBox.StandardButton.Cancel)
+#            if reply == int(QMessageBox.StandardButton.Close):
+#                self.aw.scheduler_auto_open = False
+#                self.closeScheduler()
+#            elif a0 is not None:
+#                a0.ignore()
+
+            if artisan_question(self, self.aw,
+                    QApplication.translate('Message','Roasts will not adjust the schedule while the schedule window is closed'),
+                    QApplication.translate('Message','Close Scheduler'),
+                    True):
+                self.aw.scheduler_auto_open = False
                 self.closeScheduler()
             elif a0 is not None:
                 a0.ignore()
@@ -3090,6 +3227,8 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                         self.aw.qmc.beansize_max = blend['screen_max']
                     else:
                         self.aw.qmc.beansize_max = 0
+        self.aw.dashboard.update_dashboard()
+
 
 
     def set_selected_remaining_item_roast_properties(self) -> None:
@@ -3966,6 +4105,8 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             self.task_weight.setStyleSheet(
                 f'{tooltip_dull_dark_background_style} QLabel {{ color: {dim_white}; font-size: 40px; font-weight: 700; }}')
             self.task_frame.setStyleSheet(f'background: {medium_dark_grey};')
+            self.roasted_notes.update_style(self.aw.app.darkmode, background_color = 'palette(base)', selection_background_color = 'palette(base)', border_color = '#555555')
+            self.cupping_notes.update_style(self.aw.app.darkmode, background_color = 'palette(base)', selection_background_color = 'palette(base)', border_color = '#555555')
         else:
             # set light mode styles
             self.task_type.setStyleSheet(f'QLabel {{ color: {dark_grey}; font-weight: 700; }}')
@@ -3973,6 +4114,40 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             self.task_weight.setStyleSheet(
                 f'{tooltip_style} QLabel {{ color: {plus_alt_blue}; font-size: 40px; font-weight: 700; }}')
             self.task_frame.setStyleSheet(f'background: {dull_white};')
+            self.roasted_notes.update_style(self.aw.app.darkmode)
+            self.cupping_notes.update_style(self.aw.app.darkmode)
+        # status bars
+        self.status_bar.setStyleSheet('QStatusBar {background-color:palette(base);} QStatusBar::item { border: none; }')
+        self.status_bar_completed.setStyleSheet('QStatusBar {background-color:palette(base);} QStatusBar::item { border: none; }')
+        # scroll areas
+        remaining_scrollarea_viewport = self.remaining_scrollarea.viewport()
+        if remaining_scrollarea_viewport is not None:
+            remaining_scrollarea_viewport.setAutoFillBackground(False)
+        remaining_scrollarea_widget = self.remaining_scrollarea.widget()
+        if remaining_scrollarea_widget is not None:
+            remaining_scrollarea_widget.setAutoFillBackground(False)
+        completed_scrollarea_viewport = self.completed_scrollarea.viewport()
+        if completed_scrollarea_viewport is not None:
+            completed_scrollarea_viewport.setAutoFillBackground(False)
+        completed_scrollarea_widget = self.completed_scrollarea.widget()
+        if completed_scrollarea_widget is not None:
+            completed_scrollarea_widget.setAutoFillBackground(False)
+        completed_details_scrollarea_viewport = self.completed_details_scrollarea.viewport()
+        if completed_details_scrollarea_viewport is not None:
+            completed_details_scrollarea_viewport.setAutoFillBackground(False)
+        completed_details_scrollarea_widget = self.completed_details_scrollarea.widget()
+        if completed_details_scrollarea_widget is not None:
+            completed_details_scrollarea_widget.setAutoFillBackground(False)
+        # update toolbutton styles
+        self.sync_button.setStyleSheet(tool_button_icon_style(self.aw.app.darkmode,
+            'update-light.svg', 'update-dark.svg',
+            border_width=0, border_radius=3))
+        self.task_display_green_button.setStyleSheet(tool_button_icon_style(self.aw.app.darkmode,
+            'coffee_light.svg', 'coffee_dark.svg',
+            border_width=0, border_radius=3))
+        self.task_display_roasted_button.setStyleSheet(tool_button_icon_style(self.aw.app.darkmode,
+            'roast_light.svg', 'roast_dark.svg',
+            border_width=0, border_radius=3))
 
 
     # called from main:updateSchedule() on opening the scheduler dialog, on schedule filter changes, on app raise,
@@ -4020,7 +4195,8 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                             self.aw.qmc.scheduleID = None
                             self.aw.qmc.scheduleDate = None
                         # show empty schedule message
-                        self.remaining_message.setText(QApplication.translate('Plus', 'Schedule empty!{}Plan your schedule on {}').format('<BR><BR>', f'<a href="{schedulerLink()}">artisan platform</a><br>'))
+                        self.remaining_message.setVisible(False)
+                        self.create_schedule_widget.setVisible(True)
                         self.stacked_remaining_widget.setCurrentWidget(self.remaining_message_widget)
                         self.setAppBadge(0)
                     else:
@@ -4028,7 +4204,9 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                         if displayed_scheduled_items > 0:
                             self.stacked_remaining_widget.setCurrentWidget(self.remaining_scrollarea)
                         else:
-                            self.remaining_message.setText(f"{QApplication.translate('Plus', 'Nothing scheduled for you today!{}Deactivate filters to see all items.').format('<BR><BR>')}<br>")
+                            self.remaining_message.setVisible(True)
+                            self.create_schedule_widget.setVisible(False)
+                            self.remaining_message.setText(f"{QApplication.translate('Plus', 'Nothing scheduled for you today!{}Deactivate filters to see all items.{}').format('<BR><BR><a href="#open_filters">','</a>')}<br>")
                             self.stacked_remaining_widget.setCurrentWidget(self.remaining_message_widget)
 
 
@@ -4037,7 +4215,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                         self.completed_stacked_widget.setCurrentWidget(self.completed_message_widget)
                     else:
                         self.updateRoastedItems()                               # redraw Completed widget
-                        self.completed_stacked_widget.setCurrentWidget(self.completed_splitter)
+                        self.completed_stacked_widget.setCurrentWidget(self.completed_splitter_layout_widget)
 
                     # the weight unit might have changed, we update its label
                     self.roasted_weight_suffix.setText(self.aw.qmc.weight[2].lower())

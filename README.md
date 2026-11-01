@@ -33,7 +33,7 @@ Donations
 
 This software is open-source and absolutely free to use, also in commercial settings.
 
-If you think artisan scope is useful to you, contribute financially to its further development. Send any amount via my [PayPal.Me page](https://www.paypal.me/MarkoLuther). Thanks!
+If you think artisan scope is useful to you, contribute financially to its further development: [Donate!](https://artisan-scope.org/donate/). Thanks.
 
 > *Home roasting enthusiasts often donate 10-100.- (in $ or EUR), while small roasting businesses and consultant that use Artisan in their daily work tend to donate 100-300.- (in $ or EUR). For extra tech support, please inquire.*
 
@@ -62,6 +62,7 @@ Version History
 
 | Version | Date  | Comment |
 |---------|------:|---------|
+| [v5.0.0](https://artisan-scope.org/release/Artisan-v5/) | Nov&nbsp;5,&nbsp;2026 | Adds dashboard and support for [Dutch Master Roasters](https://artisan-scope.org/machines/dmr/), [FreshRoast SR900](https://artisan-scope.org/machines/freshroast/), synchronized autoCHARGE/autoDROP for [IMF](https://artisan-scope.org/machines/imf/) and [Schuilenburg](https://artisan-scope.org/machines/schuilenburg/) machines. Adds fresh UI, comes with smaller builds and a tightened license [AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html). <br>:heart: <b>Release Sponsor: [SIVETZ](https://sivetz.com/)</b> :heart: |
 | [v4.2.0](https://artisan-scope.org/release/Artisan-v4.2/) | Jun&nbsp;30,&nbsp;2026 | Adds support for [ROEST](https://artisan-scope.org/machines/roest/), [Orbiter](https://artisan-scope.org/machines/orbiter/), [Pratter](https://artisan-scope.org/machines/pratter/), [Probat G/UG 2026](https://artisan-scope.org/machines/probat/), [Neuhaus Neotec](https://artisan-scope.org/machines/neuhaus/), [North Roasters](https://artisan-scope.org/machines/north/), and the [MQTT protocol](https://artisan-scope.org/devices/mqtt/). <br>:heart: <b>Release Sponsor: [LABEL!STEN](https://labelisten.com/)</b> :heart: |
 | [v4.0.2](https://github.com/artisan-roaster-scope/artisan/releases/tag/v4.0.2) | Feb&nbsp;7,&nbsp;2026 | Bug fixes |
 | [v4.0.0](https://github.com/artisan-roaster-scope/artisan/releases/tag/v4.0.0) | Jan&nbsp;28,&nbsp;2026 | Adds UI modes, adds support for [Lebrew RoastSee NEXT](https://lebrewtech.com/products/roastsee-next) and [Acaia Pyxis Black (2025)](https://eu.acaia.co/products/pyxis-black), 2DOF software PID implementation with interpolated gain scheduling, bumpless transfer and filtering, general stability and performance improvements.<br>:heart: <b>Release Sponsor: [artisan.plus](https://artisan.plus/)</b> :heart: |

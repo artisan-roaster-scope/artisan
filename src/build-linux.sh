@@ -99,6 +99,8 @@ cp includes/dijkstra.ttf dist
 cp includes/ComicNeue-Regular.ttf dist
 cp includes/xkcd-script.ttf dist
 cp includes/Nunito-Regular.ttf dist
+cp includes/Nunito-SemiBold.ttf dist
+cp includes/Nunito-ExtraBold.ttf dist
 cp includes/NotoSansMono-Regular.ttf dist
 cp includes/alarmclock.eot dist
 cp includes/alarmclock.svg dist
@@ -108,7 +110,25 @@ cp includes/roboto-300.woff2 dist
 cp includes/roboto-600.woff2 dist
 cp includes/roboto-regular.woff2 dist
 cp includes/artisan.tpl dist
-cp includes/scale_widget.tpl dist
+cp includes/green_scale_widget.tpl dist
+cp includes/green-android-chrome-192x192.png dist
+cp includes/green-android-chrome-512x512.png dist
+cp includes/green-apple-touch-icon.png dist
+cp includes/green-favicon-16x16.png dist
+cp includes/green-favicon-32x32.png dist
+cp includes/green-favicon-48x48.png dist
+cp includes/green-favicon.ico dist
+cp includes/green-site.webmanifest dist
+cp includes/roasted_scale_widget.tpl dist
+cp includes/roasted-android-chrome-192x192.png dist
+cp includes/roasted-android-chrome-512x512.png dist
+cp includes/roasted-apple-touch-icon.png dist
+cp includes/roasted-favicon-16x16.png dist
+cp includes/roasted-favicon-32x32.png dist
+cp includes/roasted-favicon-48x48.png dist
+cp includes/roasted-favicon.ico dist
+cp includes/roasted-site.webmanifest dist
+cp includes/artisan-combo-mark-white.svg dist
 cp includes/fitty_patched.js dist
 cp includes/bigtext.js dist
 cp includes/sorttable.js dist
@@ -125,12 +145,15 @@ cp includes/apple-touch-icon.png dist
 cp includes/browserconfig.xml dist
 cp includes/favicon-16x16.png dist
 cp includes/favicon-32x32.png dist
+cp includes/favicon-48x48.png dist
 cp includes/favicon.ico dist
 cp includes/mstile-150x150.png dist
 cp includes/safari-pinned-tab.svg dist
 cp includes/site.webmanifest dist
 cp includes/logging.json dist
 cp includes/artisan_public_key.pem dist
+cp includes/release-sponsor-logo.svg dist
+cp includes/release-sponsor-logo-dark.svg dist
 cp -R icons dist
 cp -R Wheels dist
 cp README.txt dist

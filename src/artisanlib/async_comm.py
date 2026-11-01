@@ -34,7 +34,7 @@ import serial as pyserial
 from  serial.serialutil import SerialException
 
 from contextlib import suppress
-from threading import Thread
+from threading import Thread, current_thread
 from pymodbus.transport.serialtransport import SerialTransport # patched pyserial-asyncio
 from collections.abc import Callable, AsyncIterator
 from typing import Final, Any, TYPE_CHECKING
@@ -75,11 +75,35 @@ class AsyncLoopThread:
         self.__thread.start()
 
     def __del__(self) -> None:
+        self.stop(timeout=0.0)
+
+    ## A Bleak/CoreBluetooth callback must never outlive Python. Merely
+    ## scheduling loop.stop() from __del__ left the daemon thread running while
+    ## _Py_Finalize dismantled its callback objects. Explicit owners call this
+    ## method with a bounded wait; __del__ remains non-blocking as a fallback.
+    def stop(self, timeout: float | None = 5.0) -> bool:
+        if (timeout is None or timeout > 0) and current_thread() is not self.__thread and not self.__loop.is_closed():
+            async def cancel_pending_tasks() -> None:
+                current = asyncio.current_task()
+                pending = [task for task in asyncio.all_tasks() if task is not current and not task.done()]
+                for task in pending:
+                    task.cancel()
+                if pending:
+                    await asyncio.gather(*pending, return_exceptions=True)
+
+            try:
+                drain = asyncio.run_coroutine_threadsafe(cancel_pending_tasks(), self.__loop)
+                drain.result(timeout=timeout)
+            except Exception:  # pylint: disable=broad-except # the loop may already be stopping, or draining may time out
+                pass
         if not self.__loop.is_closed():
-            self.__loop.call_soon_threadsafe(self.__loop.stop)
-#        self.__thread.join()
-# WARNING: we don't join and expect the clients running on this thread to stop themself
-# (using self._running) to finally get rid of this thread to prevent hangs
+            try:
+                self.__loop.call_soon_threadsafe(self.__loop.stop)
+            except RuntimeError:
+                pass
+        if timeout is not None and current_thread() is not self.__thread:
+            self.__thread.join(timeout=max(0.0, timeout))
+        return not self.__thread.is_alive()
 
     @property
     def loop(self) -> asyncio.AbstractEventLoop:

@@ -504,6 +504,16 @@
         </tr>
         <tr>
             <td>&#160;</td>
+            <td>lebrew(&lt;msg&gt;)</td>
+            <td>sends &lt;msg&gt; to the BLE connected RoastSeeNEXT device</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>sr900(&lt;target&gt;[,&lt;value&gt;])</td>
+            <td>sends &lt;target&gt; command like ‘heat’ and ‘fan’, with optional int &lt;value&gt;</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
             <td>shellyrelay(n,b)</td>
             <td>switches Shelly plug number &lt;n&gt; ON if b is true or 1, and OFF otherwise</td>
         </tr>
@@ -829,6 +839,26 @@
         </tr>
         <tr>
             <td>&#160;</td>
+            <td>pidPositiveTargetMin(&lt;n&gt;)</td>
+            <td>sets the PID positive target range minium</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>pidPositiveTargetMax(&lt;n&gt;)</td>
+            <td>sets the PID positive target range maximum</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>pidNegativeTargetMin(&lt;n&gt;)</td>
+            <td>sets the PID negative target range minium</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>pidNegativeTargetMax(&lt;n&gt;)</td>
+            <td>sets the PID negative target range maximum</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
             <td>replayLookahead(&lt;int&gt;)</td>
             <td>sets the Ramping Event Replay lookahead in seconds</td>
         </tr>
@@ -979,11 +1009,6 @@
         </tr>
         <tr>
             <td>&#160;</td>
-            <td>upload2RoastHubs</td>
-            <td>upload current loaded profile to RoastHubs</td>
-        </tr>
-        <tr>
-            <td>&#160;</td>
             <td>zoom(&lt;x&gt;[,&lt;y&gt;])</td>
             <td>zooms the canvas by factor &lt;x&gt; horizontally and the optional &lt;y&gt; vertically. &lt;y&gt; defaults to &lt;x&gt;.</td>
         </tr>
@@ -1026,6 +1051,11 @@
             <td>&#160;</td>
             <td>forward</td>
             <td>toolbar forward action</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>dashboard([&lt;bool&gt;])</td>
+            <td>show/hides dashboard; without argument visibility is toggled</td>
         </tr>
         <tr>
             <td>RC Command</td>

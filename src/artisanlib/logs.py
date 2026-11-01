@@ -38,7 +38,7 @@ from artisanlib import __version__
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import ArtisanPlainTextEdit
 
-from PyQt6.QtCore import Qt, pyqtSlot
+from PyQt6.QtCore import pyqtSlot
 from PyQt6.QtWidgets import (QApplication, QLabel, QCheckBox, QVBoxLayout)
 
 
@@ -51,14 +51,14 @@ class serialLogDlg(ArtisanDialog):
         super().__init__(parent, aw)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate('Form Caption','Serial Log'))
-        self.serialcheckbox = QCheckBox(QApplication.translate('CheckBox','Serial Log ON/OFF'))
-        self.serialcheckbox.setToolTip(QApplication.translate('Tooltip', 'ON/OFF logs serial communication'))
+        self.serialcheckbox = QCheckBox(QApplication.translate('Label', 'Logging'))
+        self.serialcheckbox.setToolTip(QApplication.translate('Tooltip', 'Toggle logging of serial communication'))
         self.serialcheckbox.setChecked(self.aw.seriallogflag)
         self.serialcheckbox.stateChanged.connect(self.serialcheckboxChanged)
-        self.serialEdit = ArtisanPlainTextEdit()
+        self.serialEdit = ArtisanPlainTextEdit(self.aw.app.darkmode)
         self.serialEdit.setReadOnly(True)
-        self.serialEdit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.serialEdit.setPlainText(self.getstring())
+#        self.serialEdit.setFocusPolicy(Qt.FocusPolicy.NoFocus)  # NoFocus breaks copy keyboard selection and shortcuts
+        self.serialEdit.appendHtml(self.getstring())
         layout = QVBoxLayout()
         layout.addWidget(self.serialcheckbox,0)
         layout.addWidget(self.serialEdit,1)
@@ -74,7 +74,8 @@ class serialLogDlg(ArtisanDialog):
 
     def update_log(self) -> None:
         if self.aw.seriallogflag:
-            self.serialEdit.setPlainText(self.getstring())
+            self.serialEdit.clear()
+            self.serialEdit.appendHtml(self.getstring())
 
     @pyqtSlot(int)
     def serialcheckboxChanged(self, _:int) -> None:
@@ -100,9 +101,9 @@ class errorDlg(ArtisanDialog):
         self.setModal(True)
         self.setWindowTitle(QApplication.translate('Form Caption','Error Log'))
         self.elabel = QLabel()
-        self. errorEdit = ArtisanPlainTextEdit()
+        self. errorEdit = ArtisanPlainTextEdit(self.aw.app.darkmode)
         self.errorEdit.setReadOnly(True)
-        self.errorEdit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+#        self.errorEdit.setFocusPolicy(Qt.FocusPolicy.NoFocus) # NoFocus breaks copy keyboard selection and shortcuts
         layout = QVBoxLayout()
         layout.addWidget(self.elabel,0)
         layout.addWidget(self.errorEdit,1)
@@ -117,7 +118,8 @@ class errorDlg(ArtisanDialog):
         enumber = len(self.aw.qmc.errorlog)
         labelstr =  f'{QApplication.translate('Label','Number of errors found {0}').format(str(enumber))}\n'
         self.elabel.setText(labelstr)
-        self.errorEdit.setPlainText(f'version = {__version__}\n\n' + htmlerr)
+        self.errorEdit.clear()
+        self.errorEdit.appendHtml(f'version = {__version__}\n\n{htmlerr}')
 
     @pyqtSlot('QCloseEvent')
     @override
@@ -136,9 +138,9 @@ class messageDlg(ArtisanDialog):
         super().__init__(parent, aw)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate('Form Caption','Message History'))
-        self.messageEdit = ArtisanPlainTextEdit()
+        self.messageEdit = ArtisanPlainTextEdit(self.aw.app.darkmode)
         self.messageEdit.setReadOnly(True)
-        self.messageEdit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+#        self.messageEdit.setFocusPolicy(Qt.FocusPolicy.NoFocus) # NoFocus breaks copy keyboard selection and shortcuts
         layout = QVBoxLayout()
         layout.addWidget(self.messageEdit,0)
         self.setLayout(layout)

@@ -26,18 +26,22 @@
 # Marko Luther, 2023
 
 from typing import override, TYPE_CHECKING
-from artisanlib.dialogs import ArtisanDialog
-
-from PyQt6.QtCore import Qt, pyqtSlot, QSettings
-from PyQt6.QtWidgets import (QApplication, QMessageBox, QLabel, QPushButton, QDialogButtonBox, QFrame,
-    QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QLineEdit, QSpacerItem)
-
-
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from artisanlib.dialogs import HelpDlg # noqa: F401 # pylint: disable=unused-import
     from PyQt6.QtWidgets import QWidget # pylint: disable=unused-import
     from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
+
+from PyQt6.QtCore import Qt, pyqtSlot, QSettings, QSize
+from PyQt6.QtGui import QIcon
+from PyQt6.QtWidgets import (QApplication, QLabel, QPushButton, QDialogButtonBox, QFrame,
+    QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QLineEdit, QSpacerItem)
+
+from artisanlib.util import getStyleIconPath
+from artisanlib.dialogs import ArtisanDialog, artisan_warning
+from artisanlib.widgets import ArtisanMinorPushButton
+from artisanlib.styles import line_edit_style, artisan_minor_push_button_style
+
 
 class autosaveDlg(ArtisanDialog):
     def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
@@ -52,6 +56,7 @@ class autosaveDlg(ArtisanDialog):
         self.helpdialog:HelpDlg|None = None
 
         self.prefixEdit = QLineEdit(self.aw.qmc.autosaveprefix)
+        self.prefixEdit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.prefixEdit.setToolTip(QApplication.translate('Tooltip', 'Automatic generated name'))
         self.prefixEdit.textChanged.connect(self.prefixChanged)
         prefixpreviewLabel = QLabel()
@@ -63,18 +68,15 @@ class autosaveDlg(ArtisanDialog):
         self.prefixPreviewrecording = QLabel()
         self.prefixChanged()
 
-        autochecklabel = QLabel(QApplication.translate('CheckBox','Autosave [a]'))
-        self.autocheckbox = QCheckBox()
+        self.autocheckbox = QCheckBox(QApplication.translate('CheckBox','Autosave [a]'))
         self.autocheckbox.setToolTip(QApplication.translate('Tooltip', 'ON/OFF of automatic saving when pressing keyboard letter [a]'))
         self.autocheckbox.setChecked(bool(self.aw.qmc.autosaveflag))
 
-        addtorecentfileslabel = QLabel(QApplication.translate('CheckBox','Add to recent file list'))
-        self.addtorecentfiles = QCheckBox()
+        self.addtorecentfiles = QCheckBox(QApplication.translate('CheckBox','Add to recent file list'))
         self.addtorecentfiles.setToolTip(QApplication.translate('Tooltip', 'Add auto saved file names to the recent files list'))
         self.addtorecentfiles.setChecked(self.aw.qmc.autosaveaddtorecentfilesflag)
 
-        autopdflabel = QLabel(QApplication.translate('CheckBox','Save also'))
-        self.autopdfcheckbox = QCheckBox()
+        self.autopdfcheckbox = QCheckBox(QApplication.translate('CheckBox','Save also'))
         self.autopdfcheckbox.setToolTip(QApplication.translate('Tooltip', 'Save image alongside .alog profiles'))
         self.autopdfcheckbox.setChecked(self.aw.qmc.autosaveimage)
         self.imageTypesComboBox = QComboBox()
@@ -89,27 +91,37 @@ class autosaveDlg(ArtisanDialog):
         self.dialogbuttons.rejected.connect(lambda : (None if self.close() else None)) # lambda to make mypy happy, turning close from None->bool into None->None
         self.helpButton = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.Help)
         if self.helpButton is not None:
-            self.setButtonTranslations(self.helpButton,'Help',QApplication.translate('Button','Help'))
+            self.dialogbuttons.removeButton(self.helpButton)
             self.helpButton.clicked.connect(self.showautosavehelp)
+            self.setButtonTranslations(self.helpButton,'Help',QApplication.translate('Button','Help'))
+            self.helpButton.setIconSize(QSize(14,14))
+            self.helpButton.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
+            self.helpButton.setIcon(QIcon(getStyleIconPath('help-square-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'help-square-stroke-rounded-white.svg')))
 
-        pathButton = QPushButton(QApplication.translate('Button','Path'))
+
+        pathButton = ArtisanMinorPushButton(QApplication.translate('Button','Path'),
+            'folder-01-stroke-rounded-white.svg',
+            'folder-01-stroke-rounded-dark.svg',
+            self.aw.app.darkmode)
         pathButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.pathEdit = QLineEdit(self.aw.qmc.autosavepath)
+        self.pathEdit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.pathEdit.setToolTip(QApplication.translate('Tooltip', 'Sets the directory to store batch profiles when using the letter [a]'))
         pathButton.clicked.connect(self.getpath)
 
-        pathAlsoButton = QPushButton(QApplication.translate('Button','Path'))
+        pathAlsoButton = ArtisanMinorPushButton(QApplication.translate('Button','Path'),
+            'folder-01-stroke-rounded-white.svg',
+            'folder-01-stroke-rounded-dark.svg',
+            self.aw.app.darkmode)
         pathAlsoButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.pathAlsoEdit = QLineEdit(self.aw.qmc.autosavealsopath)
+        self.pathAlsoEdit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.pathAlsoEdit.setToolTip(QApplication.translate('Tooltip', 'Sets the directory to store the save also files'))
         pathAlsoButton.clicked.connect(self.getalsopath)
 
         # this intermediate layout is needed to add the 'addtorecentfiles' checkbox into the existing grid layout.
         autochecklabelplus = QHBoxLayout()
-        autochecklabelplus.addWidget(autochecklabel)
         autochecklabelplus.addWidget(self.addtorecentfiles)
-        autochecklabelplus.addSpacing(15)
-        autochecklabelplus.addWidget(addtorecentfileslabel)
         autochecklabelplus.addStretch()
 
         linea = QFrame()
@@ -119,6 +131,8 @@ class autosaveDlg(ArtisanDialog):
         linea.setFrameShadow(QFrame.Shadow.Sunken)
 
         buttonLayout = QHBoxLayout()
+        buttonLayout.addWidget(self.helpButton)
+        buttonLayout.addStretch()
         buttonLayout.addWidget(self.dialogbuttons)
         autolayout = QGridLayout()
         autolayout.addWidget(self.autocheckbox,0,0,Qt.AlignmentFlag.AlignRight)
@@ -129,15 +143,13 @@ class autosaveDlg(ArtisanDialog):
         autolayout.addWidget(self.prefixPreview,2,1)
         autolayout.addWidget(self.prefixpreviewrecordingLabel,3,0)
         autolayout.addWidget(self.prefixPreviewrecording,3,1)
-        autolayout.addWidget(pathButton,4,0)
+        autolayout.addWidget(pathButton,4,0,Qt.AlignmentFlag.AlignRight)
         autolayout.addWidget(self.pathEdit,4,1,1,2)
         autolayout.addItem(QSpacerItem(0,12),5,0)
         autolayout.addWidget(linea,6,0,1,3)
-        autolayout.addItem(QSpacerItem(0,7),7,0)
-        autolayout.addWidget(self.autopdfcheckbox,8,0,Qt.AlignmentFlag.AlignRight)
-        autolayout.addWidget(autopdflabel,8,1)
+        autolayout.addWidget(self.autopdfcheckbox,8,0)
         autolayout.addWidget(self.imageTypesComboBox,8,2)
-        autolayout.addWidget(pathAlsoButton,9,0)
+        autolayout.addWidget(pathAlsoButton,9,0,Qt.AlignmentFlag.AlignRight)
         autolayout.addWidget(self.pathAlsoEdit,9,1,1,2)
         autolayout.setColumnStretch(0,0)
         autolayout.setColumnStretch(1,10)
@@ -224,6 +236,8 @@ class autosaveDlg(ArtisanDialog):
         settings.setValue('autosaveGeometry',self.saveGeometry())
 
         if self.aw.qmc.autosaveflag and self.aw.qmc.autosavepath == '':
-            QMessageBox.warning(None, #self.aw, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
-                QApplication.translate('Message', 'Warning'),
+#            QMessageBox.warning(None, #self.aw, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+#                QApplication.translate('Message', 'Warning'),
+#                QApplication.translate('Message', 'Autosave turned ON, but filepath empty!\n\nATTENTION: Recorded data will get cleared without confirmation'))
+            artisan_warning(self, self.aw,
                 QApplication.translate('Message', 'Autosave turned ON, but filepath empty!\n\nATTENTION: Recorded data will get cleared without confirmation'))

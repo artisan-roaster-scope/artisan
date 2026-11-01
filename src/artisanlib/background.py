@@ -28,11 +28,6 @@
 import platform
 import logging
 
-from artisanlib.main import UI_MODE
-from artisanlib.util import deltaLabelUTF8, deltaLabelPrefix, stringfromseconds
-from artisanlib.dialogs import ArtisanResizeablDialog
-from artisanlib.widgets import (MyTableWidgetItemNumber)
-from artisanlib.table_style import horizontal_header_style, vertical_header_style
 
 from typing import override, Final, TYPE_CHECKING
 
@@ -42,10 +37,15 @@ if TYPE_CHECKING:
 
 from PyQt6.QtCore import (Qt, pyqtSlot, QSettings, QTimer)
 from PyQt6.QtGui import QColor, QKeySequence
-from PyQt6.QtWidgets import (QApplication, QCheckBox, QGridLayout, QHBoxLayout, QVBoxLayout,
+from PyQt6.QtWidgets import (QApplication, QCheckBox, QGridLayout, QHBoxLayout, QVBoxLayout, QToolButton,
                              QLabel, QLineEdit,QPushButton, QComboBox, QDialogButtonBox, QHeaderView,
-                             QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QWidget, QGroupBox)
+                             QSpinBox, QTableWidget, QTableWidgetItem, QWidget, QGroupBox)
 
+from artisanlib.main import UI_MODE
+from artisanlib.util import deltaLabelUTF8, deltaLabelPrefix, stringfromseconds
+from artisanlib.dialogs import ArtisanResizeablDialog
+from artisanlib.widgets import MyTableWidgetItemNumber, ArtisanMinorPushButton, ArtisanQTabWidget
+from artisanlib.styles import horizontal_header_style, vertical_header_style, line_edit_style, tool_button_icon_style, table_style, spin_box_style
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -58,7 +58,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.ETname = self.aw.qmc.device_name_subst(self.aw.ETname)
         self.BTname = self.aw.qmc.device_name_subst(self.aw.BTname)
 
-        self.setWindowTitle(QApplication.translate('Form Caption','Profile Background'))
+        self.setWindowTitle(QApplication.translate('Form Caption','Background Roast Template'))
         self.setModal(True)
 
         settings = QSettings()
@@ -67,7 +67,7 @@ class backgroundDlg(ArtisanResizeablDialog):
 
         #TAB 1
         self.pathedit = QLineEdit(self.aw.qmc.backgroundpath)
-        self.pathedit.setStyleSheet("background-color:'lightgrey';")
+        self.pathedit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.pathedit.setReadOnly(True)
         self.pathedit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.filename = ''
@@ -82,7 +82,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.backgroundBTflag = QCheckBox(self.BTname)
         self.backgroundFullflag = QCheckBox(QApplication.translate('CheckBox','Show Full'))
         self.keyboardControlflag = QCheckBox(QApplication.translate('CheckBox','Keyboard Control'))
-        self.keyboardControlflag.setToolTip(QApplication.translate('Tooltip', 'Move the background profile using the cursor keys'))
+        self.keyboardControlflag.setToolTip(QApplication.translate('Tooltip', 'Move the template profile using the cursor keys'))
         self.backgroundCheck.setChecked(self.aw.qmc.background)
         self.backgroundDetails.setChecked(self.aw.qmc.backgroundDetails)
         self.backgroundeventsflag.setChecked(self.aw.qmc.backgroundeventsflag)
@@ -92,16 +92,25 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.backgroundBTflag.setChecked(self.aw.qmc.backgroundBTcurve)
         self.backgroundFullflag.setChecked(self.aw.qmc.backgroundShowFullflag)
         self.keyboardControlflag.setChecked(self.aw.qmc.backgroundKeyboardControlFlag)
-        loadButton = QPushButton(QApplication.translate('Button','Load'))
+        loadButton = ArtisanMinorPushButton(QApplication.translate('Button','Load'),
+            'file-02-stroke-rounded-white.svg',
+            'file-02-stroke-rounded-dark.svg',
+            self.aw.app.darkmode)
         loadButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        delButton = QPushButton(QApplication.translate('Button','Delete'))
+        delButton = ArtisanMinorPushButton(QApplication.translate('Button','Clear'),
+            'cancel-01-stroke-rounded-white.svg',
+            'cancel-01-stroke-rounded-dark.svg',
+            self.aw.app.darkmode)
         delButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(self.accept)
         self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel))
 
-        alignButton = QPushButton(QApplication.translate('Button','Align'))
+        alignButton = ArtisanMinorPushButton(QApplication.translate('Button','Align'),
+            'keyframe-align-vertical-stroke-rounded-white.svg',
+            'keyframe-align-vertical-stroke-rounded-dark.svg',
+            self.aw.app.darkmode)
         alignButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.alignComboBox = QComboBox()
         self.aw.qmc.alignnames = [
@@ -121,6 +130,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         alignButton.clicked.connect(self.timealign)
 
         self.speedSpinBox = QSpinBox()
+        self.speedSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.speedSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.speedSpinBox.setRange(1,90)
         self.speedSpinBox.setSingleStep(5)
@@ -147,7 +157,7 @@ class backgroundDlg(ArtisanResizeablDialog):
             curvenames.append(f'B{2*i+4}: {cn2}')
         self.xtcurvelabel = QLabel(QApplication.translate('Label', 'Extra 1'))
         self.xtcurveComboBox = QComboBox()
-        self.xtcurveComboBox.setToolTip(QApplication.translate('Tooltip','For loaded backgrounds with extra devices only'))
+        self.xtcurveComboBox.setToolTip(QApplication.translate('Tooltip','For loaded templates with extra devices only'))
         self.xtcurveComboBox.setMinimumWidth(120)
         self.xtcurveComboBox.addItems(curvenames)
         if self.aw.qmc.xtcurveidx < len(curvenames):
@@ -156,21 +166,41 @@ class backgroundDlg(ArtisanResizeablDialog):
 
         self.ytcurvelabel = QLabel(QApplication.translate('Label', 'Extra 2'))
         self.ytcurveComboBox = QComboBox()
-        self.ytcurveComboBox.setToolTip(QApplication.translate('Tooltip','For loaded backgrounds with extra devices only'))
+        self.ytcurveComboBox.setToolTip(QApplication.translate('Tooltip','For loaded templates with extra devices only'))
         self.ytcurveComboBox.setMinimumWidth(120)
         self.ytcurveComboBox.addItems(curvenames)
         if self.aw.qmc.ytcurveidx < len(curvenames):
             self.ytcurveComboBox.setCurrentIndex(self.aw.qmc.ytcurveidx)
         self.ytcurveComboBox.currentIndexChanged.connect(self.changeYTcurveidx)
 
-        self.upButton = QPushButton(QApplication.translate('Button','Up'))
+        self.upButton = QToolButton()
+        self.upButton.setText('')
+        self.upButton.setStyleSheet(tool_button_icon_style(self.aw.app.darkmode, 'arrow-big-up-dash-stroke-rounded-light.svg', 'arrow-big-up-dash-stroke-rounded-dark.svg'))
+        self.upButton.setMinimumWidth(35)
+        self.upButton.setMinimumHeight(35)
         self.upButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.downButton = QPushButton(QApplication.translate('Button','Down'))
+
+        self.downButton = QToolButton()
+        self.downButton.setText('')
+        self.downButton.setStyleSheet(tool_button_icon_style(self.aw.app.darkmode, 'arrow-big-down-dash-stroke-rounded-light.svg', 'arrow-big-down-dash-stroke-rounded-dark.svg'))
+        self.downButton.setMinimumWidth(35)
+        self.downButton.setMinimumHeight(35)
         self.downButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.leftButton = QPushButton(QApplication.translate('Button','Left'))
+
+        self.leftButton = QToolButton()
+        self.leftButton.setText('')
+        self.leftButton.setStyleSheet(tool_button_icon_style(self.aw.app.darkmode, 'arrow-big-left-dash-stroke-rounded-light.svg', 'arrow-big-left-dash-stroke-rounded-dark.svg'))
+        self.leftButton.setMinimumWidth(35)
+        self.leftButton.setMinimumHeight(35)
         self.leftButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.rightButton = QPushButton(QApplication.translate('Button','Right'))
+
+        self.rightButton = QToolButton()
+        self.rightButton.setText('')
+        self.rightButton.setStyleSheet(tool_button_icon_style(self.aw.app.darkmode, 'arrow-big-right-dash-stroke-rounded-light.svg', 'arrow-big-right-dash-stroke-rounded-dark.svg'))
+        self.rightButton.setMinimumWidth(35)
+        self.rightButton.setMinimumHeight(35)
         self.rightButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
         self.backgroundCheck.clicked.connect(self.readChecks)
         self.backgroundDetails.clicked.connect(self.readChecks)
         self.backgroundeventsflag.clicked.connect(self.readChecks)
@@ -187,6 +217,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         #TAB 2 EVENTS
         #table for showing events
         self.eventtable = QTableWidget()
+        self.eventtable.setStyleSheet(table_style(self.aw.app.darkmode))
         horizontal_header = self.eventtable.horizontalHeader()
         if horizontal_header is not None:
             horizontal_header.setStyleSheet(horizontal_header_style(self.aw.app.darkmode))
@@ -195,15 +226,17 @@ class backgroundDlg(ArtisanResizeablDialog):
             vertical_header.setStyleSheet(vertical_header_style(self.aw.app.darkmode))
             vertical_header.setDefaultAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
         self.eventtable.setTabKeyNavigation(True)
-        self.copyeventTableButton = QPushButton(QApplication.translate('Button', 'Copy Table'))
+        self.copyeventTableButton = ArtisanMinorPushButton(QApplication.translate('Button', 'Copy table'),
+            'copy-stroke-rounded-white.svg',
+            'copy-stroke-rounded-dark.svg',
+            self.aw.app.darkmode)
         self.copyeventTableButton.setToolTip(QApplication.translate('Tooltip','Copy table to clipboard, OPTION or ALT click for tabular text'))
         self.copyeventTableButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.copyeventTableButton.setMaximumSize(self.copyeventTableButton.sizeHint())
-        self.copyeventTableButton.setMinimumSize(self.copyeventTableButton.minimumSizeHint())
         self.copyeventTableButton.clicked.connect(self.copyEventTabletoClipboard)
         #TAB 3 DATA
         #table for showing data
         self.datatable = QTableWidget()
+        self.datatable.setStyleSheet(table_style(self.aw.app.darkmode))
         horizontal_header = self.datatable.horizontalHeader()
         if horizontal_header is not None:
             horizontal_header.setStyleSheet(horizontal_header_style(self.aw.app.darkmode))
@@ -212,7 +245,10 @@ class backgroundDlg(ArtisanResizeablDialog):
             vertical_header.setStyleSheet(vertical_header_style(self.aw.app.darkmode))
             vertical_header.setDefaultAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
         self.datatable.setTabKeyNavigation(True)
-        self.copydataTableButton = QPushButton(QApplication.translate('Button', 'Copy Table'))
+        self.copydataTableButton = ArtisanMinorPushButton(QApplication.translate('Button', 'Copy table'),
+            'copy-stroke-rounded-white.svg',
+            'copy-stroke-rounded-dark.svg',
+            self.aw.app.darkmode)
         self.copydataTableButton.setToolTip(QApplication.translate('Tooltip','Copy table to clipboard, OPTION or ALT click for tabular text'))
         self.copydataTableButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.copydataTableButton.setMaximumSize(self.copydataTableButton.sizeHint())
@@ -244,6 +280,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.replayDropComboBox.setEnabled(self.aw.qmc.backgroundPlaybackDROP)
 
         self.backgroundReproduce = QCheckBox(QApplication.translate('CheckBox','Playback Aid'))
+        self.backgroundReproduce.setToolTip(QApplication.translate('Tooltip', 'Show text warnings ahead of approaching an event in the template'))
         self.backgroundReproduce.setChecked(self.aw.qmc.backgroundReproduce)
         self.backgroundReproduce.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.backgroundReproduce.stateChanged.connect(self.setreproduce)
@@ -256,44 +293,46 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.backgroundPlaybackEvents.setChecked(self.aw.qmc.backgroundPlaybackEvents)
         self.backgroundPlaybackEvents.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.backgroundPlaybackEvents.stateChanged.connect(self.setplaybackevent)
-        self.backgroundPlaybackEvents.setToolTip(QApplication.translate('Tooltip', 'Replays the selected backgrounds events by time, BT, or ET (before TP always by time at least until 2min into the roast)'))
+        self.backgroundPlaybackEvents.setToolTip(QApplication.translate('Tooltip', 'Replays the selected templates events by time, BT, or ET (before TP always by time at least until 2min into the roast)'))
         self.backgroundPlaybackDROP = QCheckBox(QApplication.translate('CheckBox','Playback DROP'))
         self.backgroundPlaybackDROP.setChecked(self.aw.qmc.backgroundPlaybackDROP)
         self.backgroundPlaybackDROP.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.backgroundPlaybackDROP.stateChanged.connect(self.setplaybackdrop)
-        self.backgroundPlaybackDROP.setToolTip(QApplication.translate('Tooltip', 'Replays the backgrounds DROP event by time, BT, or ET (but earlierst 4min into the roast)'))
+        self.backgroundPlaybackDROP.setToolTip(QApplication.translate('Tooltip', 'Replays the templates DROP event by time, BT, or ET (but earlierst 4min into the roast)'))
         self.etimelabel =QLabel(QApplication.translate('Label', 'Text Warning'))
         self.etimelabel.setEnabled(self.aw.qmc.backgroundReproduce)
         self.etimeunit =QLabel(QApplication.translate('Label', 'sec'))
         self.etimeunit.setEnabled(self.aw.qmc.backgroundReproduce)
         self.etimeSpinBox = QSpinBox()
+        self.etimeSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.etimeSpinBox.setRange(1,60)
+        self.etimeSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.etimeSpinBox.setValue(int(self.aw.qmc.detectBackgroundEventTime))
         self.etimeSpinBox.valueChanged.connect(self.setreproduce)
         self.etimeSpinBox.setEnabled(self.aw.qmc.backgroundReproduce)
-        self.clearBgbeforeprofileload = QCheckBox(QApplication.translate('CheckBox','Clear background before loading'))
-        self.clearBgbeforeprofileload.setToolTip(QApplication.translate('Tooltip', 'Clear background before loading a profile'))
+        self.clearBgbeforeprofileload = QCheckBox(QApplication.translate('CheckBox','Clear template before loading'))
+        self.clearBgbeforeprofileload.setToolTip(QApplication.translate('Tooltip', 'Clear template before loading a profile'))
         self.clearBgbeforeprofileload.setChecked(self.aw.qmc.clearBgbeforeprofileload)
         self.clearBgbeforeprofileload.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.clearBgbeforeprofileload.stateChanged.connect(self.optclearbgbeforeprofileload)
         self.setBatchSizeFromBackground = QCheckBox(QApplication.translate('CheckBox','Set batch size'))
-        self.setBatchSizeFromBackground.setToolTip(QApplication.translate('Tooltip', 'Set batch size from background profile on load'))
+        self.setBatchSizeFromBackground.setToolTip(QApplication.translate('Tooltip', 'Set batch size from template profile on load'))
         self.setBatchSizeFromBackground.setChecked(self.aw.qmc.setBatchSizeFromBackground)
         self.setBatchSizeFromBackground.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.setBatchSizeFromBackground.stateChanged.connect(self.optsetBatchSizeFromBackground)
-        self.hideBgafterprofileload = QCheckBox(QApplication.translate('CheckBox','Always hide background on loading'))
-        self.hideBgafterprofileload.setToolTip(QApplication.translate('Tooltip', 'Always hide background on loading a profile'))
+        self.hideBgafterprofileload = QCheckBox(QApplication.translate('CheckBox','Hide template on loading profiles'))
+        self.hideBgafterprofileload.setToolTip(QApplication.translate('Tooltip', 'Always hide template on loading a profile'))
         self.hideBgafterprofileload.setChecked(self.aw.qmc.hideBgafterprofileload)
         self.hideBgafterprofileload.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.hideBgafterprofileload.stateChanged.connect(self.opthideBgafterprofileload)
 
         #LAYOUT MANAGERS
         movelayout = QGridLayout()
-        movelayout.addWidget(self.upButton,0,1)
+        movelayout.addWidget(self.upButton,0,1, Qt.AlignmentFlag.AlignCenter)
         movelayout.addWidget(self.leftButton,1,0)
         movelayout.addWidget(self.speedSpinBox,1,1)
         movelayout.addWidget(self.rightButton,1,2)
-        movelayout.addWidget(self.downButton,2,1)
+        movelayout.addWidget(self.downButton,2,1, Qt.AlignmentFlag.AlignCenter)
         movelayout.setSpacing(15)
         checkslayout1 = QHBoxLayout()
         checkslayout1.addStretch()
@@ -323,25 +362,44 @@ class backgroundDlg(ArtisanResizeablDialog):
         layoutBoxedH.addStretch()
         layoutBoxedH.addLayout(movelayout)
         layoutBoxedH.addStretch()
-        if self.aw.ui_mode is not UI_MODE.PRODUCTION:
-            layoutBoxedH.addWidget(self.keyboardControlflag)
+        layoutOuterBoxed = QVBoxLayout()
+        layoutBoxedH.addLayout(layoutOuterBoxed)
+        layoutOuterBoxed.addStretch()
         layoutBoxed = QVBoxLayout()
-        layoutBoxed.addStretch()
+        layoutBoxed.addSpacing(5)
         if self.aw.ui_mode is not UI_MODE.PRODUCTION:
             layoutBoxed.addLayout(checkslayout1)
             layoutBoxed.addStretch()
         layoutBoxed.addLayout(layoutBoxedH)
         layoutBoxed.addStretch()
+        if self.aw.ui_mode is not UI_MODE.PRODUCTION:
+            keyboardHBox = QHBoxLayout()
+
+            keyboardHBox.addStretch()
+
+            if len(self.aw.qmc.extratimexB)>0:
+                keyboardHBox.addWidget(self.xtcurvelabel)
+                keyboardHBox.addWidget(self.xtcurveComboBox)
+                keyboardHBox.addSpacing(10)
+                keyboardHBox.addStretch()
+
+            keyboardHBox.addWidget(self.keyboardControlflag)
+
+            if len(self.aw.qmc.extratimexB)>0:
+                keyboardHBox.addStretch()
+                keyboardHBox.addSpacing(10)
+                keyboardHBox.addWidget(self.ytcurvelabel)
+                keyboardHBox.addWidget(self.ytcurveComboBox)
+
+            keyboardHBox.addStretch()
+            layoutBoxed.addLayout(keyboardHBox)
         alignButtonBoxed = QHBoxLayout()
-        if len(self.aw.qmc.extratimexB)>0 and self.aw.ui_mode is not UI_MODE.PRODUCTION:
-            alignButtonBoxed.addWidget(self.xtcurvelabel)
-            alignButtonBoxed.addWidget(self.xtcurveComboBox)
-            alignButtonBoxed.addSpacing(10)
-            alignButtonBoxed.addWidget(self.ytcurvelabel)
-            alignButtonBoxed.addWidget(self.ytcurveComboBox)
         alignButtonBoxed.addStretch()
-        alignButtonBoxed.addWidget(alignButton)
         alignButtonBoxed.addWidget(self.alignComboBox)
+        alignButtonBoxed.addWidget(alignButton)
+        layoutOuterBoxed.addLayout(alignButtonBoxed)
+        layoutOuterBoxed.addStretch()
+
 
         self.backgroundPlaybackAid0 = QCheckBox(self.aw.qmc.etypesf(0))
         self.backgroundPlaybackAid0.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -429,6 +487,7 @@ class backgroundDlg(ArtisanResizeablDialog):
 
         # Ramp Lookahead
         self.rampLookahead = QSpinBox()
+        self.rampLookahead.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.rampLookahead.setToolTip(QApplication.translate('Tooltip', 'On ramping the ramp value is taken with a positive time offset\nspecified by the lookahead'))
         self.rampLookahead.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.rampLookahead.setRange(0,999)
@@ -506,7 +565,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         optcontent.addWidget(self.hideBgafterprofileload)
         tab1layout = QVBoxLayout()
         tab1layout.addLayout(layoutBoxed)
-        tab1layout.addLayout(alignButtonBoxed)
+#        tab1layout.addLayout(alignButtonBoxed)
         if self.aw.ui_mode is not UI_MODE.PRODUCTION:
             tab1layout.addWidget(playbackGroupLayout)
         if self.aw.ui_mode is UI_MODE.EXPERT:
@@ -528,7 +587,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         tab3layout.addLayout(databuttonLayout)
         tab3layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom
         #tab layout
-        self.TabWidget = QTabWidget()
+        self.TabWidget = ArtisanQTabWidget()
         C1Widget = QWidget()
         C1Widget.setLayout(tab1layout)
         self.TabWidget.addTab(C1Widget,QApplication.translate('Tab','Config'))
@@ -630,15 +689,13 @@ class backgroundDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(int)
     def setplaybackevent(self, _:int) -> None:
-        s = None
         if self.backgroundPlaybackEvents.isChecked():
             self.aw.qmc.turn_playback_event_ON()
             msg = QApplication.translate('Message','Playback Events set ON')
         else:
             self.aw.qmc.turn_playback_event_OFF()
             msg = QApplication.translate('StatusBar','Playback Events set OFF')
-            s = "background-color:'transparent';"
-        self.aw.sendmessage(msg, style=s)
+        self.aw.sendmessage(msg)
         self.aw.updatePlaybackIndicator()
         for widget in [
                 self.replayComboBox,
@@ -761,50 +818,6 @@ class backgroundDlg(ArtisanResizeablDialog):
         else:
             self.aw.qmc.hideBgafterprofileload = False
 
-#    def adjustcolor(self,curve):
-#
-#        curve = str(curve).lower()
-#
-#        etcolor = str(self.metcolorComboBox.currentText()).lower()
-#        btcolor = str(self.btcolorComboBox.currentText()).lower()
-#        deltabtcolor = str(self.deltabtcolorComboBox.currentText()).lower()
-#        deltaetcolor = str(self.deltaetcolorComboBox.currentText()).lower()
-#        xtcolor = str(self.xtcolorComboBox.currentText()).lower()
-#
-#        defaults =  ['et','bt','deltaet','deltabt']
-#
-#        if curve == 'et':
-#            if etcolor in defaults:
-#                self.aw.qmc.backgroundmetcolor = self.aw.qmc.palette[etcolor]
-#            else:
-#                self.aw.qmc.backgroundmetcolor = etcolor
-#
-#        elif curve == 'bt':
-#            if btcolor in defaults:
-#                self.aw.qmc.backgroundbtcolor = self.aw.qmc.palette[btcolor]
-#            else:
-#                self.aw.qmc.backgroundbtcolor = btcolor
-#
-#        elif curve == 'deltaet':
-#            if deltaetcolor in defaults:
-#                self.aw.qmc.backgrounddeltaetcolor = self.aw.qmc.palette[deltaetcolor]
-#            else:
-#                self.aw.qmc.backgrounddeltaetcolor = deltaetcolor
-#
-#        elif curve == 'deltabt':
-#            if deltabtcolor in defaults:
-#                self.aw.qmc.backgrounddeltabtcolor = self.aw.qmc.palette[deltabtcolor]
-#            else:
-#                self.aw.qmc.backgrounddeltabtcolor = deltabtcolor
-#
-#        elif curve == 'xt':
-#            if xtcolor in defaults:
-#                self.aw.qmc.backgroundxtcolor = self.aw.qmc.palette[xtcolor]
-#            else:
-#                self.aw.qmc.backgroundxtcolor = xtcolor
-#
-#        self.aw.qmc.redraw(recomputeAllDeltas=False)
-
     @pyqtSlot(bool)
     def delete(self, _:bool = False) -> None:
         self.pathedit.setText('')
@@ -883,10 +896,10 @@ class backgroundDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def load(self, _:bool = False) -> None:
-        self.filename = self.aw.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Background'),ext='*.alog')
+        self.filename = self.aw.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Background Roast Template'),ext='*.alog')
         if len(self.filename) == 0:
             return
-        self.aw.sendmessage(QApplication.translate('Message','Reading background profile...'))
+        self.aw.sendmessage(QApplication.translate('Message','Reading template profile...'))
         self.aw.qmc.resetlinecountcaches()
         self.aw.loadbackground(self.filename, quiet=False)
 

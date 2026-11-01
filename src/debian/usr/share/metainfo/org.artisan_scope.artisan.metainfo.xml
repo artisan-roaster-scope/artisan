@@ -19,7 +19,7 @@
 
     <p>**Notable features**</p>
     <ul>
-      <li>Fully open-source under GPLv3</li>
+      <li>Fully open-source under AGPLv3</li>
       <li>Extensive machine and device support, including the ability to control roasters</li>
       <li>Local-First data management. Your curves live on your machine!</li>
       <li>Rate-of-rise (RoR), area-under-the-curve (AUC), development-time-ratio (DTR), and projection lines</li>
@@ -35,14 +35,14 @@
     <p>Subscribers to our artisan platform unlock access to even more features of artisan scope, including:</p>
     <ul>
       <li>Inventory management</li>
-      <li>Roast scheduling with Acaia scale integration</li>
+      <li>Roast scheduling with scale integration</li>
       <li>RoastGuard automated quality control flagging</li>
       <li>Production reporting</li>
       <li>Maintenance reminders</li>
-      <li>Multiple users under one organization  </li>
+      <li>Multiple users under one organization</li>
     </ul>
 
-    <p>The artisan project runs on donations from individuals and companies recognising the value of artisan for the coffee community. Consider supporting this project with a donation or by purchasing an artisan platform membership!</p>
+    <p>The artisan project runs on donations from individuals and companies recognizing the value of artisan for the coffee community. Consider supporting this project with a donation or by purchasing an artisan platform membership!</p>
   </description>
 
   <developer id="org.artisan-scope">
@@ -79,7 +79,49 @@
 
   <releases>
 
-     <release version="4.2.0" date="2026-06-30">
+    <release version="5.0.0" date="2026-11-05">
+      <url type="details">https://artisan-scope.org/release/Artisan-v5.0/</url>
+      <description>
+        <p>ADDITIONS</p>
+        <ul>
+          <li>adds dashboard</li>
+          <li>adds support for Dutch Master Roasters</li>
+          <li>adds support for FreshRoast SR900</li>
+          <li>adds improved machine setups for Sivetz original fluid bed roasters</li>
+          <li>adds improved support for Orbiter smart roasters</li>
+          <li>adds autoCHARGE/autoDROP synchronization for IMF machines</li>
+          <li>adds autoCHARGE/DROP and drum speed control to the Schuilenburg PLC machine setup</li>
+          <li>adds device setup for Lebrews online-color sensor RoastSee NEXT</li>
+          <li>adds configuration to use the artisan internal software PID instead of the Kaleido machines internal one</li>
+          <li>adds Aillio CSV import</li>
+          <li>adds MCR RoastPATH .rpath import</li>
+          <li>adds Catppuccin and Chalkboard themes</li>
+          <li>adds UI scaling</li>
+          <li>adds two more MODBUS device channels</li>
+          <li>adds Artisan Commands pidDerivativeFilter, pidDerivativeLimit, pidILF, pidIWP, pidIRoC, pidPositiveTargetMin, pidPositiveTargetMax, pidNegativeTargetMin, pidNegativeTargetMax, zoom, pan, center, clamp, followMode, followModePanning, home, back, forward</li>
+        </ul>
+        <p>CHANGES</p>
+        <ul>
+          <li>tightened license from GPLv3 to AGPLv3 to prevent commercialization as headless engine</li>
+          <li>smaller builds by replacing headless Chromium engine by Rust-based fulgur lib for HTML2PDF conversion (size reduced by ~45%)</li>
+          <li>faster app start (startup time reduced by ~50% on macOS)</li>
+          <li>refreshed UI</li>
+          <li>improved translations</li>
+          <li>automatic restart on switching the language and on Factory Reset</li>
+        </ul>
+        <p>FIXES</p>
+        <ul>
+          <li>fixes faulty hash generation on files created using Save As causing modified file warnings on load (Issue #2205)</li>
+          <li>fixes regression causing canvas color not being applied correctly (Issue #2212)</li>
+          <li>fixes wrong time formatting in Artisan CSV export (Issue #2233)</li>
+          <li>fixes incorrect BT/ET readings on newer Santoker R machines (Discussion #2232 and Discussion #2085)</li>
+          <li>fixes the image export of profiles with very long titles that could result in compressed time axis (Discussion #2231)</li>
+          <li>fixes random crashes of v4.2 on latest macOS versions (26.7.2 and 27.2) caused by issues in the bundled Qt 6.11.0 version (Issue #2245 and Issue #2246)</li>
+        </ul>
+      </description>
+    </release>
+
+    <release version="4.2.0" date="2026-06-30">
       <url type="details">https://artisan-scope.org/release/Artisan-v4.2/</url>
       <description>
         <p>ADDITIONS</p>
@@ -149,7 +191,7 @@
         <ul>
           <li>fixes regression where cut/copy/paste shortcuts are not working in file selector dialogs (Issue #2114)</li>
           <li>fixes build issues which broke PDF reports on Linux and macOS (Issue #2113)</li>
-          <li>fixes issue with delta axis assignents in extra device setups on loading background profiles</li>
+          <li>fixes issue with delta axis assignments in extra device setups on loading background profiles</li>
         </ul>
       </description>
     </release>

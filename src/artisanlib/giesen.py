@@ -22,9 +22,9 @@
 # MAINTAINER
 # Marko Luther, 2026
 
-from pathlib import Path
 import csv
 import logging
+from pathlib import Path
 from collections.abc import Callable
 from typing import Final
 

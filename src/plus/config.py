@@ -59,6 +59,7 @@ stock_url: Final[str] = api_base_url + '/acoffees'
 roast_url: Final[str] = api_base_url + '/aroast'
 lock_schedule_url: Final[str] = api_base_url + '/aschedule/lock'
 notifications_url: Final[str] = api_base_url + '/notifications'
+upload_url: Final[str] = api_base_url + '/aprofile/upload'
 
 # Connection configurations
 

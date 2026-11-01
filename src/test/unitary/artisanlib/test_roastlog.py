@@ -237,12 +237,12 @@ class TestRoastLogImplementationDetails:
         # Test that temperature mode detection exists
         assert "mode = 'F'" in source_content
         assert (
-            'if timeindex[6] != 0 and len(temp1) > timeindex[6] and temp1[timeindex[6]] < 250:'
+            'if 0 < timeindex[6] < len(temp1) and temp1[timeindex[6]] < 250:'
             in source_content
         )
         assert "mode = 'C'" in source_content
         assert (
-            'if timeindex[0] > -1 and len(temp1) > timeindex[0] and temp1[timeindex[0]] < 250:'
+            'if -1 < timeindex[0] < len(temp1) and temp1[timeindex[0]] < 250:'
             in source_content
         )
 

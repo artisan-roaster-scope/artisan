@@ -64,8 +64,8 @@ application_organization_domain: Final[str] = 'artisan-scope.org'
 application_desktop_file_name: Final[str] = 'org.artisan_scope.artisan'
 
 
-from PyQt6.QtCore import Qt, QStandardPaths, QCoreApplication, QTime, QDate, QDateTime
-from PyQt6.QtGui import QColor
+from PyQt6.QtCore import Qt, QStandardPaths, QCoreApplication, QTime, QDate, QDateTime, QUrl
+from PyQt6.QtGui import QColor, QDesktopServices
 
 
 deltaLabelPrefix:Final[str] = '<html>&Delta;&thinsp;</html>' # prefix constant for labels to compose DeltaET/BT by prepending this prefix to ET/BT labels
@@ -517,6 +517,11 @@ def getResourcePath() -> str:
         return os.path.dirname(os.path.realpath(__file__)) + '\\..\\includes\\'
     return QCoreApplication.applicationDirPath() + '/'
 
+@functools.cache
+def getStyleIconPath(icon_filename:str) -> str:
+    # path in stylesheets needs to feature forward slashes also on Windows!
+    return Path.as_posix(Path(getResourcePath()).joinpath('Icons').joinpath(icon_filename))
+
 # if share is True, the same (cache) file is shared between the Artisan and
 # ArtisanViewer apps
 # and locks have to be used to avoid race conditions
@@ -538,6 +543,27 @@ def getDirectory(filename: str, ext: str|None = None, share: bool = False) -> st
         pass
     return str(fp)
 
+
+
+def getTaskURL(port:int, index_path:str) -> str:
+#    # use Artisan's host IP address
+#    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#    s.connect(('8.8.8.8', 80))
+#    localIP = s.getsockname()[0]
+#    s.close()
+#    return f'http://{str(localIP)}:{str(port)}/{index_path}'
+    # use Artisan's host name (more stable over DHCP/zeroconf updates), but cannot be accessed on Windows from iPhone
+    if sys.platform.startswith('darwin'):
+        import subprocess
+        host = subprocess.check_output(['scutil', '--get', 'LocalHostName']).decode('utf-8')
+    else:
+        import socket
+        # on Linux/Windows the mdns name is created by appending ".local" to the hostname
+        host = socket.gethostname()
+    return f"http://{host.strip().replace(' ', '_').casefold()}.local:{str(port)}/{index_path}"
+
+def open_link(url:str) -> None:
+    QDesktopServices.openUrl(QUrl(url, QUrl.ParsingMode.TolerantMode))
 
 # standard/MPL hex color strings append alpha information to the end, while QColor assumes the alpha information in color name strings at the begin
 
@@ -574,9 +600,12 @@ def toDim(color:str) -> str:
     return gray.name(QColor.NameFormat.HexRgb)
 
 # creates QLinearGradient style from light to dark by default, or from dark to light if reverse is True
+# xalpha can be given as a hex value of two letters
 @functools.cache
-def createGradient(rgb:QColor|str, tint_factor:float = 0.1, shade_factor:float = 0.1, reverse:bool = False, left_to_right:bool = False) -> str:
+def createGradient(rgb:QColor|str, tint_factor:float = 0.1, shade_factor:float = 0.1, reverse:bool = False, left_to_right:bool = False, alpha:str = '') -> str:
     light_grad,dark_grad = createRGBGradient(rgb,tint_factor,shade_factor)
+    light_grad = f'#{alpha}{light_grad[1:]}'
+    dark_grad = f'#{alpha}{dark_grad[1:]}'
     if reverse:
         # dark to light
         if left_to_right:
@@ -966,7 +995,7 @@ def findTPint(timeindex:list[int], timex:list[float], temp:list[float]) -> int:
     if start < SOR_index < end:
         start = SOR_index
     for i in range(end - 1, start -1, -1):
-        if temp[i] > 0 and temp[i] < TP:
+        if 0 < temp[i] < TP:
             TP = temp[i]
             idx = i
     return idx
@@ -975,7 +1004,7 @@ def findTPint(timeindex:list[int], timex:list[float], temp:list[float]) -> int:
 def eventtime2string(time:float) -> str:
     if time == 0.0:
         return ''
-    di,mo = divmod(time,60)
+    di,mo = divmod(math.floor(time + 0.5),60)
     return f'{di:02.0f}:{mo:02.0f}'
 
 
@@ -1344,7 +1373,7 @@ def computeDeltas(
 
         # cut out the part after DROP and before CHARGE and remove values beyond the RoRlimit
         return [
-            d if ((roast_start_idx <= i <= roast_end_idx) and (d is not None and (not limit_ror or
+            float(d) if ((roast_start_idx <= i <= roast_end_idx) and (d is not None and (not limit_ror or
                 ror_limit_min < d < ror_limit_max)))
             else None
             for i,d in enumerate(delta1)
@@ -1586,7 +1615,7 @@ def roast_time(timeindex:list[int], timex:list[float]) -> float|None:
     if len(timex) == 0 or len(timeindex) < 7:
         return None
     starttime = (timex[timeindex[0]] if timeindex[0] != -1 and timeindex[0] < len(timex) else 0)
-    endtime = (timex[timeindex[6]] if timeindex[6] > 0  and timeindex[6] < len(timex) else timex[-1])
+    endtime =  (timex[timeindex[6]] if 0 < timeindex[6] < len(timex) else timex[-1])
     return endtime - starttime
 
 # return the total roasting time of the given profile in seconds
@@ -1691,12 +1720,12 @@ def roast_message(profile:'ProfileData', org_id:str|None = None, machine_id:str|
         try:
             roastdate = None
             date = QDate.fromString(decodeLocalStrict(profile['roastisodate']),Qt.DateFormat.ISODate)
-            if not date.isValid(): # ty:ignore[no-matching-overload]
+            if not date.isValid():
                 date = QDate.currentDate()
             if 'roasttime' in profile:
                 try:
                     time = QTime.fromString(decodeLocalStrict(profile['roasttime']))
-                    if not time.isValid(): # ty:ignore[no-matching-overload]
+                    if not time.isValid():
                         time = QTime().currentTime()
                     roastdate = QDateTime(date,time)
                 except Exception: # pylint: disable=broad-except
@@ -1708,7 +1737,7 @@ def roast_message(profile:'ProfileData', org_id:str|None = None, machine_id:str|
     elif 'roastdate' in profile:
         try:
             date = QDate.fromString(decodeLocalStrict(profile['roastdate']))
-            if not date.isValid(): # ty:ignore[no-matching-overload]
+            if not date.isValid():
                 date = QDate.currentDate()
             if 'roasttime' in profile:
                 try:
@@ -1734,10 +1763,10 @@ def roast_message(profile:'ProfileData', org_id:str|None = None, machine_id:str|
     # remove readings before CHARGE and after DROP
     start_idx:int = 0
     end_idx:int = len(timex)
-    if seconds_before_charge is not None and timeindex[0]>-1 and timeindex[0]<len(timex):
+    if seconds_before_charge is not None and -1 < timeindex[0] < len(timex):
         readings_before,_ = divmod(seconds_before_charge,sampling_interval)
         start_idx = max(0,timeindex[0]-readings_before)
-    if seconds_after_drop is not None and timeindex[6]>0 and timeindex[6]<len(timex):
+    if seconds_after_drop is not None and 0 < timeindex[6] < len(timex):
         readings_after,_ = divmod(seconds_after_drop,sampling_interval)
         end_idx = min(end_idx, timeindex[6]+readings_after+1)
     # adjust roastepoch (start of recording) by adding the duration removed
@@ -1781,7 +1810,7 @@ def roast_message(profile:'ProfileData', org_id:str|None = None, machine_id:str|
     # roast start / CHARGE
     last_idx:int = 0
     charge_offset:int = 0 # delta in seconds between time[0] (start of recording; roastepoch) and CHARGE (start of roast)
-    if len(timeindex)>0 and timeindex[0]>-1 and len(timex_resampled)>timeindex[0]:
+    if len(timeindex)>0 and timeindex[0] > -1 and -1 < timeindex[0] < len(timex_resampled):
         charge_offset = timex_resampled[timeindex[0]]
         roast.milestones.charge_idx = timeindex[0]
         last_idx = timeindex[0]
@@ -1794,22 +1823,22 @@ def roast_message(profile:'ProfileData', org_id:str|None = None, machine_id:str|
         last_idx = timeindex[1]
 
     # FIRST CRACK START
-    if len(timeindex)>1 and timeindex[2]>0 and len(timex_resampled)>timeindex[2]>last_idx:
+    if len(timeindex)>2 and timeindex[2]>0 and len(timex_resampled)>timeindex[2]>last_idx:
         roast.milestones.first_crack_start_idx = timeindex[2]
         last_idx = timeindex[2]
 
     # FIRST CRACK END
-    if len(timeindex)>1 and timeindex[3]>0 and len(timex_resampled)>timeindex[3]>last_idx:
+    if len(timeindex)>3 and timeindex[3]>0 and len(timex_resampled)>timeindex[3]>last_idx:
         roast.milestones.first_crack_end_idx = timeindex[3]
         last_idx = timeindex[3]
 
     # SECOND CRACK START
-    if len(timeindex)>1 and timeindex[4]>0 and len(timex_resampled)>timeindex[4]>last_idx:
+    if len(timeindex)>4 and timeindex[4]>0 and len(timex_resampled)>timeindex[4]>last_idx:
         roast.milestones.second_crack_start_idx = timeindex[4]
         last_idx = timeindex[4]
 
     # SECOND CRACK END
-    if len(timeindex)>1 and timeindex[5]>0 and len(timex_resampled)>timeindex[5]>last_idx:
+    if len(timeindex)>5 and timeindex[5]>0 and len(timex_resampled)>timeindex[5]>last_idx:
         roast.milestones.second_crack_end_idx = timeindex[5]
         last_idx = timeindex[5]
 
@@ -1927,8 +1956,8 @@ def roast_message(profile:'ProfileData', org_id:str|None = None, machine_id:str|
                 True,               # optimal smoothing
                 time_lin,
                 delta_ET_filter,    # delta filter
-                (timeindex[0] if len(timeindex)>0 and timeindex[0]>-1 and len(timex)>timeindex[0] else 0),           # roast_start_idx
-                (timeindex[6] if len(timeindex)>6 and timeindex[6]>0 and len(timex)>timeindex[6] else len(timex)-1), # roast_end_idx
+                (timeindex[0] if len(timeindex)>0 and -1 < timeindex[0] < len(timex) else 0),           # roast_start_idx
+                (timeindex[6] if len(timeindex)>6 and 0 < timeindex[6] < len(timex) else len(timex)-1), # roast_end_idx
                 True, # polyfit ror computation (in combination with optimal smoothing this results in the application of the optimal Savgol filter)
                 medfilt_factor_RoR, # median filter factor RoR
                 False,              # no further dropout filtering
@@ -1949,8 +1978,8 @@ def roast_message(profile:'ProfileData', org_id:str|None = None, machine_id:str|
                 True,               # optimal smoothing
                 time_lin,
                 delta_BT_filter,    # delta filter
-                (timeindex[0] if len(timeindex)>0 and timeindex[0]>-1 and len(timex)>timeindex[0] else 0),           # roast_start_idx
-                (timeindex[6] if len(timeindex)>6 and timeindex[6]>0 and len(timex)>timeindex[6] else len(timex)-1), # roast_end_idx
+                (timeindex[0] if len(timeindex)>0 and -1 < timeindex[0] < len(timex) else 0),           # roast_start_idx
+                (timeindex[6] if len(timeindex)>6 and 0 < timeindex[6] < len(timex) else len(timex)-1), # roast_end_idx
                 True, # polyfit ror computation (in combination with optimal smoothing this results in the application of the optimal Savgol filter)
                 medfilt_factor_RoR, # median filter factor RoR
                 False,              # no further dropout filtering

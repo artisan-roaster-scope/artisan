@@ -35,6 +35,9 @@ os.environ['OMP_NUM_THREADS'] = '1'
 # deactivate defusedexml in OPENPYXL as it might not be installed or bundled
 os.environ['OPENPYXL_DEFUSEDXML'] = 'False'
 
+# suppress Qt 6.12 warning "qt.gui.icc: fromIccProfile: Failed to parse description" on starting on a monitor with broken ICC color profile
+# (eg. ASCII count not containing the terminating NULL as on some Lenovo's default profiles)
+os.environ['QT_LOGGING_RULES'] = 'qt.gui.icc.warning=false'
 
 from artisanlib import main, command_utility
 

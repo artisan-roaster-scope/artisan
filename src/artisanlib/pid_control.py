@@ -44,7 +44,7 @@ from typing import Final, TYPE_CHECKING
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
 
-from artisanlib.button_style import artisan_push_button_style_dict
+from artisanlib.styles import push_button_style
 from artisanlib.util import fromCtoFstrict, fromFtoCstrict, hex2int, str2cmd, stringfromseconds, cmd2str, float2float
 
 from PyQt6.QtCore import pyqtSlot
@@ -1279,6 +1279,35 @@ class PIDcontrol:
 
         self.slider_force_move:bool = True # if True move the slider independent of the slider position to fire slider action!
 
+
+    def setPositiveTargetMin(self, value:int) -> None:
+        if self.aw.pidcontrol.pidPositiveTarget != 0:
+            slidernr = self.pidPositiveTarget - 1
+            slider_min = self.aw.eventslidermin[slidernr]
+            slider_max = self.aw.eventslidermax[slidernr]
+            self.positiveTargetMin = max(slider_min, min(slider_max, value, self.positiveTargetMax))
+
+    def setPositiveTargetMax(self, value:int) -> None:
+        if self.aw.pidcontrol.pidPositiveTarget != 0:
+            slidernr = self.pidPositiveTarget - 1
+            slider_min = self.aw.eventslidermin[slidernr]
+            slider_max = self.aw.eventslidermax[slidernr]
+            self.positiveTargetMax = max(slider_min, min(slider_max, value), self.positiveTargetMin)
+
+    def setNegativeTargetMin(self, value:int) -> None:
+        if self.aw.pidcontrol.pidNegativeTarget != 0:
+            slidernr = self.pidNegativeTarget - 1
+            slider_min = self.aw.eventslidermin[slidernr]
+            slider_max = self.aw.eventslidermax[slidernr]
+            self.negativeTargetMin = max(slider_min, min(slider_max, value, self.negativeTargetMax))
+
+    def setNegativeTargetMax(self, value:int) -> None:
+        if self.aw.pidcontrol.pidNegativeTarget != 0:
+            slidernr = self.pidNegativeTarget - 1
+            slider_min = self.aw.eventslidermin[slidernr]
+            slider_max = self.aw.eventslidermax[slidernr]
+            self.negativeTargetMax = max(slider_min, min(slider_max, value), self.negativeTargetMax)
+
     @staticmethod
     def RStotalTime(ramps:list[int], soaks:list[int]) -> int:
         return sum(ramps) + sum(soaks)
@@ -1490,7 +1519,8 @@ class PIDcontrol:
 
     # if send_command is False, the pidOn command is not forwarded to the external PID (TC4, Kaleido, ..)
     def pidOn(self, send_command:bool = True) -> None:
-#        if self.aw.qmc.flagon:
+        if not self.aw.qmc.flagon:
+            return
         if not self.pidActive:
             self.aw.sendmessage(QApplication.translate('StatusBar','PID ON'))
         self.pidModeInit()
@@ -1501,7 +1531,8 @@ class PIDcontrol:
         if (self.externalPIDControl() == 1 and self.aw.modbus.PID_ON_action and self.aw.modbus.PID_ON_action != ''):
             self.aw.eventaction(4,self.aw.modbus.PID_ON_action)
             self.pidActive = True
-            self.aw.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PIDactive'].format(
+            self.aw.buttonCONTROL.setStyleSheet(push_button_style(bool(self.aw.simulator), 'PIDactive',
+                min_height=self.aw.main_button_min_height,
                 min_width=self.aw.main_button_min_width,
                 font_size=self.aw.button_font_size,
                 border_radius=self.aw.button_border_radius))
@@ -1510,7 +1541,8 @@ class PIDcontrol:
         elif (self.externalPIDControl() == 2 and self.aw.s7.PID_ON_action and self.aw.s7.PID_ON_action != ''):
             self.aw.eventaction(15,self.aw.s7.PID_ON_action)
             self.pidActive = True
-            self.aw.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PIDactive'].format(
+            self.aw.buttonCONTROL.setStyleSheet(push_button_style(bool(self.aw.simulator), 'PIDactive',
+                min_height=self.aw.main_button_min_height,
                 min_width=self.aw.main_button_min_width,
                 font_size=self.aw.button_font_size,
                 border_radius=self.aw.button_border_radius))
@@ -1527,7 +1559,8 @@ class PIDcontrol:
                         self.aw.ser.SP.write(str2cmd('PID;LIMIT;' + str(duty_min) + ';' + str(duty_max) + '\n'))
                         self.aw.ser.SP.write(str2cmd('PID;ON\n'))
                         self.pidActive = True
-                        self.aw.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PIDactive'].format(
+                        self.aw.buttonCONTROL.setStyleSheet(push_button_style(bool(self.aw.simulator), 'PIDactive',
+                            min_height=self.aw.main_button_min_height,
                             min_width=self.aw.main_button_min_width,
                             font_size=self.aw.button_font_size,
                             border_radius=self.aw.button_border_radius))
@@ -1541,7 +1574,8 @@ class PIDcontrol:
                 self.aw.kaleido.pidON()
             self.pidActive = True
             self.aw.qmc.pid.on()
-            self.aw.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PIDactive'].format(
+            self.aw.buttonCONTROL.setStyleSheet(push_button_style(bool(self.aw.simulator), 'PIDactive',
+                min_height=self.aw.main_button_min_height,
                 min_width=self.aw.main_button_min_width,
                 font_size=self.aw.button_font_size,
                 border_radius=self.aw.button_border_radius))
@@ -1551,7 +1585,8 @@ class PIDcontrol:
                 self.confSoftwarePID()
                 self.pidActive = True
                 self.aw.qmc.pid.on()
-                self.aw.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PIDactive'].format(
+                self.aw.buttonCONTROL.setStyleSheet(push_button_style(bool(self.aw.simulator), 'PIDactive',
+                    min_height=self.aw.main_button_min_height,
                     min_width=self.aw.main_button_min_width,
                     font_size=self.aw.button_font_size,
                     border_radius=self.aw.button_border_radius))
@@ -1570,7 +1605,8 @@ class PIDcontrol:
         if (self.externalPIDControl() == 1 and self.aw.modbus.PID_OFF_action and self.aw.modbus.PID_OFF_action != ''):
             self.aw.eventaction(4,self.aw.modbus.PID_OFF_action)
             if not self.aw.HottopControlActive:
-                self.aw.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PID'].format(
+                self.aw.buttonCONTROL.setStyleSheet(push_button_style(bool(self.aw.simulator), 'PID',
+                    min_height=self.aw.main_button_min_height,
                     min_width=self.aw.main_button_min_width,
                     font_size=self.aw.button_font_size,
                     border_radius=self.aw.button_border_radius))
@@ -1579,7 +1615,8 @@ class PIDcontrol:
         elif (self.externalPIDControl() == 2 and self.aw.s7.PID_OFF_action and self.aw.s7.PID_OFF_action != ''):
             self.aw.eventaction(15,self.aw.s7.PID_OFF_action)
             if not self.aw.HottopControlActive:
-                self.aw.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PID'].format(
+                self.aw.buttonCONTROL.setStyleSheet(push_button_style(bool(self.aw.simulator), 'PID',
+                    min_height=self.aw.main_button_min_height,
                     min_width=self.aw.main_button_min_width,
                     font_size=self.aw.button_font_size,
                     border_radius=self.aw.button_border_radius))
@@ -1599,7 +1636,8 @@ class PIDcontrol:
                     if self.aw.ser.COMsemaphore.available() < 1:
                         self.aw.ser.COMsemaphore.release(1)
                 if not self.aw.HottopControlActive:
-                    self.aw.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PID'].format(
+                    self.aw.buttonCONTROL.setStyleSheet(push_button_style(bool(self.aw.simulator), 'PID',
+                        min_height=self.aw.main_button_min_height,
                         min_width=self.aw.main_button_min_width,
                         font_size=self.aw.button_font_size,
                         border_radius=self.aw.button_border_radius))
@@ -1610,7 +1648,8 @@ class PIDcontrol:
                 self.aw.kaleido.pidOFF()
             self.pidActive = False
             self.aw.qmc.pid.off()
-            self.aw.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PID'].format(
+            self.aw.buttonCONTROL.setStyleSheet(push_button_style(bool(self.aw.simulator), 'PID',
+                min_height=self.aw.main_button_min_height,
                 min_width=self.aw.main_button_min_width,
                 font_size=self.aw.button_font_size,
                 border_radius=self.aw.button_border_radius))
@@ -1620,7 +1659,8 @@ class PIDcontrol:
             self.pidActive = False
             self.aw.qmc.pid.off()
             if not self.aw.HottopControlActive:
-                self.aw.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PID'].format(
+                self.aw.buttonCONTROL.setStyleSheet(push_button_style(bool(self.aw.simulator), 'PID',
+                    min_height=self.aw.main_button_min_height,
                     min_width=self.aw.main_button_min_width,
                     font_size=self.aw.button_font_size,
                     border_radius=self.aw.button_border_radius))

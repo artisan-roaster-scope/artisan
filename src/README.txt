@@ -1,6 +1,6 @@
 #### Artisan helps coffee roasters record, analyze, and control roast profiles. With the help of a thermocouple data logger, or a proportional–integral–derivative controller (PID controller), this software offers roasting metrics to help make decisions that influence the final coffee flavor.
 
-Artisan is free for personal and commercial use, but asks for a [donation](https://www.paypal.me/MarkoLuther).
+Artisan is free for personal and commercial use, but asks for a [donation](https://artisan-scope.org/donate/).
 
 ## HOME
 
@@ -20,7 +20,7 @@ https://artisan-roasterscope.blogspot.de
 
 ## FEATURES
 
-Runs on 64bit Windows 10, macOS (legacy builds support Windows 8 x64 and macOS 10.13 High Sierra), Redhat/Debian Linux (incl. 64bit Raspberry Pi Bookworm) and supports a large number of devices and roasting machines. See <https://artisan-scope.org/devices/index> for supported devices and <https://artisan-scope.org/machines/index> for supported machines.
+Runs on 64bit Windows 10, macOS (legacy builds support Windows 8 x64 and macOS 10.13 High Sierra), Redhat/Debian Linux (incl. 64bit Raspberry Pi Bookworm) and supports a large number of devices and roasting machines. See <https://artisan-scope.org/devices/> for supported devices and <https://artisan-scope.org/machines/> for supported machines.
 
 **Artisan offers**
 - Unlimited number of curves.
@@ -63,20 +63,18 @@ Artisan uses the following libraries in unmodified forms:
 - Python released under the PSF licence http://www.python.org/psf/
   http://www.python.org/
 - QT under the Qt GNU Lesser General Public License version 2.1 (LGPL)
-  http://qt-project.org/products/licensing
+  https://www.qt.io/
+  https://contribute.qt-project.org/
 - Numpy and Scipy, Copyright (c) 2005-2023, NumPy Developers; All Rights Reserved
   http://www.scipy.org/
 - PyQt under the Qt GNU GPL v. 3.0 licence; Copyright (c) 2010-2023 Riverbank Computing Limited
   http://www.riverbankcomputing.co.uk/software/pyqt/
 - matplotlib, Copyright (c) 2002-2015 John D. Hunter; All Rights Reserved. Distributed under a licence based on PSF.
-  http://matplotlib.sourceforge.net
-- py2app under the PSF open source licence; Copyright (c) 2004-2006 Bob Ippolito <bob at redivi.com>
-  Copyright (c) 2010-2023 Ronald Oussoren <ronaldoussoren at mac.com>.
-  http://packages.python.org/py2app/
+  https://github.com/matplotlib/matplotlib
 - pyinstaller under the GPL license
   http://www.pyinstaller.org
-- pymodbus under the BSD License by Galen Collins
-  https://github.com/bashwork/pymodbus
+- pymodbus
+  https://github.com/pymodbus-dev/pymodbus
 - python-snap7 under MIT license
   https://github.com/gijzelaerr/python-snap7
 - arabic_reshaper.py under GPL by Abd Allah Diab (Mpcabd)

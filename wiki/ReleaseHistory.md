@@ -2,28 +2,43 @@ Detailed Release History
 ========================
 
 ----
-v4.2.2
+v5.0.0 (Nov 5, 2026)
 ------------------
 
 * ADDITIONS
+  - adds dashboard
   - adds support for [Dutch Master Roasters](https://artisan-scope.org/machines/dmr/)
-  - adds support for [RoastHubs](https://roasthubs.com/)
+  - adds support for [FreshRoast SR900](https://artisan-scope.org/machines/freshroast/) including the IO Command `sr900(<target>[,<value>])` ([PR #2240](../../../pull/2240) contributed by [Brian Schmitt](https://github.com/brianschmitt))
+  - adds improved machine setups for [Sivetz](https://artisan-scope.org/machines/sivetz/) original fluid bed roasters
+  - adds improved support for [Orbiter](https://artisan-scope.org/machines/orbiter/) smart roasters
+  - adds autoCHARGE/autoDROP synchronization for [IMF machines](https://artisan-scope.org/machines/imf/) as 'auto' setup which picks up CHARGE and DROP events from the machine
   - adds autoCHARGE/DROP and drum speed control to the [Schuilenburg](https://artisan-scope.org/machines/schuilenburg/) PLC machine setup
-  - adds autoCHARGE/autoDROP recognition for [IMF](https://artisan-scope.org/machines/imf/) as 'auto' setup which picks up CHARGE and DROP events from the machine
-  - adds UI scaling factor
-  - adds [Catppuccin](https://github.com/catppuccin) themes by Liam
+  - adds device setup for Lebrews online-color sensor [RoastSee NEXT](https://artisan-scope.org/devices/lebrew/) and `lebrew(<msg>)` IO Command
+  - adds configuration to use the artisan internal software PID instead of the [Kaleido machines](https://artisan-scope.org/machines/kaleido/) internal one
+  - adds [Aillio](https://artisan-scope.org/machines/aillio/) CSV import
+  - adds [MCR](https://artisan-scope.org/machines/mcr/) RoastPATH `.rpath` import
+  - adds [Catppuccin](https://github.com/catppuccin) and Chalkboard themes
+  - adds UI scaling
   - adds two more MODBUS device channels
   - adds Artisan Commands `pidDerivativeFilter(<n>)`, `pidDerivativeLimit(<n>)`, `pidILF(<n>)`, `pidIWP(<bool>)`, and `pidIRoC(<bool>)` to configure the internal PID (for John)
   - adds Artisan Commands `zoom(<x>[,<y>])`, `pan(<x>[,<y>])`, `center(<x>,<y>[,<clamp>])`, `clamp(<n>)`, `followMode(<bool>)`, and `followModePanning(<x>[,<y>])` to update the canvas perspective
   - adds Artisan Commands `home`, `back` and `forward` to operate the navigation bar
+  - adds Artisan Commands `pidPositiveTargetMin(<n>)`, `pidPositiveTargetMax(<n>)`, `pidNegativeTargetMin(<n>)`, and `pidNegativeTargetMax(<n>)` to adjust PID min/max target limits (eg. for preheating) ([Issue #2238](../../../issues/2238))
 * CHANGES
   - tightened license from [GPLv3](https://www.gnu.org/licenses/gpl-3.0.html) to [AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html) to prevent commercialization as headless engine
   - smaller builds by replacing headless Chromium engine by Rust-based [fulgur lib](https://github.com/fulgur-rs/fulgur) for HTML2PDF conversion (size reduced by ~45%)
-  - faster app start (startup time redued by ~50%)
+  - faster app start (startup time reduced by ~50% on macOS)
   - refreshed UI
+  - improved translations
+  - automatic restart on switching the language and on Factory Reset
 * FIXES
   - fixes faulty hash generation on files created using `Save As` causing `modified file` warnings on load ([Issue #2205](../../../issues/2205))
   - fixes regression causing canvas color not being applied correctly ([Issue #2212](../../../issues/2212))
+  - fixes wrong time formatting in Artisan CSV export ([Issue #2233](../../../issues/2233))
+  - fixes incorrect BT/ET readings on newer Santoker R machines ([Discussion #2232](../../../discussions/2232) and [Discussion #2085](../../../discussions/2085))
+  - fixes the image export of profiles with very long titles that could result in compressed time axis ([Discussion #2231](../../../discussions/2231))
+  - fixes random crashes of v4.2 on latest macOS versions (26.7.2 and 27.2) caused by issues in the bundled Qt 6.11.0 version ([Issue #2245](../../../issues/2245) and [Issue #2246](../../../issues/2246))
+
 
 ----
 v4.2.0 (Jun 30, 2026)

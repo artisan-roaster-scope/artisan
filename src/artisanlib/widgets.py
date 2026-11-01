@@ -26,22 +26,27 @@
 # Marko Luther, 2023
 
 from contextlib import contextmanager
-from collections.abc import Generator
+from collections.abc import Generator, Callable
 from typing import override, Any, TYPE_CHECKING
 
-from artisanlib.util import stringtoseconds, createGradient
 
 if TYPE_CHECKING:
     from PyQt6.QtCore import QCoreApplication, QObject # pylint: disable=unused-import
     from PyQt6.QtGui import QWheelEvent, QMouseEvent, QFocusEvent, QResizeEvent, QKeyEvent # pylint: disable=unused-import
-    from PyQt6.QtWidgets import QWidget, QTimeEdit, QCheckBox, QComboBox # pylint: disable=unused-import
+    from PyQt6.QtWidgets import QWidget, QTimeEdit, QCheckBox, QComboBox, QCompleter # pylint: disable=unused-import
+    from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
 
 from PyQt6.QtCore import (Qt, pyqtSignal, pyqtSlot, QLine, QEvent,
     QByteArray, QPropertyAnimation, QEasingCurve, QLocale)
-from PyQt6.QtCore import pyqtProperty # type:ignore[attr-defined]
+from PyQt6.QtCore import pyqtProperty, QSize # Xtype: ignore[attr-defined]
 from PyQt6.QtWidgets import (QApplication, QSplitter, QSplitterHandle, QLabel, QComboBox, QLineEdit, QTextEdit, QPlainTextEdit, QDoubleSpinBox, QPushButton,
-    QTableWidget, QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame, QSlider, QStyle, QStyleOptionSlider)
-from PyQt6.QtGui import QPen, QPainter, QFontMetrics, QColor, QCursor, QEnterEvent, QPaintEvent
+    QTableWidget, QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame, QSlider, QStyle, QStyleOptionSlider, QListView, QToolButton, QSpinBox,
+    QTabWidget, QTabBar)
+from PyQt6.QtGui import QPen, QPainter, QFontMetrics, QColor, QCursor, QEnterEvent, QPaintEvent, QIcon
+
+from artisanlib.util import stringtoseconds, createGradient,getStyleIconPath
+from artisanlib.styles import text_edit_style, artisan_minor_push_button_style
+
 
 
 @contextmanager
@@ -51,6 +56,31 @@ def wait_cursor() -> Generator[None]:
         yield
     finally:
         QApplication.restoreOverrideCursor()
+
+# not used
+#def adjust_combobox_width(combo: QComboBox) -> None:
+#    fm = QFontMetrics(combo.font())
+#    text_width = fm.horizontalAdvance(combo.currentText())
+#    # Add padding for the arrow and borders
+#    padding = 35
+#    combo.setFixedWidth(text_width + padding)
+
+
+def adjust_combobox_dropdown_width(combobox:QComboBox) -> None:
+    # Find the maximum width needed for the items
+    max_width = 0
+    font_metrics = combobox.fontMetrics()
+
+    for i in range(combobox.count()):
+        item_text = combobox.itemText(i)
+        # Add a small padding (e.g., 30px) for the scrollbar and text margins
+        item_width = font_metrics.horizontalAdvance(item_text) + 30
+        max_width = max(max_width, item_width)
+
+    # Apply the width to the dropdown view container
+    view = combobox.view()
+    if view is not None:
+        view.setMinimumWidth(max_width)
 
 class MyQComboBox(QComboBox):
     def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[Any,Any]) -> None:
@@ -63,6 +93,112 @@ class MyQComboBox(QComboBox):
         if self.hasFocus():
             super().wheelEvent(e)
 
+# coffee and blend ComboBox which toggles the weight unit on holding the ALT/OPTION modifier key on open
+class StockComboBox(MyQComboBox):
+    def __init__(self, parent:'QWidget|None', get_current_unit:Callable[[], int]|None = None, get_items:Callable[[int], list[str]]|None = None) -> None:
+        super().__init__(parent)
+        self.inverted:bool = False # is True if the weight units were inverted before
+        self.get_current_unit:Callable[[], int]|None = get_current_unit
+        self.get_items:Callable[[int], list[str]]|None = get_items
+
+    def set_get_current_unit(self, f:Callable[[], int]) -> None:
+        self.get_current_unit = f
+
+    def set_get_items(self, f:Callable[[int], list[str]]) -> None:
+        self.get_items = f
+
+    def resetInverted(self) -> None:
+        self.inverted = False
+
+    @override
+    def mousePressEvent(self, e:'QMouseEvent|None') -> None:
+        modifier_pressed = QApplication.keyboardModifiers() == Qt.KeyboardModifier.AltModifier
+        if self.get_current_unit is not None and self.get_items is not None and (modifier_pressed or self.inverted):
+            # with ALT (Win) / OPTION (macOS) pressed we rewrite the popup menu indicating weights in imperial units if metric units were selected and vice versa
+            default_unit:int = self.get_current_unit()
+            unit:int = 0 # g
+            if self.inverted and not modifier_pressed:
+                # we revert to the original units
+                unit = default_unit
+            elif default_unit < 2:
+                # if default unit is g or kg we convert to oz, otherwise to g
+                unit = 3
+            items = self.get_items(unit)
+            for i in range(self.count()):
+                if len(items) > i:
+                    self.setItemText(i, items[i])
+            self.inverted = not self.inverted
+        super().mousePressEvent(e)
+
+
+class RoastsComboBox(MyQComboBox):
+    def __init__(self, parent:'QWidget') -> None:
+        super().__init__(parent)
+        self.installEventFilter(self)
+        self.selection:str|None = None
+        self.edited:str|None = None
+        self.editTextChanged.connect(self.textEdited)
+        self.setEditable(True)
+        line_edit = self.lineEdit()
+        if line_edit:
+            line_edit.setClearButtonEnabled(True)
+        completer: QCompleter|None = self.completer()
+        if completer is not None:
+            completer.setCaseSensitivity(Qt.CaseSensitivity.CaseSensitive)
+#        self.setMouseTracking(False)
+        self.recent_roasts_menu_list:Callable[[], list[str]]|None = None
+
+    def init(self, recent_roasts_menu_list:Callable[[], list[str]], selection:str|None) -> None:
+        self.setView(QListView())
+        self.recent_roasts_menu_list = recent_roasts_menu_list
+        self.selection = selection # just the roast title
+        self.edited = selection
+        self.updateMenu()
+
+    @pyqtSlot(str)
+    def textEdited(self, txt:str) -> None:
+        cleaned = ' '.join(txt.split())
+        self.edited = cleaned
+
+    def getSelection(self) -> str|None:
+        return self.edited or self.selection
+
+    def setSelection(self, i:int) -> None:
+        if i >= 0:
+            try:
+                self.edited = None # reset the user text editing
+            except Exception: # pylint: disable=broad-except
+                pass
+
+    @override
+    def eventFilter(self, a0:'QObject|None' = None, a1:QEvent|None = None) -> bool:
+        del a0
+# the next prevents correct setSelection on Windows
+#        if a1.type() == QEvent.Type.FocusIn:
+#            self.setSelection(self.currentIndex())
+        if a1 is not None and a1.type() == QEvent.Type.MouseButtonPress:
+            self.updateMenu()
+#            return True # stops processing # popup not drawn if this line is added
+#        return super().eventFilter(a0, a1) # this seems to slow down things on Windows and not necessary anyhow
+        return False # cont processing
+
+    # the first entry is always just the current text edit line
+    def updateMenu(self) -> None:
+        if self.recent_roasts_menu_list is not None:
+            self.blockSignals(True)
+            try:
+    #            roasts = self.aw.recentRoastsMenuList()
+                roasts = self.recent_roasts_menu_list()
+                self.clear()
+                if self.edited is None:
+                    self.addItems(roasts)
+                else:
+                    self.addItems([self.edited] + roasts)
+            except Exception: # pylint: disable=broad-except
+                pass
+            self.blockSignals(False)
+
+
 class MyContentLimitedQComboBox(MyQComboBox): # pylint: disable=too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues]# Argument to class must be a base class
     def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[Any,Any]) -> None:
         super().__init__(parent, **kwargs)
@@ -74,6 +210,17 @@ class MyContentLimitedQComboBox(MyQComboBox): # pylint: disable=too-few-public-m
         view = self.view()
         if view is not None:
             view.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+
+# Spin box with mouse wheel / touch pad scrolling disabled
+class MyQSpinBox(QSpinBox):
+    def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[str,Any]) -> None:
+        super().__init__(parent, **kwargs)
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.setLocale(QLocale('C'))
+
+    @override
+    def wheelEvent(self, e:'QWheelEvent|None') -> None: # pylint: disable=no-self-use # used as slot
+        del e
 
 class MyQDoubleSpinBox(QDoubleSpinBox):
     def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[str,Any]) -> None:
@@ -96,6 +243,58 @@ class MyQDoubleSpinBox(QDoubleSpinBox):
         super().mouseReleaseEvent(a0)
         super().mouseDoubleClickEvent(a0)
         super().mouseReleaseEvent(a0)
+
+
+
+#class TabBarDescenderFixStyle(QProxyStyle):
+#    def sizeFromContents(self, contents_type: QStyle.ContentsType,
+#                         option: QStyleOption, size: QSize,
+#                         widget: QWidget) -> QSize:
+#
+#        # Get the standard size calculated by the Fusion style
+#        s = super().sizeFromContents(contents_type, option, size, widget)
+#
+#        # Check if the requested content type is a TabBar Tab
+#        if contents_type == QStyle.ContentsType.CT_TabBarTab and widget:
+#            fm = QFontMetrics(widget.font())
+#            # Explicitly add the descent (and a safety buffer) to the height
+#            s.setHeight(s.height() + fm.descent() + 2)
+#
+#        return s
+
+# adds extra vertical spacing to avoid clipping of tab labels
+class SpaciousTabBar(QTabBar):
+    def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[Any,Any]) -> None:
+        super().__init__(parent, **kwargs)
+        self.currentChanged.connect(self.handle_tab_change)
+
+    def handle_tab_change(self, index:int) -> None:
+        del index
+        # Clears internal caches and tells the layout engine to poll hints again
+        self.updateGeometry()
+
+    @override
+    def tabSizeHint(self, index: int) -> QSize:
+        size = super().tabSizeHint(index)
+        size.setHeight(size.height() + 5)  # Example padding adjustment
+        return size
+
+    @override
+    def minimumTabSizeHint(self, index: int) -> QSize:
+        return self.tabSizeHint(index)
+
+# fixes clipping of decenders of tab labels in Fusion style by adding some vertical padding
+class ArtisanQTabWidget(QTabWidget):
+    def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[Any,Any]) -> None:
+        super().__init__(parent, **kwargs)
+        app = QApplication.instance()
+        if app is not None and app.style().name().lower() in {'fusion', 'windows', 'windowsvista'}: # type: ignore[attr-defined]
+            # increase tab height to prevent vertical clipping of descenders observed on Windows/Fusion-style
+            self.setTabBar(SpaciousTabBar())
+# alternative fix, which alters tab height to font size + safety buffer (somewhat smaller than original design)
+#            self.fix_style = TabBarDescenderFixStyle()
+#            self.tabBar().setStyle(self.fix_style)
+
 
 class MyQTableWidget(QTableWidget):
     def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[Any,Any]) -> None:
@@ -212,6 +411,12 @@ class SliderUnclickable(QSlider):
     focus_out = pyqtSignal()
 
     @override
+    def keyPressEvent(self, ev:'QKeyEvent|None') -> None:
+        if ev is not None and ev.key() in (Qt.Key.Key_Left, Qt.Key.Key_Right):
+            return
+        super().keyPressEvent(ev)
+
+    @override
     def mousePressEvent(self, ev:'QMouseEvent|None') -> None:
         opt = QStyleOptionSlider()
         self.initStyleOption(opt)
@@ -280,6 +485,7 @@ class MyQLabel(QLabel):
             #--- update font size ---
             self.setFont(f)
 
+# wider border than styles.py:line_edit_style (used in login/roest-setup dialogs)
 class StyledQLineEdit(QLineEdit):
     def __init__(self, parent: 'QWidget|None' = None) -> None:
         super().__init__(parent)
@@ -366,52 +572,32 @@ class ClickableLCDFrame(QFrame):
                 self.right_clicked.emit()
 
 
-# Text Edits
-
-def textEditColorStyle(
-        background_color: str|None = None,
-        selection_background_color: str|None = None) -> str:
-    if background_color is not None and selection_background_color is not None:
-        return f"""
-            QTextEdit, QPlainTextEdit {{
-                background-color: {background_color};
-                selection-background-color: {selection_background_color};
-                padding: 0 0.8px;
-                border-radius: 10px;
-                border-width: 2px;
-                border-style: solid;
-                border-color: palette(dark);
-            }}
-            QTextEdit, QPlainTextEdit:focus {{
-                border-color: palette(accent);
-            }}
-        """
-    return """
-        QTextEdit, QPlainTextEdit {
-            background-color: palette(base);
-            padding: 0 0.8px;
-            border-radius: 10px;
-            border-width: 2px;
-            border-style: solid;
-            border-color: palette(dark);
-        }
-        QTextEdit:focus, QPlainTextEdit:focus {
-            border-color: palette(accent);
-        }
-    """
-
-
 class ArtisanTextEdit(QTextEdit):
-    def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[Any,Any]) -> None:
+    def __init__(self, darkmode:bool = False, parent:'QWidget|None' = None, **kwargs:dict[Any,Any]) -> None:
         super().__init__(parent, **kwargs)
-        self.setStyleSheet(textEditColorStyle())
+        self.update_style(darkmode)
+
+    def update_style(self,
+            darkmode:bool,
+            background_color: str|None = None,
+            selection_background_color: str|None = None,
+            border_color: str|None = None,
+            color: str|None = None) -> None:
+        self.setStyleSheet(text_edit_style(darkmode, background_color, selection_background_color, border_color, color))
 
 
 class ArtisanPlainTextEdit(QPlainTextEdit):
-    def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[Any,Any]) -> None:
+    def __init__(self, darkmode:bool = False, parent:'QWidget|None' = None, **kwargs:dict[Any,Any]) -> None:
         super().__init__(parent, **kwargs)
-        self.setStyleSheet(textEditColorStyle())
+        self.update_style(darkmode)
 
+    def update_style(self,
+            darkmode:bool,
+            background_color: str|None = None,
+            selection_background_color: str|None = None,
+            border_color: str|None = None,
+            color: str|None = None) -> None:
+        self.setStyleSheet(text_edit_style(darkmode, background_color, selection_background_color, border_color, color))
 
 # this one emits a clicked event on right-clicks and an editingFinished event when the text was changed and the focus got lost
 class ClickableTextEdit(ArtisanPlainTextEdit):
@@ -419,8 +605,8 @@ class ClickableTextEdit(ArtisanPlainTextEdit):
     editingFinished = pyqtSignal()
     receivedFocus = pyqtSignal()
 
-    def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[str,Any]) -> None:
-        super().__init__(parent, **kwargs)
+    def __init__(self, darkmode:bool = False, parent:'QWidget|None' = None, **kwargs:dict[str,Any]) -> None:
+        super().__init__(darkmode, parent, **kwargs)
         self._changed = False
         self.setTabChangesFocus(True)
         self.textChanged.connect(self._handle_text_changed)
@@ -496,6 +682,21 @@ class ClickableQLineEdit(QLineEdit):
 
 
 # Event Buttons
+
+class ArtisanMinorPushButton(QPushButton):
+    def __init__(self, text:str, light_icon:str|None = None, dark_icon:str|None = None, dark:bool = False, parent:'QWidget|None' = None) -> None:
+        super().__init__(text, parent)
+        self.setStyleSheet(artisan_minor_push_button_style(dark))
+        if dark_icon is None:
+            dark_icon = light_icon
+        if dark and dark_icon is not None:
+            self.setIconSize(QSize(14,14))
+            self.setIcon(QIcon(getStyleIconPath(dark_icon)))
+        elif light_icon is not None:
+            self.setIconSize(QSize(14,14))
+            self.setIcon(QIcon(getStyleIconPath(light_icon)))
+        self.setMaximumSize(self.sizeHint())
+        self.setMinimumSize(self.minimumSizeHint())
 
 # selector is a stylesheet property selector like "[Selected=true]"
 # state is a stylesheet pseudo state restriction like ":!pressed:hover"
@@ -645,7 +846,7 @@ class SplitterHandle(QSplitterHandle):
     def enterEvent(self, event:QEnterEvent|None) -> None:
         if event is not None:
             app:QCoreApplication|None = QApplication.instance()
-            if app is not None and app.darkmode: # type:ignore[attr-defined]
+            if app is not None and app.darkmode: # type: ignore[attr-defined]
                 self.pen_color = self.pen_color_hover_darkmode
             else:
                 self.pen_color = self.pen_color_hover_lightmode
@@ -689,3 +890,31 @@ class Splitter(QSplitter):
     @override
     def createHandle(self) -> QSplitterHandle:
         return SplitterHandle(self.orientation(), self)
+
+
+class FixedRatio2ToolButton(QToolButton):
+    def __init__(self, parent:'QWidget|None' = None) -> None:
+        super().__init__(parent)
+        # Set a policy that allows expansion, then enable height-for-width
+        policy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        policy.setHeightForWidth(True)
+        self.setSizePolicy(policy)
+
+    # pylint: disable=no-self-use
+    @override
+    def hasHeightForWidth(self) -> bool:
+        return True
+
+    # pylint: disable=no-self-use
+    @override
+    def heightForWidth(self, a0: int) -> int:
+        # 2:1 ratio
+        return int(round(a0/2))
+
+    # Ensure the default size hint also respects the aspect ratio
+    @override
+    def sizeHint(self) -> QSize:
+        hint = super().sizeHint()
+        # Maintain aspect ratio based on the default width hint
+        hint.setHeight(self.heightForWidth(hint.width()))
+        return hint

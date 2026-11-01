@@ -40,14 +40,15 @@ if TYPE_CHECKING:
     from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
     import numpy.typing as npt  # pylint: disable=unused-import
 
-from artisanlib.dialogs import ArtisanDialog
-from artisanlib.util import stringfromseconds, stringtoseconds, float2float
 
-
-from PyQt6.QtCore import Qt, pyqtSlot, QSettings, QRegularExpression, QDateTime
-from PyQt6.QtGui import QRegularExpressionValidator
+from PyQt6.QtCore import Qt, pyqtSlot, QSettings, QRegularExpression, QDateTime, QSize
+from PyQt6.QtGui import QRegularExpressionValidator, QIcon
 from PyQt6.QtWidgets import (QApplication, QHeaderView, QAbstractItemView, QWidget, QLabel, QLineEdit, QComboBox, QDialogButtonBox,
             QTableWidget, QTableWidgetItem, QGroupBox, QLayout, QHBoxLayout, QVBoxLayout, QFrame)
+
+from artisanlib.dialogs import ArtisanDialog
+from artisanlib.util import stringfromseconds, stringtoseconds, float2float, getStyleIconPath
+from artisanlib.styles import horizontal_header_style, vertical_header_style, line_edit_style, table_style, artisan_minor_push_button_style
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -99,6 +100,11 @@ class profileTransformatorDlg(ArtisanDialog):
         self.timetable = QTableWidget()
         self.temptable = QTableWidget()
 
+        # apply style
+        for table in [self.phasestable, self.timetable, self.temptable]:
+            table.setStyleSheet(table_style(self.aw.app.darkmode))
+            table.setShowGrid(False)
+
         # time table widgets initialized by createTimeTable() to a list (target/result) with 4 widgets each
         #   DRY, FCs, SCs, DROP
         # if an event is not set in the profile, None is set instead of a widget
@@ -139,16 +145,34 @@ class profileTransformatorDlg(ArtisanDialog):
         if self.applyButton is not None:
             self.applyButton.clicked.connect(self.apply)
             self.setButtonTranslations(self.applyButton,'Apply',QApplication.translate('Button','Apply'))
+            self.applyButton.setIconSize(QSize(14,14))
+            self.applyButton.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
+            self.applyButton.setIcon(QIcon(getStyleIconPath(
+                'tick-01-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'tick-01-stroke-rounded-white.svg')))
+            self.dialogbuttons.removeButton(self.applyButton)
         if self.resetButton is not None:
             self.resetButton.clicked.connect(self.restore)
             self.setButtonTranslations(self.resetButton,'Reset',QApplication.translate('Button','Reset'))
+            self.resetButton.setIconSize(QSize(14,14))
+            self.resetButton.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
+            self.resetButton.setIcon(QIcon(getStyleIconPath('undo-03-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'undo-03-stroke-rounded-white.svg')))
+            self.dialogbuttons.removeButton(self.resetButton)
         if self.helpButton is not None:
             self.helpButton.clicked.connect(self.openHelp)
             self.setButtonTranslations(self.helpButton,'Help',QApplication.translate('Button','Help'))
+            self.helpButton.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
+            self.helpButton.setIcon(QIcon(getStyleIconPath('help-square-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'help-square-stroke-rounded-white.svg')))
+            self.dialogbuttons.removeButton(self.helpButton)
 
         #buttons
         buttonsLayout = QHBoxLayout()
-        buttonsLayout.addWidget(self.dialogbuttons)
+        buttonsLayout.addWidget(self.helpButton)
+        buttonsLayout.addWidget(self.resetButton)
+        buttonsLayout.addWidget(self.applyButton)
+        buttonsLayout.addStretch()
+        standardButtonsLayout = QHBoxLayout()
+        standardButtonsLayout.addStretch()
+        standardButtonsLayout.addWidget(self.dialogbuttons)
 
         mappingLabel = QLabel(QApplication.translate('Label','Mapping'))
         self.mappingModeComboBox = QComboBox()
@@ -209,6 +233,11 @@ class profileTransformatorDlg(ArtisanDialog):
         mainlayout.addWidget(tempGroupLayout)
         mainlayout.addStretch()
         mainlayout.addLayout(buttonsLayout)
+        mainlayout.addLayout(standardButtonsLayout)
+        buttonsLayout.setContentsMargins(0, 5, 0, 0)  # left, top, right, bottom
+        standardButtonsLayout.setContentsMargins(0, 0, 0, 0)  # left, top, right, bottom
+        mainlayout.setContentsMargins(10, 5, 10, 5)  # left, top, right, bottom
+        mainlayout.setSpacing(5)
 
         self.setLayout(mainlayout)
         ok_button = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
@@ -900,14 +929,14 @@ class profileTransformatorDlg(ArtisanDialog):
         for i, _ in enumerate(timex):
             # first fit is to be applied for all readings before DRY
             j = 0
-            if self.aw.qmc.timeindex[6] > 0 and i >= self.aw.qmc.timeindex[6]:
+            if 0 < self.aw.qmc.timeindex[6] <= i:
                 # last fit counts after DROP
                 j = 4
-            elif self.aw.qmc.timeindex[4] > 0 and i >= self.aw.qmc.timeindex[4]:
+            elif 0 < self.aw.qmc.timeindex[4] <= i:
                 j = 3 # after SCs
-            elif self.aw.qmc.timeindex[2] > 0 and i >= self.aw.qmc.timeindex[2]:
+            elif 0 < self.aw.qmc.timeindex[2] <= i:
                 j = 2 # after FCs
-            elif self.aw.qmc.timeindex[1] > 0 and i >= self.aw.qmc.timeindex[1]:
+            elif 0 < self.aw.qmc.timeindex[1] <= i:
                 j = 1 # after DRY
             fitsj = fits[j]
             if fitsj is None:
@@ -988,14 +1017,14 @@ class profileTransformatorDlg(ArtisanDialog):
             for i, _ in enumerate(self.org_temp2):
                 # first fit is to be applied for all readings before DRY
                 j = 0
-                if self.aw.qmc.timeindex[6] > 0 and i >= self.aw.qmc.timeindex[6]:
+                if 0 < self.aw.qmc.timeindex[6] <= i:
                     # last fit counts after DROP
                     j = 4
-                elif self.aw.qmc.timeindex[4] > 0 and i >= self.aw.qmc.timeindex[4]:
+                elif 0 < self.aw.qmc.timeindex[4] <= i:
                     j = 3 # after SCs
-                elif self.aw.qmc.timeindex[2] > 0 and i >= self.aw.qmc.timeindex[2]:
+                elif  0 < self.aw.qmc.timeindex[2] <= i:
                     j = 2 # after FCs
-                elif self.aw.qmc.timeindex[1] > 0 and i >= self.aw.qmc.timeindex[1]:
+                elif 0 < self.aw.qmc.timeindex[1] <= i:
                     j = 1 # after DRY
 
                 tp = self.org_temp2[i]
@@ -1026,14 +1055,19 @@ class profileTransformatorDlg(ArtisanDialog):
         vheader = self.phasestable.verticalHeader()
         hheader = self.phasestable.horizontalHeader()
 
+        self.phasestable.clear()
         self.phasestable.setRowCount(3)
         self.phasestable.setColumnCount(3)
         if hheader is not None:
             hheader.setStretchLastSection(False)
             hheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
             hheader.setHighlightSections(False)
+            hheader.setStyleSheet(horizontal_header_style(self.aw.app.darkmode))
+            hheader.setMinimumSectionSize(120)
         if vheader is not None:
             vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+            vheader.setStyleSheet(vertical_header_style(self.aw.app.darkmode))
+            vheader.setDefaultAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
 
         self.phasestable.setHorizontalHeaderLabels([QApplication.translate('Label','Drying'),
                                                          QApplication.translate('Label','Maillard'),
@@ -1045,6 +1079,7 @@ class profileTransformatorDlg(ArtisanDialog):
         self.phasestable.setAlternatingRowColors(True)
         self.phasestable.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.phasestable.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.phasestable.setFrameStyle(QFrame.Shape.NoFrame)
         if hheader is not None and vheader is not None:
             self.phasestable.setFixedSize(
                 hheader.length() +
@@ -1084,12 +1119,14 @@ class profileTransformatorDlg(ArtisanDialog):
             profilePhasesPercentage = profilePhasesPercentages[i]
             if len(profilePhasesTimes) > i and profilePhasesTime is not None and profilePhasesPercentage is not None:
                 profile_phases_time_str = \
-                    f'{stringfromseconds(int(round(profilePhasesTime)),leadingzero=False)}    {float2float(profilePhasesPercentage)}%'
+                    f' {stringfromseconds(int(round(profilePhasesTime)),leadingzero=False)}     {float2float(profilePhasesPercentage)}%'
                 profile_phases_widget = QTableWidgetItem(profile_phases_time_str)
                 profile_phases_widget.setTextAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 self.phasestable.setItem(0,i,profile_phases_widget)
                 #
                 target_widget_time = QLineEdit('')
+                target_widget_time.setStyleSheet(line_edit_style(self.aw.app.darkmode))
+                target_widget_time.setMinimumWidth(50)
                 target_widget_time.setValidator(MyQRegularExpressionValidator(self.regextime))
                 target_widget_time.setAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 if phases_enabled:
@@ -1097,6 +1134,8 @@ class profileTransformatorDlg(ArtisanDialog):
                 else:
                     target_widget_time.setEnabled(False)
                 target_widget_percent = QLineEdit('')
+                target_widget_percent.setStyleSheet(line_edit_style(self.aw.app.darkmode))
+                target_widget_percent.setMinimumWidth(50)
                 target_widget_percent.setValidator(QRegularExpressionValidator(self.regexpercent))
                 target_widget_percent.setAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 if phases_enabled:
@@ -1133,8 +1172,11 @@ class profileTransformatorDlg(ArtisanDialog):
             hheader.setStretchLastSection(False)
             hheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
             hheader.setHighlightSections(False)
+            hheader.setStyleSheet(horizontal_header_style(self.aw.app.darkmode))
         if vheader is not None:
             vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+            vheader.setStyleSheet(vertical_header_style(self.aw.app.darkmode))
+            vheader.setDefaultAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
         self.timetable.setHorizontalHeaderLabels([QApplication.translate('Label','DRY END'),
                                                          QApplication.translate('Label','FC START'),
                                                          QApplication.translate('Label','SC START'),
@@ -1174,6 +1216,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 self.timetable.setItem(0,i,profile_widget)
                 #
                 target_widget = QLineEdit('')
+                target_widget.setStyleSheet(line_edit_style(self.aw.app.darkmode))
                 target_widget.setValidator(MyQRegularExpressionValidator(self.regextime))
                 target_widget.setAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 target_widget.editingFinished.connect(self.updateTimesWidget)
@@ -1203,8 +1246,11 @@ class profileTransformatorDlg(ArtisanDialog):
         if hheader is not None:
             hheader.setStretchLastSection(False)
             hheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+            hheader.setStyleSheet(horizontal_header_style(self.aw.app.darkmode))
         if vheader is not None:
             vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+            vheader.setStyleSheet(vertical_header_style(self.aw.app.darkmode))
+            vheader.setDefaultAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
         self.temptable.setHorizontalHeaderLabels([QApplication.translate('Label','CHARGE'),
                                                          QApplication.translate('Label','DRY END'),
                                                          QApplication.translate('Label','FC START'),
@@ -1246,6 +1292,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 self.temptable.setItem(0,i,profile_widget)
                 #
                 target_widget = QLineEdit('')
+                target_widget.setStyleSheet(line_edit_style(self.aw.app.darkmode))
                 target_widget.setValidator(QRegularExpressionValidator(self.regextemp))
                 target_widget.editingFinished.connect(self.updateTempResults)
                 target_widget.setAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)

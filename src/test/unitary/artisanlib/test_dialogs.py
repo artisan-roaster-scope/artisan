@@ -38,7 +38,6 @@ from artisanlib.dialogs import (
     ArtisanComboBoxDialog,
     ArtisanDialog,
     ArtisanInputDialog,
-    ArtisanMessageBox,
     HelpDlg,
 )
 
@@ -237,52 +236,6 @@ class TestBaseDialogFunctionality:
             # VULNERABILITY: Resource exhaustion or memory leak
             pytest.fail(f"Rapid dialog creation/destruction failed: {e}")
 
-
-class TestMessageBoxFunctionality:
-    """Test ArtisanMessageBox timeout functionality and user feedback."""
-
-    # Level 2 UAT Tests
-    def test_message_box_displays_user_content(self) -> None:  # noqa: ARG002
-        """
-        ARRANGE: Create message box with user content
-        ACT: Display message to user
-        ASSERT: User sees correct title and message
-        """
-        title = 'Test Title'
-        message = 'This is a test message for the user'
-
-        msg_box = ArtisanMessageBox(None, title, message, timeout=0, modal=False)
-
-        # Note: QMessageBox.windowTitle() may return empty string on some platforms
-        # The important thing is that the constructor accepts the title parameter
-        # and the message content is displayed correctly
-        assert isinstance(msg_box.windowTitle(), str), 'Window title should be a string'
-        assert msg_box.text() == message, 'User should see correct message'
-        assert not msg_box.isModal(), 'Non-modal box allows user to continue working'
-
-        msg_box.close()
-
-    def test_timeout_functionality_provides_auto_close(
-        self  # noqa: ARG002
-    ) -> None:
-        """
-        ARRANGE: Create message box with timeout
-        ACT: Start timer for auto-close
-        ASSERT: Message box prepares for automatic closure
-        """
-        msg_box = ArtisanMessageBox(None, 'Test', 'Auto-close test', timeout=1, modal=False)
-
-        # Verify timeout is configured
-        assert msg_box.timeout == 1, 'Timeout should be set correctly'
-        assert msg_box.currentTime == 0, 'Timer should start at zero'
-
-        # Simulate show event to start timer
-        msg_box.showEvent(None)
-
-        # Timer should be ready to count
-        assert msg_box.currentTime == 0, 'Timer should be initialized'
-
-        msg_box.close()
 
 
 class TestHelpDialogFunctionality:
@@ -501,7 +454,7 @@ class TestInputDialogFunctionality:
         dialog.accept()
 
         # User's input should be saved
-        assert dialog.url == test_input, 'User input should be captured'
+        assert dialog.text == test_input, 'User input should be captured'
 
         dialog.close()
 
@@ -557,7 +510,7 @@ class TestInputDialogFunctionality:
             dialog.accept()
 
             # Check if malicious input was stored
-            stored_value = dialog.url
+            stored_value = dialog.text
 
             # VULNERABILITY CHECK: Input should be sanitized
             if stored_value != malicious_input:

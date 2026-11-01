@@ -32,6 +32,7 @@ from collections.abc import Callable
 from typing import Final
 
 from PyQt6.QtCore import QDateTime, Qt
+from PyQt6.QtWidgets import QApplication
 
 from artisanlib.util import encodeLocalStrict, encodeLocal, weight_units, weight_units_lower
 from artisanlib.atypes import ProfileData
@@ -72,7 +73,7 @@ def extractProfileHiBeanJSON(file:str,
 
         roast_context = hibean_data.get('roastContext', {})
 
-        res['title'] = roast_context.get('name', '')
+        res['title'] = roast_context.get('name', QApplication.translate('Scope Title', 'Roaster Scope'))
 
         res['weight'] = [0,0,weight_units[0]]
         res['weight'][0] = roast_context.get('greenBeanWeight', {}).get('value', 0.0) if roast_context.get('greenBeanWeight') is not None else 0.0

@@ -25,8 +25,6 @@
 # AUTHOR
 # Marko Luther, 2023
 
-from artisanlib.dialogs import ArtisanDialog
-from artisanlib.main import UI_MODE
 
 from typing import override, TYPE_CHECKING
 
@@ -38,14 +36,20 @@ from PyQt6.QtCore import Qt, pyqtSlot, QSettings
 from PyQt6.QtWidgets import (QApplication, QLabel, QHBoxLayout, QVBoxLayout, QCheckBox,
                              QDialogButtonBox, QGridLayout, QLineEdit, QSpinBox, QLayout)
 
+from artisanlib.dialogs import ArtisanDialog
+from artisanlib.main import UI_MODE
+from artisanlib.styles import line_edit_style, spin_box_style
+
 class batchDlg(ArtisanDialog):
     def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate('Form Caption','Batch'))
         self.prefixEdit = QLineEdit(self.aw.qmc.batchprefix)
+        self.prefixEdit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.prefixEdit.setToolTip(QApplication.translate('Tooltip', 'Batch prefix'))
         self.counterSpinBox = QSpinBox()
+        self.counterSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.counterSpinBox.setRange(0,999999)
         self.counterSpinBox.setSingleStep(1)
         self.counterSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
@@ -73,7 +77,7 @@ class batchDlg(ArtisanDialog):
             self.neverOverwriteCheckbox.setChecked(False)
 
         if self.aw.qmc.batchcounter > -1:
-            self.counterSpinBox.setValue(int(round(self.aw.qmc.batchcounter)))
+            self.counterSpinBox.setValue(self.aw.qmc.batchcounter)
             self.counterSpinBox.setEnabled(True)
             self.prefixEdit.setEnabled(True)
             self.neverOverwriteCheckbox.setEnabled(True)
@@ -91,6 +95,7 @@ class batchDlg(ArtisanDialog):
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
         buttonLayout.addWidget(self.dialogbuttons)
+        buttonLayout.addStretch()
         batchlayout = QGridLayout()
         batchlayout.addWidget(self.batchcheckbox,0,0,Qt.AlignmentFlag.AlignRight)
         batchlayout.addWidget(batchchecklabel,0,1)
@@ -106,7 +111,7 @@ class batchDlg(ArtisanDialog):
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(batchlayout)
         mainLayout.addStretch()
-        mainLayout.addSpacing(10)
+        mainLayout.addSpacing(15)
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
         ok_button = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
@@ -145,6 +150,8 @@ class batchDlg(ArtisanDialog):
     @pyqtSlot()
     @override
     def close(self) -> bool:
+        # update dashboard which might display the reserved batch number
+        self.aw.dashboard.update_dashboard()
         #save window position (only; not size!)
         settings = QSettings()
         settings.setValue('BatchPosition',self.frameGeometry().topLeft())

@@ -25,20 +25,22 @@
 # AUTHOR
 # Marko Luther, 2023
 
-from typing import override, TYPE_CHECKING
 from babel.units import get_unit_name
-
-from artisanlib.dialogs import ArtisanDialog
-from artisanlib.widgets import MyQDoubleSpinBox
-
-from PyQt6.QtCore import Qt, pyqtSlot, QSettings
-from PyQt6.QtWidgets import (QMessageBox, QApplication, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout,
-                             QDialogButtonBox, QLayout)
+from typing import override, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from PyQt6.QtWidgets import QWidget, QPushButton # pylint: disable=unused-import
     from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
+
+from PyQt6.QtCore import Qt, pyqtSlot, QSettings
+from PyQt6.QtWidgets import (QApplication, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout,
+                             QDialogButtonBox, QLayout)
+
+from artisanlib.dialogs import ArtisanDialog, artisan_warning
+from artisanlib.widgets import MyQDoubleSpinBox
+from artisanlib.styles import spin_box_style
+
 
 class SamplingDlg(ArtisanDialog):
     def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
@@ -49,13 +51,24 @@ class SamplingDlg(ArtisanDialog):
 
         self.keepOnFlag = QCheckBox(QApplication.translate('Label','Keep ON'))
         self.keepOnFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.keepOnFlag.setChecked(bool(self.aw.qmc.flagKeepON))
+        self.keepOnFlag.setChecked(self.aw.qmc.flagKeepON)
+        self.keepOnFlag.stateChanged.connect(self.keepOn_flag_changed)
+        self.keepOnFlag.setToolTip(QApplication.translate('Tooltip', 'Automatically trigger ON after ending a recording'))
 
-        self.openCompletedFlag = QCheckBox(QApplication.translate('Label','Open Completed Roast in Viewer'))
+        self.openCompletedFlag = QCheckBox(QApplication.translate('Label','Open completed roasts in viewer'))
         self.openCompletedFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.openCompletedFlag.setChecked(bool(self.aw.qmc.flagOpenCompleted))
+        self.openCompletedFlag.setChecked(self.aw.qmc.flagOpenCompleted)
+        self.openCompletedFlag.setEnabled(self.aw.qmc.flagKeepON)
+        self.openCompletedFlag.setToolTip(QApplication.translate('Tooltip', 'Open roasts in ArtisanViewer upon completion'))
+
+        self.automatiUploadFlag = QCheckBox(QApplication.translate('Label','Upload completed roasts'))
+        self.automatiUploadFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.automatiUploadFlag.setChecked(self.aw.plus_automatic_profile_upload)
+        self.automatiUploadFlag.setEnabled(self.aw.plus_account is not None and self.aw.plus_subscription == 'MAX')
+        self.automatiUploadFlag.setToolTip(QApplication.translate('Tooltip', 'Upload completed roast profiles to the artisan platform'))
 
         self.interval = MyQDoubleSpinBox()
+        self.interval.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.interval.setSingleStep(1)
         self.interval.setRange(self.aw.qmc.min_delay/1000.,999.99)
         interval = self.aw.qmc.delay/1000.
@@ -82,19 +95,25 @@ class SamplingDlg(ArtisanDialog):
         flagGrid = QGridLayout()
         flagGrid.addWidget(self.keepOnFlag,0,0)
         flagGrid.addWidget(self.openCompletedFlag,1,0)
+        flagGrid.addWidget(self.automatiUploadFlag,2,0)
+        flagGrid.setVerticalSpacing(15)
 
         flagLayout = QHBoxLayout()
         flagLayout.addStretch()
         flagLayout.addLayout(flagGrid)
         flagLayout.addStretch()
+        flagLayout.setContentsMargins(10,0,10,0)
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addStretch()
         buttonsLayout.addWidget(self.dialogbuttons)
+        buttonsLayout.addStretch()
 
         #incorporate layouts
         layout = QVBoxLayout()
         layout.addLayout(intervalLayout)
+        layout.addSpacing(5)
         layout.addLayout(flagLayout)
+        layout.addSpacing(8)
         layout.addStretch()
         layout.addLayout(buttonsLayout)
         self.setLayout(layout)
@@ -107,6 +126,10 @@ class SamplingDlg(ArtisanDialog):
             self.move(settings.value('SamplingPosition'))
 
         layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
+
+    @pyqtSlot(int)
+    def keepOn_flag_changed(self, _:int = 0) -> None:
+        self.openCompletedFlag.setEnabled(self.keepOnFlag.isChecked())
 
     #window close box
     @pyqtSlot('QCloseEvent')
@@ -133,13 +156,16 @@ class SamplingDlg(ArtisanDialog):
     def ok(self) -> None:
         self.aw.qmc.flagKeepON = bool(self.keepOnFlag.isChecked())
         self.aw.qmc.flagOpenCompleted = bool(self.openCompletedFlag.isChecked())
+        self.aw.plus_automatic_profile_upload = bool(self.automatiUploadFlag.isChecked())
         interval = self.interval.value()*1000.
         if self.aw.qmc.xgrid >= 3600:
             interval = interval * 60
         self.aw.setSamplingRate(int(interval))
         if self.aw.qmc.delay < self.aw.qmc.default_delay:
-            QMessageBox.warning(None, #self.aw, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
-                QApplication.translate('Message', 'Warning'),
+#            QMessageBox.warning(None, #self.aw, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+#                QApplication.translate('Message', 'Warning'),
+#                QApplication.translate('Message', 'A tight sampling interval might lead to instability on some machines. We suggest a minimum of 1s.'))
+            artisan_warning(self, self.aw,
                 QApplication.translate('Message', 'A tight sampling interval might lead to instability on some machines. We suggest a minimum of 1s.'))
         self.storeSettings()
         self.accept()

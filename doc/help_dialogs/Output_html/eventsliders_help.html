@@ -449,6 +449,18 @@
         </tr>
         <tr>
             <td>&#160;</td>
+            <td>lebrew(&lt;msg&gt;)</td>
+            <td>sends &lt;msg&gt; to the BLE connected RoastSeeNEXT device</td>
+            <td>&#160;</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>sr900(&lt;target&gt;[,&lt;value&gt;])</td>
+            <td>sends &lt;target&gt; command like ‘heat’ and ‘fan’, with optional int &lt;value&gt;</td>
+            <td>&#160;</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
             <td>shellyrelay(n,b)</td>
             <td>switches Shelly plug number &lt;n&gt; ON if b is true or 1, and OFF otherwise</td>
             <td>&#160;</td>
@@ -647,6 +659,30 @@
         </tr>
         <tr>
             <td>&#160;</td>
+            <td>pidPositiveTargetMin(&lt;n&gt;)</td>
+            <td>sets the PID positive target range minium</td>
+            <td>&#160;</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>pidPositiveTargetMax(&lt;n&gt;)</td>
+            <td>sets the PID positive target range maximum</td>
+            <td>&#160;</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>pidNegativeTargetMin(&lt;n&gt;)</td>
+            <td>sets the PID negative target range minium</td>
+            <td>&#160;</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>pidNegativeTargetMax(&lt;n&gt;)</td>
+            <td>sets the PID negative target range maximum</td>
+            <td>&#160;</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
             <td>replayLookahead(&lt;int&gt;)</td>
             <td>sets the Ramping Event Replay lookahead in seconds</td>
             <td>&#160;</td>
@@ -805,12 +841,6 @@
             <td>&#160;</td>
             <td>showBackgroundEvents(&lt;bool&gt;)</td>
             <td>shows/hides the events of the background profile</td>
-            <td>&#160;</td>
-        </tr>
-        <tr>
-            <td>&#160;</td>
-            <td>upload2RoastHubs</td>
-            <td>upload current loaded profile to RoastHubs</td>
             <td>&#160;</td>
         </tr>
         <tr>

@@ -20,7 +20,7 @@ environment:
   # Set the default Appveyor Python version here. Can be overridden in platform environment.
   PYTHON_V: 3.14
   # Upgrade to specific version (for platforms supporting upgrade). Upgrade skipped if env var is missing or blank.
-  PYUPGRADE_WIN_VER: 3.14.6
+  PYUPGRADE_WIN_VER: 3.14.9
   #PYUPGRADE_MACOS_V: 3.12.1  # when upgrading see the notes in the deploy phase
 
   ARTISAN_KEY:
@@ -28,11 +28,11 @@ environment:
 
   matrix:
   - job_name: windows
-    appveyor_build_worker_image: Visual Studio 2022
+    appveyor_build_worker_image: Visual Studio 2026
   - job_name: macos
-    appveyor_build_worker_image: macos-ventura
+    appveyor_build_worker_image: macos-sonoma
   - job_name: linux
-    appveyor_build_worker_image: Ubuntu2204
+    appveyor_build_worker_image: Ubuntu2404
 
 
 # Generic build number, later set to commit hash by init
@@ -151,10 +151,10 @@ for:
     fast_finish: false
 
   environment:
-    PYTHON_UPGRADE_V: 3.14.6 # Upgrade to this version
+    PYTHON_UPGRADE_V: 3.14.9 # Upgrade to this version
     PYTHON_V: 3.12  # Override the stack key with latest Appveyor version
     ARTISAN_OS: macos
-    MACOSX_DEPLOYMENT_TARGET: 13.0
+    MACOSX_DEPLOYMENT_TARGET: 14.4
     PYUIC: pyuic6
     PYLUPDATE: ./pylupdate6pro.py  #the dot slash is necessary
 
@@ -261,7 +261,7 @@ for:
     - sudo apt install -y python${PYTHON_UPGRADE_V} python${PYTHON_UPGRADE_V}-venv libpython${PYTHON_UPGRADE_V}
     # Create and activate virtual environment
     - echo "Creating and activating virtual environment"
-    - python${PYTHON_UPGRADE_V} -m venv venv${PYTHON_UPGRADE_V}
+    - /usr/bin/python${PYTHON_UPGRADE_V} -m venv venv${PYTHON_UPGRADE_V}
     - source venv${PYTHON_UPGRADE_V}/bin/activate
     # Log for confirmation
     - echo "Confirming Python version and location"

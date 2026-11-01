@@ -27,20 +27,23 @@
 
 import sys
 import platform
-from typing import override, Any, cast, TYPE_CHECKING, Final
-from artisanlib.dialogs import ArtisanResizeablDialog
-from artisanlib.util import deltaLabelUTF8
-from artisanlib.widgets import MyContentLimitedQComboBox, MyQTableWidget
 import logging
+from typing import override, Any, cast, TYPE_CHECKING, Final
 
-from PyQt6.QtCore import Qt, pyqtSlot, QSettings, QTimer
+from PyQt6.QtCore import Qt, pyqtSlot, QSettings, QTimer, QSize
+from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import (QApplication, QLabel, QDialogButtonBox, QGridLayout,
     QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGroupBox,
-    QSpinBox, QWidget, QTabWidget, QTableWidget, QPushButton, QHeaderView, QLineEdit)
+    QSpinBox, QWidget, QTableWidget, QPushButton, QHeaderView, QLineEdit)
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
+
+from artisanlib.dialogs import ArtisanResizeablDialog
+from artisanlib.util import deltaLabelUTF8, getStyleIconPath
+from artisanlib.widgets import MyContentLimitedQComboBox, MyQTableWidget, ArtisanMinorPushButton, ArtisanQTabWidget
+from artisanlib.styles import vertical_header_style, table_style, spin_box_style, artisan_minor_push_button_style
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -118,6 +121,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
         self.beginComboBox.currentIndexChanged.connect(self.AUCBeginChanged)
         baseeditlabel = QLabel(QApplication.translate('Label', 'Base'))
         self.baseedit = QSpinBox()
+        self.baseedit.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.baseedit.setToolTip(QApplication.translate('Tooltip','Set start temp of AUC, must un-tick "From Event"'))
         self.baseedit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.baseedit.setRange(0,999)
@@ -134,6 +138,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
         self.baseFlag.stateChanged.connect(self.switchAUCbase)
         targetlabel =QLabel(QApplication.translate('Label', 'Target'))
         self.targetedit = QSpinBox()
+        self.targetedit.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.targetedit.setToolTip(QApplication.translate('Tooltip','Set a target total AUC to display during roast'))
         self.targetedit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.targetedit.setRange(0,9999)
@@ -262,6 +267,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
         # max chars per line
         self.statsmaxchrperlinelabel = QLabel(QApplication.translate('Label', 'Max characters per line'))
         self.statsmaxchrperlineSpinBox = QSpinBox()
+        self.statsmaxchrperlineSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.statsmaxchrperlineSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.statsmaxchrperlineSpinBox.setToolTip(QApplication.translate('Tooltip','Determines the width of the display box'))
         self.statsmaxchrperlineSpinBox.setRange(1,120)
@@ -272,6 +278,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
         # Font size
         self.fontsizeLabel = QLabel(QApplication.translate('Table', 'Text Size'))
         self.fontsizeSpinBox = QSpinBox()
+        self.fontsizeSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.fontsizeSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.fontsizeSpinBox.setToolTip(QApplication.translate('Tooltip','Choose the font size\nFont type is set in Config>> Curves>> UI tab'))
         self.fontsizeSpinBox.setRange(1,4)
@@ -282,39 +289,61 @@ class StatisticsDlg(ArtisanResizeablDialog):
         self.fontsizeSpinBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         #table for showing events
         self.summarystatstable = MyQTableWidget() #QTableWidget()
+        self.summarystatstable.setStyleSheet(table_style(self.aw.app.darkmode))
+        self.summarystatstable.setShowGrid(False)
         self.summarystatstable.setTabKeyNavigation(True)
         self.summarystatstable.itemSelectionChanged.connect(self.selectionChanged)
         vheader: QHeaderView|None = self.summarystatstable.verticalHeader()
         if vheader is not None:
             vheader.sectionMoved.connect(self.sectionMoved)
-        self.copysummarystatsTableButton = QPushButton(QApplication.translate('Button', 'Copy Table'))
-        self.copysummarystatsTableButton.setToolTip(QApplication.translate('Tooltip','Copy table to clipboard, OPTION or ALT click for tabular text'))
-        self.copysummarystatsTableButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.copysummarystatsTableButton.clicked.connect(self.copyEventButtonTabletoClipboard)
-        addButton: QPushButton = QPushButton(QApplication.translate('Button','Add'))
+            vheader.setStyleSheet(vertical_header_style(self.aw.app.darkmode))
+            vheader.setDefaultAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+        horizontal_header = self.summarystatstable.horizontalHeader()
+        if horizontal_header is not None:
+            horizontal_header.hide()
+        addButton = ArtisanMinorPushButton(QApplication.translate('Button','Add'),
+            'add-01-stroke-rounded-white.svg',
+            'add-01-stroke-rounded-dark.svg',
+            self.aw.app.darkmode)
         addButton.setToolTip(QApplication.translate('Tooltip','Add new Statistic'))
         #addButton.setMaximumWidth(100)
         addButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         addButton.clicked.connect(self.addsummarystatSlot)
-        delButton: QPushButton = QPushButton(QApplication.translate('Button','Delete'))
+        delButton = ArtisanMinorPushButton(QApplication.translate('Button','Delete'),
+            'delete-02-stroke-rounded-white.svg',
+            'delete-02-stroke-rounded-dark.svg',
+            self.aw.app.darkmode)
         delButton.setToolTip(QApplication.translate('Tooltip','Delete the selected Statistic'))
         #delButton.setMaximumWidth(100)
         delButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         delButton.clicked.connect(self.deletesummarystat)
-        self.insertButton: QPushButton = QPushButton(QApplication.translate('Button','Insert'))
+        self.insertButton = ArtisanMinorPushButton(QApplication.translate('Button','Insert'),
+            'row-insert-stroke-rounded-white.svg',
+            'row-insert-stroke-rounded-dark.svg',
+            self.aw.app.darkmode)
         self.insertButton.setToolTip(QApplication.translate('Tooltip','Insert below the selected Statistic'))
         self.insertButton.clicked.connect(self.insertsummarystatSlot)
         self.insertButton.setMinimumWidth(80)
         self.insertButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.insertButton.setEnabled(False)
-        self.copyTableButton = QPushButton(QApplication.translate('Button', 'Copy Table'))
+        self.insertButtonSetEnabled(False)
+        self.copyTableButton = ArtisanMinorPushButton(QApplication.translate('Button', 'Copy table'),
+            'copy-stroke-rounded-white.svg',
+            'copy-stroke-rounded-dark.svg',
+            self.aw.app.darkmode)
         self.copyTableButton.setToolTip(QApplication.translate('Tooltip','Copy table to clipboard, OPTION or ALT click for tabular text'))
         self.copyTableButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.copyTableButton.clicked.connect(self.copyEventButtonTabletoClipboard)
-        self.defaultButton = QPushButton(QApplication.translate('Button', 'Defaults'))
-        self.defaultButton.setToolTip(QApplication.translate('Tooltip','Set Statistics Summary to default settings'))
-        self.defaultButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.defaultButton.clicked.connect(self.restoreDefaults)
+
+
+        self.defaultButton = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.Reset)
+        if self.defaultButton is not None:
+            self.defaultButton.clicked.connect(self.restoreDefaults)
+            self.setButtonTranslations(self.defaultButton,'Reset',QApplication.translate('Button','Reset'))
+            self.defaultButton.setIconSize(QSize(14,14))
+            self.defaultButton.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
+            self.defaultButton.setIcon(QIcon(getStyleIconPath('undo-03-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'undo-03-stroke-rounded-white.svg')))
+            self.dialogbuttons.removeButton(self.defaultButton)
+
 #        helpDialogButton = QDialogButtonBox()
 #        helpButtonD: QPushButton|None = helpDialogButton.addButton(QDialogButtonBox.StandardButton.Help)
 #        if helpButtonD is not None:
@@ -325,30 +354,32 @@ class StatisticsDlg(ArtisanResizeablDialog):
 
         statstablebuttonslayout = QHBoxLayout()
         statstablebuttonslayout.addWidget(self.ShowStatsSummary)
-        statstablebuttonslayout.addSpacing(10)
+        statstablebuttonslayout.addSpacing(12)
         statstablebuttonslayout.addStretch()
         statstablebuttonslayout.addWidget(self.statsmaxchrperlinelabel)
         statstablebuttonslayout.addWidget(self.statsmaxchrperlineSpinBox)
-        statstablebuttonslayout.addSpacing(5)
+        statstablebuttonslayout.addSpacing(7)
         statstablebuttonslayout.addStretch()
         statstablebuttonslayout.addWidget(self.fontsizeLabel)
         statstablebuttonslayout.addWidget(self.fontsizeSpinBox)
         statstablebuttonslayout.addStretch()
+        statstablebuttonslayout.setContentsMargins(7, 2, 7, 2)  # left, top, right, bottom
         tab2buttonlayout = QHBoxLayout()
+        tab2buttonlayout.addWidget(self.defaultButton)
+        tab2buttonlayout.addWidget(self.copyTableButton)
+        tab2buttonlayout.addStretch()
         tab2buttonlayout.addWidget(addButton)
         tab2buttonlayout.addWidget(self.insertButton)
         tab2buttonlayout.addWidget(delButton)
-        tab2buttonlayout.addWidget(self.copyTableButton)
         tab2buttonlayout.addStretch()
-        tab2buttonlayout.addWidget(self.defaultButton)
 #        tab2buttonlayout.addWidget(helpDialogButton)
-        tab2buttonlayout.setContentsMargins(10, 0, 0, 0)  # left, top, right, bottom
+        tab2buttonlayout.setContentsMargins(7, 0, 7, 0)  # left, top, right, bottom
 
         self.dialogbuttons.accepted.connect(self.accept)
         self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel))
 
         ### tab1 layout
-        self.TabWidget = QTabWidget()
+        self.TabWidget = ArtisanQTabWidget()
         self.TabWidget.setContentsMargins(0, 0, 0, 0)  # left, top, right, bottom
         tab1layout = QVBoxLayout()
         tab1layout.addWidget(displayGroupLayout)
@@ -393,6 +424,12 @@ class StatisticsDlg(ArtisanResizeablDialog):
         # some tabs are not rendered at all on Windows using Qt v6.5.1 (https://bugreports.qt.io/projects/QTBUG/issues/QTBUG-114204?filter=allissues)
         QTimer.singleShot(50, self.setActiveTab)
 
+    def insertButtonSetEnabled(self, b:bool) -> None:
+        self.insertButton.setEnabled(b)
+        if b:
+            self.insertButton.setIcon(QIcon(getStyleIconPath('row-insert-stroke-rounded-white.svg')))
+        else:
+            self.insertButton.setIcon(QIcon(getStyleIconPath('row-insert-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'row-insert-stroke-rounded.svg')))
 
     @pyqtSlot(int)
     def AUCLCDflagChanged(self, _:int) -> None:
@@ -529,9 +566,9 @@ class StatisticsDlg(ArtisanResizeablDialog):
     def selectionChanged(self) -> None:
         selected = self.summarystatstable.selectedRanges()
         if selected and len(selected) > 0:
-            self.insertButton.setEnabled(True)
+            self.insertButtonSetEnabled(True)
         else:
-            self.insertButton.setEnabled(False)
+            self.insertButtonSetEnabled(False)
         vheader = self.summarystatstable.verticalHeader()
         if self.summarystatstable.cursor_navigation and vheader is not None:
             QTimer.singleShot(0, vheader.setFocus)

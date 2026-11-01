@@ -45,23 +45,22 @@ if TYPE_CHECKING:
     from PyQt6.QtGui import QStandardItem, QKeyEvent, QDropEvent, QDragEnterEvent, QCloseEvent # pylint: disable=unused-import
     from PyQt6.QtCore import QMimeData # pylint: disable=unused-import
 
-from artisanlib.util import (deltaLabelUTF8, decodeLocal, decodeLocalStrict, stringfromseconds, fromFtoCstrict,
-        fromCtoFstrict, fill_gaps, float2float, deserialize, float2str, smooth_list)
 from artisanlib.suppress_errors import suppress_stdout_stderr
-from artisanlib.dialogs import ArtisanDialog
-from artisanlib.widgets import MyQComboBox
-from artisanlib.qcheckcombobox import CheckComboBox
-from artisanlib.table_style import horizontal_header_style, vertical_header_style
-
 with suppress_stdout_stderr():
     from matplotlib import colormaps # pyrefly:ignore[missing-module-attribute]
 
 from PyQt6.QtCore import (Qt, pyqtSignal, pyqtSlot, QSettings, QFile, QTextStream, QUrl,
     QFileInfo, QDate, QTime, QDateTime)
 from PyQt6.QtGui import (QColor, QDesktopServices, QStandardItemModel)
-from PyQt6.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton,
-    QComboBox, QSizePolicy, QHBoxLayout, QVBoxLayout, QHeaderView, QTableWidgetItem, QCheckBox)
+from PyQt6.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QCheckBox,
+    QComboBox, QSizePolicy, QHBoxLayout, QVBoxLayout, QHeaderView, QTableWidgetItem)
 
+from artisanlib.util import (deltaLabelUTF8, decodeLocal, decodeLocalStrict, stringfromseconds, fromFtoCstrict,
+        fromCtoFstrict, fill_gaps, float2float, deserialize, float2str, smooth_list)
+from artisanlib.dialogs import ArtisanDialog
+from artisanlib.widgets import MyQComboBox, ArtisanMinorPushButton
+from artisanlib.qcheckcombobox import CheckComboBox
+from artisanlib.styles import horizontal_header_style, vertical_header_style, table_style
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -278,7 +277,7 @@ class RoastProfile:
                 roastdate_str:str|None = decodeLocal(profile['roastdate'])
                 if roastdate_str is not None:
                     date = QDate.fromString(roastdate_str)
-                    if not date.isValid(): # ty:ignore[no-matching-overload]
+                    if not date.isValid():
                         date = QDate.currentDate()
                 else:
                     date = QDate.currentDate()
@@ -972,13 +971,15 @@ class roastCompareDlg(ArtisanDialog):
     __slots__ = [ 'foreground', 'background', 'maxentries', 'basecolors', 'profiles', 'label_number', 'l_align', 'legend', 'legendloc_pos', 'addButton',
         'deleteButton', 'alignnames', 'alignComboBox', 'eventsComboBox', 'cb', 'model',
         'pick_handler_id', 'modeComboBox', 'buttonCONTROL_org_state_hidden', 'buttonONOFF_org_state_hidden',
-        'buttonRESET_org_state_hidden', 'buttonSTARTSTOP_org_state_hidden', 'profileTable', 'delta_axis_visible' ]
+        'buttonRESET_org_state_hidden', 'buttonSTARTSTOP_org_state_hidden', 'profileTable', 'delta_axis_visible', 'dashboard_was_active_on_open']
 
     def __init__(self, parent:QWidget, aw:'ApplicationWindow', foreground:str|None = None, background:str|None = None) -> None:
         super().__init__(parent, aw)
 
         if platform.system() == 'Darwin':
             self.setAttribute(Qt.WidgetAttribute.WA_MacAlwaysShowToolWindow) # show tool window even if app is in background (see https://bugreports.qt.io/browse/QTBUG-57581)
+
+        self.dashboard_was_active_on_open = self.aw.dashboard.dashboard_active()
 
         self.setAcceptDrops(True)
 
@@ -998,12 +999,20 @@ class roastCompareDlg(ArtisanDialog):
         self.legendloc_pos:tuple[float,float]|None = None
         # table
         self.profileTable = CompareTableWidget()
+        self.profileTable.setStyleSheet(table_style(self.aw.app.darkmode))
+        self.profileTable.setShowGrid(False)
         self.createProfileTable()
         # buttons
-        self.addButton = QPushButton(QApplication.translate('Button','Add'))
+        self.addButton = ArtisanMinorPushButton(QApplication.translate('Button','Add'),
+            'add-01-stroke-rounded-white.svg',
+            'add-01-stroke-rounded-dark.svg',
+            self.aw.app.darkmode)
         self.addButton.clicked.connect(self.add)
         self.addButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.deleteButton = QPushButton(QApplication.translate('Button','Delete'))
+        self.deleteButton = ArtisanMinorPushButton(QApplication.translate('Button','Delete'),
+            'delete-02-stroke-rounded-white.svg',
+            'delete-02-stroke-rounded-dark.svg',
+            self.aw.app.darkmode)
         self.deleteButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.deleteButton.clicked.connect(self.delete)
         # configurations
@@ -1077,6 +1086,7 @@ class roastCompareDlg(ArtisanDialog):
         settingsLayout.addLayout(settings2Layout)
         settingsLayout.addLayout(settings1Layout)
         settingsLayout.setSpacing(2)
+        settingsLayout.setContentsMargins(0, 5, 0, 10)
 
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
@@ -1084,12 +1094,13 @@ class roastCompareDlg(ArtisanDialog):
         buttonLayout.addSpacing(10)
         buttonLayout.addWidget(self.deleteButton)
         buttonLayout.addStretch()
+        buttonLayout.setContentsMargins(0, 10, 0, 10)
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(settingsLayout)
         mainLayout.addWidget(self.profileTable)
         mainLayout.addLayout(buttonLayout)
         mainLayout.setSpacing(0)
-        mainLayout.setContentsMargins(0, 0, 0, 0)
+        mainLayout.setContentsMargins(5, 0, 5, 0)
         self.setLayout(mainLayout)
 
         # we want minimize and close buttons, but no maximize buttons
@@ -1107,7 +1118,7 @@ class roastCompareDlg(ArtisanDialog):
         self.buttonRESET_org_state_hidden = self.aw.buttonRESET.isHidden() # RESET
         self.buttonONOFF_org_state_hidden = self.aw.buttonONOFF.isHidden() # ON/OFF
         self.buttonSTARTSTOP_org_state_hidden = self.aw.buttonSTARTSTOP.isHidden() # START/STOP
-        self.buttonCONTROL_org_state_hidden = self.aw.buttonCONTROL.isHidden() # CONTROL
+        self.buttonCONTROL_org_state_hidden = self.aw.buttonCONTROLwidget.isHidden() # CONTROL
 
         self.disableButtons()
         self.aw.disableEditMenus(compare=True)
@@ -1170,13 +1181,13 @@ class roastCompareDlg(ArtisanDialog):
         if not self.buttonSTARTSTOP_org_state_hidden:
             self.aw.buttonSTARTSTOP.show() # START/STOP
         if not self.buttonCONTROL_org_state_hidden:
-            self.aw.buttonCONTROL.show() # CONTROL
+            self.aw.buttonCONTROLwidget.show() # CONTROL
 
     def disableButtons(self) -> None:
         self.aw.buttonRESET.hide() # RESET
         self.aw.buttonONOFF.hide() # ON/OFF
         self.aw.buttonSTARTSTOP.hide() # START/STOP
-        self.aw.buttonCONTROL.hide() # CONTROL
+        self.aw.buttonCONTROLwidget.hide() # CONTROL
 
     ### DRAWING
 
@@ -2197,3 +2208,7 @@ class roastCompareDlg(ArtisanDialog):
             _log.exception(e)
         if self.aw.qpc is not None:
             self.aw.qpc.update_phases(None)
+        self.aw.dashboard.enable_dashboard_toggle_toolbutton()
+        # show dashboard again if it was shown on starting the Comparato
+        if self.dashboard_was_active_on_open:
+            self.aw.dashboard.show_dashboard()

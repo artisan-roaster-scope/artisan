@@ -25,15 +25,15 @@
 # AUTHOR
 # Marko Luther, 2023
 
-from Phidget22.Devices.Manager import Manager # type: ignore[import-untyped]
-from Phidget22.DeviceID import DeviceID # type: ignore[import-untyped]
-from Phidget22.DeviceClass import DeviceClass # type: ignore[import-untyped]
+from Phidget22.Devices.Manager import Manager
+from Phidget22.DeviceID import DeviceID
+from Phidget22.DeviceClass import DeviceClass
 
 import logging
 from typing import Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from Phidget22.Phidget import Phidget # type: ignore[import-untyped] # pylint: disable=unused-import
+    from Phidget22.Phidget import Phidget # pylint: disable=unused-import
 
 from PyQt6.QtCore import QSemaphore
 
@@ -68,7 +68,8 @@ class PhidgetManager:
 
     def attachHandler(self,_:Manager , attachedChannel:'Phidget') -> None: # type:ignore[no-any-unimported,unused-ignore]
         try:
-            if attachedChannel.getParent().getDeviceClass() != DeviceClass.PHIDCLASS_HUB:
+            parent = attachedChannel.getParent()
+            if parent is not None and parent.getDeviceClass() != DeviceClass.PHIDCLASS_HUB:
                 # we do not add the hub itself
                 self.addChannel(attachedChannel)
         except Exception as e: # pylint: disable=broad-except

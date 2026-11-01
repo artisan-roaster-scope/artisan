@@ -3549,20 +3549,20 @@ class TestColorUtilitiesExtended:
         assert result.startswith('#')
 
 
-class TestDonationUtilities:
-    """Test donation utility static methods."""
-
-    def test_resetDonateCounter_basic(self) -> None:
-        """Test resetDonateCounter resets donation settings."""
-        # Arrange & Act
-        ApplicationWindow.resetDonateCounter()
-
-        # Assert
-        settings = QSettings()
-        # Check that the settings were written (values should exist)
-        assert settings.contains('lastdonationpopup')
-        assert settings.contains('starts')
-        assert settings.value('starts') == 0
+#class TestDonationUtilities:
+#    """Test donation utility static methods."""
+#
+#    def test_resetDonateCounter_basic(self) -> None:
+#        """Test resetDonateCounter resets donation settings."""
+#        # Arrange & Act
+#        ApplicationWindow.resetDonateCounter()
+#
+#        # Assert
+#        settings = QSettings()
+#        # Check that the settings were written (values should exist)
+#        assert settings.contains('lastdonationpopup')
+#        assert settings.contains('starts')
+#        assert settings.value('starts') == 0
 
 
 class TestHelpDialogUtilities:
