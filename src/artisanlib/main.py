@@ -23839,7 +23839,7 @@ class ApplicationWindow(QMainWindow):
             cp = self.computedProfileInformation()
 
             if 'CHARGE_ET' in cp and 'CHARGE_BT' in cp:
-                charge = f"BT {cp['CHARGE_BT']:.0f}&deg;{self.qmc.mode} <br>ET {cp['CHARGE_ET']:.0f}{self.qmc.mode}"
+                charge = f"BT {cp['CHARGE_BT']:.0f}&deg;{self.qmc.mode} <br>ET {cp['CHARGE_ET']:.0f}&deg;{self.qmc.mode}"
             else:
                 charge = '--'
             dryphase, midphase, finishphase, coolphase = self.phases2html(cp)
@@ -23848,9 +23848,9 @@ class ApplicationWindow(QMainWindow):
             if ('AUC' in cp and cp['AUC'] != 0):
                 etbta = f"{cp['AUC']:.0f}C*min"
                 if ('AUCbegin' in cp and cp['AUCbegin'] != '' and 'AUCbase' in cp):
-                    etbta += f" [{cp['AUCbegin']},{cp['AUCbase']:.0f}{self.qmc.mode}]"
+                    etbta += f" [{cp['AUCbegin']},{cp['AUCbase']:.0f}&deg;{self.qmc.mode}]"
                 elif 'AUCbase' in cp:
-                    etbta += f" [{cp['AUCbase']:.0f}]"
+                    etbta += f" [{cp['AUCbase']:.0f}&deg;{self.qmc.mode}]"
             tmpdir = str(QDir.tempPath() + '/')
 
             org_patheffects = self.qmc.patheffects

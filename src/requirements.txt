@@ -20,7 +20,7 @@
 # the following commented package versions are read by appveyor.yml and downloaded outside of pip.
 #
 # pyinstaller==6.22.3; platform_system='Windows'
-# libusb==1.0.30;  platform_system='Linux'
+# libusb==1.0.30.0.post2;  platform_system='Linux'
 # dotenv==2.8.1;   platform_system='Linux'  # v3.0.0 not compatible with fpm  # gem installed, not pip
 #
 ######
@@ -69,7 +69,7 @@ jmespath==1.1.0
 cryptography==48.0.1; sys_platform=='darwin' # last version with macOS Intel binaries: 48.0.1
 cryptography==50.0.2; sys_platform=='Linux' or platform_system=='Windows'
 aiohttp-retry==2.9.1
-pyfulgur==0.40.0
+pyfulgur==0.41.0
 #
 #
 ######
@@ -105,5 +105,5 @@ SecretStorage==3.5.0; platform_system=='Linux'
 build==1.6.1; platform_system=='Windows'
 pywin32==312; platform_system=='Windows'
 pyinstaller-versionfile==3.1.0; platform_system=='Windows'
-libusb-package==1.0.30.0; platform_system=='Windows'
+libusb-package==1.0.30.0.post2; platform_system=='Windows'
 tzdata==2026.6; platform_system=='Windows' # to prevent pyinstaller WARNING: Hidden import "tzdata" not found!
