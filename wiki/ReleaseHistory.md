@@ -108,7 +108,7 @@ v4.0.0 (Jan 28, 2026)
 
 * ADDITIONS
   - adds UI modes (production, standard, expert)
-  - adds support for [Lebrew RoastSee NEXT](https://lebrewtech.com/products/roastsee-next) real-time Agtron and crack analyzer
+  - adds support for [Lebrew RoastSee NEXT](https://lebrewtech.com/products/roastsee-next) real-time Agtron sensor
   - adds support for [Acaia Pyxis Black (2025)](https://eu.acaia.co/products/pyxis-black)
   - adds support for Yoccto Meteo as well as Phidget TMP1000, HUM1000 and PRE1000 configured as extra devices ([Issue #1251](../../../issues/1251))
   - adds Kaleido CSV importer ([PR #2090](../../../pull/2090) contributed by [Terracotta-6](https://github.com/Terracotta-6))
