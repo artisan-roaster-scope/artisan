@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/tools/#scope
 layout: splash
 permalink: /about/
 title: "About"

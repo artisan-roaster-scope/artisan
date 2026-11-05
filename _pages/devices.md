@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/devices/
 title: "Supported Devices"
 layout: collection
 classes: wide

@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/blog/
 title: ""
 layout: collection
 collection: posts

@@ -21,8 +21,6 @@ sidebar:
 <center>
 <a href="{{ site.baseurl }}/assets/images/kaleido-all-buttons.png" style="width: 80%;">
 <img src="{{ site.baseurl }}/assets/images/kaleido-all-buttons.png" ></a>
-<a href="{{ site.baseurl }}/assets/images/kaleido-essential-buttons.png" style="width: 80%;">
-<img src="{{ site.baseurl }}/assets/images/kaleido-essential-buttons.png" ></a>
     <figcaption>custom event buttons</figcaption>
 </center>
 </figure>

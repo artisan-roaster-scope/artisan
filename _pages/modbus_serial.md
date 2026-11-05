@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/devices/modbus-serial
 layout: single
 permalink: /modbus_serial/
 title: "MODBUS Serial"

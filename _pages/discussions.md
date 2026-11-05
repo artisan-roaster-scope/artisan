@@ -13,7 +13,8 @@ author_profile: true
 # Register for GitHub
 
 If you do not already have a GitHub account you will need ro [register](https://github.com/join){:target="_blank"} before you can post in the Discussions forum.  Registration is free.
-# How to Subscribe to Artisan Discussions.  
+
+# How to Subscribe to Artisan Discussions 
 
 Artisan has established a [Discussions page](https://github.com/artisan-roaster-scope/artisan/discussions){:target="_blank"} on [GitHub](https://github.com/){:target="_blank"} where users can ask questions and the community can participate in answering.  This is the preferred method for getting help.  Unlike a traditional mailing list you can choose how you want to see and follow posts.  
 

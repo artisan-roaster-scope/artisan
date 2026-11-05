@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/resources/ratings
 layout: single
 permalink: /ratings/
 header:

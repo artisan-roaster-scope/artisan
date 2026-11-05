@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools
 title: "Documentation"
 permalink: /docs/
 sidebar:
@@ -8,7 +9,6 @@ header:
   overlay_image: /assets/images/teaser-small.webp
   image: /assets/images/teaser-small.webp
 ---
-
 
 If you need support please check the [documentation](#documentation) or ask the [community](#Community) for help. We also composed a list of [reoccuring questions with answers (FAQ)](/docs/faq/). In case your problem is more specific and you might need to consult a specialist. Why not [book a video session with Marko](https://shop.artisan.plus/shop/en/consulting/){:target="_blank"}?
 

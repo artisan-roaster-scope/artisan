@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/download/
 layout: single
 permalink: /download-linux/
 title: ""

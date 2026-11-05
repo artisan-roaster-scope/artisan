@@ -10,7 +10,7 @@ main:
   - title: "Docs"
     url: /docs/
   - title: "Shop"
-    url: https://shop.artisan.plus/
+    url: https://artisan.tools/shop/
 
 machines:
   - title: "Machines"
@@ -72,6 +72,8 @@ machines:
         url: /machines/easyster/
       - title: "Fabrica Coffee Roasters"
         url: /machines/fabrica/
+      - title: "Fresh Roast"
+        url: /machines/freshroast/
       - title: "Froco"
         url: /machines/froco/
       - title: "Garanti"

@@ -37,6 +37,8 @@ The IO Command `lebrew(<msg>)` sends the given `<msg>` to the device while it is
 - `start` : start recording and start sending readings to artisan
 - `stop` : stop recording and stop sending readings to artisan
 
+Other recognized commands are `agtron`, `zeroing`, `history`, `back`, `readlog`, and `yellow`.
+
 On pressing the ON button, artisan scope connects to the device and sends the message `roasting` followed by the message `start` to receive readings.
 
 <figure>

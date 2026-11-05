@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/about/#donate
 layout: single
 permalink: /donate/
 title: ""
