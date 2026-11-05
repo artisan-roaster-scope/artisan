@@ -58,13 +58,13 @@ aiohttp_jinja2==1.6
 python-bidi==0.6.12
 arabic-reshaper==3.1.0
 pillow==13.0.0
-pydantic==2.14.2
+pydantic==2.14.3
 babel==2.18.0
 bleak==3.0.2
 python-statemachine==3.2.2
 yoctopuce==2.1.16772
 PyQt6==6.12.0
-paho-mqtt==2.1.0
+paho-mqtt==2.2.0
 jmespath==1.1.0
 cryptography==48.0.1; sys_platform=='darwin' # last version with macOS Intel binaries: 48.0.1
 cryptography==50.0.2; sys_platform=='Linux' or platform_system=='Windows'

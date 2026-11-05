@@ -1,10 +1,10 @@
 #### Artisan helps coffee roasters record, analyze, and control roast profiles. With the help of a thermocouple data logger, or a proportional–integral–derivative controller (PID controller), this software offers roasting metrics to help make decisions that influence the final coffee flavor.
 
-Artisan is free for personal and commercial use, but asks for a [donation](https://artisan-scope.org/donate/).
+Artisan is free for personal and commercial use, but asks for a [donation](https://artisan.tools/about/#donate).
 
 ## HOME
 
-<https://artisan-scope.org>
+<https://artisan.tools>
 
 The home of its development is on GitHub where all source and binary files are available as well as an issue tracker.
 
@@ -16,11 +16,11 @@ The home of its development is on GitHub where all source and binary files are a
 
 ## ARTISAN BLOG
 
-https://artisan-roasterscope.blogspot.de
+<https://artisan.tools/blog/>
 
 ## FEATURES
 
-Runs on 64bit Windows 10, macOS (legacy builds support Windows 8 x64 and macOS 10.13 High Sierra), Redhat/Debian Linux (incl. 64bit Raspberry Pi Bookworm) and supports a large number of devices and roasting machines. See <https://artisan-scope.org/devices/> for supported devices and <https://artisan-scope.org/machines/> for supported machines.
+Runs on 64bit Windows 10, macOS (legacy builds support Windows 8 x64 and macOS 10.13 High Sierra), Redhat/Debian Linux (incl. 64bit Raspberry Pi Bookworm) and supports a large number of devices and roasting machines. See <https://docs.artisan.tools/desktop/devices> for supported devices and <https://docs.artisan.tools/desktop/machines> for supported machines.
 
 **Artisan offers**
 - Unlimited number of curves.

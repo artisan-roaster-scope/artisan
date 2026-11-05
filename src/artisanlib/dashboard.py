@@ -85,10 +85,10 @@ SPONSOR_LOGO_BACKGROUND_COLOR_PRESSED_DARK = '#99505050'
 
 class Dashboard(QWidget):
 
-    DOCUMENTATION_URL:Final[str] = 'https://artisan-scope.org/docs'
+    DOCUMENTATION_URL:Final[str] = 'https://docs.artisan.tools/'
     USER_FORUM_URL:Final[str] = 'https://github.com/artisan-roaster-scope/artisan/discussions'
     ISSUE_TRACKER_URL:Final[str] = 'https://github.com/artisan-roaster-scope/artisan/issues'
-    DONATE_URL:Final[str] = 'https://artisan-scope.org/donate'
+    DONATE_URL:Final[str] = 'https://artisan.tools/about/#donate'
 
     TITLE_CHANGE_ESTABLISH_PERIOD:Final[int] = 400 # time in ms after which title changes are established
 

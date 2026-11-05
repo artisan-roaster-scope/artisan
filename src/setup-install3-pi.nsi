@@ -216,8 +216,8 @@ Var IsSilentMode        ; 1 = /S mode
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 ; The following gets transposed to "SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
-!define Finish_Documentation_URL "https://artisan-scope.org/docs/"
-!define Finish_Donate_URL "https://artisan-scope.org/donate/"
+!define Finish_Documentation_URL "https://docs.artisan.tools/"
+!define Finish_Donate_URL "https://artisan.tools/about/#donate"
 
 ; Set with command line options
 !define /ifndef PRODUCT_VERSION "0.0.0"

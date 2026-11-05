@@ -24713,7 +24713,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def helpHelp(self, _:bool = False) -> None:  # pylint: disable=no-self-use # used as slot
-        QDesktopServices.openUrl(QUrl('https://artisan-scope.org/docs/', QUrl.ParsingMode.TolerantMode))
+        QDesktopServices.openUrl(QUrl('https://docs.artisan.tools/', QUrl.ParsingMode.TolerantMode))
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -24734,7 +24734,7 @@ class ApplicationWindow(QMainWindow):
                             update_str = QApplication.translate('About', 'A new release is available.')
                             update_str += '<br/><a href="https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/ReleaseHistory.md">'
                             update_str +=  QApplication.translate('About', 'Show Change list')
-                            update_str += '<br/><a href="https://artisan-scope.org/download/">'
+                            update_str += '<br/><a href="https://artisan.tools/download/">'
                             update_str +=  QApplication.translate('About', 'Download Release') + ' ' + str(tag_name)
                         elif latest == __version__ :
                             update_str = QApplication.translate('About', 'You are using the latest release.')
@@ -26599,7 +26599,7 @@ class ApplicationWindow(QMainWindow):
                         'Title': f'{batch_nr_str}{self.qmc.title}',
                         'Author': getpass.getuser(),
                         'Description': f'artisan roast profile {batch_nr_str}{self.qmc.title}',
-                        'Software': f'artisan v{__version__}, https://artisan-scope.org/'
+                        'Software': f'artisan v{__version__}, https://artisan.tools/'
                     }
                 else:
                     metadata = None
@@ -26652,7 +26652,7 @@ class ApplicationWindow(QMainWindow):
                             'Author': getpass.getuser(),
                             'Subject': f'artisan roast profile {batch_nr_str}{self.qmc.title}',
                             'Keywords': ', '.join(filter(None, ['artisan', 'roast profile', batch_nr_str])),
-                            'Creator': f'artisan v{__version__}, https://artisan-scope.org/'
+                            'Creator': f'artisan v{__version__}, https://artisan.tools/'
                             }
                 else: # SVG
                     metadata = {
@@ -26660,7 +26660,7 @@ class ApplicationWindow(QMainWindow):
                             'Creator': getpass.getuser(),
                             'Description': f'artisan roast profile {batch_nr_str}{self.qmc.title}',
                             'Keywords': ', '.join(filter(None, ['artisan', 'roast profile', batch_nr_str])),
-                            'Publisher': f'artisan v{__version__}, https://artisan-scope.org/'
+                            'Publisher': f'artisan v{__version__}, https://artisan.tools/'
                     }
                     if self.curFile is not None:
                         metadata['Source'] = Path(self.curFile).name

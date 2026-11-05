@@ -50,10 +50,10 @@
   </developer>
 
   <url type="bugtracker">https://github.com/artisan-roaster-scope/artisan/issues</url>
-  <url type="homepage">https://artisan-scope.org/</url>
-  <url type="donation">https://artisan-scope.org/donate/</url>
-  <url type="contact">https://artisan-roasterscope.blogspot.com/p/contact-me.html</url>
-  <url type="faq">https://artisan-scope.org/help/#faq</url>
+  <url type="homepage">https://artisan.tools/</url>
+  <url type="donation">https://artisan.tools/about/#donate</url>
+  <url type="contact">https://artisan.tools/support/contact/</url>
+  <url type="faq">https://docs.artisan.tools/desktop/getting-started/faq</url>
   <url type="vcs-browser">https://github.com/artisan-roaster-scope/artisan</url>
 
   <launchable type="desktop-id">org.artisan_scope.artisan.desktop</launchable>
@@ -80,7 +80,7 @@
   <releases>
 
     <release version="5.0.0" date="2026-11-05">
-      <url type="details">https://artisan-scope.org/release/Artisan-v5.0/</url>
+      <url type="details">https://artisan.tools/blog/artisan-v5-0/</url>
       <description>
         <p>ADDITIONS</p>
         <ul>
@@ -122,7 +122,7 @@
     </release>
 
     <release version="4.2.0" date="2026-06-30">
-      <url type="details">https://artisan-scope.org/release/Artisan-v4.2/</url>
+      <url type="details">https://artisan.tools/blog/artisan-v4-2/</url>
       <description>
         <p>ADDITIONS</p>
         <ul>
