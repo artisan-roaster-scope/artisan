@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/devices/shelly
 layout: single
 permalink: /devices/shelly/
 title: "Shelly"

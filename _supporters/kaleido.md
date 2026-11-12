@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/kaleido
 layout: single
 permalink: /machines/kaleido/
 title: "Kaleido & Beanseeker"

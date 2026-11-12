@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/devices/phidgets
 layout: single
 permalink: /devices/phidgets/
 title: "Phidgets"

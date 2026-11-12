@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/kapok
 layout: single
 permalink: /machines/kapok/
 title: "KapoK"

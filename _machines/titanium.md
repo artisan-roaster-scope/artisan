@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/titanium
 layout: single
 permalink: /machines/titanium/
 title: "Titanium"

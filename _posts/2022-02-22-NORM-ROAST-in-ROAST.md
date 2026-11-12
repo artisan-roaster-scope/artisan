@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/blog/norm-roast-in-roast
 header:
   image: /assets/images/posts/2022-02-22-NORM-ROAST-in-ROAST.webp
   teaser: /assets/images/posts/2022-02-22-NORM-ROAST-in-ROAST-teaser.webp

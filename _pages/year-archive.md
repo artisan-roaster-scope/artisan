@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/blog/
 title: "News by Year"
 permalink: /year-archive/
 layout: posts

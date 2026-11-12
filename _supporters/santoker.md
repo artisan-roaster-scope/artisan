@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/santoker
 layout: single
 permalink: /machines/santoker/
 title: "Santoker"

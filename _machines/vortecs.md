@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/vortecs
 layout: single
 permalink: /machines/vortecs/
 title: "Vortecs"

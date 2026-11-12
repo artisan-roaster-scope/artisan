@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/dongyi
 layout: single
 permalink: /machines/dongyi/
 title: "Dongyi"

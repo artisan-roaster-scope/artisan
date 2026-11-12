@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/datgen
 layout: single
 permalink: /machines/datgen/
 title: "Dätgen"

@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/blog/price-drop/
 header:
   image: /assets/images/posts/2021-12-01-Price-Drop.webp
   teaser: /assets/images/posts/2021-12-01-Price-Drop-teaser.webp

@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/devices/meters
 layout: single
 permalink: /devices/meters/
 title: "Meters"

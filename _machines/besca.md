@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/besca
 layout: single
 permalink: /machines/besca/
 title: "Besca"

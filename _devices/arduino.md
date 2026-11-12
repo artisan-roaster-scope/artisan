@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/devices/arduino
 layout: single
 permalink: /devices/arduino/
 title: "Arduino"

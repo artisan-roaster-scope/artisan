@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/sivetz
 layout: single
 permalink: /machines/sivetz/
 title: "Sivetz"

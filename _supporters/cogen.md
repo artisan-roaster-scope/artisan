@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/cogen
 layout: single
 permalink: /machines/cogen/
 title: "Cogen"

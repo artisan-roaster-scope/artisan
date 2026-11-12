@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/blog/pgc-partner/
 header:
   image: /assets/images/posts/2023-12-14-pgc-Partner.webp
   teaser: /assets/images/posts/2023-12-14-pgc-Partner-teaser.webp

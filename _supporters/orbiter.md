@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/orbiter
 layout: single
 permalink: /machines/orbiter/
 title: "Orbiter"

@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/devices/phidget-sets
 layout: single
 permalink: /devices/phidget-sets/
 title: "Phidget SETS"

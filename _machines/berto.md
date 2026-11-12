@@ -1,4 +1,4 @@
----
+---redirect_to: https://docs.artisan.tools/desktop/machines/berto
 layout: single
 permalink: /machines/berto/
 title: "Berto"

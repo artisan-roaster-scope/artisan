@@ -1,4 +1,4 @@
----
+---redirect_to: https://docs.artisan.tools/desktop/machines/arc
 layout: single
 permalink: /machines/arc/
 title: "Arc"

@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/tesla
 layout: single
 permalink: /machines/tesla/
 title: "Tesla"

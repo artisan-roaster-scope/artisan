@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/schuilenburg
 layout: single
 permalink: /machines/schuilenburg/
 title: "Schuilenburg"

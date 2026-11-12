@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/pratter
 layout: single
 permalink: /machines/pratter/
 title: "Pratter"

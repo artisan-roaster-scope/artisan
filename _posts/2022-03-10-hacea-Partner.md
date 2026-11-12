@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/blog/hacea-partner
 header:
   image: /assets/images/posts/2022-03-10-hacea-Partner.webp
   teaser: /assets/images/posts/2022-03-10-hacea-Partner-teaser.webp

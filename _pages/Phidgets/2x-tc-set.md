@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/devices/phidgets-2x-tc-set/
 layout: single
 permalink: /phidgets/2x-tc-set/
 header:

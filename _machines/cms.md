@@ -1,4 +1,4 @@
----
+---redirect_to: https://docs.artisan.tools/desktop/machines/cms
 layout: single
 permalink: /machines/cms/
 title: "Coffee Machines Sale"

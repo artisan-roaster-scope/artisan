@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/kaldi
 layout: single
 permalink: /machines/kaldi/
 title: "Kaldi"

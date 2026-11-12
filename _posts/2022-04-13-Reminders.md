@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/blog/reminders/
 header:
   image: /assets/images/posts/2022-04-13-Reminders.webp
   teaser: /assets/images/posts/2022-04-13-Reminders-teaser.webp

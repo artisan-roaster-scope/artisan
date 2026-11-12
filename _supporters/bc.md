@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/bc
 layout: single
 permalink: /machines/bc/
 title: "BC Roasters"

@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/blog/rjavitukan-partner/
 header:
   image: /assets/images/posts/2022-05-01-rjavitukan-Partner.webp
   teaser: /assets/images/posts/2022-05-01-rjavitukan-Partner-teaser.webp

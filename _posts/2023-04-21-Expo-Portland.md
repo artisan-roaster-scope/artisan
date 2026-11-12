@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/blog/expo-portland/
 header:
   image: /assets/images/posts/2023-04-21-Expo-Portland.webp
   teaser: /assets/images/posts/2023-04-21-Expo-Portland-teaser.webp

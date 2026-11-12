@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/blog/probat-pop-up
 header:
   image: /assets/images/posts/2022-03-17-Probat-POP-UP2.webp
   teaser: /assets/images/posts/2022-03-17-Probat-POP-UP-teaser.webp

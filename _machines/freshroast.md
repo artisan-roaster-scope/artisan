@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/freshroast
 layout: single
 permalink: /machines/freshroast/
 title: "Fresh Roast"

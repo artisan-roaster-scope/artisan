@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/toper
 layout: single
 permalink: /machines/toper/
 title: "Toper"

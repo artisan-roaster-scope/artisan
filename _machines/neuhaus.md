@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/neuhaus
 layout: single
 permalink: /machines/neuhaus/
 title: "Neuhaus Neotec"

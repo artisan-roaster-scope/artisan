@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/ikawa
 layout: single
 permalink: /machines/ikawa/
 title: "IKAWA"

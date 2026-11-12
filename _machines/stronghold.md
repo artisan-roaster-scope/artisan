@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/stronghold
 layout: single
 permalink: /machines/stronghold/
 title: "Stronghold"

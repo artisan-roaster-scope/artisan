@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/petroncini
 layout: single
 permalink: /machines/petroncini/
 title: "Petroncini"

@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/garanti
 layout: single
 permalink: /machines/garanti/
 title: "Garanti"

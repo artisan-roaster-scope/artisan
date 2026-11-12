@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/blog/understanding-roast-color/
 header:
   image: /assets/images/posts/2023-03-05-Understanding-Roast-Color.jpg.webp
   teaser: /assets/images/posts/2023-03-05-Understanding-Roast-Color-teaser.jpg.webp

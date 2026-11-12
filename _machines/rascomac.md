@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/rascomac
 layout: single
 permalink: /machines/rascomac/
 title: "Rasco Mac"

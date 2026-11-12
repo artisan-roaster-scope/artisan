@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/devices/phidgets-2x-rtd-set/
 layout: single
 permalink: /phidgets/2x-rtd-set/
 header:

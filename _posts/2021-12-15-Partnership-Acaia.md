@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/blog/partnership-acaia/
 header:
   image: /assets/images/posts/2021-12-15-Partnership-Acaia.webp
   teaser: /assets/images/posts/2021-12-15-Partnership-Acaia-teaser.webp

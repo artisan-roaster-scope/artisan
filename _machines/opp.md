@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/opp
 layout: single
 permalink: /machines/opp/
 title: "Opp Roaster"

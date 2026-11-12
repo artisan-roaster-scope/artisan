@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/craftsmith
 layout: single
 permalink: /machines/craftsmith/
 title: "Craftsmith"

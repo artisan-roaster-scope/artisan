@@ -1,4 +1,4 @@
----
+---redirect_to: https://docs.artisan.tools/desktop/machines/bellatw
 layout: single
 permalink: /machines/bellatw/
 title: "BellaTW"

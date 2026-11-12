@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/getting-started/support
 layout: single
 permalink: /discussions/
 header:

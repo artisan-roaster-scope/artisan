@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/devices/acaia
 layout: single
 permalink: /devices/acaia/
 title: "Acaia"

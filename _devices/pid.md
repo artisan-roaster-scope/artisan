@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/devices/pid
 layout: single
 permalink: /devices/pid/
 title: "PID"

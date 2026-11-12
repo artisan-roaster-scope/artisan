@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/tostabar
 layout: single
 permalink: /machines/tostabar/
 title: "Tostabar"

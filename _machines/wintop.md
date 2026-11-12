@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/wintop
 layout: single
 permalink: /machines/wintop/
 title: "Wintop"

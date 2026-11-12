@@ -1,4 +1,4 @@
----
+---redirect_to: https://docs.artisan.tools/desktop/machines/caromaq
 layout: single
 permalink: /machines/carmomaq/
 title: "Carmomaq"

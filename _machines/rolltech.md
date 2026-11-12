@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/rolltech
 layout: single
 permalink: /machines/rolltech/
 title: "Rolltech"

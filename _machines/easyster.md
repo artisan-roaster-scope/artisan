@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/easyster
 layout: single
 permalink: /machines/easyster/
 title: "Easyster"

@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/about/#team
 layout: single
 permalink: /authors/holleis/
 header:

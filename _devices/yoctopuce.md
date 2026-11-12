@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/devices/yoctopuce
 layout: single
 permalink: /devices/yoctopuce/
 title: "Yoctopuce"

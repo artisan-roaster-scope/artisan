@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/hive
 layout: single
 permalink: /machines/hive/
 title: "Hive Roaster"

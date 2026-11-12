@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/blog/supplier-partners/
 header:
   image: /assets/images/posts/2021-12-10-Supplier-Partners.webp
   teaser: /assets/images/posts/2021-12-10-Supplier-Partners-teaser.webp

@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/dmr
 layout: single
 permalink: /machines/dmr/
 title: "Dutch Master Roasters"

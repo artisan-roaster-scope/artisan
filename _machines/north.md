@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/north
 layout: single
 permalink: /machines/north/
 title: "North Roasters"

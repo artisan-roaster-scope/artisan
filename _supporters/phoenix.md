@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/phoenix
 layout: single
 permalink: /machines/phoenix/
 title: "Phoenix"

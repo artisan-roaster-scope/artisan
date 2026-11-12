@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/ozturk
 layout: single
 permalink: /machines/ozturk/
 title: "Ozturk"

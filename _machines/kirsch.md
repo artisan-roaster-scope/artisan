@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/kirsch
 layout: single
 permalink: /machines/kirsch/
 title: "Kirsch & Mausser"

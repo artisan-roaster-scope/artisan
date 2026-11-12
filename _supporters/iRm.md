@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/iRm
 layout: single
 permalink: /machines/iRm/
 title: "iRm"

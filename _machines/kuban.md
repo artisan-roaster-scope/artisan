@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/kuban
 layout: single
 permalink: /machines/kuban/
 title: "Kuban"

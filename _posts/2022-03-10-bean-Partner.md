@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/blog/bean-partner
 header:
   image: /assets/images/posts/2022-03-10-bean-Partner.wep
   teaser: /assets/images/posts/2022-03-10-bean-Partner-teaser.webp

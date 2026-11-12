@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/giesen
 layout: single
 permalink: /machines/giesen/
 title: "Giesen"

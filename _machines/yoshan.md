@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/yoshan
 layout: single
 permalink: /machines/yoshan/
 title: "Yoshan"

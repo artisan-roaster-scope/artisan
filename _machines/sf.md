@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/sf
 layout: single
 permalink: /machines/sf/
 title: "San Franciscan"

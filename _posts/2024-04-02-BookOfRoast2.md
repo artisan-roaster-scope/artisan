@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/blog/bookofroast2/
 header:
   image: /assets/images/posts/2024-04-02-BookOfRoast2.jpg.webp
   teaser: /assets/images/posts/2024-04-02-BookOfRoast2-teaser.jpg.webp

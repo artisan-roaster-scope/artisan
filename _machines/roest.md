@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/roest
 layout: single
 permalink: /machines/roest/
 title: "ROEST"

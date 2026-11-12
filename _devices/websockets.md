@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/devices/websockets
 layout: single
 permalink: /devices/websockets/
 title: "WebSockets"

@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/ambex
 layout: single
 permalink: /machines/ambex/
 title: "Ambex"

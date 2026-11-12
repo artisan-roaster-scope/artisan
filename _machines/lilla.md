@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/lilla
 layout: single
 permalink: /machines/lilla/
 title: "Lilla"

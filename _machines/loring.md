@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/loring
 layout: single
 permalink: /machines/loring/
 title: "Loring"

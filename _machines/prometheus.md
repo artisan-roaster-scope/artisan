@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/prometheus
 layout: single
 permalink: /machines/prometheus/
 title: "Prometheus"

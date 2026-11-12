@@ -1,4 +1,4 @@
----
+---redirect_to: https://docs.artisan.tools/desktop/machines/atilla
 layout: single
 permalink: /machines/atilla/
 title: "Atilla"

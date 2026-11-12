@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/blog/kaffeepod
 header:
   image: /assets/images/posts/2022-03-18-KaffeePod.webp
   teaser: /assets/images/posts/2022-03-18-KaffeePod-teaser.webp

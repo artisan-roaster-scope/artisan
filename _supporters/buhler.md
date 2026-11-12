@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/buhler
 layout: single
 permalink: /machines/buhler/
 title: "Bühler"

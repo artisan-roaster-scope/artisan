@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/mugma
 layout: single
 permalink: /machines/mugma/
 title: "Mugma"

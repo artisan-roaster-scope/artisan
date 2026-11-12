@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/devices/lebrew
 layout: single
 permalink: /devices/lebrew/
 title: "RoastSee NEXT"

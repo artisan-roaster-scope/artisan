@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/imf
 layout: single
 permalink: /machines/imf/
 title: "IMF"

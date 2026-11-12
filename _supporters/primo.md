@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/primo
 layout: single
 permalink: /machines/primo/
 title: "Primo"

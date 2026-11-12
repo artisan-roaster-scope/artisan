@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/sci
 layout: single
 permalink: /machines/sci/
 title: "Sweet Coffee Italia"

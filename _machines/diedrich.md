@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/diedrich
 layout: single
 permalink: /machines/diedrich/
 title: "Diedrich"

@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/typhoon
 layout: single
 permalink: /machines/typhoon/
 title: "Typhoon"

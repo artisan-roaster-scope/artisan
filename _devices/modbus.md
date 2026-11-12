@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/devices/modbus
 layout: single
 permalink: /devices/modbus/
 title: "MODBUS"

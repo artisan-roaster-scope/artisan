@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/blueking
 layout: single
 permalink: /machines/blueking/
 title: "BlueKing"

@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/beango
 layout: single
 permalink: /machines/beango/
 title: "BeanGo"

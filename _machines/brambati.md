@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/brambati
 layout: single
 permalink: /machines/brambati/
 title: "Brambati"

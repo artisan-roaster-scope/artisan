@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/prisma
 layout: single
 permalink: /machines/prisma/
 title: "Prisma"

@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/trinitas
 layout: single
 permalink: /machines/trinitas/
 title: "Trinitas"

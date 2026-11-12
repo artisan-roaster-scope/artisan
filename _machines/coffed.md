@@ -1,4 +1,4 @@
----
+---redirect_to: https://docs.artisan.tools/desktop/machines/coffed
 layout: single
 permalink: /machines/coffed/
 title: "Coffed"

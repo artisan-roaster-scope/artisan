@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/coffeetech
 layout: single
 permalink: /machines/coffeetech/
 title: "Coffee Tech"

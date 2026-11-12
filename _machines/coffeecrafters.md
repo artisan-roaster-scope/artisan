@@ -1,4 +1,4 @@
----
+---redirect_to: https://docs.artisan.tools/desktop/machines/coffeecrafters
 layout: single
 permalink: /machines/coffeecrafters/
 title: "Coffee Crafters"

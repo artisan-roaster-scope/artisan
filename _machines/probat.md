@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/probat
 layout: single
 permalink: /machines/probat/
 title: "Probat"

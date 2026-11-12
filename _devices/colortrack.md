@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/devices/colortrack
 layout: single
 permalink: /devices/colortrack/
 title: "ColorTrack"

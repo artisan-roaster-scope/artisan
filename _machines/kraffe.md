@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/kraffe
 layout: single
 permalink: /machines/kraffe/
 title: "Kraffe"

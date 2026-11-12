@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/twino-ozstar
 layout: single
 permalink: /machines/twino-ozstar/
 title: "Twino/Ozstar"

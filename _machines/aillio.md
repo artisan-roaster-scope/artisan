@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/aillio
 layout: single
 permalink: /machines/aillio/
 title: "Aillio"

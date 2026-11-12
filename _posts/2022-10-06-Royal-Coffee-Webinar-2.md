@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/blog/royal-coffee-webinar-2
 header:
   image: /assets/images/posts/2022-10-06-Royal-Coffee-Webinar.webp
   teaser: /assets/images/posts/2022-10-06-Royal-Coffee-Webinar-teaser.webp

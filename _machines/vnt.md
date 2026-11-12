@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/vnt
 layout: single
 permalink: /machines/vnt/
 title: "VNT"

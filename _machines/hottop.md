@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/hottop
 layout: single
 permalink: /machines/hottop/
 title: "Hottop"

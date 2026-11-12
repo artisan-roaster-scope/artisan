@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/proaster
 layout: single
 permalink: /machines/proaster/
 title: "Proaster"

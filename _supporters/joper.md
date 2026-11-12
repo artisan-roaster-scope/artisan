@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/joper
 layout: single
 permalink: /machines/joper/
 title: "Joper"

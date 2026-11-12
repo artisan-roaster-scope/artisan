@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/hb
 layout: single
 permalink: /machines/hb/
 title: "HB-Roaster"

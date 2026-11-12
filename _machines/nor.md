@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/nor
 layout: single
 permalink: /machines/nor/
 title: "NOR Coffee Roaster"

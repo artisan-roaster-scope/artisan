@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/sedona
 layout: single
 permalink: /machines/sedona/
 title: "Sedona"

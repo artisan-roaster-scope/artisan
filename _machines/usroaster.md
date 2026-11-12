@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/usroaster
 layout: single
 permalink: /machines/usroaster/
 title: "US Roaster Corp"

@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/roasterandroaster
 layout: single
 permalink: /machines/roasterandroaster/
 title: "Roaster & Roaster"

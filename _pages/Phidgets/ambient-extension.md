@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/devices/phidgets-ambient-extension/
 layout: single
 permalink: /phidgets/ambient-extension/
 header:

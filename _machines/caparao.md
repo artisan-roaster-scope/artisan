@@ -1,4 +1,4 @@
----
+---redirect_to: https://docs.artisan.tools/desktop/machines/caparo
 layout: single
 permalink: /machines/caparao/
 title: "Caparaó"

@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/fabrica
 layout: single
 permalink: /machines/fabrica/
 title: "Fabrica Coffee Roasters"

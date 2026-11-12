@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/mcr
 layout: single
 permalink: /machines/mcr/
 title: "Mill City Roasters"

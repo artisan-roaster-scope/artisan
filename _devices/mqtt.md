@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/devices/mqtt
 layout: single
 permalink: /devices/mqtt/
 title: "MQTT"

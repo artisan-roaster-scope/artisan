@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/roastmax
 layout: single
 permalink: /machines/roastmax/
 title: "Roastmax"

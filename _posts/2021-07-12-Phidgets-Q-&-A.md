@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/blog/phidgets-q-a/
 header:
   video:
     id: mxKqstWoCDE

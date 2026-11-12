@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/machines/nordic
 layout: single
 permalink: /machines/nordic/
 title: "Nordic"
