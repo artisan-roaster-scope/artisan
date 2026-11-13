@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/reports/roast-reports
 title: "Roast Reports"
 permalink: /docs/roast-reports/
 excerpt: ""

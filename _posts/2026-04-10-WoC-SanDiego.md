@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/blog/woc-sandiego/
 header:
   image: /assets/images/posts/2026-04-10-WoC-SanDiego.webp
   teaser: /assets/images/posts/2026-04-10-WoC-SanDiego_teaser.webp

@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/blog/woc-geneva/
 header:
   image: /assets/images/posts/2025-06-26-WoC-Geneva2.webp
   teaser: /assets/images/posts/2025-06-26-WoC-Geneva_teaser.webp

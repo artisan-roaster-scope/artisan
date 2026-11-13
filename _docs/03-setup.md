@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/getting-started/setup
 title: "Setup"
 permalink: /docs/setup/
 excerpt: "Setup Artisan for a first roast"

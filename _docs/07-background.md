@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/roasting/background
 title: "Background"
 permalink: /docs/background/
 excerpt: ""

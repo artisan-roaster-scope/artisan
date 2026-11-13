@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/getting-started/quick-start-guide
 title: "Quick-Start Guide"
 permalink: /docs/quick-start-guide/
 excerpt: "How to quickly install and setup artisan scope"

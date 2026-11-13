@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/configuration/curves
 title: "Curves"
 permalink: /docs/curves/
 excerpt: ""

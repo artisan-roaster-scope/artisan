@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/features/roast-comparator
 title: "Roast Comparator"
 permalink: /docs/comparator/
 excerpt: ""

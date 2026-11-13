@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/features/shortcuts
 title: "Shortcuts"
 permalink: /docs/shortcuts/
 excerpt: ""

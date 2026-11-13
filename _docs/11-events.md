@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/configuration/events
 title: "Events"
 permalink: /docs/events/
 excerpt: ""

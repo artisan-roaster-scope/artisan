@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/reports/ranking-reports
 title: "Ranking Reports"
 permalink: /docs/ranking-reports/
 excerpt: ""

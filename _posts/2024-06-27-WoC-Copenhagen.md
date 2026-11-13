@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/blog/woc-copenhagen/
 header:
   image: /assets/images/posts/2024-06-27-WoC-Copenhagen.webp
   teaser: /assets/images/posts/2024-06-27-WoC-Copenhagen-teaser.webp

@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/configuration/phases
 title: "Phases"
 permalink: /docs/phases/
 excerpt: ""

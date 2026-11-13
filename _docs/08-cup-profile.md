@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/roasting/cup-profile
 title: "Cup Profile"
 permalink: /docs/cup-profile/
 excerpt: ""

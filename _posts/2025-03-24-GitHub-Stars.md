@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/blog/github-stars/
 header:
   image: /assets/images/posts/2025-03-24-GitHub-Stars.webp
   teaser: /assets/images/posts/2025-03-24-GitHub-Stars-teaser.webp

@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/roasting/properties
 title: "Properties"
 permalink: /docs/properties/
 excerpt: "Roast properties dialog"

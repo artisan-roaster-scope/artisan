@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/configuration/colors
 title: "Colors and Background Image"
 permalink: /docs/colors/
 excerpt: ""

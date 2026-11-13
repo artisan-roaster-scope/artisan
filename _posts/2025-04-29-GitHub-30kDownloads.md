@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/blog/github-30kdownloads/
 header:
   image: /assets/images/posts/2025-04-29-GitHub-30kDownloads.webp
   teaser: /assets/images/posts/2025-04-29-GitHub-30kDownloads-teaser.webp

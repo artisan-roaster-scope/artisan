@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/blog/roastguard/
 header:
   image: /assets/images/posts/2026-06-26-RoastGuard.webp
   teaser: /assets/images/posts/2026-06-26-RoastGuard_teaser.webp

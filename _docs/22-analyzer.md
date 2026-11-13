@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/features/profile-analyzer
 title: "Profile Analyzer"
 permalink: /docs/analyzer/
 excerpt: ""

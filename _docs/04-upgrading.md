@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/getting-started/upgrading
 title: "Upgrading"
 permalink: /docs/upgrading/
 excerpt: "How to upgrade to the latest version"

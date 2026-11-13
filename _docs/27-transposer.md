@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/features/profile-transposer
 title: "Profile Transposer"
 permalink: /docs/transposer/
 excerpt: ""

@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/features/flavor-wheel
 title: "Flavor Wheel"
 permalink: /docs/wheel-graph/
 excerpt: ""

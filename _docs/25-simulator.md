@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/features/roast-simulator
 title: "Roast Simulator"
 permalink: /docs/simulator/
 excerpt: ""

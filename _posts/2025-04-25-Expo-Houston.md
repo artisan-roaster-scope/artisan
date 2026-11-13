@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/blog/expo-houston/
 header:
   image: /assets/images/posts/2025-04-25-Expo-Houston.webp
   teaser: /assets/images/posts/2025-04-25-Expo-Houston-teaser.webp

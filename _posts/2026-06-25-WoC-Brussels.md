@@ -1,4 +1,5 @@
 ---
+redirect_to: https://artisan.tools/blog/woc-brussels/
 header:
   image: /assets/images/posts/2026-06-25-WoC-Brussels.webp
   teaser: /assets/images/posts/2026-06-25-WoC-Brussels_teaser.webp

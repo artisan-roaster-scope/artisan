@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/views/controls
 title: "Controls"
 permalink: /docs/controls/
 excerpt: ""

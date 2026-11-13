@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/configuration/axes
 title: "Axes"
 permalink: /docs/axes/
 excerpt: ""

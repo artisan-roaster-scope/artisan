@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/features/profile-designer
 title: "Designer"
 permalink: /docs/designer/
 excerpt: ""

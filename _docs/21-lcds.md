@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/views/lcds
 title: "LCDs"
 permalink: /docs/lcds/
 excerpt: ""

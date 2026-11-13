@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/configuration/alarms
 title: "Alarms"
 permalink: /docs/alarms/
 excerpt: ""

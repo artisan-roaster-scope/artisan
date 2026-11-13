@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/getting-started/faq
 layout: single
 permalink: /docs/faq/
 title: "FAQ"

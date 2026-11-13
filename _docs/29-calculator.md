@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/features/calculator
 title: "Calculator"
 permalink: /docs/calculator/
 excerpt: ""

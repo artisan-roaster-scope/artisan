@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/reports/production-reports
 title: "Production Reports"
 permalink: /docs/production-reports/
 excerpt: ""

@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/features/profile-converter
 title: "Profile Converter"
 permalink: /docs/converter/
 excerpt: ""

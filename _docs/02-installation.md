@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/getting-started/installation
 title: "Installation"
 permalink: /docs/installation/
 excerpt: "Instructions for installing Artisan"

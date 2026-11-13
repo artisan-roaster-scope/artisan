@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/configuration/sampling
 title: "Sampling"
 permalink: /docs/sampling/
 excerpt: ""

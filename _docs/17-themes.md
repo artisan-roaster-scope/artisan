@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/configuration/themes
 title: "Themes"
 permalink: /docs/themes/
 excerpt: ""

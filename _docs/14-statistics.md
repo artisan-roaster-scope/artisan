@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/configuration/statistics
 title: "Statistics"
 permalink: /docs/statistics/
 excerpt: ""

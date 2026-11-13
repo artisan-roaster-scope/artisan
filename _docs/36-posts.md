@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/resources/posts
 title: "Posts"
 permalink: /docs/posts/
 excerpt: "Blog posts on Artisan"

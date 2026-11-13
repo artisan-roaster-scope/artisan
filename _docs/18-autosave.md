@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/configuration/autosave
 title: "Autosave"
 permalink: /docs/autosave/
 excerpt: ""

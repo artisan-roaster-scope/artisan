@@ -1,4 +1,5 @@
 ---
+redirect_to: https://docs.artisan.tools/desktop/resources/videos
 title: "Videos"
 permalink: /docs/videos/
 excerpt: "Tutorial videos provided by the Community"
