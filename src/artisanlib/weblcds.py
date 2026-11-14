@@ -25,6 +25,9 @@
 # AUTHOR
 # Marko Luther, 2023
 
+
+__lazy_modules__ = { 'threading', 'contextlib', 'weakref', 'jinja2', 'aiohttp_jinja2', 'aiohttp', 'asyncio' }
+
 import time
 import asyncio
 import logging

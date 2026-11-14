@@ -463,7 +463,7 @@ class TestPIDUserAcceptance:
         This ensures the derivative filter helps stabilize control in noisy environments.
         """
         with patch('artisanlib.pid.QSemaphore', return_value=_create_mock_semaphore()), patch(
-            'artisanlib.pid.LiveSosFilter', return_value=_create_mock_live_sos_filter()
+            'artisanlib.filters.LiveSosFilter', return_value=_create_mock_live_sos_filter()
         ):
             from artisanlib.pid import PID
 

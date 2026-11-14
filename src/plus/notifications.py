@@ -27,6 +27,8 @@
 # AUTHOR
 # Marko Luther
 
+__lazy_modules__ = { 'json', 'json.decoder' }
+
 from PyQt6.QtCore import QSemaphore, QTimer, pyqtSlot
 
 from typing import Final, Any

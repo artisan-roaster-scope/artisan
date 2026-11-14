@@ -27,6 +27,7 @@
 # AUTHOR
 # Marko Luther
 
+__lazy_modules__ = { 'threading', 'json', 'json.decoder', 'plus.roast' }
 
 from PyQt6.QtCore import QCoreApplication, QObject, QThread, pyqtSlot, pyqtSignal, QSemaphore
 from PyQt6.QtWidgets import QApplication
@@ -36,7 +37,6 @@ from plus import config, util, roast, connection, sync, controller
 import threading
 import time
 import datetime
-import requests.models
 import json
 import json.decoder
 import logging
@@ -44,6 +44,7 @@ from typing import Final, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     import persistqueue # pylint: disable=unused-import
+    import requests.models # pylint: disable=unused-import
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)

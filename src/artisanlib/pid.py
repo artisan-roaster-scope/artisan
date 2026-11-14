@@ -37,9 +37,9 @@ from typing import Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
     import numpy.typing as npt # pylint: disable=unused-import
+    from artisanlib.filters import LiveSosFilter # pylint: disable=unused-import
 
 
-from artisanlib.filters import LiveSosFilter
 from artisanlib.suppress_errors import suppress_stdout_stderr
 
 from PyQt6.QtCore import QSemaphore
@@ -153,6 +153,7 @@ class PID:
         gamma: float = 1.,
         sampling_rate: float = 1. # >0 in seconds
     ) -> None:
+
         self.pidSemaphore: QSemaphore = QSemaphore(1)
 
         self.outMin: int = 0  # minimum output value
@@ -662,11 +663,12 @@ class PID:
             self.pidSemaphore.release(1)
 
     @staticmethod
-    def irrFilter(sampling_rate:float, wn:float) -> LiveSosFilter:
+    def irrFilter(sampling_rate:float, wn:float) -> 'LiveSosFilter':
         """infinite impulse response filter"""
         # Note: IIR filter can be computed faster but can suffer from artefacts and FIR filters should be preferred. However, IIR filter specification
         # can be easier adjusted to varying samplings rates
         from scipy.signal import iirfilter  # type # ignore[import-untyped]
+        from artisanlib.filters import LiveSosFilter
         return LiveSosFilter(
             iirfilter(
                 1,         # order (higher-order, sharper cut-off, but incr. delay)
@@ -676,10 +678,10 @@ class PID:
                 ftype='butter',
                 output='sos'))
     @staticmethod
-    def derivativeFilter(sampling_rate:float) -> LiveSosFilter:
+    def derivativeFilter(sampling_rate:float) -> 'LiveSosFilter':
         return PID.irrFilter(sampling_rate, 0.1)
     @staticmethod
-    def outputFilter(sampling_rate:float) -> LiveSosFilter:
+    def outputFilter(sampling_rate:float) -> 'LiveSosFilter':
         return PID.irrFilter(sampling_rate, 0.35)
 
     def setOutputFilterLevel(self, v:int, reset:bool = True) -> None:

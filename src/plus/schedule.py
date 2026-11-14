@@ -27,6 +27,8 @@
 # AUTHOR
 # Marko Luther
 
+__lazy_modules__ = { 'json', 'pydantic', 'uuid' }
+
 import os
 import time
 import math
@@ -2642,10 +2644,9 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                 self.task_frame.show()
                 self.main_splitter.setSizes([0, splitter_sizes[0]+splitter_sizes[1]])
                 self.setUpdatesEnabled(True)
-            elif index == 1 and splitter_sizes[0] == 0 and self.task_frame.isVisible():
-                if not self.task_frame_hide:
-                    self.task_frame_hide = True
-                    QTimer.singleShot(1000, self.hide_task_frame)
+            elif index == 1 and splitter_sizes[0] == 0 and self.task_frame.isVisible() and not self.task_frame_hide:
+                self.task_frame_hide = True
+                QTimer.singleShot(1000, self.hide_task_frame)
 
     def hide_filter_frame(self) -> None:
         if self.filter_frame_hide:
@@ -2664,10 +2665,9 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                 self.remaining_filter_group.show()
                 self.remaining_splitter.setSizes([splitter_sizes[0]+splitter_sizes[1], 0])
                 self.setUpdatesEnabled(True)
-            elif index == 1 and splitter_sizes[1] == 0 and self.remaining_filter_group.isVisible():
-                if not self.filter_frame_hide:
-                    self.filter_frame_hide = True
-                    QTimer.singleShot(1000, self.hide_filter_frame)
+            elif index == 1 and splitter_sizes[1] == 0 and self.remaining_filter_group.isVisible() and not self.filter_frame_hide:
+                self.filter_frame_hide = True
+                QTimer.singleShot(1000, self.hide_filter_frame)
 
     def hide_completed_frame(self) -> None:
         if self.completed_details_scrollarea_hide:
@@ -2686,10 +2686,9 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                 self.completed_details_scrollarea.show()
                 self.completed_splitter.setSizes([splitter_sizes[0]+splitter_sizes[1], 0])
                 self.setUpdatesEnabled(True)
-            elif index == 1 and splitter_sizes[1] == 0 and self.completed_details_scrollarea.isVisible():
-                if not self.completed_details_scrollarea_hide:
-                    self.completed_details_scrollarea_hide = True
-                    QTimer.singleShot(1000, self.hide_completed_frame)
+            elif index == 1 and splitter_sizes[1] == 0 and self.completed_details_scrollarea.isVisible() and not self.completed_details_scrollarea_hide:
+                self.completed_details_scrollarea_hide = True
+                QTimer.singleShot(1000, self.hide_completed_frame)
 
     @pyqtSlot(bool)
     def disconnected_link_handler(self, _b:bool) -> None:

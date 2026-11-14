@@ -27,9 +27,6 @@ Original Author: user763305
 Notes: modified to remove blocking sockets remaining from died server; Updated to support Qt6
 """
 
-import sys
-import multiprocessing as mp
-
 from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -49,11 +46,6 @@ class QtSingleApplication(QApplication):
         '_isRunningViewer', '_outSocketViewer', '_inStream', '_outStream', '_outStreamViewer' ]
 
     def __init__(self, _id:str, _viewer_id:str, *argv: Any) -> None:
-
-        if sys.platform.startswith('darwin') and mp.current_process().name == 'WebLCDs':
-            import AppKit # type: ignore[import-untyped] # pylint: disable=import-error
-            info = AppKit.NSBundle.mainBundle().infoDictionary()  # type:ignore[attr-defined, unused-ignore] # @UndefinedVariable # pylint: disable=maybe-no-member
-            info['LSBackgroundOnly'] = '1'
 
         super().__init__(*argv)
 

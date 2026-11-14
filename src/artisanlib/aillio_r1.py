@@ -25,6 +25,8 @@
 # AUTHOR
 # Rui Paulo, 2023
 
+__lazy_modules__ = { 'threading' }
+
 import time
 import re
 import array
@@ -43,11 +45,6 @@ from PyQt6.QtCore import Qt, QDateTime, QLocale
 
 if system().startswith('Windows'):
     import libusb_package # type:ignore [import-not-found, unused-ignore] # pyright:ignore[reportMissingImports] # pylint: disable=import-error
-
-#import requests
-#from requests_file import FileAdapter # @UnresolvedImport
-#import json
-#from lxml import html # unused
 
 import logging
 from typing import Final, Any, TYPE_CHECKING

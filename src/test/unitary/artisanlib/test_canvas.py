@@ -731,29 +731,6 @@ class TestCalcFlavorChartScoreFromFlavors:
         assert result != result_no_correction
 
 
-class TestDeviceLogMethods:
-    """Test deviceLogDEBUG and deviceLLogINFO static methods."""
-
-    @patch('Phidget22.Devices.Log.Log')
-    @patch('Phidget22.LogLevel.LogLevel')
-    def test_deviceLogDEBUG(self, mock_log_level: Any, mock_log: Any) -> None:
-        """Test deviceLogDEBUG sets verbose log level."""
-        # Act
-        tgraphcanvas.deviceLogDEBUG()
-
-        # Assert
-        mock_log.setLevel.assert_called_once_with(mock_log_level.PHIDGET_LOG_VERBOSE)
-
-    @patch('Phidget22.Devices.Log.Log')
-    @patch('Phidget22.LogLevel.LogLevel')
-    def test_deviceLLogINFO(self, mock_log_level: Any, mock_log: Any) -> None:
-        """Test deviceLLogINFO sets info log level."""
-        # Act
-        tgraphcanvas.deviceLLogINFO()
-
-        # Assert
-        mock_log.setLevel.assert_called_once_with(mock_log_level.PHIDGET_LOG_INFO)
-
 
 class TestCalcMeterRead:
     """Test calc_meter_read static method."""

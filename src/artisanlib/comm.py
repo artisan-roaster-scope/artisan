@@ -25,6 +25,16 @@
 # AUTHOR
 # Marko Luther, 2023
 
+
+__lazy_modules__ = {'threading', 'shlex', 'yoctopuce.yocto_api', 'Phidget22', 'Phidget22.Phidget',
+    'Phidget22.Devices.Manager', 'Phidget22.Devices', 'Phidget22.Net', 'Phidget22.PhidgetException',
+    'Phidget22.DeviceID', 'Phidget22.Devices.TemperatureSensor',
+    'Phidget22.Devices.HumiditySensor', 'Phidget22.Devices.PressureSensor', 'Phidget22.Devices.VoltageRatioInput',
+    'Phidget22.Devices.VoltageInput', 'Phidget22.Devices.DigitalInput', 'Phidget22.Devices.DigitalOutput',
+    'Phidget22.Devices.VoltageOutput', 'Phidget22.Devices.RCServo', 'Phidget22.Devices.CurrentInput', 'Phidget22.Devices.Stepper',
+    'Phidget22.Devices.FrequencyCounter', 'Phidget22.Devices.DCMotor', 'Phidget22.Devices.BLDCMotor' }
+
+
 import os
 import sys
 import struct
@@ -35,7 +45,6 @@ import shlex
 import threading
 import platform
 import logging
-import requests
 from collections.abc import Callable
 from typing import override, Final, Any, cast, TYPE_CHECKING
 
@@ -48,7 +57,7 @@ if TYPE_CHECKING:
     from Phidget22.RTDType import RTDType # pylint: disable=unused-import
     from Phidget22.RTDWireSetup import RTDWireSetup # pylint: disable=unused-import
     from Phidget22.BridgeGain import BridgeGain # pylint: disable=unused-import
-    from Phidget22 import TemperatureSensor # pylint: disable=unused-import
+    from Phidget22 import TemperatureSensor, DeviceID # pylint: disable=unused-import
     from yoctopuce.yocto_voltageoutput import YVoltageOutput # type: ignore[import-untyped] # pylint: disable=unused-import
     from yoctopuce.yocto_currentloopoutput import YCurrentLoopOutput # type: ignore[import-untyped] # pylint: disable=unused-import
     from yoctopuce.yocto_relay import YRelay # type: ignore[import-untyped] # pylint: disable=unused-import
@@ -723,25 +732,31 @@ class serialport:
         if not self.aw.pidcontrol.externalPIDControl() and \
             (self.aw.qmc.device == 19 or self.aw.qmc.device in {29, 79}):
                 # TC4 (19) or MODBUS/S7 (29/79) with Artisan Software PID
-            duty = self.aw.qmc.pid.getDuty()
-            duty = (-1.0 if duty is None else min(100.0, max(-100.0, duty)))
-            self.aw.qmc.updateLargePIDLCDs(sv=lcdformat%self.aw.qmc.pid.target, duty=lcdformat%duty)
-            return self.aw.qmc.timeclock.elapsedMilli(), duty, self.aw.qmc.pid.target
+            duty = -1.0
+            target = -1.0
+            if self.aw.qmc.pid is not None:
+                d = self.aw.qmc.pid.getDuty()
+                if d is not None:
+                    duty = d
+                target = self.aw.qmc.pid.target
+            self.aw.qmc.updateLargePIDLCDs(sv=lcdformat%target, duty=lcdformat%duty)
+            return self.aw.qmc.timeclock.elapsedMilli(), duty, target
         sv = self.aw.pidcontrol.sv if self.aw.pidcontrol.sv is not None else -1
-        if self.aw.qmc.device == 29: # external MODBUS PID
-            duty = -1
-        else:
-            duty = self.aw.qmc.pid.getDuty()
-            duty = (-1.0 if duty is None else min(100.0, max(-100.0, duty)))
+        # external MODBUS PID
+        duty = -1
         self.aw.qmc.updateLargePIDLCDs(sv=lcdformat%sv, duty=lcdformat%duty)
         return tx, duty, sv
 
     def pidPtermIterm(self) -> tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()
+        if self.aw.qmc.pid is None:
+            return tx, -1, -1
         return tx, self.aw.qmc.pid.getIterm(), self.aw.qmc.pid.getPterm()
 
     def pidDtermError(self) -> tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()
+        if self.aw.qmc.pid is None:
+            return tx, -1, -1
         return tx, self.aw.qmc.pid.getError(), self.aw.qmc.pid.getDterm()
 
     def Shelly3EMPro_EnergyReturn(self) -> tuple[float,float,float]:
@@ -751,6 +766,7 @@ class serialport:
         try:
             shelly_connect_timeout = 0.5
             shelly_read_timeout = 0.5
+            import requests
             r = requests.get(f'http://{self.aw.shelly_3EMPro_host}/rpc/EMData.GetStatus?id=0',
                 headers={'Content-Type': 'application/json'},
                 timeout=(shelly_connect_timeout, shelly_read_timeout))
@@ -772,6 +788,7 @@ class serialport:
         try:
             shelly_connect_timeout = 0.5
             shelly_read_timeout = 0.5
+            import requests
             r = requests.get(f'http://{self.aw.shelly_3EMPro_host}/rpc/EM.GetStatus?id=0',
                 headers={'Content-Type': 'application/json'},
                 timeout=(shelly_connect_timeout, shelly_read_timeout))
@@ -796,6 +813,7 @@ class serialport:
         try:
             shelly_connect_timeout = 0.5
             shelly_read_timeout = 0.5
+            import requests
             r = requests.get(f'http://{self.aw.shelly_PlusPlug_host}/rpc/Switch.GetStatus?id=0',
                 headers={'Content-Type': 'application/json'},
                 timeout=(shelly_connect_timeout, shelly_read_timeout))
@@ -4035,7 +4053,8 @@ class serialport:
 
     # this one is reused for the 1045 (IR), the 1051 (1xTC), TMP1100 (1xTC), and TMP1200/TMP1202 (1xRTD)
     # if alternative_conf is set, the second configuration for the TMP1200/TMP1202 module is used
-    def PHIDGET1045temperature(self, deviceType:int=DeviceID.PHIDID_1045, retry:bool = True, alternative_conf:bool = False) -> tuple[float, float]:
+    def PHIDGET1045temperature(self, deviceType:int=32,#=DeviceID.PHIDID_1045,
+            retry:bool = True, alternative_conf:bool = False) -> tuple[float, float]:
         try:
             if self.PhidgetIRSensor is None and self.aw.qmc.phidgetManager is not None:
                 ser,port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetTemperatureSensor',deviceType,
@@ -4333,7 +4352,8 @@ class serialport:
 
     # mode = 0 for probe 1 and 2; mode = 1 for probe 3 and 4; mode 2 for Ambient Temperature
     # works for the 4xTC USB_Phidget 1048 and the 4xTC VINT Phidget TMP1101
-    def PHIDGET1048temperature(self, deviceType:int = DeviceID.PHIDID_1048, mode:int = 0, retry:bool = True) -> tuple[float, float]:
+    def PHIDGET1048temperature(self, deviceType:int = 26, #='DeviceID.PHIDID_1048',
+            mode:int = 0, retry:bool = True) -> tuple[float, float]:
         try:
             if not self.PhidgetTemperatureSensor and self.aw.qmc.phidgetManager is not None:
                 ser = None
@@ -6231,7 +6251,9 @@ class serialport:
             if deviceType in [DeviceID.PHIDID_VCP1000, DeviceID.PHIDID_VCP1001, DeviceID.PHIDID_VCP1002]:
                 try:
                     voltageRangeIdx = self.aw.qmc.phidgetVCP100x_voltageRanges[channel]
-                    cast(VoltageInput, self.PhidgetIO[idx]).setVoltageRange(self.aw.qmc.phidgetVCP100x_voltageRangeValues[voltageRangeIdx])
+#                    cast(VoltageInput, self.PhidgetIO[idx]).setVoltageRange(self.aw.qmc.phidgetVCP100x_voltageRangeValues[voltageRangeIdx])
+                    from Phidget22.VoltageRange import VoltageRange
+                    cast(VoltageInput, self.PhidgetIO[idx]).setVoltageRange(VoltageRange(self.aw.qmc.phidgetVCP100x_voltageRangeValues[voltageRangeIdx]))
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
             # set the PowerSupply for the DAQ1400
@@ -6399,8 +6421,8 @@ class serialport:
 
     # the API parameter is one of "voltage", "digital", "current", "frequency"
     # if single is set, only the first channel of the two is allocated
-    def PHIDGET1018values(self, deviceType:int = DeviceID.PHIDID_1010_1013_1018_1019, mode:int = 0, API:str = 'voltage', retry:bool = True, single:bool = False) -> tuple[float, float]:
-
+    def PHIDGET1018values(self, deviceType:int = 6, #='DeviceID.PHIDID_1010_1013_1018_1019',
+            mode:int = 0, API:str = 'voltage', retry:bool = True, single:bool = False) -> tuple[float, float]:
         try:
             if self.PhidgetIO is None and self.aw.qmc.phidgetManager is not None:
                 ser:int|None = None

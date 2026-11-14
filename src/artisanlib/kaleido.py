@@ -25,6 +25,7 @@
 # AUTHOR
 # Marko Luther, 2023
 
+__lazy_modules__ = { 'asyncio', 'websockets', 'pymodbus.transport.serialtransport' }
 
 import asyncio
 import websockets

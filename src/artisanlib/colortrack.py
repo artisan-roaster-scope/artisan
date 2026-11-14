@@ -25,6 +25,8 @@
 # AUTHOR
 # Marko Luther, 2024
 
+__lazy_modules__ = { 'asyncio' }
+
 import asyncio
 import logging
 import numpy as np
@@ -43,7 +45,6 @@ if TYPE_CHECKING:
 
 from artisanlib.async_comm import AsyncComm
 from artisanlib.ble_port import ClientBLE
-from artisanlib.filters import LiveMean, LiveMedian
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -121,6 +122,8 @@ class ColorTrackBLE(ClientBLE):
                        connected_handler:Callable[[], None]|None = None,
                        disconnected_handler:Callable[[], None]|None = None):
         super().__init__()
+
+        from artisanlib.filters import LiveMean, LiveMedian
 
         # handlers
         self._connected_handler = connected_handler

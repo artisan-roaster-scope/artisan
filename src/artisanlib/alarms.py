@@ -301,6 +301,8 @@ class AlarmDlg(ArtisanResizeablDialog):
             ok_button: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
             if ok_button is not None:
                 ok_button.setFocus()
+                ok_button.setDefault(True)
+                ok_button.setAutoDefault(True)
         else:
             self.TabWidget.setFocus()
 

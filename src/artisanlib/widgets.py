@@ -25,6 +25,8 @@
 # AUTHOR
 # Marko Luther, 2023
 
+__lazy_modules__ = { 'contextlib' }
+
 from contextlib import contextmanager
 from collections.abc import Generator, Callable
 from typing import override, Any, TYPE_CHECKING

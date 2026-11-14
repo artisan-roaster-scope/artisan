@@ -27,6 +27,8 @@
 # AUTHOR
 # Marko Luther
 
+__lazy_modules__ = { 'json' }
+
 from PyQt6.QtCore import QSemaphore, QObject, QThread, pyqtSlot, pyqtSignal
 from PyQt6.QtWidgets import QApplication
 
@@ -35,15 +37,16 @@ import json
 import time
 import datetime
 import html
-import requests
-import requests.models
 import logging
 import functools
 
 from artisanlib.util import (decodeLocal, encodeLocal, getDirectory, is_int_list, is_float_list, render_weight,
     weight_units, float2float, convertWeight)
 from plus import config, connection, controller, util
-from typing import Final, TypedDict, TextIO, NotRequired
+from typing import Final, TypedDict, TextIO, NotRequired, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import requests.models # pylint: disable=unused-import
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)

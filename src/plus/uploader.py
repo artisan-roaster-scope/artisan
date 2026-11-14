@@ -25,11 +25,13 @@
 # AUTHOR
 # Marko Luther, 2026
 
+__lazy_modules__ = { 'asyncio', 'uuid', 'aiohttp', 'aiohttp_retry'}
+
 import logging
 import asyncio
-import aiohttp
 import uuid
 import concurrent.futures
+import aiohttp
 from aiohttp_retry import RetryClient, ExponentialRetry
 from collections.abc import Callable
 from typing import Final, TYPE_CHECKING

@@ -22,11 +22,10 @@
 # MAINTAINER
 # Marko Luther, 2026
 
-#from pathlib import Path
-#import os
+__lazy_modules__ = { 'json' }
+
 import time as libtime
 import json
-#import re
 import logging
 from collections.abc import Callable
 from typing import Final

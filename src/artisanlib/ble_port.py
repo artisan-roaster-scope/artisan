@@ -25,6 +25,8 @@
 # AUTHOR
 # Marko Luther, 2024
 
+__lazy_modules__ = { 'asyncio' }
+
 import asyncio
 import logging
 from concurrent.futures import CancelledError as FutureCancelledError, Future
@@ -591,7 +593,9 @@ class ClientBLE(QObject):
         elif service_uuid not in self._device_descriptions:
             self._device_descriptions[service_uuid] = { device_name }
         elif self._device_descriptions[service_uuid] is not None:
-            self._device_descriptions[service_uuid].add(device_name) # type:ignore[union-attr]
+            device_descriptions_service_uuid = self._device_descriptions[service_uuid]
+            if device_descriptions_service_uuid is not None:
+                device_descriptions_service_uuid.add(device_name)
         #
         if service_uuid is not None and device_name is not None and device_manufacturer_key is not None:
             if service_uuid not in self._device_manufacturer_keys:

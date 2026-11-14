@@ -25,6 +25,8 @@
 # AUTHOR
 # Marko Luther, 2026
 
+__lazy_modules__ = { 'asyncio' }
+
 import io
 import os
 import asyncio

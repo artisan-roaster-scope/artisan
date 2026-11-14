@@ -248,14 +248,14 @@ class TestServiceUrls:
     def test_web_base_url(self) -> None:
         """Test web base URL configuration."""
         # Assert
-        assert config.web_base_url == 'https://artisan.plus'
+        assert config.web_base_url == 'https://artisan.tools'
         assert isinstance(config.web_base_url, str)
         assert config.web_base_url.startswith('https://')
 
     def test_shop_base_url(self) -> None:
         """Test shop base URL configuration."""
         # Assert
-        assert config.shop_base_url == 'https://buy.artisan.plus/'
+        assert config.shop_base_url == 'https://artisan.tools/shop/'
         assert isinstance(config.shop_base_url, str)
         assert config.shop_base_url.startswith('https://')
 

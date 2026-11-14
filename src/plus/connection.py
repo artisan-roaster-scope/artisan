@@ -27,10 +27,15 @@
 # AUTHOR
 # Marko Luther
 
+__lazy_modules__ = { 'json', 'json.decoder', 'cryptography.fernet' }
+
 from PyQt6.QtCore import QSemaphore
 
 from artisanlib import __version__
-from typing import Final, Any, Protocol
+from typing import Final, Any, Protocol, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import requests.models # pylint: disable=unused-import
 
 import time
 import uuid
@@ -41,9 +46,6 @@ import json
 import json.decoder
 import logging
 import dateutil.parser
-import requests
-import requests.models
-import requests.exceptions
 from cryptography.fernet import Fernet
 
 from plus import config, account, util
@@ -173,6 +175,7 @@ def make_authentify() -> Authentifier:
         def seed() -> None:
             return None
 
+        import requests.exceptions
         try:
             aw = config.app_window
             if (
@@ -408,7 +411,7 @@ def sendData(
     verb: str, # POST or PUT
     authorized: bool = True,
     compress: bool = config.compress_posts,
-) -> requests.models.Response:
+) -> 'requests.models.Response':
     # don't log POST data as it might contain credentials!
     _log.debug('sendData(%s,_data_,%s,%s)', url, verb, authorized)
     jsondata = json.dumps(data, indent=None, separators=(',', ':'), ensure_ascii=False).encode('utf8')
@@ -417,6 +420,8 @@ def sendData(
     headers, postdata = getHeadersAndData(authorized, compress, jsondata, verb)
 #    _log.debug("PRINT headers: %s",headers)
 
+    import requests
+    import requests.exceptions
     try:
         if verb == 'POST':
             r = requests.post(
@@ -469,7 +474,7 @@ def sendData(
         raise e
 
 
-def getData(url: str, authorized: bool = True, params:dict[str,str]|None = None) -> requests.models.Response|None:
+def getData(url: str, authorized: bool = True, params:dict[str,str]|None = None) -> 'requests.models.Response|None':
     _log.debug('getData(%s,%s,%s)', url, authorized, params)
     headers = getHeaders(authorized)
     if authorized and 'Authorization' not in headers:
@@ -479,6 +484,8 @@ def getData(url: str, authorized: bool = True, params:dict[str,str]|None = None)
             return None
     params = params or {}
     # _log.debug("-> request headers %s",headers)
+    import requests
+    import requests.exceptions
     try:
         r:requests.models.Response = requests.get(
             url,

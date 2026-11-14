@@ -25,6 +25,8 @@
 # AUTHOR
 # Marko Luther, 2026
 
+__lazy_modules__ = { 'contextlib', 'threading', 'asyncio', 'serial', 'serial.serialutil', 'pymodbus.transport.serialtransport' }
+
 import os
 import sys
 import time
@@ -269,8 +271,8 @@ async def create_serial_connection(
             _log.error(e)
 
     # in any case we open the serial port
-    if not transport.sync_serial.is_open:
-        transport.sync_serial.open()
+    if not transport.sync_serial.is_open: # ty:ignore[missing-union-attribute]
+        transport.sync_serial.open() # ty:ignore[missing-union-attribute]
 
     # and if clear_HUPCL, we immediately set the dtr/rts again
     if clear_HUPCL:

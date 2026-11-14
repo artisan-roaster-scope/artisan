@@ -1492,6 +1492,9 @@ class PIDcontrol:
     # if reset the PID is initialized which resets its iTerm to 0 and initializes the derivative filter with the configured sampling rate
     def confSoftwarePID(self, reset:bool=False) -> None:
         # software PID
+        if self.aw.qmc.pid is None:
+            from artisanlib import pid
+            self.aw.qmc.pid = pid.PID()
         self.aw.qmc.pid.setSamplingRate(self.aw.qmc.delay/1000)
         self.aw.qmc.pid.setPID(self.pidKp,self.pidKi,self.pidKd)
         self.aw.qmc.pid.setWeights(self.pidPsetpointWeight,self.pidDsetpointWeight)
@@ -1573,24 +1576,29 @@ class PIDcontrol:
             if send_command:
                 self.aw.kaleido.pidON()
             self.pidActive = True
+            if self.aw.qmc.pid is None:
+                from artisanlib import pid
+                self.aw.qmc.pid = pid.PID()
             self.aw.qmc.pid.on()
             self.aw.buttonCONTROL.setStyleSheet(push_button_style(bool(self.aw.simulator), 'PIDactive',
                 min_height=self.aw.main_button_min_height,
                 min_width=self.aw.main_button_min_width,
                 font_size=self.aw.button_font_size,
                 border_radius=self.aw.button_border_radius))
-        elif self.aw.qmc.Controlbuttonflag:
+        elif self.aw.qmc.Controlbuttonflag and not self.pidActive: # only if not yet active!
             # software PID
-            if not self.pidActive: # only if not yet active!
-                self.confSoftwarePID()
-                self.pidActive = True
-                self.aw.qmc.pid.on()
-                self.aw.buttonCONTROL.setStyleSheet(push_button_style(bool(self.aw.simulator), 'PIDactive',
-                    min_height=self.aw.main_button_min_height,
-                    min_width=self.aw.main_button_min_width,
-                    font_size=self.aw.button_font_size,
-                    border_radius=self.aw.button_border_radius))
-                self.aw.qmc.pid.setTarget(self.svValue,init=False)
+            self.confSoftwarePID()
+            self.pidActive = True
+            if self.aw.qmc.pid is None:
+                from artisanlib import pid
+                self.aw.qmc.pid = pid.PID()
+            self.aw.qmc.pid.on()
+            self.aw.buttonCONTROL.setStyleSheet(push_button_style(bool(self.aw.simulator), 'PIDactive',
+                min_height=self.aw.main_button_min_height,
+                min_width=self.aw.main_button_min_width,
+                font_size=self.aw.button_font_size,
+                border_radius=self.aw.button_border_radius))
+            self.aw.qmc.pid.setTarget(self.svValue,init=False)
         if self.sv is None and self.svMode == 0: # only in manual SV mode we initialize the SV on PID ON
             self.setSV(self.svValue)
 
@@ -1647,6 +1655,9 @@ class PIDcontrol:
             if send_command:
                 self.aw.kaleido.pidOFF()
             self.pidActive = False
+            if self.aw.qmc.pid is None:
+                from artisanlib import pid
+                self.aw.qmc.pid = pid.PID()
             self.aw.qmc.pid.off()
             self.aw.buttonCONTROL.setStyleSheet(push_button_style(bool(self.aw.simulator), 'PID',
                 min_height=self.aw.main_button_min_height,
@@ -1654,10 +1665,11 @@ class PIDcontrol:
                 font_size=self.aw.button_font_size,
                 border_radius=self.aw.button_border_radius))
         elif self.aw.qmc.Controlbuttonflag:
-            # software PID
-            self.aw.qmc.pid.setControl(lambda _: None)
             self.pidActive = False
-            self.aw.qmc.pid.off()
+            # software PID
+            if self.aw.qmc.pid is not None:
+                self.aw.qmc.pid.setControl(lambda _: None)
+                self.aw.qmc.pid.off()
             if not self.aw.HottopControlActive:
                 self.aw.buttonCONTROL.setStyleSheet(push_button_style(bool(self.aw.simulator), 'PID',
                     min_height=self.aw.main_button_min_height,
@@ -1806,6 +1818,9 @@ class PIDcontrol:
 
     def setDutySteps(self, dutySteps:int) -> None:
         if self.aw.qmc.Controlbuttonflag and not self.externalPIDControl():
+            if self.aw.qmc.pid is None:
+                from artisanlib import pid
+                self.aw.qmc.pid = pid.PID()
             self.aw.qmc.pid.setDutySteps(dutySteps)
 
 
@@ -1856,6 +1871,9 @@ class PIDcontrol:
             # in all other cases if the "Control" flag is ticked: software PID
             if move and self.svSlider:
                 self.aw.moveSVslider(sv,setValue=True)
+            if self.aw.qmc.pid is None:
+                from artisanlib import pid
+                self.aw.qmc.pid = pid.PID()
             self.aw.qmc.pid.setTarget(sv,init=init)
             self.sv = sv # remember last sv
             self.svValue = sv
@@ -1948,6 +1966,9 @@ class PIDcontrol:
                 self.pidPsetpointWeight = beta
             if gamma is not None:
                 self.pidDsetpointWeight = gamma
+            if self.aw.qmc.pid is None:
+                from artisanlib import pid
+                self.aw.qmc.pid = pid.PID()
             self.aw.qmc.pid.setWeights(beta, gamma)
 
     # send p-i-d conf to connected PID
@@ -1989,6 +2010,9 @@ class PIDcontrol:
                     if self.aw.ser.COMsemaphore.available() < 1:
                         self.aw.ser.COMsemaphore.release(1)
         elif self.aw.qmc.Controlbuttonflag: # in all other cases if the "Control" flag is ticked
+            if self.aw.qmc.pid is None:
+                from artisanlib import pid
+                self.aw.qmc.pid = pid.PID()
             self.aw.qmc.pid.setPID(kp,ki,kd)
             self.pidKp = kp
             self.pidKi = ki

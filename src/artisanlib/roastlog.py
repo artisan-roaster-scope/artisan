@@ -24,8 +24,6 @@
 
 import time as libtime
 import dateutil.parser
-import requests
-from requests_file import FileAdapter
 import re
 from lxml import html
 import logging
@@ -52,6 +50,8 @@ def extractProfileRoastLog(url:'QUrl',
         _eventsExternal2InternalValue:Callable[[int],float]) -> ProfileData|None:
     res:ProfileData = ProfileData() # the interpreted data set
     try:
+        import requests
+        from requests_file import FileAdapter
         s = requests.Session()
         s.mount('file://', FileAdapter())
         page = s.get(url.toString(), timeout=(4, 15), headers={'Accept-Encoding' : 'gzip'})

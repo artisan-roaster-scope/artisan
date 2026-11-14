@@ -25,6 +25,8 @@
 # AUTHOR
 # Marko Luther, 2023
 
+__lazy_modules__ = { 'asyncio' }
+
 import time
 import logging
 import asyncio

@@ -42,7 +42,6 @@ if TYPE_CHECKING:
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
-from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtCore import Qt, pyqtSlot, QSettings, QTimer, QRegularExpression, QSignalBlocker, QSize
 from PyQt6.QtGui import (QStandardItemModel, QStandardItem, QColor, QIntValidator, QRegularExpressionValidator, QPixmap, QIcon)
 from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
@@ -1838,6 +1837,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
             green_icon_path = os.path.join(getResourcePath(),'Icons',
                 ('coffee_dark.svg' if aw.app.darkmode else 'coffee_light.svg'))
+            from PyQt6.QtSvgWidgets import QSvgWidget
             self.taskWebDisplayGreenIcon = QSvgWidget(green_icon_path)
             self.taskWebDisplayGreenIcon.setFixedSize(40,40)
 

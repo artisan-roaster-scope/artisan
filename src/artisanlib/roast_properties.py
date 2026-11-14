@@ -25,6 +25,8 @@
 # AUTHOR
 # Marko Luther, 2023
 
+__lazy_modules__ = { 'plus', 'plus.queue', 'plus.blend', 'plus.stock' }
+
 import sys
 import math
 import platform
@@ -955,8 +957,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         weightoutdefectsToggle = QToolButton()
         weightoutdefectsToggle.setText('')
         weightoutdefectsToggle.setStyleSheet(tool_button_icon_style(self.aw.app.darkmode, 'arrow-reload-horizontal-stroke-rounded-light.svg', 'arrow-reload-horizontal-stroke-rounded-dark.svg'))
-        weightoutdefectsToggle.setMinimumWidth(20)
-        weightoutdefectsToggle.setMinimumHeight(20)
+        weightoutdefectsToggle.setMinimumWidth(28)
+        weightoutdefectsToggle.setMinimumHeight(28)
         weightoutdefectsToggle.setToolTip(QApplication.translate('Tooltip', 'toggle defects input mode'))
         weightoutdefectsToggle.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         weightoutdefectsToggle.clicked.connect(self.toggleWeightOutDefects)
@@ -1038,8 +1040,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         volumeCalcButton = QToolButton()
         volumeCalcButton.setToolTip(QApplication.translate('Tooltip', 'Volume calculator to determine coffee volume from sample weight measured in container of known volume'))
         volumeCalcButton.setText('')
-        volumeCalcButton.setMinimumWidth(20)
-        volumeCalcButton.setMinimumHeight(20)
+        volumeCalcButton.setMinimumWidth(28)
+        volumeCalcButton.setMinimumHeight(28)
         volumeCalcButton.setText('')
         volumeCalcButton.setStyleSheet(tool_button_icon_style(self.aw.app.darkmode, 'calculate-stroke-rounded_light.svg', 'calculate-stroke-rounded_dark.svg'))
 
@@ -1442,8 +1444,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.plus_custom_blend_button = QToolButton()
             self.plus_custom_blend_button.setToolTip(QApplication.translate('Tooltip','Define a custom blend'))
             self.plus_custom_blend_button.setText('')
-            self.plus_custom_blend_button.setMinimumWidth(20)
-            self.plus_custom_blend_button.setMinimumHeight(20)
+            self.plus_custom_blend_button.setMinimumWidth(28)
+            self.plus_custom_blend_button.setMinimumHeight(28)
             self.plus_custom_blend_button.setStyleSheet(tool_button_icon_style(self.aw.app.darkmode, 'pencil-edit-02-stroke-rounded-light.svg', 'pencil-edit-02-stroke-rounded-dark.svg'))
             self.plus_custom_blend_button.setEnabled(False)
             self.plus_custom_blend_button.clicked.connect(self.customBlendButton_triggered)

@@ -35,7 +35,6 @@ from typing import override, Final, TYPE_CHECKING
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
 
-from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QGroupBox, QHBoxLayout, # QCheckBox,
     QVBoxLayout, QLabel, QLineEdit, QDialogButtonBox, QWidget, QLayout)
 from PyQt6.QtCore import Qt, pyqtSlot
@@ -73,6 +72,7 @@ class Login(ArtisanDialog):
 
         basedir = os.path.join(getResourcePath(),'Icons')
         register_icon_path = os.path.join(basedir, ('user-add-01-stroke-rounded-dark.svg' if aw.app.darkmode else 'user-add-01-stroke-rounded-light.svg'))
+        from PyQt6.QtSvgWidgets import QSvgWidget
         self.register_icon = QSvgWidget(register_icon_path)
         self.register_icon.setMaximumSize(15,15)
 

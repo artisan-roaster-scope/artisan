@@ -25,6 +25,8 @@
 # AUTHOR
 # Marko Luther, 2024
 
+__lazy_modules__ = { 'asyncio' }
+
 import asyncio
 import logging
 from collections.abc import Callable

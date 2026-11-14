@@ -25,6 +25,8 @@
 # AUTHOR
 # Marko Luther, 2026
 
+__lazy_modules__ = { 'ssl', 'json' }
+
 import ssl
 import platform
 import json
@@ -123,14 +125,14 @@ class mqttport:
             self.aw.qmc.adderror(QApplication.translate('Error Message','MQTT failed to connect to {0}: {1}').format(self.host,status))
 
     def on_disconnect_handler(self, _client:'mqtt.Client', _userdata:Any, _disconnect_flags:'DisconnectFlags|None', status:'ReasonCodes', _properties:'Properties|None') -> None:
-        _log.debug('MQTT disconnected: %s', status.getName()) # type:ignore[no-untyped-call]
+        _log.debug('MQTT disconnected: %s', status.getName()) # Xtype:ignore[no-untyped-call]
         self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('MQTT'),True,None)
 
     def on_subscribe_handler(self, _client:'mqtt.Client', _userdata:Any, _mid:int, reason_code_list:'list[ReasonCodes]', _properties:'Properties') -> None:
-        _log.debug('on_subscribe_handler: %s', [(rc.getId(rc.getName()), rc.getName()) for rc in reason_code_list]) # type:ignore[no-untyped-call]
+        _log.debug('on_subscribe_handler: %s', [(rc.getId(rc.getName()), rc.getName()) for rc in reason_code_list]) # Xtype:ignore[no-untyped-call]
         for rc in reason_code_list:
-            name = rc.getName() # type:ignore[no-untyped-call]
-            if rc.getId(name) != 0: # type:ignore[no-untyped-call]
+            name = rc.getName() # Xtype:ignore[no-untyped-call]
+            if rc.getId(name) != 0: # Xtype:ignore[no-untyped-call]
                 self.aw.qmc.adderror(QApplication.translate('Error Message','MQTT subscribe error: {0}').format(name))
 
 

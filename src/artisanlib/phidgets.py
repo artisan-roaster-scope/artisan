@@ -25,6 +25,9 @@
 # AUTHOR
 # Marko Luther, 2023
 
+
+__lazy_modules__ = {'Phidget22.Phidget', 'Phidget22.Devices.Manager', 'Phidget22.DeviceID', 'Phidget22.DeviceClass'}
+
 from Phidget22.Devices.Manager import Manager
 from Phidget22.DeviceID import DeviceID
 from Phidget22.DeviceClass import DeviceClass

@@ -48,9 +48,9 @@ schedule_date_tag: Final[str] = 'scheduleDate' # send as 's_item_date' as part o
 
 # # CLOUD SETUP
 api_base_url: Final[str] = 'https://artisan.plus/api/v1'
-web_base_url: Final[str] = 'https://artisan.plus'
+web_base_url: Final[str] = 'https://artisan.tools'
 
-shop_base_url: Final[str] = 'https://buy.artisan.plus/'
+shop_base_url: Final[str] = 'https://artisan.tools/shop/'
 
 register_url: Final[str] = web_base_url + '/register'
 reset_passwd_url: Final[str] = web_base_url + '/resetPassword'

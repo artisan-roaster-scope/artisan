@@ -26,6 +26,8 @@
 # AUTHOR
 # mikefsq, r2 2025
 
+__lazy_modules__ = { 'json', 'threading' }
+
 import time
 import json
 import threading

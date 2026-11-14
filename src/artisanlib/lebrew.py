@@ -25,6 +25,8 @@
 # AUTHOR
 # Marko Luther, 2025
 
+__lazy_modules__ = { 'asyncio', 'pymodbus.framer.rtu' }
+
 import re
 import time
 import asyncio

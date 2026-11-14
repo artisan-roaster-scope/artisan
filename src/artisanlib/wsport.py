@@ -25,6 +25,8 @@
 # AUTHOR
 # Marko Luther, 2024
 
+__lazy_modules__ = { 'json', 'random', 'threading', 'contextlib', 'socket', 'websockets', 'asyncio' }
+
 import sys
 import random
 import json
@@ -34,7 +36,6 @@ import websockets
 import contextlib
 import socket
 
-from contextlib import suppress
 from threading import Thread
 from typing import Final, Any, TYPE_CHECKING
 
@@ -338,7 +339,7 @@ class wsport:
             for task in asyncio.all_tasks(loop):
                 task.cancel()
             for t in [t for t in asyncio.all_tasks(loop) if not (t.done() or t.cancelled())]:
-                with suppress(asyncio.CancelledError):
+                with contextlib.suppress(asyncio.CancelledError):
                     loop.run_until_complete(t)
             self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('WebSocket'),True,None)
         except Exception as e:  # pylint: disable=broad-except

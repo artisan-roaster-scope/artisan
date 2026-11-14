@@ -6,7 +6,7 @@ v5.0.1
 ------------------
 
 * CHANGES
-  - enable machine control on new Santoker machines already on ON, not only after CHARGE
+  - Revise Slovak translation ([PR #2255](../../../pull/2255)) contributed by [Patrik Cevela](https://github.com/pcevela))
 
 
 ----

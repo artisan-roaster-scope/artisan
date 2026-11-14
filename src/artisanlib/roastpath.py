@@ -22,6 +22,8 @@
 # MAINTAINER
 # Marko Luther, 2026
 
+__lazy_modules__ = { 'json' }
+
 import time
 import json
 import logging

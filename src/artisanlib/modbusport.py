@@ -25,6 +25,9 @@
 # AUTHOR
 # Marko Luther, 2023
 
+
+__lazy_modules__ = { 'asyncio', 'artisanlib.async_comm', 'pymodbus.pdu', 'pymodbus.client', 'pymodbus.client.mixin', 'pymodbus.framer' }
+
 import sys
 import time
 import asyncio

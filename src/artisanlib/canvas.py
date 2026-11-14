@@ -25,6 +25,8 @@
 # AUTHOR
 # Marko Luther, 2023
 
+__lazy_modules__ = { 'json', 're', 'psutil', 'psutil._common', 'plus', 'plus.queue', 'plus.sync' }
+
 from artisanlib import __version__
 from artisanlib import __revision__
 from artisanlib import __build__
@@ -33,7 +35,6 @@ from artisanlib import __build__
 import time as libtime
 import os
 import sys  # @UnusedImport
-import ast
 import platform
 import math
 import warnings
@@ -43,8 +44,6 @@ import logging
 import re
 import textwrap
 import functools
-import psutil
-from psutil._common import bytes2human # pyright:ignore[reportPrivateImportUsage]
 
 
 from collections.abc import Callable, Sequence
@@ -54,6 +53,7 @@ if TYPE_CHECKING:
     from artisanlib.comm import serialport # pylint: disable=unused-import
     from artisanlib.atypes import ProfileData, BTU # pylint: disable=unused-import
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
+    from artisanlib import pid # pylint: disable=unused-import
     from plus.stock import Blend # pylint: disable=unused-import
     from plus.blend import CustomBlend # pylint: disable=unused-import
     from matplotlib.collections import PolyCollection # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
@@ -71,8 +71,7 @@ from artisanlib.util import (to_ascii, uchr, fill_gaps, deltaLabelPrefix, deltaL
         fromFtoC, fromFtoCstrict, fromCtoF, fromCtoFstrict, RoRfromFtoC, RoRfromFtoCstrict, RoRfromCtoF, RoRfromCtoFstrict, toInt, toString,
         toFloat, application_name, getResourcePath, getDirectory, convertWeight, right_to_left, float2str,
         abbrevString, scaleFloat2String, is_proper_temp, weight_units, render_weight, volume_units, float2float, timearray2index,
-        events_internal_to_external_value, events_external_to_internal_value, smooth_list, computeDeltas)
-from artisanlib import pid
+        events_internal_to_external_value, events_external_to_internal_value, smooth_list, computeDeltas, debugLogLevelActive)
 from artisanlib.time import ArtisanTime
 #from artisanlib.filters import LiveMedian
 from artisanlib.dialogs import (DesignerSplineNodesDlg, ArtisanMessageBox, artisan_information, artisan_question,
@@ -85,7 +84,6 @@ from artisanlib.device_registry import is_special_device, is_non_temp_device, is
 from plus.util import roastLink
 from plus.queue import addRoast, sendLockSchedule
 from plus.sync import clearSyncRecordHash
-from plus.uploader import send_profile
 from plus.controller import is_synced, is_connected
 
 from PyQt6.QtWidgets import (QApplication, QWidget, QMessageBox,
@@ -115,18 +113,9 @@ from matplotlib.offsetbox import DraggableAnnotation # type:ignore[untyped-impor
 from matplotlib.colors import to_hex, to_rgba # type:ignore[untyped-import,unused-ignore]
 
 from artisanlib.phidgets import PhidgetManager
-from Phidget22.VoltageRange import VoltageRange
-
-try:
-    # spanning a second multiprocessing instance on macOS falils to import the YAPI interface
-    from yoctopuce.yocto_api import YAPI # type: ignore[import-untyped]
-except Exception: # pylint: disable=broad-except
-    pass
-
-
+#from Phidget22.VoltageRange import VoltageRange
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
-
 
 
 type Interp1dKind = Literal['linear', 'nearest', 'nearest-up', 'zero', 'slinear', 'quadratic', 'cubic', 'previous', 'next']
@@ -775,19 +764,32 @@ class tgraphcanvas(QObject):
         self.phidget1018_changeTriggersValues: Final[list[int]] = list(range(0,51,1))
         self.phidget1018_changeTriggersStrings: Final[list[str]] = [f'{x*10}mV' for x in self.phidget1018_changeTriggersValues]
 
-        self.phidgetVCP100x_voltageRanges: list[int] = [int(VoltageRange.VOLTAGE_RANGE_AUTO)]*8
-        self.phidgetVCP100x_voltageRangeValues: Final[list[VoltageRange]] = [
-            VoltageRange.VOLTAGE_RANGE_AUTO,
-            VoltageRange.VOLTAGE_RANGE_10mV,
-            VoltageRange.VOLTAGE_RANGE_40mV,
-            VoltageRange.VOLTAGE_RANGE_200mV,
-            VoltageRange.VOLTAGE_RANGE_312_5mV,
-            VoltageRange.VOLTAGE_RANGE_400mV,
-            VoltageRange.VOLTAGE_RANGE_1000mV,
-            VoltageRange.VOLTAGE_RANGE_2V,
-            VoltageRange.VOLTAGE_RANGE_5V,
-            VoltageRange.VOLTAGE_RANGE_15V,
-            VoltageRange.VOLTAGE_RANGE_40V
+        self.phidgetVCP100x_voltageRanges: list[int] = [11]*8 # [int(VoltageRange.VOLTAGE_RANGE_AUTO)]*8
+#        self.phidgetVCP100x_voltageRangeValues: Final[list[VoltageRange]] = [
+#            VoltageRange.VOLTAGE_RANGE_AUTO,
+#            VoltageRange.VOLTAGE_RANGE_10mV,
+#            VoltageRange.VOLTAGE_RANGE_40mV,
+#            VoltageRange.VOLTAGE_RANGE_200mV,
+#            VoltageRange.VOLTAGE_RANGE_312_5mV,
+#            VoltageRange.VOLTAGE_RANGE_400mV,
+#            VoltageRange.VOLTAGE_RANGE_1000mV,
+#            VoltageRange.VOLTAGE_RANGE_2V,
+#            VoltageRange.VOLTAGE_RANGE_5V,
+#            VoltageRange.VOLTAGE_RANGE_15V,
+#            VoltageRange.VOLTAGE_RANGE_40V
+#        ]
+        self.phidgetVCP100x_voltageRangeValues: Final[list[int]] = [
+            11,#VoltageRange.VOLTAGE_RANGE_AUTO,
+            1, #VoltageRange.VOLTAGE_RANGE_10mV,
+            2, #VoltageRange.VOLTAGE_RANGE_40mV,
+            3, #VoltageRange.VOLTAGE_RANGE_200mV,
+            4, #VoltageRange.VOLTAGE_RANGE_312_5mV,
+            5, #VoltageRange.VOLTAGE_RANGE_400mV,
+            6, #VoltageRange.VOLTAGE_RANGE_1000mV,
+            7, #VoltageRange.VOLTAGE_RANGE_2V,
+            8, #VoltageRange.VOLTAGE_RANGE_5V,
+            9, #VoltageRange.VOLTAGE_RANGE_15V,
+            10 #VoltageRange.VOLTAGE_RANGE_40V
         ]
         self.phidgetVCP100x_voltageRangeStrings: Final[list[str]] = [
             'Auto',
@@ -1117,7 +1119,7 @@ class tgraphcanvas(QObject):
         #ATTENTION: never change this flag directly. Use the methods self.fileDirty() and self.fileClean() instead!!
         self.safesaveflag:bool = False
 
-        self.pid = pid.PID()
+        self.pid:pid.PID|None = None
 
         #background profile
         self.background:bool = False # set to True if loaded background profile is shown and False if hidden
@@ -2611,7 +2613,7 @@ class tgraphcanvas(QObject):
             if self.ax is not None:
                 axfig = self.ax.get_figure()
                 if axfig is not None and hasattr(self.fig.canvas,'copy_from_bbox'):
-                    self.ax_background = self.fig.canvas.copy_from_bbox(axfig.bbox) # ty:ignore[call-non-callable] # pyright: ignore[reportAttributeAccessIssue]
+                    self.ax_background = self.fig.canvas.copy_from_bbox(axfig.bbox) # ty:ignore[not-callable] # pyright: ignore[reportAttributeAccessIssue]
                     # we redraw the additional artists like the projection lines, the timeline and the AUC guide line
 
                     for fill in self.extrafill1lines + self.extrafill2lines:
@@ -3937,7 +3939,7 @@ class tgraphcanvas(QObject):
                             # Mark starting point of click-and-drag with a marker
                             self.base_horizontalcrossline, = self.ax.plot(numpy.array(self.baseX), numpy.array(self.baseY), 'r+', markersize=20)
                             self.base_verticalcrossline, = self.ax.plot(numpy.array(self.baseX), numpy.array(self.baseY), 'wo', markersize = 2)
-                    elif not bool(self.aw.comparator) and event.button == 3 and event.inaxes and not self.designerflag and not self.wheelflag and self.aw.ntb.mode not in ['pan/zoom', 'zoom rect']:# and not self.flagon:
+                    elif not bool(self.aw.comparator) and event.button == 3 and event.inaxes and not self.designerflag and not self.wheelflag and self.aw.ntb.mode not in ['pan/zoom', 'zoom rect']:
                         # popup not available if pan/zoom or zoom rect is active as it interacts
                         timex = self.time2index(event_xdata)
                         if timex > 0:
@@ -4786,6 +4788,9 @@ class tgraphcanvas(QObject):
                                 process_value = sample_extratemp1[ps // 2][-1]
                             elif len(sample_extratemp1)>(ps // 2) and len(sample_extratemp2[ps // 2])>0:
                                 process_value = sample_extratemp2[ps // 2][-1]
+                        from artisanlib import pid
+                        if self.pid is None:
+                            self.pid = pid.PID()
                         self.pid.update(process_value)
 
                     rateofchange1plot:float|None = None
@@ -8122,12 +8127,15 @@ class tgraphcanvas(QObject):
 #            _log.debug('gc_stats: %s', gc.get_stats())
 #        except Exception: # pylint: disable=broad-except
 #            pass
-        # write memory stats to the log
-        try:
-            vm = psutil.virtual_memory()
-            _log.info('memory used %s, %s (%s%%) available', bytes2human(psutil.Process().memory_full_info().uss),bytes2human(vm[1]),int(round(100-vm[2]))) # pyright:ignore[reportUnknownArgumentType]
-        except Exception: # pylint: disable=broad-except
-            pass
+        # write memory stats to the debug log
+        if debugLogLevelActive():
+            try:
+                import psutil
+                from psutil._common import bytes2human # pyright:ignore[reportPrivateImportUsage]
+                vm = psutil.virtual_memory()
+                _log.debug('memory used %s, %s (%s%%) available', bytes2human(psutil.Process().memory_full_info().uss),bytes2human(vm[1]),int(round(100-vm[2]))) # pyright:ignore[reportUnknownArgumentType]
+            except Exception: # pylint: disable=broad-except
+                pass
 
 
         self.aw.sendmessage(QApplication.translate('Message','Scope has been reset'))
@@ -10762,7 +10770,7 @@ class tgraphcanvas(QObject):
 
                                 if self.aw.extraDelta1[i] and self.delta_ax is not None:
                                     trans = self.delta_ax.transData
-                                else:
+                                elif self.ax is not None:
                                     trans = self.ax.transData
                                 visible_extratemp1 : npt.NDArray[numpy.double]
                                 if not self.flagstart and not self.foregroundShowFullflag and (not self.autotimex or self.autotimexMode == 0) and len(self.extrastemp1[i]) > 0:
@@ -10777,22 +10785,23 @@ class tgraphcanvas(QObject):
                                 else:
                                     visible_extratemp1 = numpy.array(self.extrastemp1[i], dtype=numpy.double)
                                 # first draw the fill if any
-                                if self.aw.extraFill1[i] > 0:
+                                if self.aw.extraFill1[i] > 0 and self.ax is not None:
                                     self.extrafill1lines.append(self.ax.fill_between(
                                             self.extratimex[i], visible_extratemp1, 0, transform=trans,
                                             color=self.extradevicecolor1[i],alpha=self.aw.extraFill1[i]/100.,
                                             sketch_params=None))
                                 else:
                                     self.extrafill1lines.append(None)
-                                self.extratemp1lines.append(self.ax.plot(numpy.array(self.extratimex[i]),visible_extratemp1,transform=trans,color=self.extradevicecolor1[i],
-                                    sketch_params=None,
-                                    path_effects=self.line_path_effects(self.glow, self.patheffects, self.aw.light_background_p, self.extralinewidths1[i],self.extradevicecolor1[i]),
-                                    markersize=self.extramarkersizes1[i],
-                                    marker=self.extramarkers1[i],
-                                    linewidth=self.extralinewidths1[i],
-                                    linestyle=self.extralinestyles1[i],
-                                    drawstyle=self.extradrawstyles1[i],
-                                    label=extraname1_subst[i])[0])
+                                if self.ax is not None:
+                                    self.extratemp1lines.append(self.ax.plot(numpy.array(self.extratimex[i]),visible_extratemp1,transform=trans,color=self.extradevicecolor1[i],
+                                        sketch_params=None,
+                                        path_effects=self.line_path_effects(self.glow, self.patheffects, self.aw.light_background_p, self.extralinewidths1[i],self.extradevicecolor1[i]),
+                                        markersize=self.extramarkersizes1[i],
+                                        marker=self.extramarkers1[i],
+                                        linewidth=self.extralinewidths1[i],
+                                        linestyle=self.extralinestyles1[i],
+                                        drawstyle=self.extradrawstyles1[i],
+                                        label=extraname1_subst[i])[0])
                         except Exception as ex: # pylint: disable=broad-except
                             _log.exception(ex)
                             _, _, exc_tb = sys.exc_info()
@@ -10819,7 +10828,7 @@ class tgraphcanvas(QObject):
 
                                 if self.aw.extraDelta2[i] and self.delta_ax is not None:
                                     trans = self.delta_ax.transData
-                                else:
+                                elif self.ax is not None:
                                     trans = self.ax.transData
                                 visible_extratemp2 : npt.NDArray[numpy.double]
                                 if not self.flagstart and not self.foregroundShowFullflag and (not self.autotimex or self.autotimexMode == 0) and len(self.extrastemp2[i]) > 0:
@@ -10834,22 +10843,23 @@ class tgraphcanvas(QObject):
                                 else:
                                     visible_extratemp2 = numpy.array(self.extrastemp2[i], dtype=numpy.double)
                                 # first draw the fill if any
-                                if self.aw.extraFill2[i] > 0:
+                                if self.aw.extraFill2[i] > 0 and self.ax is not None:
                                     self.extrafill2lines.append(self.ax.fill_between(
-                                            self.extratimex[i], visible_extratemp2, 0, transform=trans,
-                                            color=self.extradevicecolor2[i],alpha=self.aw.extraFill2[i]/100.,
-                                            sketch_params=None))
+                                                self.extratimex[i], visible_extratemp2, 0, transform=trans,
+                                                color=self.extradevicecolor2[i],alpha=self.aw.extraFill2[i]/100.,
+                                                sketch_params=None))
                                 else:
                                     self.extrafill2lines.append(None)
-                                self.extratemp2lines.append(self.ax.plot(numpy.array(self.extratimex[i]),visible_extratemp2,transform=trans,color=self.extradevicecolor2[i],
-                                    sketch_params=None,
-                                    path_effects=self.line_path_effects(self.glow, self.patheffects, self.aw.light_background_p, self.extralinewidths2[i],self.extradevicecolor2[i]),
-                                    markersize=self.extramarkersizes2[i],
-                                    marker=self.extramarkers2[i],
-                                    linewidth=self.extralinewidths2[i],
-                                    linestyle=self.extralinestyles2[i],
-                                    drawstyle=self.extradrawstyles2[i],
-                                    label= extraname2_subst[i])[0])
+                                if self.ax is not None:
+                                    self.extratemp2lines.append(self.ax.plot(numpy.array(self.extratimex[i]),visible_extratemp2,transform=trans,color=self.extradevicecolor2[i],
+                                        sketch_params=None,
+                                        path_effects=self.line_path_effects(self.glow, self.patheffects, self.aw.light_background_p, self.extralinewidths2[i],self.extradevicecolor2[i]),
+                                        markersize=self.extramarkersizes2[i],
+                                        marker=self.extramarkers2[i],
+                                        linewidth=self.extralinewidths2[i],
+                                        linestyle=self.extralinestyles2[i],
+                                        drawstyle=self.extradrawstyles2[i],
+                                        label= extraname2_subst[i])[0])
                         except Exception as ex: # pylint: disable=broad-except
                             _log.exception(ex)
                             _, _, exc_tb = sys.exc_info()
@@ -10983,10 +10993,11 @@ class tgraphcanvas(QObject):
                         self.drawAUC()
 
                     #update label rotating_colors
-                    for label in self.ax.xaxis.get_ticklabels():
-                        label.set_color(self.palette['xlabel'])
-                    for label in self.ax.yaxis.get_ticklabels():
-                        label.set_color(self.palette['ylabel'])
+                    if self.ax is not None:
+                        for label in self.ax.xaxis.get_ticklabels():
+                            label.set_color(self.palette['xlabel'])
+                        for label in self.ax.yaxis.get_ticklabels():
+                            label.set_color(self.palette['ylabel'])
                     if two_ax_mode and self.delta_ax is not None:
                         for label in self.delta_ax.yaxis.get_ticklabels():
                             label.set_color(self.palette['ylabel'])
@@ -11011,26 +11022,27 @@ class tgraphcanvas(QObject):
                         else:
                             loc = self.legend._loc # type: ignore[attr-defined] # "Legend" has no attribute "_loc" # pylint: disable=protected-access
                         try:
-                            leg = self.ax.legend(self.handles,self.labels, loc=loc,
-                                ncols=ncol,fancybox=True,prop=prop,shadow=False,frameon=True)
-                            leg.set_in_layout(False) # remove legend from tight_layout calculation
-                            self.legend = leg
-                            self.legend_lines = leg.get_lines()
-                            for h in leg.legend_handles:
-                                if h is not None:
-                                    h.set_picker(False) # we disable the click to hide on the handles feature
-                            for ll in leg.texts:
-                                #l.set_picker(5)
-                                ll.set_picker(self.aw.draggable_text_box_picker)
-                            leg.set_draggable(state=True,use_blit=True)  #,update='bbox')
-                            leg.set_picker(self.aw.draggable_text_box_picker)
-                            frame = leg.get_frame()
-                            frame.set_facecolor(self.palette['legendbg'])
-                            frame.set_alpha(self.alpha['legendbg'])
-                            frame.set_edgecolor(self.palette['legendborder'])
-                            frame.set_linewidth(0.5)
-                            for line,text in zip(leg.get_lines(), leg.get_texts(), strict=True):
-                                text.set_color(line.get_color())
+                            if self.ax is not None:
+                                leg = self.ax.legend(self.handles,self.labels, loc=loc,
+                                    ncols=ncol,fancybox=True,prop=prop,shadow=False,frameon=True)
+                                leg.set_in_layout(False) # remove legend from tight_layout calculation
+                                self.legend = leg
+                                self.legend_lines = leg.get_lines()
+                                for h in leg.legend_handles:
+                                    if h is not None:
+                                        h.set_picker(False) # we disable the click to hide on the handles feature
+                                for ll in leg.texts:
+                                    #l.set_picker(5)
+                                    ll.set_picker(self.aw.draggable_text_box_picker)
+                                leg.set_draggable(state=True,use_blit=True)  #,update='bbox')
+                                leg.set_picker(self.aw.draggable_text_box_picker)
+                                frame = leg.get_frame()
+                                frame.set_facecolor(self.palette['legendbg'])
+                                frame.set_alpha(self.alpha['legendbg'])
+                                frame.set_edgecolor(self.palette['legendborder'])
+                                frame.set_linewidth(0.5)
+                                for line,text in zip(leg.get_lines(), leg.get_texts(), strict=True):
+                                    text.set_color(line.get_color())
                         except Exception as e: # pylint: disable=broad-except
                             _log.error(e)
 
@@ -11054,37 +11066,37 @@ class tgraphcanvas(QObject):
                 # add projection and AUC guide lines last as those are removed by updategraphics for optimized redrawing and not cached
                 if self.ETprojectFlag:
                     if self.ETcurve:
-                        self.l_ETprojection, = self.ax.plot(self.ETprojection_tx, self.ETprojection_temp,color = self.palette['et'],
+                        self.l_ETprojection, = self.ax.plot(self.ETprojection_tx, self.ETprojection_temp,color = self.palette['et'], # ty:ignore[missing-union-attribute]
                                                     dashes=dashes_setup,
                                                     label=self.aw.arabicReshape(QApplication.translate('Label', 'ETprojection')),
                                                     linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
                     if self.projectDeltaFlag and self.DeltaETflag and self.delta_ax is not None:
                         trans = self.delta_ax.transData
-                        self.l_DeltaETprojection, = self.ax.plot(self.DeltaETprojection_tx, self.DeltaETprojection_temp,color = self.palette['deltaet'],
+                        self.l_DeltaETprojection, = self.ax.plot(self.DeltaETprojection_tx, self.DeltaETprojection_temp,color = self.palette['deltaet'],  # ty:ignore[missing-union-attribute]
                                                     dashes=dashes_setup,
                                                     transform=trans,
                                                     label=self.aw.arabicReshape(QApplication.translate('Label', 'DeltaETprojection')),
                                                     linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
                 if self.BTprojectFlag:
                     if self.BTcurve:
-                        self.l_BTprojection, = self.ax.plot(self.BTprojection_tx, self.BTprojection_temp,color = self.palette['bt'],
+                        self.l_BTprojection, = self.ax.plot(self.BTprojection_tx, self.BTprojection_temp,color = self.palette['bt'],  # ty:ignore[missing-union-attribute]
                                                     dashes=dashes_setup,
                                                     label=self.aw.arabicReshape(QApplication.translate('Label', 'BTprojection')),
                                                     linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
                     if self.projectDeltaFlag and self.DeltaBTflag and self.delta_ax is not None:
                         trans = self.delta_ax.transData
-                        self.l_DeltaBTprojection, = self.ax.plot(self.DeltaBTprojection_tx, self.DeltaBTprojection_temp,color = self.palette['deltabt'],
+                        self.l_DeltaBTprojection, = self.ax.plot(self.DeltaBTprojection_tx, self.DeltaBTprojection_temp,color = self.palette['deltabt'],  # ty:ignore[missing-union-attribute]
                                                     dashes=dashes_setup,
                                                     transform=trans,
                                                     label=self.aw.arabicReshape(QApplication.translate('Label', 'DeltaBTprojection')),
                                                     linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
                 if (self.device == 18 and self.aw.simulator is None) or self.showtimeguide: # not NONE device
-                    self.l_timeline = self.ax.axvline(self.timeclock.elapsedMilli(),color = self.palette['timeguide'],
+                    self.l_timeline = self.ax.axvline(self.timeclock.elapsedMilli(),color = self.palette['timeguide'],  # ty:ignore[missing-union-attribute]
                                             label=self.aw.arabicReshape(QApplication.translate('Label', 'TIMEguide')),
                                             visible=self.flagstart,
                                             linestyle = '-', linewidth= 1, alpha = .5,sketch_params=None,path_effects=[])
                 if self.AUCguideFlag:
-                    self.l_AUCguide = self.ax.axvline(self.AUCguideTime,visible=(0 < self.AUCguideTime < self.endofx),color = self.palette['aucguide'],
+                    self.l_AUCguide = self.ax.axvline(self.AUCguideTime,visible=(0 < self.AUCguideTime < self.endofx),color = self.palette['aucguide'],  # ty:ignore[missing-union-attribute]
                                                 label=self.aw.arabicReshape(QApplication.translate('Label', 'AUCguide')),
                                                 linestyle = '-', linewidth= 1, alpha = .5,sketch_params=None,path_effects=[])
 
@@ -12824,17 +12836,17 @@ class tgraphcanvas(QObject):
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
 
-    @staticmethod
-    def deviceLogDEBUG() -> None:
-        from Phidget22.Devices.Log import Log as PhidgetLog
-        from Phidget22.LogLevel import LogLevel as PhidgetLogLevel
-        PhidgetLog.setLevel(PhidgetLogLevel.PHIDGET_LOG_VERBOSE)
+    def deviceLogDEBUG(self) -> None:
+        if self.PhidgetsConfigured():
+            from Phidget22.Devices.Log import Log as PhidgetLog
+            from Phidget22.LogLevel import LogLevel as PhidgetLogLevel
+            PhidgetLog.setLevel(PhidgetLogLevel.PHIDGET_LOG_VERBOSE)
 
-    @staticmethod
-    def deviceLLogINFO() -> None:
-        from Phidget22.Devices.Log import Log as PhidgetLog
-        from Phidget22.LogLevel import LogLevel as PhidgetLogLevel
-        PhidgetLog.setLevel(PhidgetLogLevel.PHIDGET_LOG_INFO)
+    def deviceLLogINFO(self) -> None:
+        if self.PhidgetsConfigured():
+            from Phidget22.Devices.Log import Log as PhidgetLog
+            from Phidget22.LogLevel import LogLevel as PhidgetLogLevel
+            PhidgetLog.setLevel(PhidgetLogLevel.PHIDGET_LOG_INFO)
 
     # returns True if any device (main or extra) is a Phidget, ambient sensor or button/slider actions contain Phidget commands
     # the PhidgetManager which makes Phidgets accessible is only started if PhdigetsConfigured returns True
@@ -13797,6 +13809,7 @@ class tgraphcanvas(QObject):
                         ser.YOCTOthread = None
                     ser.YOCTOvalues = [[],[]]
                     ser.YOCTOlastvalues = [-1.0]*2
+                    from yoctopuce.yocto_api import YAPI # type: ignore[import-untyped]
                     YAPI.FreeAPI() # type:ignore[reportUnboundVariable,unused-ignore]
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
@@ -14959,6 +14972,7 @@ class tgraphcanvas(QObject):
             if is_connected() and not is_synced() and not self.flagon and self.checkSaved(allow_discard=False):
                 addRoast(unsynced=True)
 
+            from plus.uploader import send_profile
             send_profile(
                 profile,
                 # filter conf
@@ -17751,6 +17765,7 @@ class tgraphcanvas(QObject):
             obj = None
             if os.path.exists(filename):
                 with open(filename, encoding='utf-8') as f:
+                    import ast
                     obj=ast.literal_eval(f.read())
             if obj and 'timex' in obj and 'temp1' in obj and 'temp2' in obj:
                 self.timex = obj['timex']
@@ -18135,11 +18150,11 @@ class tgraphcanvas(QObject):
                 # initialize bitblit background
                 axfig = self.ax.get_figure()
                 if axfig is not None and hasattr(self.fig.canvas,'copy_from_bbox'):
-                    self.ax_background_designer = self.fig.canvas.copy_from_bbox(axfig.bbox)  # ty:ignore[call-non-callable]  # pyright: ignore[reportAttributeAccessIssue]
+                    self.ax_background_designer = self.fig.canvas.copy_from_bbox(axfig.bbox)  # ty:ignore[not-callable]  # pyright: ignore[reportAttributeAccessIssue]
 
             # restore background
             if hasattr(self.fig.canvas,'restore_region'):
-                self.fig.canvas.restore_region(self.ax_background_designer) # ty:ignore[call-non-callable] # pyright: ignore[reportAttributeAccessIssue]
+                self.fig.canvas.restore_region(self.ax_background_designer) # ty:ignore[not-callable] # pyright: ignore[reportAttributeAccessIssue]
 
 
             #create statistics bar

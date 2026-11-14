@@ -27,6 +27,8 @@
 # AUTHOR
 # Marko Luther
 
+__lazy_modules__ = { 'json', 'json.decoder', 'plus', 'plus.roast', 'plus.stock' }
+
 from PyQt6.QtCore import QSemaphore, QTimer, pyqtSlot
 from PyQt6.QtWidgets import QApplication
 
@@ -38,7 +40,10 @@ import time
 import logging
 import json
 import json.decoder
-from typing import Final, Any, IO
+from typing import Final, Any, IO, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import requests.models # noqa: F401 # pylint: disable=unused-import
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -758,8 +763,6 @@ def applyServerUpdates(data:dict[str, Any]) -> None:
 # if return_data is set, the received data is not applied via applyServerUpdates, but returned instead
 def fetchServerUpdate(uuid: str, file:str|None = None, return_data:bool = False) -> dict[str, Any]|None:
     aw = config.app_window
-    import requests
-    import requests.models
     import requests.exceptions
     res:requests.models.Response|None = None
     try:

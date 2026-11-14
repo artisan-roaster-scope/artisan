@@ -27,6 +27,10 @@
 # AUTHOR
 # Marko Luther
 
+
+__lazy_modules__ = { 'threading', 'asyncio', 'aiohttp', 'aiohttp_retry',
+    'plus', 'plus.stock', 'plus.queue', 'plus.sync', 'plus.roast'}
+
 from PyQt6.QtCore import QSemaphore, QTimer, Qt, pyqtSlot
 from PyQt6.QtWidgets import QApplication
 

@@ -25,6 +25,9 @@
 # AUTHOR
 # Marko Luther, 2026
 
+
+__lazy_modules__ = { 'plus', 'plus.blend', 'plus.stock' }
+
 import os
 import sys
 import platform
@@ -205,6 +208,12 @@ class Dashboard(QWidget):
 
             self.ui.login_pushButton.setIconSize(QSize(20,20))
             self.ui.login_pushButton.setIcon(QIcon(getStyleIconPath('user-circle-stroke-rounded-dark.svg')))
+
+            self.ui.custom_blend.setMinimumWidth(28)
+            self.ui.custom_blend.setMinimumHeight(28)
+
+            self.ui.sync.setMinimumWidth(28)
+            self.ui.sync.setMinimumHeight(28)
 
             self.ui.documentation_pushButton.setIconSize(QSize(10,10))
             self.ui.documentation_pushButton.setIcon(QIcon(getStyleIconPath('external-link-stroke-rounded.svg')))

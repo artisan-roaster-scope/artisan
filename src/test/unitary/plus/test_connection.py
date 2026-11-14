@@ -723,7 +723,7 @@ class TestSendData:
         with patch(
             'plus.connection.getHeadersAndData',
             return_value=({'Content-Type': 'application/json'}, b'{"test":"data"}'),
-        ), patch('plus.connection.requests.post', return_value=mock_response) as mock_post, patch(
+        ), patch('requests.post', return_value=mock_response) as mock_post, patch(
             'plus.connection.config'
         ) as mock_config:
 
@@ -750,7 +750,7 @@ class TestSendData:
         with patch(
             'plus.connection.getHeadersAndData',
             return_value=({'Content-Type': 'application/json'}, b'{"test":"data"}'),
-        ), patch('plus.connection.requests.put', return_value=mock_response) as mock_put, patch(
+        ), patch('requests.put', return_value=mock_response) as mock_put, patch(
             'plus.connection.config'
         ) as mock_config:
 
@@ -781,7 +781,7 @@ class TestSendData:
             'plus.connection.getHeadersAndData',
             return_value=({'Content-Type': 'application/json'}, b'{"test":"data"}'),
         ), patch(
-            'plus.connection.requests.post', side_effect=[mock_401_response, mock_response]
+            'requests.post', side_effect=[mock_401_response, mock_response]
         ) as mock_post, patch(
             'plus.connection.authentify', return_value=True
         ) as mock_auth, patch(
@@ -815,7 +815,7 @@ class TestSendData:
             'plus.connection.getHeadersAndData',
             return_value=({'Content-Type': 'application/json'}, b'{"test":"data"}'),
         ), patch(
-            'plus.connection.requests.post', return_value=mock_401_response
+            'requests.post', return_value=mock_401_response
         ) as mock_post, patch(
             'plus.connection.authentify', return_value=False
         ) as mock_auth, patch(
@@ -849,7 +849,7 @@ class TestSendData:
             'plus.connection.getHeadersAndData',
             return_value=({'Content-Type': 'application/json'}, b'{"test":"data"}'),
         ), patch(
-            'plus.connection.requests.post', return_value=mock_401_response
+            'requests.post', return_value=mock_401_response
         ) as mock_post, patch(
             'plus.connection.authentify'
         ) as mock_auth, patch(

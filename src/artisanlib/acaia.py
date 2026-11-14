@@ -25,6 +25,8 @@
 # AUTHOR
 # Marko Luther, 2024
 
+__lazy_modules__ = { 'asyncio' }
+
 import time
 import platform
 import asyncio
@@ -35,12 +37,13 @@ from typing import override, Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from bleak.backends.characteristic import BleakGATTCharacteristic  # pylint: disable=unused-import
+    from artisanlib.scale import ScaleSpecs  # pylint: disable=unused-import
 
 from PyQt6.QtCore import pyqtSignal, pyqtSlot
 
 from artisanlib.ble_port import ClientBLE
 from artisanlib.async_comm import AsyncComm, AsyncIterable, IteratorReader
-from artisanlib.scale import Scale, ScaleSpecs, STATE_ACTION
+from artisanlib.scale import Scale, STATE_ACTION
 from artisanlib.util import float2float, round_base
 from artisanlib.atypes import SerialSettings
 
