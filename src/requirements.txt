@@ -31,7 +31,7 @@ wheel==0.48.0
 pyserial==3.5
 pymodbus==3.16.2
 python-snap7==2.1.0
-Phidget22==1.26.20260821
+Phidget22==1.27.20261112
 Unidecode==1.4.0
 qrcode==8.2
 requests==2.34.2
@@ -60,7 +60,7 @@ arabic-reshaper==3.1.0
 pillow==13.0.0
 pydantic==2.14.3
 babel==2.18.0
-bleak==3.0.2
+bleak==3.1.0
 python-statemachine==3.2.2
 yoctopuce==2.1.16772
 PyQt6==6.12.0
