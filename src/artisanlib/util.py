@@ -601,9 +601,12 @@ def color_to_lab(color: str) -> tuple[float, float, float]:
 # Note: alpha information is ignored
 @functools.lru_cache(maxsize=50)
 def color_delta_e(c1: str, c2: str) -> float:
-    L1, a1, b1 = color_to_lab(c1[:7])
-    L2, a2, b2 = color_to_lab(c2[:7])
-    return math.sqrt((L2 - L1) ** 2 + (a2 - a1) ** 2 + (b2 - b1) ** 2)
+    try:
+        L1, a1, b1 = color_to_lab(c1[:7])
+        L2, a2, b2 = color_to_lab(c2[:7])
+        return math.sqrt((L2 - L1) ** 2 + (a2 - a1) ** 2 + (b2 - b1) ** 2)
+    except Exception: # pylint: disable=broad-except
+        return 0.5
 
 # converts QColor ARGB names to a standard/MPL hex color strings with alpha values at the end
 @functools.lru_cache(maxsize=50)

@@ -6151,6 +6151,15 @@ class ApplicationWindow(QMainWindow):
                     color2 = '#f0f0f0'
                 else:
                     color2 = self.qmc.palette['canvas']
+            # support color names
+            if len(color1)>0 and color1[0] != '#':
+                color1 = QColor(color1).name()
+            else:
+                color1 = color1[:7]
+            if len(color2)>0 and color2[0] != '#':
+                color2 = QColor(color2).name()
+            else:
+                color2 = color2[:7]
             cDiff = color_delta_e(color1,color2)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)

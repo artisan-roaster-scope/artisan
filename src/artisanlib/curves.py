@@ -2015,7 +2015,7 @@ class CurvesDlg(ArtisanDialog):
         try:
             if self.aw.qmc.ax is not None:
                 self.aw.sendmessage('Dropping beans...')
-                colorb = ['#996633','#4d2600','#4b4219','black','#4b3219','#996633','#281a0d']
+                colorb = ['#996633','#4d2600','#4b4219','#000000','#4b3219','#996633','#281a0d']
                 for _ in range(3): # number of bean layers (each a randomly different color)
                     x = self.aw.qmc.endofx*numpy.random.rand(int(round(self.aw.qmc.endofx/6)))
                     y = self.aw.qmc.ylimit*numpy.random.rand(int(round(self.aw.qmc.endofx/6)))

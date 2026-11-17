@@ -2853,10 +2853,10 @@ class EventsDlg(ArtisanResizeablDialog):
             visualIndex = self.eventbuttontable.visualRow(i)
             self.extraeventbuttoncolor[i] = bcolor[visualIndex]
             #Choose text color
-            if self.aw.colorDifference('white', bcolor[visualIndex]) > self.aw.colorDifference('black', bcolor[visualIndex]):
-                self.extraeventbuttontextcolor[i] = 'white'
+            if self.aw.colorDifference('#ffffff', bcolor[visualIndex]) > self.aw.colorDifference('#000000', bcolor[visualIndex]):
+                self.extraeventbuttontextcolor[i] = '#ffffff'
             else:
-                self.extraeventbuttontextcolor[i] = 'black'
+                self.extraeventbuttontextcolor[i] = '#000000'
         self.changingcolorflag = False
         self.createEventbuttonTable()
 
