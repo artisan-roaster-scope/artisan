@@ -120,7 +120,7 @@ from PyQt6.QtWidgets import (QApplication, QWidget, QMessageBox, QLabel, QMainWi
                          QStyleFactory, QMenuBar, QMenu, QLayout, QDockWidget)
 from PyQt6.QtGui import (QScreen, QPageLayout, QAction, QWindow,
                             QKeySequence, QShortcut, QPalette,
-                            QPixmap,QColor,QDesktopServices, QIcon, QFontDatabase,
+                            QPixmap, QColor, qGray, QDesktopServices, QIcon, QFontDatabase,
                             QRegularExpressionValidator, QDoubleValidator, QPainter, QCursor)
 from PyQt6.QtCore import (QStandardPaths, QLibraryInfo, QTranslator, QLocale, QFileInfo, pyqtSignal, pyqtSlot, QtMsgType,
                           qVersion, QVersionNumber, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, QSize,
@@ -218,7 +218,7 @@ from artisanlib.util import (appFrozen, uchr, decodeLocal, decodeLocalStrict, en
         debugLogLevelActive, setDebugLogLevel, createGradient, natsort, setDeviceDebugLogLevel,
         comma2dot, is_proper_temp, weight_units, weight_units_lower, volume_units, float2float, float2str,
         convertWeight, convertVolume, rgba_colorname2argb_colorname, render_weight, serialize, deserialize, csv_load, exportProfile2CSV, findTPint,
-        eventtime2string, toDim, signature_message, rec_int_to_float, smooth_list, getStyleIconPath)
+        eventtime2string, toDim, signature_message, rec_int_to_float, smooth_list, getStyleIconPath, color_delta_e)
 from artisanlib.device_registry import DEVICE_ID_MIN, DEVICE_ID_MAX, DEVICE_ID_NONE, DEVICE_ID_VIRTUAL, get_device_name
 from artisanlib.qtsingleapplication import QtSingleApplication
 from artisanlib.styles import toolbar_style, tool_button_icon_style, combobox_style
@@ -999,7 +999,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         super().home(*args)
 
         # toggle zoom_follow if recording
-        if self.qmc.flagstart:
+        if self.qmc.flagstart and self.qmc.device != 18: # disable zoom follow for NONE / Manual device
             self.qmc.zoom_follow = not self.qmc.zoom_follow
             if self.qmc.zoom_follow:
                 self.aw.sendmessage(QApplication.translate('Message','follow on'))
@@ -6132,11 +6132,11 @@ class ApplicationWindow(QMainWindow):
 
         return colorPairsToCheck
 
-
+    # transparencies are ignored
+    # colors can be None or 'transparent' or a hex color in MPL format not Qt format (transparency information is ignored)
     def colorDifference(self, color1:str|None, color2:str|None) -> float:
         cDiff:float = 100
         try:
-            from colorspacious import deltaE # type: ignore[import-untyped]
             if color1 is None or color1 == 'None':
                 color1 = '#f0f0f0'
             if color2 is None or color2 == 'None':
@@ -6151,11 +6151,7 @@ class ApplicationWindow(QMainWindow):
                     color2 = '#f0f0f0'
                 else:
                     color2 = self.qmc.palette['canvas']
-            c1 = QColor(color1[:7]).name()
-            c2 = QColor(color2[:7]).name()
-            c1_rgb = tuple(int(c1[i:i+2], 16) for i in (1, 3 ,5))
-            c2_rgb = tuple(int(c2[i:i+2], 16) for i in (1, 3 ,5))
-            cDiff = float(deltaE(c1_rgb, c2_rgb, input_space='sRGB255', uniform_space='CIELab'))
+            cDiff = color_delta_e(color1,color2)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()
@@ -6164,6 +6160,7 @@ class ApplicationWindow(QMainWindow):
         return cDiff
 
 
+    # colors are assumed to be hex strings starting with a # and of length 7 or 9 with the transparency information in the last two positions (MPL format, not Qt format!)
     def checkColors(self, colorPairsToCheck:list[tuple[str,str,str,str]]|None = None, showMsg:bool = True) -> float:
         if colorPairsToCheck is None:
             colorPairsToCheck = []
@@ -6200,20 +6197,15 @@ class ApplicationWindow(QMainWindow):
         nc = c
         alpha = ''
         try:
-            from colorspacious import cspace_convert
             if c == 'None':
                 return 'None'
             if c.lower() == 'transparent':
                 return 'transparent'
-            cq = str(QColor(c[:7]).name())
+            cq = QColor(c[:7])
             alpha = c[7:9]
-            c_rgb:tuple[int,int,int] = cast(tuple[int,int,int], tuple(int(cq[i:i+2], 16) for i in (1, 3, 5)))
-            nc_greyscale_JCh:numpy.ndarray[tuple[Literal[1]],numpy.dtype[numpy.double]] = cspace_convert(c_rgb, 'sRGB255', 'JCh')
-            nc_greyscale_JCh[..., 1] = 0
-            nc_greyscale_sRGB:numpy.ndarray[tuple[Literal[1]],numpy.dtype[numpy.double]] = cspace_convert(nc_greyscale_JCh, 'JCh', 'sRGB255')
-            nc_greyscale_sRGB = numpy.clip(nc_greyscale_sRGB, 0, 255) # pyright:ignore[reportUnknownArgumentType]
-            nc_greyscale = f'#{int(nc_greyscale_sRGB[0]):2x}{int(nc_greyscale_sRGB[1]):2x}{int(nc_greyscale_sRGB[2]):2x}' # pyright:ignore[reportUnknownArgumentType]
-            nc = str(QColor(nc_greyscale).name())
+            gray_value = qGray(cq.rgb())
+            gray_color = QColor(gray_value, gray_value, gray_value)
+            nc = gray_color.name()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()

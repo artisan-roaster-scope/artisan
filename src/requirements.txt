@@ -30,7 +30,7 @@ setuptools==84.2.1
 wheel==0.48.0
 pyserial==3.5
 pymodbus==3.16.2
-python-snap7==2.1.0
+python-snap7==3.5.0
 Phidget22==1.27.20261112
 Unidecode==1.4.0
 qrcode==8.2
@@ -43,10 +43,9 @@ xlrd==2.0.2
 websockets==17.4
 psutil==7.2.2
 protobuf==7.36.2
-numpy==2.5.4
+numpy==2.5.5
 scipy==1.18.1
 wquantiles==0.6
-colorspacious==1.1.2
 openpyxl==3.1.5
 keyring==25.7.0
 prettytable==3.18.0
@@ -63,7 +62,7 @@ babel==2.18.0
 bleak==3.1.0
 python-statemachine==3.2.2
 yoctopuce==2.1.16772
-PyQt6==6.12.0
+PyQt6==6.12.1
 paho-mqtt==2.2.0
 jmespath==1.1.0
 cryptography==48.0.1; sys_platform=='darwin' # last version with macOS Intel binaries: 48.0.1

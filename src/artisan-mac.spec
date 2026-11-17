@@ -150,8 +150,7 @@ DATA_FILES = [
 DATA_FILES.extend(
     [(f'translations/{file}', './translations') for root,dirs,files in os.walk('translations') for file in files if (file.split('.')[1]) == 'qm'])
 
-# add snap7 libs
-BINARIES = [(os.path.join(get_package_paths('snap7')[1], 'lib/libsnap7.dylib'), 'snap7/lib' )]
+BINARIES = []
 # add yocto libs
 yocto_lib_path = os.path.join(get_package_paths('yoctopuce')[1], 'cdll')
 BINARIES.extend([(os.path.join(yocto_lib_path, fn),'yoctopuce/cdll') for fn in os.listdir(yocto_lib_path) if fn.endswith('.dylib')])

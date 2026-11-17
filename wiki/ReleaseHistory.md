@@ -8,6 +8,9 @@ v5.0.1
 * CHANGES
   - Revise Slovak translation ([PR #2255](../../../pull/2255)) contributed by [Patrik Cevela](https://github.com/pcevela))
 
+* FIXES
+  - fixes Svietz SRM machine setup quantifier range (min was 0, but should have been 20)
+  - disables zoom follow for NONE / Manual device ([Issue #2252](../../../issues/2252))
 
 ----
 v5.0.0 (Nov 5, 2026)

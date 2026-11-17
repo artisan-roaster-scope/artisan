@@ -1634,8 +1634,8 @@ class tgraphcanvas(QObject):
         # RoR display limits
         # user configurable RoR limits (only applied if flag is True; applied before TP during recording as well as full redraw)
         self.RoRlimitFlag:bool = True
-        self.RoRlimit:int = int(round(RoRfromCtoFstrict(45))) # 81F/min = 45C/min # was 95F/min
-        self.RoRlimitm:int = int(round(RoRfromCtoFstrict(-10))) # -18F/min = -10C/min # was: -95F/min
+        self.RoRlimit:int = int(round(RoRfromCtoFstrict(83))) # 150F/min = 83C/min
+        self.RoRlimitm:int = int(round(RoRfromCtoFstrict(-10))) # -18F/min = -10C/min
         # system fixed RoR limits (only applied if flag is True; usually higher than the user configurable once and always applied)
         self.maxRoRlimit: Final[int] = 170
         # axis limits
@@ -3939,7 +3939,7 @@ class tgraphcanvas(QObject):
                             # Mark starting point of click-and-drag with a marker
                             self.base_horizontalcrossline, = self.ax.plot(numpy.array(self.baseX), numpy.array(self.baseY), 'r+', markersize=20)
                             self.base_verticalcrossline, = self.ax.plot(numpy.array(self.baseX), numpy.array(self.baseY), 'wo', markersize = 2)
-                    elif not bool(self.aw.comparator) and event.button == 3 and event.inaxes and not self.designerflag and not self.wheelflag and self.aw.ntb.mode not in ['pan/zoom', 'zoom rect']:
+                    elif not bool(self.aw.comparator) and event.button == 3 and event.inaxes and not self.designerflag and not self.wheelflag:# and self.aw.ntb.mode not in ['pan/zoom', 'zoom rect']:
                         # popup not available if pan/zoom or zoom rect is active as it interacts
                         timex = self.time2index(event_xdata)
                         if timex > 0:
@@ -12368,13 +12368,27 @@ class tgraphcanvas(QObject):
                 self.extradevicecolor2[i] = self.aw.convertToGreyscale(c)
             for i,c in enumerate(self.EvalueColor):
                 self.EvalueColor[i] = self.aw.convertToGreyscale(c)
-            self.backgroundmetcolor     = self.aw.convertToGreyscale(self.backgroundmetcolor)
-            self.backgroundbtcolor      = self.aw.convertToGreyscale(self.backgroundbtcolor)
-            self.backgrounddeltaetcolor = self.aw.convertToGreyscale(self.backgrounddeltaetcolor)
-            self.backgrounddeltabtcolor = self.aw.convertToGreyscale(self.backgrounddeltabtcolor)
-            self.backgroundxtcolor      = self.aw.convertToGreyscale(self.backgroundxtcolor)
-            self.backgroundytcolor      = self.aw.convertToGreyscale(self.backgroundytcolor)
-            self.aw.setLCDsBW()
+            self.backgroundmetcolor     = self.palette['et']
+            self.backgroundbtcolor      = self.palette['bt']
+            self.backgrounddeltaetcolor = self.palette['deltaet'] # self.aw.convertToGreyscale(self.backgrounddeltaetcolor)
+            self.backgrounddeltabtcolor = self.palette['deltabt'] # self.aw.convertToGreyscale(self.backgrounddeltabtcolor)
+            self.backgroundxtcolor      = self.palette['xt']
+            self.backgroundytcolor      = self.palette['yt']
+            #
+            self.aw.lcdpaletteB['et'] = self.backgroundmetcolor
+            self.aw.lcdpaletteB['bt'] = self.backgroundbtcolor
+            self.aw.lcdpaletteF['deltaet'] = self.backgrounddeltaetcolor
+            self.aw.lcdpaletteF['deltabt'] = self.backgrounddeltabtcolor
+            # convert also the corresponding foreground/background colors
+            for tag in ['et', 'bt']:
+                self.aw.lcdpaletteF[tag] = self.aw.convertToGreyscale(self.aw.lcdpaletteF[tag])
+            for tag in ['deltaet', 'deltabt']:
+                self.aw.lcdpaletteB[tag] = self.aw.convertToGreyscale(self.aw.lcdpaletteB[tag])
+            #
+            for tag in ['timer', 'sv', 'rstimer', 'slowcoolingtimer', 'scale', 'phases']:
+                self.aw.lcdpaletteF[tag] = self.aw.convertToGreyscale(self.aw.lcdpaletteF[tag])
+                self.aw.lcdpaletteB[tag] = self.aw.convertToGreyscale(self.aw.lcdpaletteB[tag])
+
 
         elif color == 3:
             from artisanlib.colors import graphColorDlg

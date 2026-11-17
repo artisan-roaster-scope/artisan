@@ -116,7 +116,6 @@ PYQT_QT = PYTHON_PACKAGES + r'\PyQt' + PYQT + r'\Qt'
 PYQT_QT_BIN = PYQT_QT + r'\bin'
 PYQT_QT_TRANSLATIONS = QT_TRANSL
 YOCTO_BIN = PYTHON_PACKAGES + r'\yoctopuce\cdll'
-SNAP7_BIN = PYTHON_PACKAGES + r'\snap7\lib'
 PHIDGET22_BIN = PYTHON_PACKAGES + r'\Phidget22\.libs'
 
 from PyInstaller.utils.hooks import is_module_satisfies
@@ -259,9 +258,6 @@ for tr in [
 make_dir(TARGET + r'_internal\yoctopuce\cdll')
 copy_file(YOCTO_BIN + r'\yapi64.dll', TARGET + r'_internal\yoctopuce\cdll')
 # YOCTO HACK END
-
-# copy Snap7 lib
-copy_file(SNAP7_BIN + r'\snap7.dll', TARGET + r'_internal')
 
 for fn in [
     'artisan.png',
