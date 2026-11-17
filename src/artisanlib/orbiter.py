@@ -387,6 +387,14 @@ def extractProfileOrbiter(f:IO[bytes],
         alt_etypesdefault:list[str],
         _artisanflavordefaultlabels:list[str],
         eventsExternal2InternalValue:Callable[[int],float]) -> ProfileData:
+
+    def bytes2reading(b:bytes) -> float:
+        try:
+            return float(int.from_bytes(b, 'little', signed = True))
+        except Exception: # pylint: disable=broad-except
+            pass
+        return -1.0
+
     res:ProfileData = ProfileData() # the interpreted data set
     i = 0
     total_packets:int = 0
@@ -457,11 +465,11 @@ def extractProfileOrbiter(f:IO[bytes],
                     res['title'] = encodeLocalStrict(title)
                 elif not footer and i < total_packets - 2: # ignore data beyond total_packets and only process data between header and the two footers
                     # regular data
-                    BT = int.from_bytes(packet[6:8], 'little', signed = False)
-                    DT = int.from_bytes(packet[8:10], 'little', signed = False)
-                    IT = int.from_bytes(packet[10:12], 'little', signed = False)
-                    ET = int.from_bytes(packet[12:14], 'little', signed = False)
-#                    BT_target = int.from_bytes(packet[14:16], 'little', signed = False)
+                    BT = bytes2reading(packet[6:8])
+                    DT = bytes2reading(packet[8:10])
+                    IT = bytes2reading(packet[10:12])
+                    ET = bytes2reading(packet[12:14])
+#                    BT_target = bytes2reading(packet[14:16])
 
                     air = int.from_bytes(packet[16:18], 'little', signed = False)
                     heater = packet[20] * 10
@@ -524,11 +532,11 @@ def extractProfileOrbiter(f:IO[bytes],
         res['extratimex'] = [timex[:],timex[:],timex[:],timex[:]]
 
         res['extraname1'] = ['IT', 'Sound', '{2}', '{0}']
-        res['extratemp1'] = [extra1, extra3, extra5, extra7]
+        res['extratemp1'] = [replace_duplicates(extra1), extra3, extra5, extra7]
         res['extramathexpression1'] = ['', '', '', '']
 
         res['extraname2'] = ['DT', '{1}', '{3}', 'RoR']
-        res['extratemp2'] = [extra2, extra4, extra6, extra8]
+        res['extratemp2'] = [replace_duplicates(extra2), extra4, extra6, extra8]
         res['extramathexpression2'] = ['', '', '', '']
 
         res['extraLCDvisibility1'] = [True, False, False, True, True, True, True, True, True, True]
@@ -578,6 +586,14 @@ def saveOrbiterROP(filename:str, profile:ProfileData) -> bool:
 
 # store given profile in Orbiter format to outfile
 def saveOrbiter(filename:str, outfile:IO[bytes], profile:ProfileData) -> bool:
+
+    def reading2bytes(v:float) -> bytes:
+        try:
+            return int(round(v)).to_bytes(2, 'little', signed = True)
+        except Exception: # pylint: disable=broad-except
+            pass
+        return b'\xff\xff' # corresponds to -1
+
     readings:list[bytes] = []
     try:
         default_title:str = QApplication.translate('Scope Title', 'Roaster Scope')
@@ -679,12 +695,12 @@ def saveOrbiter(filename:str, outfile:IO[bytes], profile:ProfileData) -> bool:
                     time = tx_new
 
                     values:bytes = time.to_bytes(2, 'little') + \
-                        int(float(temp2[idx])).to_bytes(2, 'little') + \
-                        (int(float(extratemp2[0][idx])).to_bytes(2, 'little') if len(extratemp2)>0 else b'\x00\x00') + \
-                        (int(float(extratemp1[0][idx])).to_bytes(2, 'little') if len(extratemp1)>0 else b'\x00\x00') + \
-                        int(float(temp1[idx])).to_bytes(2, 'little') + \
+                        reading2bytes(temp2[idx]) + \
+                        (reading2bytes(extratemp2[0][idx]) if len(extratemp2)>0 else b'\x00\x00') + \
+                        (reading2bytes(extratemp1[0][idx]) if len(extratemp1)>0 else b'\x00\x00') + \
+                        reading2bytes(temp1[idx]) + \
                         b'\x00\x00' + \
-                        (int(float(extratemp1[3][idx])).to_bytes(2, 'little') if len(extratemp1)>3 else b'\x00\x00') + \
+                        (reading2bytes(extratemp1[3][idx]) if len(extratemp1)>3 else b'\x00\x00') + \
                         b'\x00\x00' + \
                         heater.to_bytes(1, 'little') + \
                         drum.to_bytes(1, 'little') + \
