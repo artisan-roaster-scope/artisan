@@ -44,14 +44,14 @@ import usb.util # type: ignore[import-untyped] # zuban: ignore[no-redef]
 from PyQt6.QtCore import Qt, QDateTime, QLocale
 
 if system().startswith('Windows'):
-    import libusb_package # type:ignore [import-not-found, unused-ignore] # pyright:ignore[reportMissingImports] # pylint: disable=import-error
+    import libusb_package   # type:ignore[import-not-found, unused-ignore] # pyright:ignore[reportMissingImports] # pylint: disable=import-error
 
 import logging
 from typing import Final, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     try:
-        from multiprocessing.connection import PipeConnection as Connection # type: ignore[unused-ignore,attr-defined,assignment] # pylint: disable=unused-import
+        from multiprocessing.connection import PipeConnection as Connection # type:ignore[unused-ignore,attr-defined,assignment] # pylint: disable=unused-import # ty:ignore[missing-module-member]
     except ImportError:
         from multiprocessing.connection import Connection # type: ignore[unused-ignore,attr-defined,assignment] # pylint: disable=unused-import
 

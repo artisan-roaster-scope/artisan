@@ -53,6 +53,7 @@ web_base_url: Final[str] = 'https://artisan.tools'
 shop_base_url: Final[str] = 'https://artisan.tools/shop/'
 
 register_url: Final[str] = web_base_url + '/register'
+pricing_url: Final[str] = web_base_url + '/pricing/'
 reset_passwd_url: Final[str] = web_base_url + '/resetPassword'
 auth_url: Final[str] = api_base_url + '/accounts/users/authenticate'
 stock_url: Final[str] = api_base_url + '/acoffees'

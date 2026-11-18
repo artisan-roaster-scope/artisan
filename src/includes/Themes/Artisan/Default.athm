@@ -74,10 +74,6 @@ legendloc=4
 resetmaxtime=600
 temp_grid=false
 time_grid=false
-ymax=275
-ymin=0
-zmax=25
-zmin=0
 
 [XT]
 color=#404040

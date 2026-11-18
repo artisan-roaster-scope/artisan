@@ -19602,7 +19602,7 @@ class SampleThread(QThread):
         try:
             self.aw.qmc.flagsamplingthreadrunning = True
             if sys.platform.startswith('darwin'):
-                from Foundation import NSAutoreleasePool # type:ignore[attr-defined, import-untyped, unused-ignore] # @UnresolvedImport  # pylint: disable=import-error,no-name-in-module
+                from Foundation import NSAutoreleasePool # type:ignore[attr-defined, import-untyped, unused-ignore] # @UnresolvedImport  # pylint: disable=import-error,no-name-in-module # ty:ignore[missing-module-member]
                 pool = NSAutoreleasePool.alloc().init()  # @UndefinedVariable # pylint: disable=maybe-no-member # noqa: F841
             self.aw.qmc.afterTP = False
             if not self.aw.qmc.flagon:

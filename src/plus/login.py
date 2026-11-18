@@ -77,7 +77,7 @@ class Login(ArtisanDialog):
         self.register_icon.setMaximumSize(15,15)
 
         self.linkRegister = QLabel(
-            f'<small>{QApplication.translate('Plus','An artisan account unlocks more features.')} <a href="{config.register_url}">{QApplication.translate('Plus', 'Register')}</a></smalls>'
+            f'<small>{QApplication.translate('Plus','An artisan account unlocks more features.')} <a href="{config.pricing_url}">{QApplication.translate('Plus', 'Subscribe')}</a></smalls>'
         )
         self.linkRegister.setOpenExternalLinks(True)
         self.linkRegister.setStyleSheet(f"""

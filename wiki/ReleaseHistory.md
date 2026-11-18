@@ -11,6 +11,9 @@ v5.0.1
 * FIXES
   - fixes Svietz SRM machine setup quantifier range (min was 0, but should have been 20)
   - disables zoom follow for NONE / Manual device ([Issue #2252](../../../issues/2252))
+  - fixes BLE loop deadlock on disconnect ([PR #2260](../../../pull/2260) contributed by [Brian Schmitt](https://github.com/brianschmitt))
+  - prevents clearing of extra devices data on theme loading
+  - prevents default theme to adjust axis limits
 
 ----
 v5.0.0 (Nov 5, 2026)

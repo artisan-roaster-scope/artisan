@@ -15295,9 +15295,9 @@ class ApplicationWindow(QMainWindow):
             self.qmc.default_etypes_set   = self.org_extradevicesettings['default_etypes_set']
             self.qmc.etypes               = self.org_extradevicesettings['etypes']
             self.eventsliderunits         = self.org_extradevicesettings['eventsliderunits']
-            self.updateExtradeviceSettings()
+            self.updateExtradeviceSettings(clear_data=True)
 
-    def updateExtradeviceSettings(self) -> None:
+    def updateExtradeviceSettings(self, clear_data:bool) -> None:
         ndevices = len(self.qmc.extradevices)
         if ndevices != len(self.qmc.extralinestyles1) or \
            ndevices != len(self.qmc.extralinestyles2) or \
@@ -15319,21 +15319,22 @@ class ApplicationWindow(QMainWindow):
             self.qmc.extramarkers2 = [self.qmc.marker_default]*ndevices
             self.qmc.extramarkersizes1 = [self.qmc.markersize_default]*ndevices
             self.qmc.extramarkersizes2 = [self.qmc.markersize_default]*ndevices
-        self.qmc.extratemp1 = []
-        self.qmc.extratemp2 = []
-        self.qmc.extratimex = []
-        self.qmc.extrastemp1 = []
-        self.qmc.extrastemp2 = []
-        for _ in range(len(self.qmc.extradevices)):
-            self.qmc.extratemp1.append([])
-            self.qmc.extratemp2.append([])
-            self.qmc.extratimex.append([])
-            self.qmc.extrastemp1.append([])
-            self.qmc.extrastemp2.append([])
-            self.qmc.extractimex1.append([])
-            self.qmc.extractimex2.append([])
-            self.qmc.extractemp1.append([])
-            self.qmc.extractemp2.append([])
+        if clear_data:
+            self.qmc.extratemp1 = []
+            self.qmc.extratemp2 = []
+            self.qmc.extratimex = []
+            self.qmc.extrastemp1 = []
+            self.qmc.extrastemp2 = []
+            for _ in range(len(self.qmc.extradevices)):
+                self.qmc.extratemp1.append([])
+                self.qmc.extratemp2.append([])
+                self.qmc.extratimex.append([])
+                self.qmc.extrastemp1.append([])
+                self.qmc.extrastemp2.append([])
+                self.qmc.extractimex1.append([])
+                self.qmc.extractimex2.append([])
+                self.qmc.extractemp1.append([])
+                self.qmc.extractemp2.append([])
         #extra LCDs and other LCDs visibility
         self.updateLCDproperties()
 
@@ -15539,7 +15540,7 @@ class ApplicationWindow(QMainWindow):
 
                     # ensure that extra list length are of the size of the extradevices:
                     self.ensureCorrectExtraDeviceListLength()
-                    self.updateExtradeviceSettings()
+                    self.updateExtradeviceSettings(clear_data=True)
 
                     settings.beginGroup('ExtraComm')
                     self.getExtraDeviceCommSettings(settings)
@@ -19188,20 +19189,6 @@ class ApplicationWindow(QMainWindow):
             self.getExtraDeviceSettings(settings)
             settings.endGroup()
 #--- END GROUP ExtraDev
-            # ensure that extra list length are of the size of the extradevices:
-            self.ensureCorrectExtraDeviceListLength()
-            self.updateExtradeviceSettings()
-
-            try:
-                _log.info('machine: %s (%s, %skg, %s)', self.qmc.machinesetup, self.qmc.roastertype_setup, self.qmc.roastersize_setup, ([''] + self.qmc.sourcenames)[self.qmc.roasterheating_setup])
-                _log.info('device: %s (%s extra devices)', ('PID' if self.qmc.device <= 0 else ('??' if not (DEVICE_ID_MIN <= self.qmc.device <= DEVICE_ID_MAX) else get_device_name(self.qmc.device))), len(self.qmc.extradevices))
-                _log.info('serial: %s @%s', self.ser.comport, self.ser.baudrate)
-                _log.info('MODBUS %s: %s, %s %s%s%s@%s (%s, %s, %s / %s, %s)', ['Serial RTU','Serial ASCII','Serial Binary','TCP','UDP'][self.modbus.type],
-                        self.modbus.host, self.modbus.comport, self.modbus.bytesize, self.modbus.parity, self.modbus.stopbits, self.modbus.baudrate, self.modbus.timeout, self.modbus.modbus_serial_connect_delay, self.modbus.serial_readRetries, self.modbus.IP_timeout, self.modbus.IP_retries)
-                _log.info('S7: %s', self.s7.host)
-                _log.info('WebSocket: %s', self.ws.host)
-            except Exception as e: # pylint: disable=broad-except
-                _log.error(e)
 
 #--- BEGIN GROUP CurveStyles
             #restore curve styles
@@ -19262,10 +19249,11 @@ class ApplicationWindow(QMainWindow):
             self.qmc.YTbacklinewidth = max(0.1,float2float(toFloat(settings.value('YTbacklinewidth',self.qmc.YTbacklinewidth))))
             self.qmc.YTbackmarker = s2a(toString(settings.value('YTbackmarker',self.qmc.YTbackmarker)))
             self.qmc.YTbackmarkersize = max(0.1,float2float(toFloat(settings.value('YTbackmarkersize',self.qmc.YTbackmarkersize))))
+            #
             self.getExtraDeviceCurveStyles(settings)
             # ensure that extra list length are of the size of the extradevices:
             self.ensureCorrectExtraDeviceListLength()
-            self.updateExtradeviceSettings()
+            self.updateExtradeviceSettings(clear_data=not theme)
             #
             self.qmc.BTBdeltalinestyle = s2a(toString(settings.value('BTBdeltalinestyle',self.qmc.BTBdeltalinestyle)))
             self.qmc.BTBdeltadrawstyle = s2a(toString(settings.value('BTBdeltadrawstyle',self.qmc.BTBdeltadrawstyle)))
@@ -19279,6 +19267,17 @@ class ApplicationWindow(QMainWindow):
             self.qmc.ETBdeltamarkersize = max(0.1,float2float(toFloat(settings.value('ETBdeltamarkersize',self.qmc.ETBdeltamarkersize))))
             settings.endGroup()
 #--- END GROUP CurveStyles
+
+            try:
+                _log.info('machine: %s (%s, %skg, %s)', self.qmc.machinesetup, self.qmc.roastertype_setup, self.qmc.roastersize_setup, ([''] + self.qmc.sourcenames)[self.qmc.roasterheating_setup])
+                _log.info('device: %s (%s extra devices)', ('PID' if self.qmc.device <= 0 else ('??' if not (DEVICE_ID_MIN <= self.qmc.device <= DEVICE_ID_MAX) else get_device_name(self.qmc.device))), len(self.qmc.extradevices))
+                _log.info('serial: %s @%s', self.ser.comport, self.ser.baudrate)
+                _log.info('MODBUS %s: %s, %s %s%s%s@%s (%s, %s, %s / %s, %s)', ['Serial RTU','Serial ASCII','Serial Binary','TCP','UDP'][self.modbus.type],
+                        self.modbus.host, self.modbus.comport, self.modbus.bytesize, self.modbus.parity, self.modbus.stopbits, self.modbus.baudrate, self.modbus.timeout, self.modbus.modbus_serial_connect_delay, self.modbus.serial_readRetries, self.modbus.IP_timeout, self.modbus.IP_retries)
+                _log.info('S7: %s', self.s7.host)
+                _log.info('WebSocket: %s', self.ws.host)
+            except Exception as e: # pylint: disable=broad-except
+                _log.error(e)
 
 #--- BEGIN GROUP ExtraComm
             # Extra com ports
@@ -28103,7 +28102,7 @@ def initialize_locale(my_app:Artisan) -> str:
 
     if locale == '':
         if platform.system() == 'Darwin':
-            from Cocoa import NSUserDefaults # type:ignore[import-not-found,attr-defined,unused-ignore,import-untyped]  # @UnresolvedImport # pylint: disable=import-error,no-name-in-module
+            from Cocoa import NSUserDefaults # type:ignore[import-not-found,attr-defined,unused-ignore,import-untyped]  # @UnresolvedImport # pylint: disable=import-error,no-name-in-module # ty:ignore[missing-module-member]
             defs = NSUserDefaults.standardUserDefaults()
             langs = defs.objectForKey_('AppleLanguages') # pyright:ignore[reportUnknownArgumentType]
             if langs.objectAtIndex_(0)[:7] == 'zh_Hans': # pyright:ignore[reportUnknownArgumentType]
