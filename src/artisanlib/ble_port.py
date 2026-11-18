@@ -257,16 +257,30 @@ class BLE:
                 _log.error('exception in start_notify: %s', exc)
                 self.disconnect_ble(client) # disconnect from ble client in case we cannot establish the notifications
 
-    def stop_notify(self, client:'BleakClient', uuid:str) -> None:
+    # returns True if the notification got stopped, False otherwise
+    def stop_notify(self, client:'BleakClient', uuid:str) -> bool:
         if hasattr(self, '_asyncLoopThread') and self._asyncLoopThread is not None and client.is_connected:
+            try:
+                if asyncio.get_running_loop() is self._asyncLoopThread.loop:
+                    # Called on the BLE loop thread itself, e.g. from a disconnected_callback that bleak (WinRT backend)
+                    # fires synchronously from within client.disconnect() while client.is_connected is still True.
+                    # Blocking on fut.result() below would deadlock the very loop that has to run client.stop_notify(),
+                    # leaving all later BLE scans/connects hanging until the app is restarted.
+                    # Bleak removes the notification handlers on disconnect anyway.
+                    _log.debug('stop_notify on %s skipped: called from the BLE loop thread', uuid)
+                    return False
+            except RuntimeError:
+                pass # no running event loop in this thread
             fut = asyncio.run_coroutine_threadsafe(
                 client.stop_notify(uuid),
                 self._asyncLoopThread.loop)
             try:
                 fut.result()
+                return True
             except Exception:  # pylint: disable=broad-except
                 exc = fut.exception() if not fut.cancelled() else asyncio.CancelledError()
                 _log.error('exception in stop_notify: %s', exc)
+        return False
 
 ble = BLE() # unique to module
 
@@ -329,8 +343,8 @@ class ClientBLE(QObject):
         for notify_uuid in self._active_notification_uuids:
             if self._ble_client is not None and self._ble_client.is_connected:
                 try:
-                    ble.stop_notify(self._ble_client, notify_uuid)
-                    _log.debug('notifications on %s stopped', notify_uuid)
+                    if ble.stop_notify(self._ble_client, notify_uuid):
+                        _log.debug('notifications on %s stopped', notify_uuid)
                 except BleakCharacteristicNotFoundError:
                     _log.debug('start_notifications: characteristic %s not found', notify_uuid)
         self._active_notification_uuids = set()

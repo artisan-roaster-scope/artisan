@@ -18,6 +18,7 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
+from artisanlib.async_comm import AsyncLoopThread
 from artisanlib.ble_port import BLE, ClientBLE
 
 
@@ -332,6 +333,55 @@ class TestBLE:
 
             # Assert
             assert result is False
+
+    def test_stop_notify_off_loop_thread(self, ble_instance: BLE, mock_bleak_client: Mock) -> None:
+        """Test stop_notify called from a foreign thread stops the notification on the BLE loop."""
+        # Arrange
+        loop_thread = AsyncLoopThread()
+        ble_instance._asyncLoopThread = loop_thread
+        try:
+            # Act
+            result = ble_instance.stop_notify(mock_bleak_client, 'uuid')
+
+            # Assert
+            assert result is True
+            mock_bleak_client.stop_notify.assert_awaited_once_with('uuid')
+        finally:
+            ble_instance._asyncLoopThread = None
+            loop_thread.stop(timeout=2.0)
+
+    def test_stop_notify_on_loop_thread_does_not_deadlock(self, ble_instance: BLE) -> None:
+        """Test stop_notify called on the BLE loop thread does not block that loop.
+
+        Bleak's WinRT backend fires the disconnected_callback synchronously from within
+        client.disconnect(), on the BLE loop, while client.is_connected is still True.
+        ClientBLE.disconnected_callback() then calls stop_notifications() -> BLE.stop_notify().
+        Waiting there on a future scheduled onto the same loop deadlocked the loop, leaving
+        every later scan/connect hanging until the app got restarted.
+        """
+        # Arrange
+        loop_thread = AsyncLoopThread()
+        ble_instance._asyncLoopThread = loop_thread
+        client = Mock()
+        client.is_connected = True
+        client.stop_notify = AsyncMock()
+
+        async def winrt_like_disconnect() -> bool:
+            # mimics bleak WinRT: disconnected callback runs inline before the session is closed
+            res = ble_instance.stop_notify(client, 'uuid')
+            client.is_connected = False
+            return res
+
+        try:
+            # Act
+            fut = asyncio.run_coroutine_threadsafe(winrt_like_disconnect(), loop_thread.loop)
+
+            # Assert
+            assert fut.result(timeout=3.0) is False  # completes instead of hanging; notification not stopped explicitly
+            client.stop_notify.assert_not_called()
+        finally:
+            ble_instance._asyncLoopThread = None
+            loop_thread.stop(timeout=2.0)
 
 
 class TestClientBLE:
