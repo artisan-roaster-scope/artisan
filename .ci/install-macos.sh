@@ -30,33 +30,6 @@ set -e # reduced logging
 echo "** Running install-macos.sh"
 #.ci/silence.sh brew update # this seems to help to work around some homebrew issues; and fails on others
 
-# upgrade Python version when PYUPGRADE_MACOS_V exists and has a value
-if [ -n "${PYUPGRADE_MACOS_V:-}" ]; then
-    # first deactivate current venv
-    source ${VIRTUAL_ENV}/bin/activate
-    deactivate
-    # brew update Python
-    brew update
-    brew upgrade python # no "brew cleanup" here, not to delete libs needed by curl!
-    # relink Python
-    brew unlink python@${PYTHON_V} && brew link --force --overwrite python@${PYTHON_V}
-    hash -r
-    brew install jq
-    # add path
-    export PATH="$(brew --cellar python@${PYTHON_V})/$(brew info --json python@${PYTHON_V} | jq -r '.[0].installed[0].version')/bin:${PATH}"
-    echo $PATH
-    which python3
-    python3 --version
-    brew reinstall openssl # needed to get the ssl certificates properly installed for artisan.plus communication
-
-    # create new venv
-    python3 -m venv /Users/appveyor/venv${PYUPGRADE_MACOS_V}
-    source /Users/appveyor/venv${PYUPGRADE_MACOS_V}/bin/activate
-    # update symbolic link to point to our new venv
-    ln -vfns /Users/appveyor/venv${PYUPGRADE_MACOS_V} /Users/appveyor/venv${PYTHON_V}
-    export PATH=/Users/appveyor/venv${PYUPGRADE_MACOS_V}/bin:${PATH} # not exported?
-fi
-
 hash -r
 uname -srv
 which python3
