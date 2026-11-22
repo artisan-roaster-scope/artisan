@@ -457,7 +457,7 @@ class GreenWeighingState(StateMachine):
             if weight is None:
                 weight = self.current_weight_item.weight
             _log.debug('BatchManager: green weighing task completed => %s', weight)
-            self.current_weight_item.callback(str(self.current_weight_item.uuid), weight) # register weight in weight_item as prepared
+            self.current_weight_item.callback(self.current_weight_item.uuid, weight) # register weight in weight_item as prepared
 
 
 #-
@@ -745,7 +745,7 @@ class RoastedWeighingState(StateMachine):
             if weight is None:
                 weight = self.current_weight_item.weight_estimate
             _log.debug('BatchManager: roasted weighing task completed => %s', weight)
-            self.current_weight_item.callback(str(self.current_weight_item.uuid), weight) # register weight in weight_item as prepared
+            self.current_weight_item.callback(self.current_weight_item.uuid, weight) # register weight in weight_item as prepared
 
 
 
@@ -800,8 +800,8 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
 
         # set display done/cancel timer values
         for display in displays:
-            display.set_cancel_timer_timeout(int(round(self.WAIT_BEFORE_CANCEL/1000)))
-            display.set_done_timer_timeout(int(round(self.WAIT_BEFORE_DONE/1000)))
+            display.set_cancel_timer_timeout(round(self.WAIT_BEFORE_CANCEL/1000))
+            display.set_done_timer_timeout(round(self.WAIT_BEFORE_DONE/1000))
 
         # holds the next WeightItem waiting to be processed, if any
         self.next_green_item: GreenWeightItem | None = None
@@ -993,7 +993,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
     # returns roasted container weight in g if one is set
     def roasted_container_weight(self) -> int | None:
         if 0 <= self.aw.container2_idx < len(self.aw.qmc.container_weights):
-            return int(round(self.aw.qmc.container_weights[self.aw.container2_idx])) # in g
+            return round(self.aw.qmc.container_weights[self.aw.container2_idx]) # in g
         return None
 
     # returns the expected total weight (bucket + roasted coffee) in g of the roasted current_weight_item if any
@@ -1004,7 +1004,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
             return None
         # current_weight_item.weight holds the weight estimate for the roasted batch in kg
         # either taken from the template or assuming a default loss (15%)
-        return int(round(self.sm_roasted.current_weight_item.weight * 1000 + roasted_container_weight))
+        return round(self.sm_roasted.current_weight_item.weight * 1000 + roasted_container_weight)
 
 
     # estimated_roasted_weight in kg
@@ -1105,7 +1105,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
 
     # tare_weight and current_weight in g
     def scale_empty(self, scale_nr:int, empty_weight:int, current_weight:int) -> bool:
-        return bool(abs(empty_weight - current_weight) <= self.empty_scale_tolerance(scale_nr))
+        return abs(empty_weight - current_weight) <= self.empty_scale_tolerance(scale_nr)
 
     # scale_nr: 1 or 2
     def scale_stable_weight_changed(self, scale_nr:int, stable_weight:int) -> None:
@@ -1328,7 +1328,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
                     self.scale_manager.scale1_disconnected_signal.connect(self.scale1_disconnected_slot)
                     self.scale_manager.reserve_scale1_signal.emit()
                     self.scale_manager.signal_user_scale1_signal.emit(STATE_ACTION.ASSIGNED_ROASTED)
-                    self.sm_roasted.send('bucket_placed', int(round(self.roasted_task_scale_total_weight - self.aw.qmc.container_weights[self.aw.container2_idx])))
+                    self.sm_roasted.send('bucket_placed', round(self.roasted_task_scale_total_weight - self.aw.qmc.container_weights[self.aw.container2_idx]))
                 elif scale_nr == 2:
                     self.roasted_task_scale = scale_nr
                     self.roasted_task_empty_scale_weight = last_stable_weight
@@ -1337,7 +1337,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
                     self.scale_manager.scale2_disconnected_signal.connect(self.scale2_disconnected_slot)
                     self.scale_manager.reserve_scale2_signal.emit()
                     self.scale_manager.signal_user_scale2_signal.emit(STATE_ACTION.ASSIGNED_ROASTED)
-                    self.sm_roasted.send('bucket_placed', int(round(self.roasted_task_scale_total_weight - self.aw.qmc.container_weights[self.aw.container2_idx])))
+                    self.sm_roasted.send('bucket_placed', round(self.roasted_task_scale_total_weight - self.aw.qmc.container_weights[self.aw.container2_idx]))
 
 
         # step < 0
@@ -1414,7 +1414,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
 
                 if self.sm_roasted.is_current_state(RoastedWeighingState.weighing) and abs(self.roasted_task_scale_total_weight + step) < self.ROASTED_BUCKET_REMOVALE_TOLERANCE:  # zuban:ignore[no-untyped-call]
                     # 1. full roasted bucket weighing finished:
-                    weight = int(round(self.roasted_task_scale_total_weight - self.aw.qmc.container_weights[self.aw.container2_idx]))
+                    weight = round(self.roasted_task_scale_total_weight - self.aw.qmc.container_weights[self.aw.container2_idx])
                     self.roasted_task_done_weight = weight
                     self.roasted_task_done_step = step
                     self.sm_roasted.send('task_completed', self.roasted_task_done_weight)
@@ -1452,7 +1452,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
         if self.roasted_task_done_weight == 0 and self.roasted_task_scale == scale_nr and self.sm_roasted.is_current_state(RoastedWeighingState.weighing):  # zuban:ignore[no-untyped-call]
             # while roasting scale is in weighing state, we updated the
             self.roasted_task_scale_total_weight = stable_weight - self.roasted_task_empty_scale_weight
-            self.sm_roasted.send('update',int(round(self.roasted_task_scale_total_weight - self.aw.qmc.container_weights[self.aw.container2_idx])))
+            self.sm_roasted.send('update',round(self.roasted_task_scale_total_weight - self.aw.qmc.container_weights[self.aw.container2_idx]))
 
         # update stable weight
         if scale_nr == 1:

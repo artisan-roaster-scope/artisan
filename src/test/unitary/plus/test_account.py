@@ -123,7 +123,7 @@ with patch('plus.config.account_cache', 'account'), patch(
 
 
 @pytest.fixture(autouse=True)
-def reset_account_state() -> Generator[None, None, None]:
+def reset_account_state() -> Generator[None]:
     """
     Reset all account module state before and after each test to ensure complete isolation.
 
@@ -175,7 +175,7 @@ def mock_file_handle() -> Mock:
 
 
 @pytest.fixture
-def temp_cache_dir() -> Generator[str, None, None]:
+def temp_cache_dir() -> Generator[str]:
     """Create a temporary cache directory for each test."""
     with tempfile.TemporaryDirectory() as temp_dir:
         yield temp_dir
@@ -195,7 +195,7 @@ def mock_shelve_db() -> Mock:
 
 
 @pytest.fixture
-def isolated_account_module() -> Generator[Any, None, None]:
+def isolated_account_module() -> Generator[Any]:
     """Provide an isolated account module for each test."""
     # Store original values
     original_cache_path = getattr(account, 'account_cache_path', None)
@@ -214,7 +214,7 @@ def isolated_account_module() -> Generator[Any, None, None]:
 
 
 @pytest.fixture
-def safe_module_reload() -> Generator[None, None, None]:
+def safe_module_reload() -> Generator[None]:
     """Safely handle module reloading with proper state restoration."""
     # Store original module state before any potential reload
     original_cache_path = getattr(account, 'account_cache_path', None)

@@ -214,7 +214,7 @@ class KaleidoPort:
         if len(message)>2 and message.startswith('{') and message.endswith('}'):
             elems = message[1:-1].split(',')
             try:
-                sid:int = int(round(float(elems[0])))
+                sid:int = round(float(elems[0]))
                 await self.set_state('sid',str(sid),False)
                 single_res:bool = len(elems[1:]) == 1 # true if the response contains only one var/value pair
                 for el in elems[1:]:

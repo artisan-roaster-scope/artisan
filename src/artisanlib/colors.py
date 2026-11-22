@@ -126,7 +126,7 @@ class graphColorDlg(ArtisanDialog):
         self.opaqbgSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.opaqbgSpinBox.setRange(1,10)
         self.opaqbgSpinBox.setSingleStep(1)
-        self.opaqbgSpinBox.setValue(int(round(self.aw.qmc.backgroundalpha * 10)))
+        self.opaqbgSpinBox.setValue(round(self.aw.qmc.backgroundalpha * 10))
         self.opaqbgSpinBox.valueChanged.connect(self.adjustintensity)
         self.opaqbgSpinBox.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.opaqbgLayout = QHBoxLayout()
@@ -225,7 +225,7 @@ class graphColorDlg(ArtisanDialog):
         self.legendbgSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.legendbgSpinBox.setRange(1,10)
         self.legendbgSpinBox.setSingleStep(1)
-        self.legendbgSpinBox.setValue(int(round(self.aw.qmc.alpha['legendbg'] * 10)))
+        self.legendbgSpinBox.setValue(round(self.aw.qmc.alpha['legendbg'] * 10))
         self.legendbgSpinBox.valueChanged.connect(self.adjustOpaqenesssSlot)
         self.legendbgSpinBox.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.legendbgButton.setSizePolicy(QSizePolicy.Policy.Expanding,self.legendbgButton.sizePolicy().verticalPolicy())
@@ -240,7 +240,7 @@ class graphColorDlg(ArtisanDialog):
         self.canvasLabel = QLabel(QApplication.translate('Button','Canvas'))
         self.canvasLabel.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         self.canvasButton = self.colorButton(self.aw.qmc.palette['canvas'])
-        if str(self.aw.qmc.palette['canvas']) == 'None':
+        if self.aw.qmc.palette['canvas'] == 'None':
             self.canvasButton.setPalette(QPalette(QColor('#f0f0f0')))
         else:
             self.canvasButton.setPalette(QPalette(QColor(self.aw.qmc.palette['canvas'])))
@@ -288,7 +288,7 @@ class graphColorDlg(ArtisanDialog):
         self.analysismaskSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.analysismaskSpinBox.setRange(1,10)
         self.analysismaskSpinBox.setSingleStep(1)
-        self.analysismaskSpinBox.setValue(int(round(self.aw.qmc.alpha['analysismask'] * 10)))
+        self.analysismaskSpinBox.setValue(round(self.aw.qmc.alpha['analysismask'] * 10))
         self.analysismaskSpinBox.valueChanged.connect(self.adjustOpaqenesssSlot)
         self.analysismaskSpinBox.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.analysismaskLayout = QHBoxLayout()
@@ -306,7 +306,7 @@ class graphColorDlg(ArtisanDialog):
         self.statsanalysisbkgndSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.statsanalysisbkgndSpinBox.setRange(1,10)
         self.statsanalysisbkgndSpinBox.setSingleStep(1)
-        self.statsanalysisbkgndSpinBox.setValue(int(round(self.aw.qmc.alpha['statsanalysisbkgnd'] * 10)))
+        self.statsanalysisbkgndSpinBox.setValue(round(self.aw.qmc.alpha['statsanalysisbkgnd'] * 10))
         self.statsanalysisbkgndSpinBox.valueChanged.connect(self.adjustOpaqenesssSlot)
         self.statsanalysisbkgndSpinBox.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.statsanalysisbkgndLayout = QHBoxLayout()
@@ -799,7 +799,7 @@ class graphColorDlg(ArtisanDialog):
         self.bgdeltabtButton.setStyleSheet('QPushButton { background-color: ' + rgba_colorname2argb_colorname(self.aw.qmc.backgrounddeltabtcolor) + '; color: ' + self.aw.labelBorW(self.aw.qmc.backgrounddeltabtcolor) + ';' + self.commonstyle + '}')
         self.bgextraButton.setStyleSheet('QPushButton { background-color: ' + rgba_colorname2argb_colorname(self.aw.qmc.backgroundxtcolor) + '; color: ' + self.aw.labelBorW(self.aw.qmc.backgroundxtcolor) + ';' + self.commonstyle + '}')
         self.bgextra2Button.setStyleSheet('QPushButton { background-color: ' + rgba_colorname2argb_colorname(self.aw.qmc.backgroundytcolor) + '; color: ' + self.aw.labelBorW(self.aw.qmc.backgroundytcolor) + ';' + self.commonstyle + '}')
-        self.opaqbgSpinBox.setValue(int(round(self.aw.qmc.backgroundalpha * 10)))
+        self.opaqbgSpinBox.setValue(round(self.aw.qmc.backgroundalpha * 10))
 
         # LEDs
         for button,tag in [
@@ -827,7 +827,7 @@ class graphColorDlg(ArtisanDialog):
             button.setStyleSheet(f"""
                 background-color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteB[tag])}; color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteF[tag])};{self.commonstyle}""")
 
-        if str(self.aw.qmc.palette['canvas']) == 'None':
+        if self.aw.qmc.palette['canvas'] == 'None':
             self.canvasLabel.setStyleSheet('QPushButton {background-color: #f0f0f0 ;' + self.commonstyle + '}')
 
     def setColorButton(self, button:QPushButton, tag:str) -> None:
@@ -904,7 +904,7 @@ class graphColorDlg(ArtisanDialog):
                 self.aw.qmc.backgroundytcolor = color
             self.aw.updateCanvasColors()
             self.aw.qmc.redraw(recomputeAllDeltas=False)
-            self.aw.sendmessage(QApplication.translate('Message','Color of {0} set to {1}').format(title,str(color)))
+            self.aw.sendmessage(QApplication.translate('Message','Color of {0} set to {1}').format(title,color))
 
     def setlcdColor(self, palette:dict[str,str], disj_palette:dict[str,str], select:str) -> None:
         res = self.aw.colordialog(QColor(rgba_colorname2argb_colorname(palette[select])), alphasupport=True)
@@ -1015,7 +1015,7 @@ class graphColorDlg(ArtisanDialog):
                 self.aw.setLabelColor(self.aw.label4, self.aw.qmc.palette[color], self.aw.qmc.DeltaETflag)
             elif title == 'DeltaBT':
                 self.aw.setLabelColor(self.aw.label5, self.aw.qmc.palette[color], self.aw.qmc.DeltaBTflag)
-            self.aw.sendmessage(QApplication.translate('Message','Color of {0} set to {1}').format(title,str(self.aw.qmc.palette[color])))
+            self.aw.sendmessage(QApplication.translate('Message','Color of {0} set to {1}').format(title,self.aw.qmc.palette[color]))
 
     @pyqtSlot(int)
     def adjustintensity(self, _:int) -> None:

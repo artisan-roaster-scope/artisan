@@ -42,7 +42,7 @@ import pytest
 
 
 @pytest.fixture(autouse=True)
-def reset_test_state() -> Generator[None, None, None]:
+def reset_test_state() -> Generator[None]:
     """Reset test state before each test to ensure test independence."""
     yield
     # No specific state to reset

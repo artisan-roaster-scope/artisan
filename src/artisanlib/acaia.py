@@ -705,7 +705,7 @@ class AcaiaProtocol:
         if b == 255:
             _log.debug('battery: --')
         elif 0 <= b <= 100:
-            self.battery = int(payload[0])
+            self.battery = payload[0]
             self._battery_changed_handler(self.battery)
             _log.debug('battery: %s', self.battery)
         return EVENT_LEN.BATTERY
@@ -765,7 +765,7 @@ class AcaiaProtocol:
             elif payload[0] == KEY_ADDITIONAL_INFO.BATTERY:
                 data_payload = payload[1:]
                 if len(data_payload) > EVENT_LEN.BATTERY:
-                    _log.debug('key event battery: %s', int(data_payload[0]))
+                    _log.debug('key event battery: %s', data_payload[0])
             elif payload[0] == KEY_ADDITIONAL_INFO.NINE:
                 _log.debug('aditional key info 9: %s', payload[1:])
             elif payload[0] == KEY_ADDITIONAL_INFO.TEN:
@@ -845,10 +845,10 @@ class AcaiaProtocol:
 
         # byte 1: battery level (7 bits of second byte) + TIMER_START (1bit)
         if payload and len(payload) > 1:
-            if int(payload[1]) == 255:
+            if payload[1] == 255:
                 _log.debug('battery: ---')
             else:
-                self.battery = int(payload[1] & ~(1 << 7))
+                self.battery = payload[1] & ~(1 << 7)
                 self._battery_changed_handler(self.battery)
                 _log.debug('battery: %s%%', self.battery)
 
@@ -856,7 +856,7 @@ class AcaiaProtocol:
         if payload and len(payload) > 2:
             if self.scale_class == SCALE_CLASS.RELAY:
                 # relay scales: auto off setting for
-                auto_off = int(payload[2] & 0xFF)
+                auto_off = payload[2] & 0xFF
                 if auto_off == 0:
                     self.auto_off_timer = AUTO_OFF_TIMER.AUTO_SLEEP_OFF
 #                    _log.debug('AUTO OFF TIMER: Auto Sleep Off')
@@ -883,7 +883,7 @@ class AcaiaProtocol:
 #                    _log.debug('AUTO OFF TIMER: AutoSleep 1 min')
             else:
                 # display scales: weight unit (7 bits of third byte) + CD_START (1bit)
-                self.unit = int(payload[2] & 0x7F)
+                self.unit = payload[2] & 0x7F
 #                _log.debug('unit: %s (%s)', self.unit, ('g' if self.unit == UNIT.G else 'oz'))
 
         # byte 3:
@@ -894,7 +894,7 @@ class AcaiaProtocol:
                 _log.debug('sound: %s', ('on' if payload[6] else 'off'))
             else:
                 # display scales: mode (7 bits of third byte) + tare (1bit)
-                mode = int(payload[3] & 0x7F)
+                mode = payload[3] & 0x7F
                 _log.debug('mode: %s', mode)
                 _log.debug('tare: %s', (payload[3] & 0x80) == 0x80)
                 # Lunar

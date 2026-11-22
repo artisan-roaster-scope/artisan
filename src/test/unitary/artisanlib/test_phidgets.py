@@ -23,14 +23,14 @@ from artisanlib.phidgets import PhidgetManager
 
 
 @pytest.fixture(autouse=True)
-def reset_test_state() -> Generator[None, None, None]:
+def reset_test_state() -> Generator[None]:
     """Reset all test state before each test to ensure test independence."""
     yield
     # Clean up after each test - no specific cleanup needed for this module
 
 
 @pytest.fixture
-def mock_manager() -> Generator[Mock, None, None]:
+def mock_manager() -> Generator[Mock]:
     """Create a fresh mock Phidget Manager for each test."""
     with patch('artisanlib.phidgets.Manager') as mock:
         mock_instance = Mock()
@@ -45,7 +45,7 @@ def mock_manager() -> Generator[Mock, None, None]:
 
 
 @pytest.fixture
-def mock_qsemaphore() -> Generator[Mock, None, None]:
+def mock_qsemaphore() -> Generator[Mock]:
     """Create a fresh mock QSemaphore for each test."""
     with patch('artisanlib.phidgets.QSemaphore') as mock:
         mock_instance = Mock()
@@ -59,7 +59,7 @@ def mock_qsemaphore() -> Generator[Mock, None, None]:
 
 
 @pytest.fixture
-def mock_device_class() -> Generator[Mock, None, None]:
+def mock_device_class() -> Generator[Mock]:
     """Create fresh mock DeviceClass constants for each test."""
     with patch('artisanlib.phidgets.DeviceClass') as mock:
         mock.reset_mock()
@@ -69,7 +69,7 @@ def mock_device_class() -> Generator[Mock, None, None]:
 
 
 @pytest.fixture
-def mock_device_id() -> Generator[Mock, None, None]:
+def mock_device_id() -> Generator[Mock]:
     """Create fresh mock DeviceID constants for each test."""
     with patch('artisanlib.phidgets.DeviceID') as mock:
         mock.reset_mock()

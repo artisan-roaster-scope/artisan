@@ -108,7 +108,7 @@ from artisanlib.s7client import S7Client
 
 
 @pytest.fixture(scope='session', autouse=True)
-def ensure_s7client_isolation() -> Generator[None, None, None]:
+def ensure_s7client_isolation() -> Generator[None]:
     """
     Ensure external modules are properly isolated for s7client tests at session level.
 
@@ -123,7 +123,7 @@ def ensure_s7client_isolation() -> Generator[None, None, None]:
 
 
 @pytest.fixture(autouse=True)
-def reset_s7client_state() -> Generator[None, None, None]:
+def reset_s7client_state() -> Generator[None]:
     """
     Reset all s7client module state before and after each test to ensure complete isolation.
 

@@ -229,7 +229,7 @@ from plus import sync
 
 # Session-level isolation fixture
 @pytest.fixture(scope='session', autouse=True)
-def isolate_sync_module() -> Generator[None, None, None]:
+def isolate_sync_module() -> Generator[None]:
     """
     Session-level fixture to isolate the sync module and prevent cross-file contamination.
 
@@ -252,7 +252,7 @@ def isolate_sync_module() -> Generator[None, None, None]:
 
 
 @pytest.fixture(autouse=True)
-def reset_sync_state() -> Generator[None, None, None]:
+def reset_sync_state() -> Generator[None]:
     """Reset sync module state before each test to ensure test independence."""
     # Reset sync module global variables
     if hasattr(sync, 'cached_sync_record'):

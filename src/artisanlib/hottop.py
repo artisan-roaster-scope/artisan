@@ -87,7 +87,7 @@ class Hottop(AsyncComm):
     def valid_message(self, message:bytearray) -> bool:
         return (len(message) == 36 and
             self.HEADER[0:2] == bytes(message[0:2]) and
-            (not self._verify_crc or int(message[35]) == sum(int(c) for c in message[:35]) & 0xFF))
+            (not self._verify_crc or message[35] == sum(c for c in message[:35]) & 0xFF))
 
 
     # asyncio read implementation
@@ -109,14 +109,14 @@ class Hottop(AsyncComm):
             if self._logging:
                 _log.info('valid message received: %s', message)
             #VERSION = int(message[4])               # => 1 (first released version)
-            self._heater = int(message[10])
-            self._fan = int(message[11])
-            self._main_fan = int(message[12]) * 10   # machine returns 0-10
-            self._et = int(message[23]) * 256 + int(message[24])
-            self._bt = int(message[25]) * 256 + int(message[26])
-            self._solenoid = int(message[16])
-            self._drum_motor = int(message[17])
-            self._cooling_motor = int(message[18])
+            self._heater = message[10]
+            self._fan = message[11]
+            self._main_fan = message[12] * 10   # machine returns 0-10
+            self._et = message[23] * 256 + message[24]
+            self._bt = message[25] * 256 + message[26]
+            self._solenoid = message[16]
+            self._drum_motor = message[17]
+            self._cooling_motor = message[18]
             #CHAFF_TRAY = int(message[19])
             if self._control_active:
                 # safety cut
@@ -163,8 +163,8 @@ class Hottop(AsyncComm):
         cmd[5] = 0x01
         cmd[6] = 0x24
         cmd[10] = self.newValue(self._set_heater, self._heater)
-        cmd[11] = int(round(self.newValue(self._set_fan, self._fan) / 10.))
-        cmd[12] = int(round(self.newValue(self._set_main_fan, self._main_fan) / 10.))
+        cmd[11] = round(self.newValue(self._set_fan, self._fan) / 10.)
+        cmd[12] = round(self.newValue(self._set_main_fan, self._main_fan) / 10.)
         cmd[16] = self.newValue(self._set_solenoid, self._solenoid)
         cmd[17] = self.newValue(self._set_drum_motor, self._drum_motor)
         cmd[18] = self.newValue(self._set_cooling_motor, self._cooling_motor)

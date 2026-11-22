@@ -213,7 +213,7 @@ convert_from_bcd, convert_to_bcd, modbusport, ApplicationWindow = _import_modbus
 
 
 @pytest.fixture(scope='session', autouse=True)
-def ensure_modbus_qt_isolation() -> Generator[None, None, None]:
+def ensure_modbus_qt_isolation() -> Generator[None]:
     """
     Ensure Qt modules are properly isolated for modbus tests at session level.
 
@@ -244,7 +244,7 @@ def ensure_modbus_qt_isolation() -> Generator[None, None, None]:
 
 
 @pytest.fixture(autouse=True)
-def reset_modbus_state() -> Generator[None, None, None]:
+def reset_modbus_state() -> Generator[None]:
     """
     Reset all modbus module state before and after each test to ensure complete isolation.
 

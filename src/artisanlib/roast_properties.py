@@ -365,7 +365,7 @@ class volumeCalculatorDlg(ArtisanDialog):
     @override
     def keyPressEvent(self, a0: 'QKeyEvent|None') -> None:
         if a0 is not None:
-            key = int(a0.key())
+            key = a0.key()
             if key == 16777220 and self.scale_connected: # ENTER key pressed
                 v = self.retrieveWeight()
                 if v and v != 0:
@@ -450,13 +450,13 @@ class volumeCalculatorDlg(ArtisanDialog):
                 self.coffeeoutvolume.setText('')
                 self.outVolume = None
             else:
-                outWeight:float = float(comma2dot(str(self.coffeeoutweightEdit.text())))
+                outWeight:float = float(comma2dot(self.coffeeoutweightEdit.text()))
                 if outWeight == 0:
                     self.coffeeoutvolume.setText('')
                     self.outVolume = None
                 else:
                     self.outVolume = convertVolume(
-                        convertWeight(self.weightOut,self.weightunit,0) * float(comma2dot(str(self.unitvolumeEdit.text()))) / outWeight,
+                        convertWeight(self.weightOut,self.weightunit,0) * float(comma2dot(self.unitvolumeEdit.text())) / outWeight,
                         5,
                         self.volumeunit)
                     self.coffeeoutvolume.setText(f'{float2floatWeightVolume(self.outVolume):g}')
@@ -1080,7 +1080,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         #bean size
         bean_size_label = QLabel('<b>' + QApplication.translate('Label', 'Screen') + '</b>')
-        self.bean_size_min_edit = QLineEdit(str(int(round(self.aw.qmc.beansize_min))))
+        self.bean_size_min_edit = QLineEdit(str(round(self.aw.qmc.beansize_min)))
         self.bean_size_min_edit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.bean_size_min_edit.setToolTip(QApplication.translate('Tooltip', 'smallest screen size'))
         self.bean_size_min_edit.editingFinished.connect(self.beanSizeMinEdited)
@@ -1089,7 +1089,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.bean_size_min_edit.setMaximumWidth(30)
         self.bean_size_min_edit.setAlignment(Qt.AlignmentFlag.AlignRight)
         bean_size_sep_label = QLabel('/')
-        self.bean_size_max_edit = QLineEdit(str(int(round(self.aw.qmc.beansize_max))))
+        self.bean_size_max_edit = QLineEdit(str(round(self.aw.qmc.beansize_max)))
         self.bean_size_max_edit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.bean_size_max_edit.setToolTip(QApplication.translate('Tooltip', 'largest screen size'))
         self.bean_size_max_edit.editingFinished.connect(self.beanSizeMaxEdited)
@@ -1489,7 +1489,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.label_origin_flag = QCheckBox(QApplication.translate('CheckBox','Standard bean labels'))
             self.label_origin_flag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             self.label_origin_flag.setToolTip(QApplication.translate('Tooltip',"Beans are listed as 'origin, name' if ticked, otherwise as 'name, origin'"))
-            self.label_origin_flag.setChecked(bool(plus.stock.coffee_label_normal_order))
+            self.label_origin_flag.setChecked(plus.stock.coffee_label_normal_order)
             self.label_origin_flag.stateChanged.connect(self.labelOriginFlagChanged)
             selectedLineLayout = QHBoxLayout()
             selectedLineLayout.addWidget(self.plus_selected_line)
@@ -1848,7 +1848,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def customBlendButton_triggered(self, _:bool = False) -> None:
-        inWeight:float = float(comma2dot(str(self.weightinedit.text())))
+        inWeight:float = float(comma2dot(self.weightinedit.text()))
 
 
         coffees = plus.stock.getCoffeeLabels()
@@ -1937,13 +1937,13 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.batchcounterSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.batchcounterSpinBox.setRange(0,65534)
         self.batchcounterSpinBox.setSingleStep(1)
-        self.batchcounterSpinBox.setValue(int(self.aw.qmc.roastbatchnr))
+        self.batchcounterSpinBox.setValue(self.aw.qmc.roastbatchnr)
         self.batchcounterSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.batchposSpinBox = QSpinBox()
         self.batchposSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.batchposSpinBox.setRange(1,99)
         self.batchposSpinBox.setSingleStep(1)
-        self.batchposSpinBox.setValue(int(self.aw.qmc.roastbatchpos))
+        self.batchposSpinBox.setValue(self.aw.qmc.roastbatchpos)
         self.batchposSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.batchLayout.addWidget(self.batchprefixedit)
         self.batchLayout.addWidget(self.batchcounterSpinBox)
@@ -1999,7 +1999,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             if unit == 0: # g selected
                 # metric
 #                v_formatted = f'{v:.0f}' # never show decimals for g # f'{-0.1:.0f}' => -0
-                v_formatted = str(int(round(v)))
+                v_formatted = str(round(v))
             elif unit == 1: # kg selected
                 # metric (always keep the accuracy to the g
                 v_formatted = f'{v/1000:.3f}'
@@ -2045,7 +2045,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                     else:
                         line = line + ', '
                     c = f"<a href=\"{plus.util.coffeeLink(i['coffee'])}\"{dark_mode_link_color}>{abbrevString(ll, 18)}</a>"
-                    line = line + str(int(round(i['ratio']*100))) + '% ' + c
+                    line = line + str(round(i['ratio']*100)) + '% ' + c
             if line and len(line)>0 and self.plus_store_selected is not None and self.plus_store_selected_label is not None:
                 line = line + f'  (<a href="{plus.util.storeLink(self.plus_store_selected)}"{dark_mode_link_color}>{self.plus_store_selected_label}</a>)'
             if line == '':
@@ -2070,8 +2070,8 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot()
     def moistureEdited(self) -> None:
-        self.moisture_greens_edit.setText(comma2dot(str(self.moisture_greens_edit.text())))
-        self.moisture_roasted_edit.setText(comma2dot(str(self.moisture_roasted_edit.text())))
+        self.moisture_greens_edit.setText(comma2dot(self.moisture_greens_edit.text()))
+        self.moisture_roasted_edit.setText(comma2dot(self.moisture_roasted_edit.text()))
         self.modified_moisture_greens_text = self.moisture_greens_edit.text()
         self.calculated_organic_loss()
         self.checkMoistureOut()
@@ -2311,9 +2311,9 @@ class editGraphDlg(ArtisanResizeablDialog):
             screen_size_max = '0'
             try:
                 if 'screen_min' in blend_dict:
-                    screen_size_min = str(int(blend_dict['screen_min']))
+                    screen_size_min = str(blend_dict['screen_min'])
                 if 'screen_max' in blend_dict:
-                    screen_size_max = str(int(blend_dict['screen_max']))
+                    screen_size_max = str(blend_dict['screen_max'])
             except Exception:  # pylint: disable=broad-except
                 pass
             self.bean_size_min_edit.setText(screen_size_min)
@@ -2355,9 +2355,9 @@ class editGraphDlg(ArtisanResizeablDialog):
                 if 'screen_size' in cd:
                     screen = cd['screen_size']
                     if 'min' in screen:
-                        screen_size_min = str(int(screen['min']))
+                        screen_size_min = str(screen['min'])
                     if 'max' in screen:
-                        screen_size_max = str(int(screen['max']))
+                        screen_size_max = str(screen['max'])
             except Exception:  # pylint: disable=broad-except
                 pass
             self.bean_size_min_edit.setText(screen_size_min)
@@ -2546,9 +2546,9 @@ class editGraphDlg(ArtisanResizeablDialog):
 
             # items added in v1.4 might not be in the data set of previous stored recent roasts
             if 'beanSize_min' in rr:
-                self.bean_size_min_edit.setText(str(int(rr['beanSize_min'])))
+                self.bean_size_min_edit.setText(str(rr['beanSize_min']))
             if 'beanSize_max' in rr:
-                self.bean_size_max_edit.setText(str(int(rr['beanSize_max'])))
+                self.bean_size_max_edit.setText(str(rr['beanSize_max']))
             # Note: the background profile will not be changed if recent roast is activated from Roast Properties
             if 'background' in rr and rr['background'] is not None:
                 self.template_file = rr['background']
@@ -2648,7 +2648,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     def addRecentRoast(self, __:bool = False) -> None:
         try:
             title = ' '.join(self.titleedit.currentText().split())
-            weightIn = float(comma2dot(str(self.weightinedit.text())))
+            weightIn = float(comma2dot(self.weightinedit.text()))
             # add new recent roast entry only if title is not default, beans is not empty and weight-in is not 0
             if title != QApplication.translate('Scope Title', 'Roaster Scope') and weightIn != 0:
                 beans = self.beansedit.toPlainText()
@@ -2656,20 +2656,20 @@ class editGraphDlg(ArtisanResizeablDialog):
                 if weightUnit == 'kg':
                     weightUnit = 'Kg'
                 if self.volumeinedit.text() != '':
-                    volumeIn = float(comma2dot(str(self.volumeinedit.text())))
+                    volumeIn = float(comma2dot(self.volumeinedit.text()))
                 else:
                     volumeIn = 0
                 volumeUnit = self.volumeUnitsComboBox.currentText()
                 if self.bean_density_in_edit.text() != '':
-                    densityWeight = float(comma2dot(str(self.bean_density_in_edit.text())))
+                    densityWeight = float(comma2dot(self.bean_density_in_edit.text()))
                 else:
                     densityWeight = 0
                 if self.bean_size_min_edit.text() != '':
-                    beanSize_min = int(round(float(comma2dot(self.bean_size_min_edit.text()))))
+                    beanSize_min = round(float(comma2dot(self.bean_size_min_edit.text())))
                 else:
                     beanSize_min = 0
                 if self.bean_size_max_edit.text() != '':
-                    beanSize_max = int(round(float(comma2dot(self.bean_size_max_edit.text()))))
+                    beanSize_max = round(float(comma2dot(self.bean_size_max_edit.text())))
                 else:
                     beanSize_max = 0
                 if self.moisture_greens_edit.text() != '':
@@ -2681,9 +2681,9 @@ class editGraphDlg(ArtisanResizeablDialog):
                 weightOut = volumeOut = densityRoasted = moistureRoasted = wholeColor = groundColor = None
                 if QApplication.keyboardModifiers() == Qt.KeyboardModifier.AltModifier:  #alt click
                     # we add weightOut, volumeOut, moistureRoasted, wholeColor, groundColor
-                    weightOut = float(comma2dot(str(self.weightoutedit_text())))
-                    volumeOut = float(comma2dot(str(self.volumeoutedit.text())))
-                    densityRoasted = float(comma2dot(str(self.bean_density_out_edit.text())))
+                    weightOut = float(comma2dot(self.weightoutedit_text()))
+                    volumeOut = float(comma2dot(self.volumeoutedit.text()))
+                    densityRoasted = float(comma2dot(self.bean_density_out_edit.text()))
                     moistureRoasted = float(comma2dot(self.moisture_roasted_edit.text()))
                     wholeColor = float2float(self.whole_color_edit.text())
                     groundColor = float2float(self.ground_color_edit.text())
@@ -2822,7 +2822,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     @override
     def keyPressEvent(self, a0: 'QKeyEvent|None') -> None:
         if a0 is not None:
-            key = int(a0.key())
+            key = a0.key()
             #print(key)
             modifiers = a0.modifiers()
             control_modifier = modifiers == Qt.KeyboardModifier.ControlModifier # command/apple k on macOS, CONTROL on Windows
@@ -3742,7 +3742,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                     if KWH_per_green < 1:
                         scaled_energy_kwh = f'{scaleFloat2String(KWH_per_green*1000.)} Wh'
                     else:
-                        scaled_energy_kwh = str(scaleFloat2String(KWH_per_green)) + ' kWh'
+                        scaled_energy_kwh = scaleFloat2String(KWH_per_green) + ' kWh'
                     self.energy_ui.EnergyPerKgCoffeeLabel.setText(f"{scaled_energy_kwh} {QApplication.translate('Label','per kg green coffee')}{mode}")
                 # no weight is available
                 else:
@@ -4244,9 +4244,9 @@ class editGraphDlg(ArtisanResizeablDialog):
     def validateNumText(s:str) -> str:
         res = ''
         try:
-            r = scaleFloat2String(toFloat(comma2dot(str(s))))
+            r = scaleFloat2String(toFloat(comma2dot(s)))
             if r != '0':
-                res = str(r)
+                res = r
         except Exception: # pylint: disable=broad-except
             pass
         return res
@@ -4255,13 +4255,13 @@ class editGraphDlg(ArtisanResizeablDialog):
         res = ''
         try:
             if s == s.strip('%'):
-                f = float2float(toFloat(comma2dot(str(s))),2)
+                f = float2float(toFloat(comma2dot(s)), 2)
                 if f < 0:
                     res = str(abs(int(f*1000./10))) + '%'  # using 1000/10 to get around Pythons decimal error ex. .58*100 = 57.999
                 else:
                     res = self.validateNumText(s)
             else:
-                r = abs(toInt(toFloat(comma2dot(str(s.strip('%'))))))
+                r = abs(toInt(toFloat(comma2dot(s.strip('%')))))
                 if r > 100:
                     res = '100%'
                 elif r != 0:
@@ -4833,9 +4833,9 @@ class editGraphDlg(ArtisanResizeablDialog):
                         timez = cast(QLineEdit, self.eventtable.cellWidget(i,0))
                         time_idx: int
                         if self.aw.qmc.timeindex[0] > -1:
-                            time_idx = self.aw.qmc.time2index(self.aw.qmc.timex[self.aw.qmc.timeindex[0]]+ stringtoseconds(str(timez.text())))
+                            time_idx = self.aw.qmc.time2index(self.aw.qmc.timex[self.aw.qmc.timeindex[0]]+ stringtoseconds(timez.text()))
                         else:
-                            time_idx = self.aw.qmc.time2index(stringtoseconds(str(timez.text())))
+                            time_idx = self.aw.qmc.time2index(stringtoseconds(timez.text()))
                         description = cast(QLineEdit, self.eventtable.cellWidget(i,3))
                         etype = cast(MyQComboBox, self.eventtable.cellWidget(i,4))
                         evalue = cast(QLineEdit, self.eventtable.cellWidget(i,5))
@@ -4927,7 +4927,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 if tx < 0: # events before TP are moved to CHARGE
                     tx = 1 # set to one second after
                     ev = 0 # CHARGE
-                self.aw.qmc.alarmoffset.append(int(round(tx))) # seconds after TP
+                self.aw.qmc.alarmoffset.append(round(tx)) # seconds after TP
                 self.aw.qmc.alarmtime.append(ev)
                 self.aw.qmc.alarmcond.append(1) # rises above (we assume that BT always rises after TP)
                 self.aw.qmc.alarmstate.append(-1) # not yet triggered
@@ -5238,7 +5238,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot()
     def weightineditChanged(self) -> None:
-        weight_in = comma2dot(str(self.weightinedit.text()))
+        weight_in = comma2dot(self.weightinedit.text())
         self.weightinedit.setText(weight_in)
         self.weightinedit.repaint()
         self.percent()
@@ -5265,7 +5265,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         percent = 0.
         try:
             if self.bean_density_out_edit.text() != '' and float(comma2dot(self.bean_density_out_edit.text())) != 0.0:
-                percent = self.aw.weight_loss(float(comma2dot(str(self.bean_density_in_edit.text()))),float(comma2dot(str(self.bean_density_out_edit.text()))))
+                percent = self.aw.weight_loss(float(comma2dot(self.bean_density_in_edit.text())), float(comma2dot(self.bean_density_out_edit.text())))
         except Exception: # pylint: disable=broad-except
             pass
         if percent <= 0:
@@ -5277,9 +5277,9 @@ class editGraphDlg(ArtisanResizeablDialog):
     def moisture_percent(self) -> None:
         percent = 0.
         try:
-            m_roasted = float(comma2dot(str(self.moisture_roasted_edit.text())))
+            m_roasted = float(comma2dot(self.moisture_roasted_edit.text()))
             if m_roasted != 0.0:
-                percent = float(comma2dot(str(self.moisture_greens_edit.text()))) - m_roasted
+                percent = float(comma2dot(self.moisture_greens_edit.text())) - m_roasted
         except Exception: # pylint: disable=broad-except
             pass
         if percent <= 0:
@@ -5322,7 +5322,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     def volume_percent(self) -> None:
         self.volumeinedit.setText(comma2dot(self.volumeinedit.text()))
         self.volumeoutedit.setText(comma2dot(self.volumeoutedit.text()))
-        self.modified_volume_in_text = str(self.volumeinedit.text())
+        self.modified_volume_in_text = self.volumeinedit.text()
         percent = 0.
         try:
             if self.volumeoutedit.text() != '' and float(comma2dot(self.volumeoutedit.text())) != 0.0:
@@ -5405,23 +5405,23 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot()
     def greens_temp_editing_finished(self) -> None:
-        self.greens_temp_edit.setText(comma2dot(str(self.greens_temp_edit.text())))
+        self.greens_temp_edit.setText(comma2dot(self.greens_temp_edit.text()))
 
     @pyqtSlot()
     def ambientedit_editing_finished(self) -> None:
-        self.ambientedit.setText(comma2dot(str(self.ambientedit.text())))
+        self.ambientedit.setText(comma2dot(self.ambientedit.text()))
 
     @pyqtSlot()
     def ambient_humidity_editing_finished(self) -> None:
-        self.ambient_humidity_edit.setText(comma2dot(str(self.ambient_humidity_edit.text())))
+        self.ambient_humidity_edit.setText(comma2dot(self.ambient_humidity_edit.text()))
 
     @pyqtSlot()
     def pressureedit_editing_finished(self) -> None:
-        self.pressureedit.setText(comma2dot(str(self.pressureedit.text())))
+        self.pressureedit.setText(comma2dot(self.pressureedit.text()))
 
     def recalc_on_density_in_editing_finished(self, keep_weight_in:bool = False) -> None:
-        self.bean_density_in_edit.setText(comma2dot(str(self.bean_density_in_edit.text())))
-        self.modified_density_in_text = str(self.bean_density_in_edit.text())
+        self.bean_density_in_edit.setText(comma2dot(self.bean_density_in_edit.text()))
+        self.modified_density_in_text = self.bean_density_in_edit.text()
         if self.bean_density_in_edit.text() != '':
             density_in = float(comma2dot(self.bean_density_in_edit.text()))
             if density_in != 0:
@@ -5455,7 +5455,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot()
     def density_out_editing_finished(self) -> None:
-        self.bean_density_out_edit.setText(comma2dot(str(self.bean_density_out_edit.text())))
+        self.bean_density_out_edit.setText(comma2dot(self.bean_density_out_edit.text()))
         if self.bean_density_out_edit.text() != '':
             density_out = float(self.bean_density_out_edit.text())
             if density_out != 0:
@@ -5485,7 +5485,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot()
     def volume_in_editing_finished(self) -> None:
-        self.volumeinedit.setText(comma2dot(str(self.volumeinedit.text())))
+        self.volumeinedit.setText(comma2dot(self.volumeinedit.text()))
         if self.volumeinedit.text() != '':
             volume_in = float(self.volumeinedit.text())
             # convert volume in to l and calculate volume in
@@ -5513,7 +5513,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot()
     def volume_out_editing_finished(self) -> None:
-        self.volumeoutedit.setText(comma2dot(str(self.volumeoutedit.text())))
+        self.volumeoutedit.setText(comma2dot(self.volumeoutedit.text()))
         if self.volumeoutedit.text() != '':
             volume_out = float(self.volumeoutedit.text())
             # convert volume in to l and calculate volume in
@@ -5546,30 +5546,30 @@ class editGraphDlg(ArtisanResizeablDialog):
                 # we keep xaxis limit the same but adjust to updated timeindex[0] mark
                 self.aw.qmc.startofx -= self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
             self.aw.qmc.timeindex[0] = -1
-        elif self.chargeeditcopy != str(self.chargeedit.text()):
+        elif self.chargeeditcopy != self.chargeedit.text():
             #if there is a CHARGE recorded and the time entered is positive. Use relative time
             try:
-                if stringtoseconds(str(self.chargeedit.text())) > 0 and self.aw.qmc.timeindex[0] != -1:
-                    startindex = self.aw.qmc.time2index(self.aw.qmc.timex[self.aw.qmc.timeindex[0]] + stringtoseconds(str(self.chargeedit.text())))
+                if stringtoseconds(self.chargeedit.text()) > 0 and self.aw.qmc.timeindex[0] != -1:
+                    startindex = self.aw.qmc.time2index(self.aw.qmc.timex[self.aw.qmc.timeindex[0]] + stringtoseconds(self.chargeedit.text()))
                     timeindex_before = self.aw.qmc.timeindex[0]
                     self.aw.qmc.timeindex[0] = max(-1,startindex)
                     self.aw.qmc.startofx += (self.aw.qmc.timex[self.aw.qmc.timeindex[0]] - self.aw.qmc.timex[timeindex_before])
                 #if there is a CHARGE recorded and the time entered is negative. Use relative time
-                elif stringtoseconds(str(self.chargeedit.text())) < 0 and self.aw.qmc.timeindex[0] != -1:
-                    relativetime = self.aw.qmc.timex[self.aw.qmc.timeindex[0]]-abs(stringtoseconds(str(self.chargeedit.text())))
+                elif stringtoseconds(self.chargeedit.text()) < 0 and self.aw.qmc.timeindex[0] != -1:
+                    relativetime = self.aw.qmc.timex[self.aw.qmc.timeindex[0]]-abs(stringtoseconds(self.chargeedit.text()))
                     startindex = self.aw.qmc.time2index(relativetime)
                     timeindex_before = self.aw.qmc.timeindex[0]
                     self.aw.qmc.timeindex[0] = max(-1,startindex)
                     self.aw.qmc.startofx += (self.aw.qmc.timex[self.aw.qmc.timeindex[0]] - self.aw.qmc.timex[timeindex_before])
                 #if there is _no_ CHARGE recorded and the time entered is positive. Use absolute time
-                elif stringtoseconds(str(self.chargeedit.text())) > 0 and self.aw.qmc.timeindex[0] == -1:
-                    startindex = self.aw.qmc.time2index(stringtoseconds(str(self.chargeedit.text())))
+                elif stringtoseconds(self.chargeedit.text()) > 0 and self.aw.qmc.timeindex[0] == -1:
+                    startindex = self.aw.qmc.time2index(stringtoseconds(self.chargeedit.text()))
                     self.aw.qmc.timeindex[0] = max(-1,startindex)
                     self.aw.qmc.startofx += self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
                 #if there is _no_ CHARGE recorded and the time entered is negative. ERROR
-                elif stringtoseconds(str(self.chargeedit.text())) < 0 and self.aw.qmc.timeindex[0] == -1:
+                elif stringtoseconds(self.chargeedit.text()) < 0 and self.aw.qmc.timeindex[0] == -1:
                     self.aw.qmc.adderror(QApplication.translate('Error Message', 'Unable to move CHARGE to a value that does not exist'))
-                self.chargeeditcopy = str(self.chargeedit.text())
+                self.chargeeditcopy = self.chargeedit.text()
             except Exception: # pylint: disable=broad-except
                 pass # invalid input can make stringtoseconds fail
         # check CHARGE (with index self.aw.qmc.timeindex[0])
@@ -5578,89 +5578,89 @@ class editGraphDlg(ArtisanResizeablDialog):
             start = 0                   #relative start time
         else:
             start = self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-        if self.dryeditcopy != str(self.dryedit.text()):
+        if self.dryeditcopy != self.dryedit.text():
             try:
-                s = stringtoseconds(str(self.dryedit.text()))
+                s = stringtoseconds(self.dryedit.text())
                 if s <= 0:
                     self.aw.qmc.timeindex[1] = 0
                 else:
                     dryindex = self.aw.qmc.time2index(start + s)
                     self.aw.qmc.timeindex[1] = max(0,dryindex)
-                self.dryeditcopy = str(self.dryedit.text())
+                self.dryeditcopy = self.dryedit.text()
             except Exception: # pylint: disable=broad-except
                 pass # invalid input can make stringtoseconds fail
-        if self.Cstarteditcopy != str(self.Cstartedit.text()):
+        if self.Cstarteditcopy != self.Cstartedit.text():
             try:
-                s = stringtoseconds(str(self.Cstartedit.text()))
+                s = stringtoseconds(self.Cstartedit.text())
                 if s <= 0:
                     self.aw.qmc.timeindex[2] = 0
                 else:
                     fcsindex = self.aw.qmc.time2index(start + s)
                     self.aw.qmc.timeindex[2] = max(0,fcsindex)
-                self.Cstarteditcopy = str(self.Cstartedit.text())
+                self.Cstarteditcopy = self.Cstartedit.text()
             except Exception: # pylint: disable=broad-except
                 pass # invalid input can make stringtoseconds fail
-        if self.Cendeditcopy != str(self.Cendedit.text()):
+        if self.Cendeditcopy != self.Cendedit.text():
             try:
-                s = stringtoseconds(str(self.Cendedit.text()))
+                s = stringtoseconds(self.Cendedit.text())
                 if s <= 0:
                     self.aw.qmc.timeindex[3] = 0
                 else:
                     fceindex = self.aw.qmc.time2index(start + s)
                     self.aw.qmc.timeindex[3] = max(0,fceindex)
-                self.Cendeditcopy = str(self.Cendedit.text())
+                self.Cendeditcopy = self.Cendedit.text()
             except Exception: # pylint: disable=broad-except
                 pass # invalid input can make stringtoseconds fail
-        if self.CCstarteditcopy != str(self.CCstartedit.text()):
+        if self.CCstarteditcopy != self.CCstartedit.text():
             try:
-                s = stringtoseconds(str(self.CCstartedit.text()))
+                s = stringtoseconds(self.CCstartedit.text())
                 if s <= 0:
                     self.aw.qmc.timeindex[4] = 0
                 else:
                     scsindex = self.aw.qmc.time2index(start + s)
                     self.aw.qmc.timeindex[4] = max(0,scsindex)
-                self.CCstarteditcopy = str(self.CCstartedit.text())
+                self.CCstarteditcopy = self.CCstartedit.text()
             except Exception: # pylint: disable=broad-except
                 pass # invalid input can make stringtoseconds fail
-        if self.CCendeditcopy != str(self.CCendedit.text()):
+        if self.CCendeditcopy != self.CCendedit.text():
             try:
-                s = stringtoseconds(str(self.CCendedit.text()))
+                s = stringtoseconds(self.CCendedit.text())
                 if s <= 0:
                     self.aw.qmc.timeindex[5] = 0
-                elif stringtoseconds(str(self.CCendedit.text())) > 0:
+                elif stringtoseconds(self.CCendedit.text()) > 0:
                     sceindex = self.aw.qmc.time2index(start + s)
                     self.aw.qmc.timeindex[5] = max(0,sceindex)
-                self.CCendeditcopy = str(self.CCendedit.text())
+                self.CCendeditcopy = self.CCendedit.text()
             except Exception: # pylint: disable=broad-except
                 pass # invalid input can make stringtoseconds fail
-        if self.dropeditcopy != str(self.dropedit.text()):
+        if self.dropeditcopy != self.dropedit.text():
             try:
-                s = stringtoseconds(str(self.dropedit.text()))
+                s = stringtoseconds(self.dropedit.text())
                 if s <= 0:
                     self.aw.qmc.timeindex[6] = 0
                 else:
                     dropindex = self.aw.qmc.time2index(start + s)
                     self.aw.qmc.timeindex[6] = max(0,dropindex)
-                self.dropeditcopy = str(self.dropedit.text())
+                self.dropeditcopy = self.dropedit.text()
             except Exception: # pylint: disable=broad-except
                 pass # invalid input can make stringtoseconds fail
-        if self.cooleditcopy != str(self.cooledit.text()):
+        if self.cooleditcopy != self.cooledit.text():
             try:
-                s = stringtoseconds(str(self.cooledit.text()))
+                s = stringtoseconds(self.cooledit.text())
                 if s <= 0:
                     self.aw.qmc.timeindex[7] = 0
                 else:
                     coolindex = self.aw.qmc.time2index(start + s)
                     self.aw.qmc.timeindex[7] = max(0,coolindex)
-                self.cooleditcopy = str(self.cooledit.text())
+                self.cooleditcopy = self.cooledit.text()
             except Exception: # pylint: disable=broad-except
                 pass # invalid input can make stringtoseconds fail
         if self.aw.qmc.phasesbuttonflag:
             # adjust phases by DryEnd and FCs events
             if self.aw.qmc.timeindex[1]:
-                self.aw.qmc.phases[1] = max(0,int(round(self.aw.qmc.temp2[self.aw.qmc.timeindex[1]])))
+                self.aw.qmc.phases[1] = max(0, round(self.aw.qmc.temp2[self.aw.qmc.timeindex[1]]))
             if self.aw.qmc.timeindex[2]:
-                self.aw.qmc.phases[2] = max(0,int(round(self.aw.qmc.temp2[self.aw.qmc.timeindex[2]])))
+                self.aw.qmc.phases[2] = max(0, round(self.aw.qmc.temp2[self.aw.qmc.timeindex[2]]))
 
     #called from OK button
     @pyqtSlot()
@@ -5823,17 +5823,17 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.aw.qmc.color_system_idx = self.colorSystemComboBox.currentIndex()
         #update beans temperature
         try:
-            self.aw.qmc.greens_temp = float(comma2dot(str(self.greens_temp_edit.text())))
+            self.aw.qmc.greens_temp = float(comma2dot(self.greens_temp_edit.text()))
         except Exception: # pylint: disable=broad-except
             self.aw.qmc.greens_temp = 0.
         #update greens moisture
         try:
-            self.aw.qmc.moisture_greens = float(comma2dot(str(self.moisture_greens_edit.text())))
+            self.aw.qmc.moisture_greens = float(comma2dot(self.moisture_greens_edit.text()))
         except Exception: # pylint: disable=broad-except
             self.aw.qmc.moisture_greens = 0.
         #update roasted moisture
         try:
-            self.aw.qmc.moisture_roasted = float(comma2dot(str(self.moisture_roasted_edit.text())))
+            self.aw.qmc.moisture_roasted = float(comma2dot(self.moisture_roasted_edit.text()))
         except Exception: # pylint: disable=broad-except
             self.aw.qmc.moisture_roasted = 0.
         #update ambient temperature
@@ -5845,12 +5845,12 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.ambientTemp = 0.0
         #update ambient humidity
         try:
-            self.aw.qmc.ambient_humidity = float(comma2dot(str(self.ambient_humidity_edit.text())))
+            self.aw.qmc.ambient_humidity = float(comma2dot(self.ambient_humidity_edit.text()))
         except Exception: # pylint: disable=broad-except
             self.aw.qmc.ambient_humidity = 0
         #update ambient pressure
         try:
-            self.aw.qmc.ambient_pressure = float(comma2dot(str(self.pressureedit.text())))
+            self.aw.qmc.ambient_pressure = float(comma2dot(self.pressureedit.text()))
         except Exception: # pylint: disable=broad-except
             self.aw.qmc.ambient_pressure = 0
         if self.tabInitialized[5] and self.setup_ui is not None:
@@ -6043,7 +6043,7 @@ class CoffeesComboBox(StockComboBox):
 
     def current_unit(self) -> int:
         try:
-            return int(self.parentDialog.unitsComboBox.currentIndex())
+            return self.parentDialog.unitsComboBox.currentIndex()
         except Exception:  # pylint: disable=broad-except
             return 0
 
@@ -6061,7 +6061,7 @@ class BlendsComboBox(StockComboBox):
 
     def current_unit(self) -> int:
         try:
-            return int(self.parentDialog.unitsComboBox.currentIndex())
+            return self.parentDialog.unitsComboBox.currentIndex()
         except Exception:  # pylint: disable=broad-except
             return 0
 

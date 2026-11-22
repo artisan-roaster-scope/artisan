@@ -128,7 +128,7 @@ def extractProfileIkawaURL(url:QUrl,
     specialeventsvalue.append(eventsExternal2InternalValue(cooldown_fan))
     specialevents.append(len(timex)-1)
     specialeventstype.append(0)
-    specialeventsStrings.append(f'{int(cooldown_fan)}' + '%')
+    specialeventsStrings.append(f'{cooldown_fan}' + '%')
 
 
     res['title'] = ikawa_profile.name
@@ -193,7 +193,7 @@ def extractProfileIkawaCSV(file:str,
             roasttime:str|None = encodeLocal(date.time().toString())
             if roasttime is not None:
                 res['roasttime'] = roasttime
-            res['roastepoch'] = int(date.toSecsSinceEpoch())
+            res['roastepoch'] = date.toSecsSinceEpoch()
             res['roasttzoffset'] = libtime.timezone
     except Exception as e: # pylint: disable=broad-except
         _log.exception(e)
@@ -297,7 +297,7 @@ def extractProfileIkawaCSV(file:str,
                         else:
                             fan_last = fan
                             fan = v
-                            specialeventsvalue.append(eventsExternal2InternalValue(int(round(v))))
+                            specialeventsvalue.append(eventsExternal2InternalValue(round(v)))
                             specialevents.append(i-1)
                             specialeventstype.append(0)
                             specialeventsStrings.append(f'{fan}' + '%')
@@ -326,7 +326,7 @@ def extractProfileIkawaCSV(file:str,
                         else:
                             heater_last = heater
                             heater = v
-                            specialeventsvalue.append(eventsExternal2InternalValue(int(round(v))))
+                            specialeventsvalue.append(eventsExternal2InternalValue(round(v)))
                             specialevents.append(i-1)
                             specialeventstype.append(3)
                             specialeventsStrings.append(f'{heater}' + '%')
@@ -340,7 +340,7 @@ def extractProfileIkawaCSV(file:str,
             fcs_time = float(last_item['adfc_timestamp'])
             if fcs_time > 0:
                 # if fcs_time is given
-                FCs_idx = int(round(fcs_time + timeindex[0]))
+                FCs_idx = round(fcs_time + timeindex[0])
                 if 0 < FCs_idx < len(timex):
                     timeindex[2] = FCs_idx
 
@@ -466,7 +466,7 @@ try: # BLE not available on some platforms
                 i3 = (i2 & 255) ^ (i & 255)
                 i4 = i3 ^ ((i3 << 4) & 255)
                 i = ((((i >> 8) & 255) | ((i4 << 8) & 65535)) ^ (i4 >> 4)) ^ ((i4 << 3) & 65535)
-            return int(i & 65535).to_bytes(2, byteorder='big')
+            return (i & 65535).to_bytes(2, byteorder='big')
 
         def escape(self, msg:bytes) -> bytes:
             message:bytes = b''
@@ -573,7 +573,7 @@ try: # BLE not available on some platforms
                                         else:
                                             self.RPM = -1
                                         self.heater = status_get_all.heater * 2
-                                        self.fan = int(round(status_get_all.fan / 2.55))
+                                        self.fan = round(status_get_all.fan / 2.55)
                                         self.state = status_get_all.state
                                         # compute the average of all received ambient pressure readings (in mbar)
                                         if status_get_all.HasField('pressure_amb'):
@@ -590,7 +590,7 @@ try: # BLE not available on some platforms
                                             self.humidity_roc = -1
                                         # add humidity RoC direction (1: down, 2: up)
                                         if status_get_all.HasField('humidity_roc_direction'):
-                                            self.humidity_roc_dir = int(status_get_all.humidity_roc_direction)
+                                            self.humidity_roc_dir = status_get_all.humidity_roc_direction
                                         else:
                                             self.humidity_roc_dir = -1
                                         # add board temperature in C

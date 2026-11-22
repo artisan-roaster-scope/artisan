@@ -231,8 +231,8 @@ class calculatorDlg(ArtisanDialog):
     @pyqtSlot(int)
     def calcEventRC(self, _:int) -> None:
         nevents = len(self.aw.qmc.specialevents)
-        Aevent = int(self.eventAComboBox.currentIndex())
-        Bevent = int(self.eventBComboBox.currentIndex())
+        Aevent = self.eventAComboBox.currentIndex()
+        Bevent = self.eventBComboBox.currentIndex()
         if Aevent <= nevents and Bevent <= nevents and Aevent and Bevent:
             if self.aw.qmc.timeindex[0] != -1:
                 start = self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
@@ -250,8 +250,8 @@ class calculatorDlg(ArtisanDialog):
                 #empty field
                 return
             try:
-                starttime = stringtoseconds(str(self.startEdit.text()))
-                endtime = stringtoseconds(str(self.endEdit.text()))
+                starttime = stringtoseconds(self.startEdit.text())
+                endtime = stringtoseconds(self.endEdit.text())
                 if  endtime > self.aw.qmc.timex[-1] or endtime < starttime:
                     self.aw.sendmessage(QApplication.translate('Label', 'Error: End time smaller than Start time'))
                     self.result1.setText('')
@@ -290,56 +290,56 @@ class calculatorDlg(ArtisanDialog):
         self.convertTempLocal('CtoF')
 
     def convertTempLocal(self, x:str) -> None:
-        self.faEdit.setText(comma2dot(str(self.faEdit.text())))
-        self.ceEdit.setText(comma2dot(str(self.ceEdit.text())))
+        self.faEdit.setText(comma2dot(self.faEdit.text()))
+        self.ceEdit.setText(comma2dot(self.ceEdit.text()))
         if x == 'FtoC':
-            newC = fromFtoC(float(str(self.faEdit.text())))
+            newC = fromFtoC(float(self.faEdit.text()))
             result = f'{newC:.2f}'
             self.ceEdit.setText(result)
         elif x == 'CtoF':
-            newF = fromCtoF(float(str(self.ceEdit.text())))
+            newF = fromCtoF(float(self.ceEdit.text()))
             result = f'{newF:.2f}'
             self.faEdit.setText(result)
 
     @pyqtSlot()
     def convertWeightItoO(self) -> None:
-        self.WinEdit.setText(comma2dot(str(self.WinEdit.text())))
-        inx = float(str(self.WinEdit.text()))
+        self.WinEdit.setText(comma2dot(self.WinEdit.text()))
+        inx = float(self.WinEdit.text())
         outx = convertWeight(inx,self.WinComboBox.currentIndex(),self.WoutComboBox.currentIndex())
         self.WoutEdit.setText(f'{outx:.2f}')
 
     @pyqtSlot()
     def convertWeightOtoI(self) -> None:
-        self.WoutEdit.setText(comma2dot(str(self.WoutEdit.text())))
-        outx = float(str(self.WoutEdit.text()))
+        self.WoutEdit.setText(comma2dot(self.WoutEdit.text()))
+        outx = float(self.WoutEdit.text())
         inx = convertWeight(outx,self.WoutComboBox.currentIndex(),self.WinComboBox.currentIndex())
         self.WinEdit.setText(f'{inx:.2f}')
 
     @pyqtSlot()
     def convertVolumeItoO(self) -> None:
-        self.VinEdit.setText(comma2dot(str(self.VinEdit.text())))
-        inx = float(str(self.VinEdit.text()))
+        self.VinEdit.setText(comma2dot(self.VinEdit.text()))
+        inx = float(self.VinEdit.text())
         outx = convertVolume(inx,self.VinComboBox.currentIndex(),self.VoutComboBox.currentIndex())
         self.VoutEdit.setText(f'{outx:.3f}')
 
     @pyqtSlot()
     def convertVolumeOtoI(self) -> None:
-        self.VoutEdit.setText(comma2dot(str(self.VoutEdit.text())))
-        outx = float(str(self.VoutEdit.text()))
+        self.VoutEdit.setText(comma2dot(self.VoutEdit.text()))
+        outx = float(self.VoutEdit.text())
         inx = convertVolume(outx,self.VoutComboBox.currentIndex(),self.VinComboBox.currentIndex())
         self.VinEdit.setText(f'{inx:.3f}')
 
     @pyqtSlot()
     def calculateYield(self) -> None:
-        self.groundsEdit.setText(comma2dot(str(self.groundsEdit.text())))
-        self.tdsEdit.setText(comma2dot(str(self.tdsEdit.text())))
-        self.coffeeEdit.setText(comma2dot(str(self.coffeeEdit.text())))
+        self.groundsEdit.setText(comma2dot(self.groundsEdit.text()))
+        self.tdsEdit.setText(comma2dot(self.tdsEdit.text()))
+        self.coffeeEdit.setText(comma2dot(self.coffeeEdit.text()))
         # Extraction yield % = Brewed Coffee[g] x TDS[%] / Coffee Grounds[g]
         if self.groundsEdit.text() == '' or self.tdsEdit.text() == '' or self.coffeeEdit.text() == '':
             return
-        grounds = float(str(self.groundsEdit.text()))
-        tds = float(str(self.tdsEdit.text()))
-        coffee = float(str(self.coffeeEdit.text()))
+        grounds = float(self.groundsEdit.text())
+        tds = float(self.tdsEdit.text())
+        coffee = float(self.coffeeEdit.text())
         if grounds == 0:
             return
         cyield = coffee * tds / grounds

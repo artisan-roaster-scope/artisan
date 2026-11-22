@@ -384,11 +384,11 @@ class designerconfigDlg(ArtisanDialog):
     @pyqtSlot(int)
     def redrawcurviness(self, _:int) -> None:
         try:
-            ETcurviness = int(str(self.ETsplineComboBox.currentText()))
+            ETcurviness = int(self.ETsplineComboBox.currentText())
         except Exception:  # pylint: disable=broad-except
             ETcurviness = self.aw.qmc.ETsplinedegree
         try:
-            BTcurviness = int(str(self.BTsplineComboBox.currentText()))
+            BTcurviness = int(self.BTsplineComboBox.currentText())
         except Exception:  # pylint: disable=broad-except
             BTcurviness = self.aw.qmc.BTsplinedegree
         timepoints = len(self.aw.qmc.timex)
@@ -442,20 +442,20 @@ class designerconfigDlg(ArtisanDialog):
             return
         if self.Edit0bt.text() != self.Edit0btcopy:
             try:
-                self.aw.qmc.temp2[self.aw.qmc.timeindex[0]] = float(str(self.Edit0bt.text()))
+                self.aw.qmc.temp2[self.aw.qmc.timeindex[0]] = float(self.Edit0bt.text())
                 self.Edit0btcopy = self.Edit0bt.text()
             except Exception: # pylint: disable=broad-except
                 self.Edit0bt.setText(self.Edit0btcopy)
         if self.Edit0et.text() != self.Edit0etcopy:
             try:
-                self.aw.qmc.temp1[self.aw.qmc.timeindex[0]] = float(str(self.Edit0et.text()))
+                self.aw.qmc.temp1[self.aw.qmc.timeindex[0]] = float(self.Edit0et.text())
                 self.Edit0etcopy = self.Edit0et.text()
             except Exception: # pylint: disable=broad-except
                 self.Edit0et.setText(self.Edit0etcopy)
         if self.dryend.isChecked():
             if self.Edit1.text() != self.Edit1copy:
                 try:
-                    timez = stringtoseconds(str(self.Edit1.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
+                    timez = stringtoseconds(self.Edit1.text())+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
                     self.aw.qmc.timex[self.aw.qmc.timeindex[1]] = timez
                     self.Edit1copy = self.Edit1.text()
                 except Exception: # pylint: disable=broad-except
@@ -475,7 +475,7 @@ class designerconfigDlg(ArtisanDialog):
         if self.fcs.isChecked():
             if self.Edit2.text() != self.Edit2copy:
                 try:
-                    timez = stringtoseconds(str(self.Edit2.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
+                    timez = stringtoseconds(self.Edit2.text())+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
                     self.aw.qmc.timex[self.aw.qmc.timeindex[2]] = timez
                     self.Edit2copy = self.Edit2.text()
                 except Exception: # pylint: disable=broad-except
@@ -495,7 +495,7 @@ class designerconfigDlg(ArtisanDialog):
         if self.fce.isChecked():
             if self.Edit3.text() != self.Edit3copy:
                 try:
-                    timez = stringtoseconds(str(self.Edit3.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
+                    timez = stringtoseconds(self.Edit3.text())+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
                     self.aw.qmc.timex[self.aw.qmc.timeindex[3]] = timez
                     self.Edit3copy = self.Edit3.text()
                 except Exception: # pylint: disable=broad-except
@@ -515,7 +515,7 @@ class designerconfigDlg(ArtisanDialog):
         if self.scs.isChecked():
             if self.Edit4.text() != self.Edit4copy:
                 try:
-                    timez = stringtoseconds(str(self.Edit4.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
+                    timez = stringtoseconds(self.Edit4.text())+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
                     self.aw.qmc.timex[self.aw.qmc.timeindex[4]] = timez
                     self.Edit4copy = self.Edit4.text()
                 except Exception: # pylint: disable=broad-except
@@ -535,7 +535,7 @@ class designerconfigDlg(ArtisanDialog):
         if self.sce.isChecked():
             if self.Edit5.text() != self.Edit5copy:
                 try:
-                    timez = stringtoseconds(str(self.Edit5.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
+                    timez = stringtoseconds(self.Edit5.text())+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
                     self.aw.qmc.timex[self.aw.qmc.timeindex[5]] = timez
                     self.Edit5copy = self.Edit5.text()
                 except Exception: # pylint: disable=broad-except
@@ -554,7 +554,7 @@ class designerconfigDlg(ArtisanDialog):
                     self.Edit5et.setText(self.Edit5etcopy)
         if self.Edit6.text() != self.Edit6copy:
             try:
-                timez = stringtoseconds(str(self.Edit6.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
+                timez = stringtoseconds(self.Edit6.text())+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
                 self.aw.qmc.timex[self.aw.qmc.timeindex[6]] = timez
                 self.Edit6copy = self.Edit6.text()
             except Exception: # pylint: disable=broad-except
@@ -581,13 +581,13 @@ class designerconfigDlg(ArtisanDialog):
         try:
             time:list[int] = []
             checks = self.readchecks()
-            time.append(stringtoseconds(str(self.Edit0.text())))
-            time.append(stringtoseconds(str(self.Edit1.text())))
-            time.append(stringtoseconds(str(self.Edit2.text())))
-            time.append(stringtoseconds(str(self.Edit3.text())))
-            time.append(stringtoseconds(str(self.Edit4.text())))
-            time.append(stringtoseconds(str(self.Edit5.text())))
-            time.append(stringtoseconds(str(self.Edit6.text())))
+            time.append(stringtoseconds(self.Edit0.text()))
+            time.append(stringtoseconds(self.Edit1.text()))
+            time.append(stringtoseconds(self.Edit2.text()))
+            time.append(stringtoseconds(self.Edit3.text()))
+            time.append(stringtoseconds(self.Edit4.text()))
+            time.append(stringtoseconds(self.Edit5.text()))
+            time.append(stringtoseconds(self.Edit6.text()))
             for i in range(len(time)-1):
                 if time[i+1] <= time[i] and checks[i+1] != 0:
                     return i
@@ -745,9 +745,9 @@ class designerconfigDlg(ArtisanDialog):
                     self.Edit1bt.setText(f'{self.aw.qmc.temp2[self.aw.qmc.timeindex[1]]:.1f}')
             if idi == 2:
                 try:
-                    timez = stringtoseconds(str(self.Edit2.text())) + self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-                    bt = float(str(self.Edit2bt.text()))
-                    et = float(str(self.Edit2et.text()))
+                    timez = stringtoseconds(self.Edit2.text()) + self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
+                    bt = float(self.Edit2bt.text())
+                    et = float(self.Edit2et.text())
                 except Exception: # pylint: disable=broad-except
                     self.Edit2.setText(stringfromseconds(self.aw.qmc.designertimeinit[2]))
                     self.Edit2et.setText(f'{self.aw.qmc.temp1[self.aw.qmc.timeindex[2]]:.1f}')
@@ -799,7 +799,7 @@ class pointDlg(ArtisanDialog):
         else:
             self.values = values
         self.setWindowTitle(QApplication.translate('Form Caption','Add Point'))
-        self.tempEdit = QLineEdit(str(int(round(self.values[1]))))
+        self.tempEdit = QLineEdit(str(round(self.values[1])))
         self.tempEdit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.tempEdit.setValidator(QIntValidator(0, 999, self.tempEdit))
         self.tempEdit.setFocus()
@@ -835,6 +835,6 @@ class pointDlg(ArtisanDialog):
 
     @pyqtSlot()
     def return_values(self) -> None:
-        self.values[0] = stringtoseconds(str(self.timeEdit.text()))
+        self.values[0] = stringtoseconds(self.timeEdit.text())
         self.values[1] = float(self.tempEdit.text())
         self.accept()

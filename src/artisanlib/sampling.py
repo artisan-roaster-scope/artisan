@@ -154,9 +154,9 @@ class SamplingDlg(ArtisanDialog):
     #ok button
     @pyqtSlot()
     def ok(self) -> None:
-        self.aw.qmc.flagKeepON = bool(self.keepOnFlag.isChecked())
-        self.aw.qmc.flagOpenCompleted = bool(self.openCompletedFlag.isChecked())
-        self.aw.plus_automatic_profile_upload = bool(self.automatiUploadFlag.isChecked())
+        self.aw.qmc.flagKeepON = self.keepOnFlag.isChecked()
+        self.aw.qmc.flagOpenCompleted = self.openCompletedFlag.isChecked()
+        self.aw.plus_automatic_profile_upload = self.automatiUploadFlag.isChecked()
         interval = self.interval.value()*1000.
         if self.aw.qmc.xgrid >= 3600:
             interval = interval * 60

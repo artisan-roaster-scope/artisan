@@ -103,7 +103,7 @@ from plus import util
 
 
 @pytest.fixture(scope='session', autouse=True)
-def ensure_util_isolation() -> Generator[None, None, None]:
+def ensure_util_isolation() -> Generator[None]:
     """
     Ensure modules are properly isolated for util tests at session level.
 
@@ -138,7 +138,7 @@ def ensure_util_isolation() -> Generator[None, None, None]:
 
 
 @pytest.fixture(scope='module', autouse=True)
-def cleanup_util_mocks() -> Generator[None, None, None]:
+def cleanup_util_mocks() -> Generator[None]:
     """
     Clean up util test mocks at module level to prevent cross-file contamination.
 
@@ -173,7 +173,7 @@ def cleanup_util_mocks() -> Generator[None, None, None]:
 
 
 @pytest.fixture(autouse=True)
-def reset_util_state() -> Generator[None, None, None]:
+def reset_util_state() -> Generator[None]:
     """
     Reset util module state before and after each test to ensure complete isolation.
 
@@ -199,14 +199,14 @@ def mock_app_window() -> Mock:
 
 
 @pytest.fixture
-def mock_config_app_window(mock_app_window: Mock) -> Generator[Mock, None, None]:
+def mock_config_app_window(mock_app_window: Mock) -> Generator[Mock]:
     """Mock the config.app_window."""
     with patch('plus.util.config.app_window', mock_app_window):
         yield mock_app_window
 
 
 @pytest.fixture
-def temp_file() -> Generator[str, None, None]:
+def temp_file() -> Generator[str]:
     """Create a temporary file for testing."""
     with tempfile.NamedTemporaryFile(delete=False) as f:
         f.write(b'test content')

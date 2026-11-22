@@ -267,7 +267,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.overlapEdit.setRange(0,100)    #(min,max)
         self.overlapEdit.setMinimumWidth(80)
         self.overlapEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.overlapEdit.setValue(int(self.aw.qmc.overlappct))
+        self.overlapEdit.setValue(self.aw.qmc.overlappct)
         self.overlapEdit.setSuffix(' %')
 
         helpcurveDialogButton = QDialogButtonBox()
@@ -313,16 +313,16 @@ class EventsDlg(ArtisanResizeablDialog):
         self.showeventsonbtbox.setToolTip(QApplication.translate('Tooltip',
             'Show event type 5 flags anchored on {}, when un-ticked they anchor to the greater of {} or {}',
             'Show event type 5 flags anchored on BT, when un-ticked they anchor to the greater of ET or BT').format(QApplication.translate('Label','BT'),QApplication.translate('Label','ET'),QApplication.translate('Label','BT')))
-        self.showeventsonbtbox.setChecked(bool(self.aw.qmc.showeventsonbt))
+        self.showeventsonbtbox.setChecked(self.aw.qmc.showeventsonbt)
         self.showeventsonbtbox.stateChanged.connect(self.showeventsonbtChanged)
 
         self.eventsclampflag = QCheckBox(QApplication.translate('CheckBox','Snap'))
         self.eventsclampflag.setToolTip(QApplication.translate('Tooltip', 'Custom events are drawn using the temperature scale'))
-        self.eventsclampflag.setChecked(bool(self.aw.qmc.clampEvents))
+        self.eventsclampflag.setChecked(self.aw.qmc.clampEvents)
         self.eventsclampflag.stateChanged.connect(self.eventsclampflagChanged)
         self.eventslabelsflag = QCheckBox(QApplication.translate('CheckBox','Descr.'))
         self.eventslabelsflag.setToolTip(QApplication.translate('Tooltip', 'Custom event descriptions are shown instead of type/value tags'))
-        self.eventslabelsflag.setChecked(bool(self.aw.qmc.renderEventsDescr))
+        self.eventslabelsflag.setChecked(self.aw.qmc.renderEventsDescr)
         self.eventslabelsflag.stateChanged.connect(self.eventslabelsflagChanged)
         self.eventslabelscharsSpinner = QSpinBox()
         self.eventslabelscharsSpinner.setStyleSheet(spin_box_style(self.aw.app.darkmode))
@@ -330,9 +330,9 @@ class EventsDlg(ArtisanResizeablDialog):
         self.eventslabelscharsSpinner.setSingleStep(1)
         self.eventslabelscharsSpinner.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.eventslabelscharsSpinner.setRange(1,20)
-        self.eventslabelscharsSpinner.setValue(int(self.aw.qmc.eventslabelschars))
+        self.eventslabelscharsSpinner.setValue(self.aw.qmc.eventslabelschars)
         self.eventslabelscharsSpinner.setToolTip(QApplication.translate('Tooltip', 'Length of text in event marks'))
-        self.eventslabelscharsSpinner.setEnabled(bool(self.aw.qmc.renderEventsDescr))
+        self.eventslabelscharsSpinner.setEnabled(self.aw.qmc.renderEventsDescr)
 
 
         if self.aw.qmc.eventsGraphflag not in [2,3,4]:
@@ -497,7 +497,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E1thicknessSpinBox.setSingleStep(1)
         self.E1thicknessSpinBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.E1thicknessSpinBox.setRange(1,10)
-        self.E1thicknessSpinBox.setValue(int(round(self.aw.qmc.Evaluelinethickness[0])))
+        self.E1thicknessSpinBox.setValue(round(self.aw.qmc.Evaluelinethickness[0]))
         self.E1thicknessSpinBox.valueChanged.connect(self.setElinethickness0)
         self.E2thicknessSpinBox = QSpinBox()
         self.E2thicknessSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
@@ -505,7 +505,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E2thicknessSpinBox.setSingleStep(1)
         self.E2thicknessSpinBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.E2thicknessSpinBox.setRange(1,10)
-        self.E2thicknessSpinBox.setValue(int(round(self.aw.qmc.Evaluelinethickness[1])))
+        self.E2thicknessSpinBox.setValue(round(self.aw.qmc.Evaluelinethickness[1]))
         self.E2thicknessSpinBox.valueChanged.connect(self.setElinethickness1)
         self.E3thicknessSpinBox = QSpinBox()
         self.E3thicknessSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
@@ -513,7 +513,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E3thicknessSpinBox.setSingleStep(1)
         self.E3thicknessSpinBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.E3thicknessSpinBox.setRange(1,10)
-        self.E3thicknessSpinBox.setValue(int(round(self.aw.qmc.Evaluelinethickness[2])))
+        self.E3thicknessSpinBox.setValue(round(self.aw.qmc.Evaluelinethickness[2]))
         self.E3thicknessSpinBox.valueChanged.connect(self.setElinethickness2)
         self.E4thicknessSpinBox = QSpinBox()
         self.E4thicknessSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
@@ -521,7 +521,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E4thicknessSpinBox.setSingleStep(1)
         self.E4thicknessSpinBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.E4thicknessSpinBox.setRange(1,10)
-        self.E4thicknessSpinBox.setValue(int(round(self.aw.qmc.Evaluelinethickness[3])))
+        self.E4thicknessSpinBox.setValue(round(self.aw.qmc.Evaluelinethickness[3]))
         self.E4thicknessSpinBox.valueChanged.connect(self.setElinethickness3)
         self.E1alphaSpinBox = MyQDoubleSpinBox()
         self.E1alphaSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
@@ -606,7 +606,7 @@ class EventsDlg(ArtisanResizeablDialog):
             self.chargeTimer.setEnabled(False)
         self.chargeTimerSpinner = QSpinBox()
         self.chargeTimerSpinner.setStyleSheet(spin_box_style(self.aw.app.darkmode))
-        self.chargeTimerSpinner.setEnabled(bool(self.aw.qmc.chargeTimerFlag))
+        self.chargeTimerSpinner.setEnabled(self.aw.qmc.chargeTimerFlag)
         self.chargeTimerSpinner.setToolTip(QApplication.translate('Tooltip',
             'Countdown seconds from {} to {}',
             'Countdown seconds from START to CHARGE'
@@ -616,7 +616,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.chargeTimerSpinner.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.chargeTimerSpinner.setRange(0,60)
         self.chargeTimerSpinner.setSuffix('s')
-        self.chargeTimerSpinner.setValue(int(self.aw.qmc.chargeTimerPeriod))
+        self.chargeTimerSpinner.setValue(self.aw.qmc.chargeTimerPeriod)
         self.autoDrop = QCheckBox(QApplication.translate('Label','DROP'))
         self.autoDrop.setToolTip(QApplication.translate('Tooltip',
             'Auto detection of {}',
@@ -678,7 +678,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.nbuttonsSpinBox.setMaximumWidth(100)
         self.nbuttonsSpinBox.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.nbuttonsSpinBox.setRange(self.aw.buttonpalettemaxlen_min,self.aw.buttonpalettemaxlen_max)
-        self.nbuttonsSpinBox.setValue(int(self.aw.buttonlistmaxlen))
+        self.nbuttonsSpinBox.setValue(self.aw.buttonlistmaxlen)
         self.nbuttonsSpinBox.valueChanged.connect(self.setbuttonlistmaxlen)
         nbuttonsSizeLabel = QLabel(QApplication.translate('Label','Button Size'))
         self.nbuttonsSizeBox = MyQComboBox()
@@ -959,42 +959,42 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E1_min.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.E1_min.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E1_min.setRange(0,self.aw.eventsMaxValue)
-        self.E1_min.setValue(int(self.aw.eventslidermin[0]))
+        self.E1_min.setValue(self.aw.eventslidermin[0])
         self.E2_min = QSpinBox()
         self.E2_min.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.E2_min.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E2_min.setRange(0,self.aw.eventsMaxValue)
-        self.E2_min.setValue(int(self.aw.eventslidermin[1]))
+        self.E2_min.setValue(self.aw.eventslidermin[1])
         self.E3_min = QSpinBox()
         self.E3_min.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.E3_min.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E3_min.setRange(0,self.aw.eventsMaxValue)
-        self.E3_min.setValue(int(self.aw.eventslidermin[2]))
+        self.E3_min.setValue(self.aw.eventslidermin[2])
         self.E4_min = QSpinBox()
         self.E4_min.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.E4_min.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E4_min.setRange(0,self.aw.eventsMaxValue)
-        self.E4_min.setValue(int(self.aw.eventslidermin[3]))
+        self.E4_min.setValue(self.aw.eventslidermin[3])
         self.E1_max = QSpinBox()
         self.E1_max.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.E1_max.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E1_max.setRange(0,self.aw.eventsMaxValue)
-        self.E1_max.setValue(int(self.aw.eventslidermax[0]))
+        self.E1_max.setValue(self.aw.eventslidermax[0])
         self.E2_max = QSpinBox()
         self.E2_max.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.E2_max.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E2_max.setRange(0,self.aw.eventsMaxValue)
-        self.E2_max.setValue(int(self.aw.eventslidermax[1]))
+        self.E2_max.setValue(self.aw.eventslidermax[1])
         self.E3_max = QSpinBox()
         self.E3_max.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.E3_max.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E3_max.setRange(0,self.aw.eventsMaxValue)
-        self.E3_max.setValue(int(self.aw.eventslidermax[2]))
+        self.E3_max.setValue(self.aw.eventslidermax[2])
         self.E4_max = QSpinBox()
         self.E4_max.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.E4_max.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.E4_max.setRange(0,self.aw.eventsMaxValue)
-        self.E4_max.setValue(int(self.aw.eventslidermax[3]))
+        self.E4_max.setValue(self.aw.eventslidermax[3])
         self.E1_calc = QToolButton()
         self.E1_calc.setText('')
         self.E1_calc.setToolTip(QApplication.translate('Form Caption', 'Slider Calculator'))
@@ -1317,7 +1317,7 @@ class EventsDlg(ArtisanResizeablDialog):
                 'tick-01-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'tick-01-stroke-rounded-white.svg')))
         self.clusterEventsFlag = QCheckBox(QApplication.translate('Label','Cluster'))
         self.clusterEventsFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.clusterEventsFlag.setChecked(bool(self.aw.clusterEventsFlag))
+        self.clusterEventsFlag.setChecked(self.aw.clusterEventsFlag)
         ### LAYOUTS
         #### tab1 layout
         bartypeLayout = QHBoxLayout()
@@ -1355,12 +1355,12 @@ class EventsDlg(ArtisanResizeablDialog):
             AutoMarkHBox.addSpacing(3)
             AutoMarkHBox.addWidget(self.autoChargeModeComboBox)
         AutoMarkHBox.addSpacing(30)
+        AutoMarkHBox.addWidget(self.markTP)
+        AutoMarkHBox.addSpacing(30)
         AutoMarkHBox.addWidget(self.autoDrop)
         if self.aw.ui_mode is UI_MODE.EXPERT:
             AutoMarkHBox.addSpacing(3)
             AutoMarkHBox.addWidget(self.autoDropModeComboBox)
-        AutoMarkHBox.addSpacing(30)
-        AutoMarkHBox.addWidget(self.markTP)
         AutoMarkHBox.addSpacing(30)
         AutoMarkHBox.addWidget(self.ShowMet)
         AutoMarkHBox.setContentsMargins(5,0,5,0) # l,t,r,b
@@ -1426,7 +1426,7 @@ class EventsDlg(ArtisanResizeablDialog):
                        QApplication.translate('ComboBox', 'WebSocket Command')]
         self.buttonActionTypesSorted = sorted(self.buttonActionTypes)
         self.CHARGEbutton = QCheckBox(QApplication.translate('Label', 'CHARGE'))
-        self.CHARGEbutton.setChecked(bool(self.aw.qmc.buttonvisibility[0]))
+        self.CHARGEbutton.setChecked(self.aw.qmc.buttonvisibility[0])
         self.CHARGEbutton.setToolTip(QApplication.translate('Tooltip', 'Display the button during roast'))
         self.CHARGEbuttonActionType = QComboBox()
         self.CHARGEbuttonActionType.setToolTip(QApplication.translate('Tooltip', 'Action type to fire when the button is clicked'))
@@ -1441,7 +1441,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.CHARGEbuttonActionString.setToolTip(QApplication.translate('Tooltip', 'Event action command'))
         self.DRYbutton = QCheckBox(QApplication.translate('Label', 'DRY END'))
         self.DRYbutton.setToolTip(QApplication.translate('Tooltip', 'Display the button during roast'))
-        self.DRYbutton.setChecked(bool(self.aw.qmc.buttonvisibility[1]))
+        self.DRYbutton.setChecked(self.aw.qmc.buttonvisibility[1])
         self.DRYbuttonActionType = QComboBox()
         self.DRYbuttonActionType.setToolTip(QApplication.translate('Tooltip', 'Action type to fire when the button is clicked'))
         self.DRYbuttonActionType.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -1454,7 +1454,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.DRYbuttonActionString.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.DRYbuttonActionString.setToolTip(QApplication.translate('Tooltip', 'Event action command'))
         self.FCSbutton = QCheckBox(QApplication.translate('Label', 'FC START'))
-        self.FCSbutton.setChecked(bool(self.aw.qmc.buttonvisibility[2]))
+        self.FCSbutton.setChecked(self.aw.qmc.buttonvisibility[2])
         self.FCSbutton.setToolTip(QApplication.translate('Tooltip', 'Display the button during roast'))
         self.FCSbuttonActionType = QComboBox()
         self.FCSbuttonActionType.setToolTip(QApplication.translate('Tooltip', 'Action type to fire when the button is clicked'))
@@ -1468,7 +1468,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.FCSbuttonActionString.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.FCSbuttonActionString.setToolTip(QApplication.translate('Tooltip', 'Event action command'))
         self.FCEbutton = QCheckBox(QApplication.translate('Label', 'FC END'))
-        self.FCEbutton.setChecked(bool(self.aw.qmc.buttonvisibility[3]))
+        self.FCEbutton.setChecked(self.aw.qmc.buttonvisibility[3])
         self.FCEbutton.setToolTip(QApplication.translate('Tooltip', 'Display the button during roast'))
         self.FCEbuttonActionType = QComboBox()
         self.FCEbuttonActionType.setToolTip(QApplication.translate('Tooltip', 'Action type to fire when the button is clicked'))
@@ -1482,7 +1482,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.FCEbuttonActionString.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.FCEbuttonActionString.setToolTip(QApplication.translate('Tooltip', 'Event action command'))
         self.SCSbutton = QCheckBox(QApplication.translate('Label', 'SC START'))
-        self.SCSbutton.setChecked(bool(self.aw.qmc.buttonvisibility[4]))
+        self.SCSbutton.setChecked(self.aw.qmc.buttonvisibility[4])
         self.SCSbutton.setToolTip(QApplication.translate('Tooltip', 'Display the button during roast'))
         self.SCSbuttonActionType = QComboBox()
         self.SCSbuttonActionType.setToolTip(QApplication.translate('Tooltip', 'Action type to fire when the button is clicked'))
@@ -1496,7 +1496,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.SCSbuttonActionString.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.SCSbuttonActionString.setToolTip(QApplication.translate('Tooltip', 'Event action command'))
         self.SCEbutton = QCheckBox(QApplication.translate('Label', 'SC END'))
-        self.SCEbutton.setChecked(bool(self.aw.qmc.buttonvisibility[5]))
+        self.SCEbutton.setChecked(self.aw.qmc.buttonvisibility[5])
         self.SCEbutton.setToolTip(QApplication.translate('Tooltip', 'Display the button during roast'))
         self.SCEbuttonActionType = QComboBox()
         self.SCEbuttonActionType.setToolTip(QApplication.translate('Tooltip', 'Action type to fire when the button is clicked'))
@@ -1510,7 +1510,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.SCEbuttonActionString.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.SCEbuttonActionString.setToolTip(QApplication.translate('Tooltip', 'Event action command'))
         self.DROPbutton = QCheckBox(QApplication.translate('Label', 'DROP'))
-        self.DROPbutton.setChecked(bool(self.aw.qmc.buttonvisibility[6]))
+        self.DROPbutton.setChecked(self.aw.qmc.buttonvisibility[6])
         self.DROPbutton.setToolTip(QApplication.translate('Tooltip', 'Display the button during roast'))
         self.DROPbuttonActionType = QComboBox()
         self.DROPbuttonActionType.setToolTip(QApplication.translate('Tooltip', 'Action type to fire when the button is clicked'))
@@ -1524,7 +1524,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.DROPbuttonActionString.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.DROPbuttonActionString.setToolTip(QApplication.translate('Tooltip', 'Event action command'))
         self.COOLbutton = QCheckBox(QApplication.translate('ComboBox', 'COOL END'))
-        self.COOLbutton.setChecked(bool(self.aw.qmc.buttonvisibility[7]))
+        self.COOLbutton.setChecked(self.aw.qmc.buttonvisibility[7])
         self.COOLbutton.setToolTip(QApplication.translate('Tooltip', 'Display the button during roast'))
         self.COOLbuttonActionType = QComboBox()
         self.COOLbuttonActionType.setToolTip(QApplication.translate('Tooltip', 'Action type to fire when the button is clicked'))
@@ -1655,7 +1655,7 @@ class EventsDlg(ArtisanResizeablDialog):
 
         self.eventUndo = QCheckBox(QApplication.translate('CheckBox','UNDO'))
         self.eventUndo.setToolTip(QApplication.translate('Tooltip', 'Undoing of event markers by pressing the corresponding main event button again'))
-        self.eventUndo.setChecked(bool(self.aw.qmc.main_event_buttons_undo_enabled))
+        self.eventUndo.setChecked(self.aw.qmc.main_event_buttons_undo_enabled)
 
         defaultButtonsOptionsQHBoxLayout = QHBoxLayout()
         defaultButtonsOptionsQHBoxLayout.addStretch()
@@ -2428,10 +2428,10 @@ class EventsDlg(ArtisanResizeablDialog):
         else:
             self.marker4typeComboBox.setCurrentIndex(0)
         # line thickness
-        self.E1thicknessSpinBox.setValue(int(round(self.aw.qmc.Evaluelinethickness[0])))
-        self.E2thicknessSpinBox.setValue(int(round(self.aw.qmc.Evaluelinethickness[1])))
-        self.E3thicknessSpinBox.setValue(int(round(self.aw.qmc.Evaluelinethickness[2])))
-        self.E4thicknessSpinBox.setValue(int(round(self.aw.qmc.Evaluelinethickness[3])))
+        self.E1thicknessSpinBox.setValue(round(self.aw.qmc.Evaluelinethickness[0]))
+        self.E2thicknessSpinBox.setValue(round(self.aw.qmc.Evaluelinethickness[1]))
+        self.E3thicknessSpinBox.setValue(round(self.aw.qmc.Evaluelinethickness[2]))
+        self.E4thicknessSpinBox.setValue(round(self.aw.qmc.Evaluelinethickness[3]))
         # opacity
         self.E1alphaSpinBox.setValue(self.aw.qmc.Evaluealpha[0])
         self.E2alphaSpinBox.setValue(self.aw.qmc.Evaluealpha[1])
@@ -2487,15 +2487,15 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E3factor.setValue(self.aw.eventsliderfactors[2])
         self.E4factor.setValue(self.aw.eventsliderfactors[3])
         # set slider min
-        self.E1_min.setValue(int(self.aw.eventslidermin[0]))
-        self.E2_min.setValue(int(self.aw.eventslidermin[1]))
-        self.E3_min.setValue(int(self.aw.eventslidermin[2]))
-        self.E4_min.setValue(int(self.aw.eventslidermin[3]))
+        self.E1_min.setValue(self.aw.eventslidermin[0])
+        self.E2_min.setValue(self.aw.eventslidermin[1])
+        self.E3_min.setValue(self.aw.eventslidermin[2])
+        self.E4_min.setValue(self.aw.eventslidermin[3])
         # set slider max
-        self.E1_max.setValue(int(self.aw.eventslidermax[0]))
-        self.E2_max.setValue(int(self.aw.eventslidermax[1]))
-        self.E3_max.setValue(int(self.aw.eventslidermax[2]))
-        self.E4_max.setValue(int(self.aw.eventslidermax[3]))
+        self.E1_max.setValue(self.aw.eventslidermax[0])
+        self.E2_max.setValue(self.aw.eventslidermax[1])
+        self.E3_max.setValue(self.aw.eventslidermax[2])
+        self.E4_max.setValue(self.aw.eventslidermax[3])
         # set slider Bernoulli
         self.E1slider_bernoulli.setChecked(bool(self.aw.eventsliderBernoulli[0]))
         self.E2slider_bernoulli.setChecked(bool(self.aw.eventsliderBernoulli[1]))
@@ -2801,7 +2801,7 @@ class EventsDlg(ArtisanResizeablDialog):
         if 0 <= pindex < 10:
             answer = self.localSetbuttonsfrom(pindex)
             if answer:
-                self.nbuttonsSpinBox.setValue(int(self.aw.buttonlistmaxlen))
+                self.nbuttonsSpinBox.setValue(self.aw.buttonlistmaxlen)
                 self.transferpalettecurrentLabelEdit.setText(self.aw.buttonpalette_label)
                 self.updatePalettePopup()
                 self.updateSliderTab()
@@ -2822,7 +2822,7 @@ class EventsDlg(ArtisanResizeablDialog):
     def colorizebuttons(self, pattern:int = 0) -> None:
         if self.changingcolorflag:
             n = self.colorSpinBox.value()
-            self.colorSpinBox.setValue(int(n-1))
+            self.colorSpinBox.setValue(n-1)
             return
         self.changingcolorflag = True
 
@@ -2845,7 +2845,7 @@ class EventsDlg(ArtisanResizeablDialog):
             for f in range(230,50,gap):
                 color = QColor()
                 color.setHsv(step,255,f,255)
-                bcolor.append(str(color.name()))
+                bcolor.append(color.name())
             step += pattern*2
 
         #Apply Colors in Right Order
@@ -2900,7 +2900,7 @@ class EventsDlg(ArtisanResizeablDialog):
     def setcoloreventline(self, b:int) -> None:
         colorf = self.aw.colordialog(QColor(self.aw.qmc.EvalueColor[b]))
         if colorf.isValid():
-            colorname = str(colorf.name())
+            colorname = colorf.name()
             self.aw.qmc.EvalueColor[b] = colorname
             self.aw.updateSliderColors()
             self.updateStyleTab()
@@ -2922,7 +2922,7 @@ class EventsDlg(ArtisanResizeablDialog):
     def setcoloreventtext(self, b:int) -> None:
         colorf = self.aw.colordialog(QColor(self.aw.qmc.EvalueTextColor[b]))
         if colorf.isValid():
-            colorname = str(colorf.name())
+            colorname = colorf.name()
             self.aw.qmc.EvalueTextColor[b] = colorname
             self.aw.updateSliderColors()
             self.updateStyleTab()
@@ -2939,7 +2939,7 @@ class EventsDlg(ArtisanResizeablDialog):
             # save the current columnWidth to reset them after table creation
             self.aw.eventbuttontablecolumnwidths = [self.eventbuttontable.columnWidth(c) for c in range(self.eventbuttontable.columnCount())]
 
-        self.nbuttonsSpinBox.setValue(int(self.aw.buttonlistmaxlen))
+        self.nbuttonsSpinBox.setValue(self.aw.buttonlistmaxlen)
         nbuttons = len(self.extraeventstypes)
 
         # self.eventbuttontable.clear() # this crashes Ubuntu 16.04
@@ -3290,7 +3290,7 @@ class EventsDlg(ArtisanResizeablDialog):
         if i is not None:
             valueedit = cast(QLineEdit, self.eventbuttontable.cellWidget(i,3))
             if i < len(self.extraeventsvalues):
-                self.extraeventsvalues[i] = self.aw.qmc.str2eventsvalue(str(valueedit.text()))
+                self.extraeventsvalues[i] = self.aw.qmc.str2eventsvalue(valueedit.text())
                 labeledit = cast(QLineEdit, self.eventbuttontable.cellWidget(i,0))
                 label = labeledit.text()
                 label = label.replace('\\n', chr(10))
@@ -3336,7 +3336,7 @@ class EventsDlg(ArtisanResizeablDialog):
         if i is not None and i < len(self.extraeventbuttoncolor):
             colorf = self.aw.colordialog(QColor(self.extraeventbuttoncolor[i]))
             if colorf.isValid():
-                self.extraeventbuttoncolor[i] = str(colorf.name())
+                self.extraeventbuttoncolor[i] = colorf.name()
                 textColor = self.extraeventbuttontextcolor[i]
                 backColor =  self.extraeventbuttoncolor[i]
                 label = self.extraeventslabels[i]
@@ -3355,7 +3355,7 @@ class EventsDlg(ArtisanResizeablDialog):
         if i is not None and i < len(self.extraeventbuttontextcolor):
             colorf = self.aw.colordialog(QColor(self.extraeventbuttontextcolor[i]))
             if colorf.isValid():
-                self.extraeventbuttontextcolor[i] = str(colorf.name())
+                self.extraeventbuttontextcolor[i] = colorf.name()
                 textColor = self.extraeventbuttontextcolor[i]
                 backColor =  self.extraeventbuttoncolor[i]
                 label = self.extraeventslabels[i]
@@ -3605,14 +3605,14 @@ class EventsDlg(ArtisanResizeablDialog):
         self.aw.eventsliderfactors[3] = float(self.E4factor.value())
         if self.aw.eventsliderfactors[3] == 1: # a zero does not make much sense and might be a user error
             self.aw.eventsliderfactors[3] = 1.0
-        self.aw.eventslidermin[0] = int(min(self.E1_min.value(),self.E1_max.value()))
-        self.aw.eventslidermin[1] = int(min(self.E2_min.value(),self.E2_max.value()))
-        self.aw.eventslidermin[2] = int(min(self.E3_min.value(),self.E3_max.value()))
-        self.aw.eventslidermin[3] = int(min(self.E4_min.value(),self.E4_max.value()))
-        self.aw.eventslidermax[0] = int(max(self.E1_min.value(),self.E1_max.value()))
-        self.aw.eventslidermax[1] = int(max(self.E2_min.value(),self.E2_max.value()))
-        self.aw.eventslidermax[2] = int(max(self.E3_min.value(),self.E3_max.value()))
-        self.aw.eventslidermax[3] = int(max(self.E4_min.value(),self.E4_max.value()))
+        self.aw.eventslidermin[0] = min(self.E1_min.value(),self.E1_max.value())
+        self.aw.eventslidermin[1] = min(self.E2_min.value(),self.E2_max.value())
+        self.aw.eventslidermin[2] = min(self.E3_min.value(),self.E3_max.value())
+        self.aw.eventslidermin[3] = min(self.E4_min.value(),self.E4_max.value())
+        self.aw.eventslidermax[0] = max(self.E1_min.value(),self.E1_max.value())
+        self.aw.eventslidermax[1] = max(self.E2_min.value(),self.E2_max.value())
+        self.aw.eventslidermax[2] = max(self.E3_min.value(),self.E3_max.value())
+        self.aw.eventslidermax[3] = max(self.E4_min.value(),self.E4_max.value())
         self.aw.eventsliderBernoulli[0] = int(self.E1slider_bernoulli.isChecked())
         self.aw.eventsliderBernoulli[1] = int(self.E2slider_bernoulli.isChecked())
         self.aw.eventsliderBernoulli[2] = int(self.E3slider_bernoulli.isChecked())
@@ -3633,7 +3633,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.aw.slidersAction.setEnabled(any(self.aw.eventslidervisibilities) or self.aw.pidcontrol.svSlider)
 
     def saveQuantifierSettings(self) -> None:
-        self.aw.clusterEventsFlag = bool(self.clusterEventsFlag.isChecked())
+        self.aw.clusterEventsFlag = self.clusterEventsFlag.isChecked()
         self.aw.eventquantifieractive[0] = int(self.E1active.isChecked())
         self.aw.eventquantifieractive[1] = int(self.E2active.isChecked())
         self.aw.eventquantifieractive[2] = int(self.E3active.isChecked())
@@ -3650,18 +3650,18 @@ class EventsDlg(ArtisanResizeablDialog):
         self.aw.eventquantifierSV[1] = int(self.E2quantifierSV.isChecked())
         self.aw.eventquantifierSV[2] = int(self.E3quantifierSV.isChecked())
         self.aw.eventquantifierSV[3] = int(self.E4quantifierSV.isChecked())
-        self.aw.eventquantifiersource[0] = int(self.E1SourceComboBox.currentIndex())
-        self.aw.eventquantifiersource[1] = int(self.E2SourceComboBox.currentIndex())
-        self.aw.eventquantifiersource[2] = int(self.E3SourceComboBox.currentIndex())
-        self.aw.eventquantifiersource[3] = int(self.E4SourceComboBox.currentIndex())
-        self.aw.eventquantifiermin[0] = int(self.E1min.value())
-        self.aw.eventquantifiermin[1] = int(self.E2min.value())
-        self.aw.eventquantifiermin[2] = int(self.E3min.value())
-        self.aw.eventquantifiermin[3] = int(self.E4min.value())
-        self.aw.eventquantifiermax[0] = int(self.E1max.value())
-        self.aw.eventquantifiermax[1] = int(self.E2max.value())
-        self.aw.eventquantifiermax[2] = int(self.E3max.value())
-        self.aw.eventquantifiermax[3] = int(self.E4max.value())
+        self.aw.eventquantifiersource[0] = self.E1SourceComboBox.currentIndex()
+        self.aw.eventquantifiersource[1] = self.E2SourceComboBox.currentIndex()
+        self.aw.eventquantifiersource[2] = self.E3SourceComboBox.currentIndex()
+        self.aw.eventquantifiersource[3] = self.E4SourceComboBox.currentIndex()
+        self.aw.eventquantifiermin[0] = self.E1min.value()
+        self.aw.eventquantifiermin[1] = self.E2min.value()
+        self.aw.eventquantifiermin[2] = self.E3min.value()
+        self.aw.eventquantifiermin[3] = self.E4min.value()
+        self.aw.eventquantifiermax[0] = self.E1max.value()
+        self.aw.eventquantifiermax[1] = self.E2max.value()
+        self.aw.eventquantifiermax[2] = self.E3max.value()
+        self.aw.eventquantifiermax[3] = self.E4max.value()
         self.aw.computeLinespaces()
 
     def saveAnnotationsSettings(self) -> None:
@@ -3839,28 +3839,28 @@ class EventsDlg(ArtisanResizeablDialog):
             #save default buttons
             self.aw.qmc.main_event_buttons_undo_enabled = self.eventUndo.isChecked()
             self.aw.qmc.buttonvisibility[0] = self.CHARGEbutton.isChecked()
-            self.aw.buttonCHARGE.setVisible(bool(self.aw.qmc.buttonvisibility[0]))
-            if bool(self.aw.qmc.buttonvisibility[0]) and not self.aw.buttonCHARGE.isFlat() and not self.aw.buttonCHARGE.animating:
+            self.aw.buttonCHARGE.setVisible(self.aw.qmc.buttonvisibility[0])
+            if self.aw.qmc.buttonvisibility[0] and not self.aw.buttonCHARGE.isFlat() and not self.aw.buttonCHARGE.animating:
                 # if animation is not running and button is enabled and not flat, we start the animation
                 self.aw.buttonCHARGE.startAnimation()
             self.aw.qmc.buttonvisibility[1] = self.DRYbutton.isChecked()
-            self.aw.buttonDRY.setVisible(bool(self.aw.qmc.buttonvisibility[1]))
+            self.aw.buttonDRY.setVisible(self.aw.qmc.buttonvisibility[1])
             self.aw.qmc.buttonvisibility[2] = self.FCSbutton.isChecked()
-            self.aw.buttonFCs.setVisible(bool(self.aw.qmc.buttonvisibility[2]))
+            self.aw.buttonFCs.setVisible(self.aw.qmc.buttonvisibility[2])
             self.aw.qmc.buttonvisibility[3] = self.FCEbutton.isChecked()
-            self.aw.buttonFCe.setVisible(bool(self.aw.qmc.buttonvisibility[3]))
+            self.aw.buttonFCe.setVisible(self.aw.qmc.buttonvisibility[3])
             self.aw.qmc.buttonvisibility[4] = self.SCSbutton.isChecked()
-            self.aw.buttonSCs.setVisible(bool(self.aw.qmc.buttonvisibility[4]))
+            self.aw.buttonSCs.setVisible(self.aw.qmc.buttonvisibility[4])
             self.aw.qmc.buttonvisibility[5] = self.SCEbutton.isChecked()
-            self.aw.buttonSCe.setVisible(bool(self.aw.qmc.buttonvisibility[5]))
+            self.aw.buttonSCe.setVisible(self.aw.qmc.buttonvisibility[5])
             self.aw.qmc.buttonvisibility[6] = self.DROPbutton.isChecked()
-            self.aw.buttonDROP.setVisible(bool(self.aw.qmc.buttonvisibility[6]))
+            self.aw.buttonDROP.setVisible(self.aw.qmc.buttonvisibility[6])
             coolButtonVisibilityOrg = self.aw.qmc.buttonvisibility[7]
             self.aw.qmc.buttonvisibility[7] = self.COOLbutton.isChecked()
             if coolButtonVisibilityOrg != self.aw.qmc.buttonvisibility[7]:
                 # adjust foreground or if no foreground but background is loaded the background; depending on showFull and COOL button state the max limit might be different
                 self.aw.autoAdjustAxis(background=self.aw.qmc.background and (not len(self.aw.qmc.timex) > 3), deltas=False)
-            self.aw.buttonCOOL.setVisible(bool(self.aw.qmc.buttonvisibility[7]))
+            self.aw.buttonCOOL.setVisible(self.aw.qmc.buttonvisibility[7])
             #save sliders
             self.saveSliderSettings()
             self.saveQuantifierSettings()
@@ -3899,7 +3899,7 @@ class EventsDlg(ArtisanResizeablDialog):
             self.aw.qmc.xextrabuttonactionstrings[1] = self.STARTbuttonActionString.text()
 
 
-            self.aw.qmc.overlappct = int(self.overlapEdit.value())
+            self.aw.qmc.overlappct = self.overlapEdit.value()
 
             self.aw.buttonpalette_shortcuts = self.switchPaletteByNumberKey.isChecked()
 
@@ -4212,6 +4212,6 @@ class customEventDlg(ArtisanDialog):
     def accept(self) -> None:
         self.description = self.descriptionEdit.text()
         evalue = self.valueEdit.text()
-        self.value = self.aw.qmc.str2eventsvalue(str(evalue))
+        self.value = self.aw.qmc.str2eventsvalue(evalue)
         self.type = self.typeCombo.currentIndex()
         super().accept()

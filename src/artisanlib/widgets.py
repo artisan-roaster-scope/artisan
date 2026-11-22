@@ -404,7 +404,7 @@ class MyTableWidgetItemQComboBox(QTableWidgetItem):
     #Qt uses a simple < check for sorting items, override this to use the sortKey
     @override
     def __lt__(self, other:'MyTableWidgetItemQComboBox') -> bool: # type: ignore[override]
-        return str(self.sortKey.currentText()) < str(other.sortKey.currentText())
+        return self.sortKey.currentText() < other.sortKey.currentText()
 
 
 # Slider which does not move if slider widget is clicked, only if slider bar is clicked
@@ -872,8 +872,8 @@ class SplitterHandle(QSplitterHandle):
         painter.setRenderHint(painter.RenderHint.Antialiasing)
 
         h = self.height()
-        hh = int(round(h/2))
-        ww = int(round(self.width()/2))
+        hh = round(h/2)
+        ww = round(self.width()/2)
 
         x0 = ww - h
         x1 = ww + h
@@ -911,7 +911,7 @@ class FixedRatio2ToolButton(QToolButton):
     @override
     def heightForWidth(self, a0: int) -> int:
         # 2:1 ratio
-        return int(round(a0/2))
+        return round(a0/2)
 
     # Ensure the default size hint also respects the aspect ratio
     @override

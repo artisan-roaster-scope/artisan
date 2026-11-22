@@ -72,7 +72,7 @@ def extractProfilePetronciniCSV(file:str,
             roasttime = encodeLocal(datetime.time().toString())
             if roasttime is not None:
                 res['roasttime'] = roasttime
-            res['roastepoch'] = int(datetime.toSecsSinceEpoch())
+            res['roastepoch'] = datetime.toSecsSinceEpoch()
             res['roasttzoffset'] = libtime.timezone
     except Exception as e: # pylint: disable=broad-except
         _log.exception(e)
@@ -160,7 +160,7 @@ def extractProfilePetronciniCSV(file:str,
                             power_last = power
                             power = v
                             power_event = True
-                            specialeventsvalue.append(eventsExternal2InternalValue(int(round(v))))
+                            specialeventsvalue.append(eventsExternal2InternalValue(round(v)))
                             specialevents.append(i)
                             specialeventstype.append(3)
                             specialeventsStrings.append(f'{power:.0f}%')
@@ -197,7 +197,7 @@ def extractProfilePetronciniCSV(file:str,
         roasttime = encodeLocal(roast_date.time().toString())
         if roasttime is not None:
             res['roasttime'] = roasttime
-        res['roastepoch'] = int(roast_date.toSecsSinceEpoch())
+        res['roastepoch'] = roast_date.toSecsSinceEpoch()
         res['roasttzoffset'] = libtime.timezone
 
     if len(specialevents) > 0:

@@ -171,7 +171,7 @@ class MockQObject:
 
 
 @pytest.fixture(scope='session', autouse=True)
-def ensure_stock_isolation() -> Generator[None, None, None]:
+def ensure_stock_isolation() -> Generator[None]:
     """
     Ensure modules are properly isolated for stock tests at session level.
 
@@ -208,7 +208,7 @@ def ensure_stock_isolation() -> Generator[None, None, None]:
 
 
 @pytest.fixture(scope='module', autouse=True)
-def cleanup_stock_mocks() -> Generator[None, None, None]:
+def cleanup_stock_mocks() -> Generator[None]:
     """
     Clean up stock test mocks at module level to prevent cross-file contamination.
 
@@ -222,7 +222,7 @@ def cleanup_stock_mocks() -> Generator[None, None, None]:
 
 
 @pytest.fixture(autouse=True)
-def reset_stock_state() -> Generator[None, None, None]:
+def reset_stock_state() -> Generator[None]:
     """
     Reset stock module state before each test to ensure test independence.
 
@@ -261,7 +261,7 @@ def reset_stock_state() -> Generator[None, None, None]:
 
 
 @pytest.fixture
-def mock_stock_semaphore() -> Generator[MockQSemaphore, None, None]:
+def mock_stock_semaphore() -> Generator[MockQSemaphore]:
     """Create a mock stock semaphore."""
     mock_sem = MockQSemaphore()
     with patch('plus.stock.stock_semaphore', mock_sem):
@@ -269,7 +269,7 @@ def mock_stock_semaphore() -> Generator[MockQSemaphore, None, None]:
 
 
 @pytest.fixture
-def mock_config() -> Generator[Mock, None, None]:
+def mock_config() -> Generator[Mock]:
     """Create mock configuration."""
     with patch('plus.stock.config') as mock_cfg:
         mock_cfg.stock_cache_expiration = 3600  # 1 hour
@@ -327,7 +327,7 @@ def sample_stock_data(sample_coffee:dict[str, Any], sample_blend:dict[str, Any])
 
 
 @pytest.fixture
-def temp_stock_cache() -> Generator[str, None, None]:
+def temp_stock_cache() -> Generator[str]:
     """Create a temporary stock cache file."""
     with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
         temp_path = f.name

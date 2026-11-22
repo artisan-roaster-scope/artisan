@@ -761,7 +761,7 @@ class Dashboard(QWidget):
                     else:
                         line = line + ', '
                     c = f"<a href=\"{coffeeLink(i['coffee'])}\"{dark_mode_link_color}>{abbrevString(ll, 18)}</a>"
-                    line = line + str(int(round(i['ratio']*100))) + '% ' + c
+                    line = line + str(round(i['ratio']*100)) + '% ' + c
             if line and len(line)>0 and self.aw.qmc.plus_store is not None and self.aw.qmc.plus_store_label is not None:
                 line = line + f'  (<a href="{storeLink(self.aw.qmc.plus_store)}"{dark_mode_link_color}>{self.aw.qmc.plus_store_label}</a>)'
 #            if line == '':

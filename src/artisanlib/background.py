@@ -134,7 +134,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.speedSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.speedSpinBox.setRange(1,90)
         self.speedSpinBox.setSingleStep(5)
-        self.speedSpinBox.setValue(int(self.aw.qmc.backgroundmovespeed))
+        self.speedSpinBox.setValue(self.aw.qmc.backgroundmovespeed)
 
         curvenames = [''] # first entry is the empty one, no extra curve displayed
         for i in range(min(len(self.aw.qmc.extraname1B),len(self.aw.qmc.extraname2B),len(self.aw.qmc.extratimexB))):
@@ -307,7 +307,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.etimeSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.etimeSpinBox.setRange(1,60)
         self.etimeSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.etimeSpinBox.setValue(int(self.aw.qmc.detectBackgroundEventTime))
+        self.etimeSpinBox.setValue(self.aw.qmc.detectBackgroundEventTime)
         self.etimeSpinBox.valueChanged.connect(self.setreproduce)
         self.etimeSpinBox.setEnabled(self.aw.qmc.backgroundReproduce)
         self.clearBgbeforeprofileload = QCheckBox(QApplication.translate('CheckBox','Clear template before loading'))
@@ -662,7 +662,7 @@ class backgroundDlg(ArtisanResizeablDialog):
     @override
     def accept(self) -> None:
         self.aw.qmc.backgroundmovespeed = self.speedSpinBox.value()
-        self.aw.qmc.backgroundKeyboardControlFlag = bool(self.keyboardControlflag.isChecked())
+        self.aw.qmc.backgroundKeyboardControlFlag = self.keyboardControlflag.isChecked()
         if self.aw.qmc.backgroundPlaybackEvents:
             # turn on again after background load to ignore already passed events
             self.aw.qmc.turn_playback_event_ON()
@@ -861,14 +861,14 @@ class backgroundDlg(ArtisanResizeablDialog):
             re_smooth_background=False)
 
     def readChecks(self) -> None:
-        self.aw.qmc.background = bool(self.backgroundCheck.isChecked())
-        self.aw.qmc.backgroundDetails = bool(self.backgroundDetails.isChecked())
-        self.aw.qmc.backgroundeventsflag = bool(self.backgroundeventsflag.isChecked())
-        self.aw.qmc.DeltaETBflag = bool(self.backgroundDeltaETflag.isChecked())
-        self.aw.qmc.DeltaBTBflag = bool(self.backgroundDeltaBTflag.isChecked())
-        self.aw.qmc.backgroundETcurve = bool(self.backgroundETflag.isChecked())
-        self.aw.qmc.backgroundBTcurve = bool(self.backgroundBTflag.isChecked())
-        self.aw.qmc.backgroundShowFullflag = bool(self.backgroundFullflag.isChecked())
+        self.aw.qmc.background = self.backgroundCheck.isChecked()
+        self.aw.qmc.backgroundDetails = self.backgroundDetails.isChecked()
+        self.aw.qmc.backgroundeventsflag = self.backgroundeventsflag.isChecked()
+        self.aw.qmc.DeltaETBflag = self.backgroundDeltaETflag.isChecked()
+        self.aw.qmc.DeltaBTBflag = self.backgroundDeltaBTflag.isChecked()
+        self.aw.qmc.backgroundETcurve = self.backgroundETflag.isChecked()
+        self.aw.qmc.backgroundBTcurve = self.backgroundBTflag.isChecked()
+        self.aw.qmc.backgroundShowFullflag = self.backgroundFullflag.isChecked()
         self.aw.qmc.l_annotations_dict = {}
         self.aw.qmc.redraw_keep_view(recomputeAllDeltas=True)
 

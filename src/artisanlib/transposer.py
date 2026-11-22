@@ -1119,7 +1119,7 @@ class profileTransformatorDlg(ArtisanDialog):
             profilePhasesPercentage = profilePhasesPercentages[i]
             if len(profilePhasesTimes) > i and profilePhasesTime is not None and profilePhasesPercentage is not None:
                 profile_phases_time_str = \
-                    f' {stringfromseconds(int(round(profilePhasesTime)),leadingzero=False)}     {float2float(profilePhasesPercentage)}%'
+                    f' {stringfromseconds(round(profilePhasesTime), leadingzero=False)}     {float2float(profilePhasesPercentage)}%'
                 profile_phases_widget = QTableWidgetItem(profile_phases_time_str)
                 profile_phases_widget.setTextAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 self.phasestable.setItem(0,i,profile_phases_widget)
@@ -1210,7 +1210,7 @@ class profileTransformatorDlg(ArtisanDialog):
         for i in range(4):
             profileTime = self.profileTimes[i]
             if len(self.profileTimes) > i and profileTime is not None:
-                profile_time_str = stringfromseconds(int(round(profileTime)),leadingzero=False)
+                profile_time_str = stringfromseconds(round(profileTime),leadingzero=False)
                 profile_widget = QTableWidgetItem(profile_time_str)
                 profile_widget.setTextAlignment(Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
                 self.timetable.setItem(0,i,profile_widget)

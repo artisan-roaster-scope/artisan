@@ -82,7 +82,7 @@ deltaLabelMathPrefix:Final[str] = r'$\Delta\/$'  # prefix for labels in matplibg
 def appFrozen() -> bool:
     ib = False
     try:
-        platf = str(platform.system())
+        platf = platform.system()
         if platf == 'Darwin':
             # the sys.frozen is set by py2app and pyinstaller and is unset otherwise
             if getattr( sys, 'frozen', False ):
@@ -153,8 +153,8 @@ def encodeLocalStrict(x:Any|None, default:str = '') -> str:
         return default
 def hex2int(h1:int, h2:int|None = None) -> int:
     if h2 is not None:
-        return int(h1*256 + h2)
-    return int(h1)
+        return h1*256 + h2
+    return h1
 
 # str2cmd converts string to bytes ignoring all non-ascii characters. Result to be used for low-level device communication.
 def str2cmd(s:str) -> bytes:
@@ -183,7 +183,7 @@ def stringfromseconds(seconds_raw:float, leadingzero:bool = True) -> str:
         seconds_raw /= 60
         sep = 'h'
     # seconds = int(round(seconds_raw)) # note that round(1.5)=round(2.5)=2
-    seconds = int(math.floor(seconds_raw + 0.5))
+    seconds = math.floor(seconds_raw + 0.5)
     if seconds >= 0:
         d, m = divmod(seconds, 60)
         if leadingzero:
@@ -305,7 +305,7 @@ def toInt(x:int|str|float|None) -> int:
     if x is None:
         return 0
     try:
-        return int(round(float(x)))
+        return round(float(x))
     except Exception: # pylint: disable=broad-except
         return 0
 
@@ -827,7 +827,7 @@ def float2float(f:float|str, n:int=1) -> float:
     if n==0:
         if math.isnan(f):
             return 0
-        return int(round(f))
+        return round(f)
     res:float = float(f'%.{n}f'%f)
     if math.isnan(res):
         return 0.0
@@ -1073,8 +1073,8 @@ def events_internal_to_external_value(v:float|None) -> int:
     if -1.0 <= v <= 1.0:
         return 0
     if v < -1.0:
-        return -(int(round(abs(v)*10)) - 10)
-    return int(round(v*10)) - 10
+        return -(round(abs(v)*10) - 10)
+    return round(v*10) - 10
 
 # the inverse of events_internal_to_external_value, converting an external to an internal event value
 # v from [-100,100]
@@ -1408,7 +1408,7 @@ def computeDeltas(
         if optimal_smoothing:
             user_filter = delta_filter
         else:
-            user_filter = int(round(delta_filter/2.))
+            user_filter = round(delta_filter/2.)
         delta1 = smooth_list(timex,z1,window_len=user_filter,decay_smoothing=(not optimal_smoothing),a_lin=timex_lin, # pyright:ignore[reportUnknownArgumentType]
                         medfilt_factor=medfilt_factor, filter_dropouts=filter_dropouts, replace_error_values=replace_error_values)
 
@@ -1429,7 +1429,7 @@ def computeDeltas(
 
 #Write object to file
 def serialize(filename:str, obj:dict[str, Any]) -> None:
-    fn = str(filename)
+    fn = filename
     with open(fn, 'w+', encoding='utf-8') as f:
         f.write(repr(obj))
 
@@ -1438,7 +1438,7 @@ def serialize(filename:str, obj:dict[str, Any]) -> None:
 def deserialize(filename:str) -> dict[str, Any]:
     obj:dict[str,Any] = {}
     try:
-        fn = str(filename)
+        fn = filename
         if os.path.exists(fn):
             with open(fn, encoding='utf-8') as f:
                 obj=ast.literal_eval(f.read()) # pylint: disable=eval-used
@@ -1469,7 +1469,7 @@ def csv_load(csvFile:io.TextIOWrapper) -> 'ProfileData':
     else:
         roastdate = QDateTime(date, QTime())
     profile['roastdate'] = encodeLocalStrict(QDate(date).toString())
-    profile['roastepoch'] = int(roastdate.toSecsSinceEpoch())
+    profile['roastepoch'] = roastdate.toSecsSinceEpoch()
     profile['roasttzoffset'] = 0
     unit = header[1].split('Unit:')[1]
     if unit in {'F', 'C'}:
@@ -1612,7 +1612,7 @@ def exportProfile2CSV(filename:str, profile:'ProfileData') -> bool:
                 'DROP:' + eventtime2string(DROP),
                 'COOL:' + eventtime2string(COOL),
                 'Time:' + QTime.fromString(decodeLocalStrict(profile['roasttime'])).toString()[:-3]]) # pyright: ignore[reportTypedDictNotRequiredAccess]
-            headrow:list[str] = (['Time1','Time2','ET','BT','Event'] + functools.reduce(lambda x,y : x + [str(y[0]),str(y[1])],
+            headrow:list[str] = (['Time1','Time2','ET','BT','Event'] + functools.reduce(lambda x,y : x + [y[0], y[1]],
                     (list(zip(profile['extraname1'][0:extradevices],profile['extraname2'][0:extradevices], strict=True)) if 'extraname1' in profile and 'extraname2' in profile else []),
                     cast(list[str], []))) # ty:ignore[redundant-cast]
             writer.writerow(headrow)
@@ -1626,7 +1626,7 @@ def exportProfile2CSV(filename:str, profile:'ProfileData') -> bool:
                     time2 = ''
                 event:str = ''
                 for ev in events:
-                    if ev[1] not in events_set and (ev[0]!=0 or (ev[1]=='CHARGE' and ev[0]!=-1)) and int(round(tx)) == int(round(ev[0])):
+                    if ev[1] not in events_set and (ev[0]!=0 or (ev[1]=='CHARGE' and ev[0]!=-1)) and round(tx) == round(ev[0]):
                         event = ev[1]
                         events_set.add(ev[1])
                         break
@@ -1644,7 +1644,7 @@ def exportProfile2CSV(filename:str, profile:'ProfileData') -> bool:
                                 extratemps.append(str(profile['extratemp2'][j][i]))
                             else:
                                 extratemps.append('-1')
-                    writer.writerow([str(time1),str(time2),str(temp1[i]),str(temp2[i]),str(event)] + extratemps)
+                    writer.writerow([time1, time2, str(temp1[i]),str(temp2[i]), event] + extratemps)
                 last_time = time1
         return True
     return False
@@ -1772,7 +1772,7 @@ def roast_message(profile:'ProfileData', org_id:str|None = None, machine_id:str|
                 except Exception: # pylint: disable=broad-except
                     roastdate = QDateTime(date, QTime())
             if roastdate is not None:
-                roastepoch = int(roastdate.toSecsSinceEpoch())
+                roastepoch = roastdate.toSecsSinceEpoch()
         except Exception: # pylint: disable=broad-except
             pass
     elif 'roastdate' in profile:
@@ -1788,7 +1788,7 @@ def roast_message(profile:'ProfileData', org_id:str|None = None, machine_id:str|
                     roastdate = QDateTime(date, QTime())
             else:
                 roastdate = QDateTime(date, QTime())
-            roastepoch = int(roastdate.toSecsSinceEpoch())
+            roastepoch = roastdate.toSecsSinceEpoch()
         except Exception: # pylint: disable=broad-except
             pass
 
@@ -1799,7 +1799,7 @@ def roast_message(profile:'ProfileData', org_id:str|None = None, machine_id:str|
 
     # samplint interval (we don't trust profile['samplinginterval'])
     tx_diff = numpy.diff(numpy.array(timex[1:])) # we skip the first sample as it might have been delayed/skipped
-    sampling_interval = max(min_sampling_interval, int(round(float(numpy.average(tx_diff))))) # sampling interval in seconds
+    sampling_interval = max(min_sampling_interval, round(float(numpy.average(tx_diff)))) # sampling interval in seconds
 
     # remove readings before CHARGE and after DROP
     start_idx:int = 0
@@ -1811,7 +1811,7 @@ def roast_message(profile:'ProfileData', org_id:str|None = None, machine_id:str|
         readings_after,_ = divmod(seconds_after_drop,sampling_interval)
         end_idx = min(end_idx, timeindex[6]+readings_after+1)
     # adjust roastepoch (start of recording) by adding the duration removed
-    roastepoch += int(round(timex[start_idx] - timex[0]))
+    roastepoch += round(timex[start_idx] - timex[0])
     # adjust timex
     timex = timex[start_idx:end_idx]
     # adjust ET
@@ -1945,7 +1945,7 @@ def roast_message(profile:'ProfileData', org_id:str|None = None, machine_id:str|
 
     # multiply reading by 10 and round to integer
     def reading2value(x:float|None, factor:int) -> int:
-        return (-1 if x is None or x == -1 or math.isnan(x) else int(round(x*factor)))
+        return (-1 if x is None or x == -1 or math.isnan(x) else round(x*factor))
 
     # et_values
     et_values = profile.get('temp1',[])
@@ -1989,7 +1989,7 @@ def roast_message(profile:'ProfileData', org_id:str|None = None, machine_id:str|
     if rate_of_rise:
         # ET RoR
         if rate_of_rise > 1 and len(et_values)>0:
-            delta_ET_samples = max(1,int(round(delta_span_ET / sampling_interval)))
+            delta_ET_samples = max(1, round(delta_span_ET / sampling_interval))
             delta_et,_ = computeDeltas(
                 numpy.array(timex),
                 numpy.array(et_values),
@@ -2011,7 +2011,7 @@ def roast_message(profile:'ProfileData', org_id:str|None = None, machine_id:str|
                 roast.et_ror_values.extend([reading2value(x, factor) for x in interp1d(tx_a,numpy.array(delta_et),fill_value='extrapolate')(timex_resampled)])
         # BT RoR
         if len(bt_values)>0:
-            delta_BT_samples = max(1,int(round(delta_span_BT / sampling_interval)))
+            delta_BT_samples = max(1,round(delta_span_BT / sampling_interval))
             delta_bt,_ = computeDeltas(
                 numpy.array(timex),
                 numpy.array(bt_values),
@@ -2136,7 +2136,7 @@ def roast_message_to_profile(roast:'artisan_roast_pb2.Roast') -> 'ProfileData': 
                     cast(list[int], event.get('values', [])),
                     strict=False):
                 specialevents.append(ind)
-                specialeventstype.append(int(i))
+                specialeventstype.append(i)
                 specialeventsvalue.append(events_external_to_internal_value(value))
                 specialeventsStrings.append('')
 
@@ -2178,14 +2178,14 @@ def roast_message_to_profile(roast:'artisan_roast_pb2.Roast') -> 'ProfileData': 
 
     if 'start' in roast_dict:
         # start points to the start of the roast (CHARGE)
-        profile['roastepoch'] = int(round(datetime.datetime.fromisoformat(roast_dict['start']).timestamp()))
+        profile['roastepoch'] = round(datetime.datetime.fromisoformat(roast_dict['start']).timestamp())
 
 
     if 'timex' in profile:
 
         # correct roastepoch which should point to the start of the recording
         if len(profile['timex']) > 0 and 'roastepoch' in profile:
-            profile['roastepoch'] = profile['roastepoch'] + int(round(profile['timex'][0]))
+            profile['roastepoch'] = profile['roastepoch'] + round(profile['timex'][0])
 
         additional_curves = roast_dict.get('additional_curves',[])
         # make the number of additional curves even

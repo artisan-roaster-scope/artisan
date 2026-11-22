@@ -155,7 +155,7 @@ class ArtisanDialog(QDialog):
     @override
     def keyPressEvent(self, a0: 'QKeyEvent|None') -> None:
         if a0 is not None:
-            key = int(a0.key())
+            key = a0.key()
             #uncomment next line to find the integer value of a key
             #print(key)
             #modifiers = QApplication.keyboardModifiers()
@@ -168,7 +168,7 @@ class ArtisanDialog(QDialog):
 class ArtisanResizeablDialog(ArtisanDialog):
     def __init__(self, parent:QWidget|None, aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
-        if str(platform.system()) == 'Windows':
+        if platform.system() == 'Windows':
             windowFlags = self.windowFlags()
 #            windowFlags |= Qt.WindowType.CustomizeWindowHint # turn off default window title hints
             windowFlags |= Qt.WindowType.WindowMinMaxButtonsHint  # add min/max combo
@@ -1304,7 +1304,7 @@ class tareDlg(ArtisanDialog):
         weight_widget.setAlignment(Qt.AlignmentFlag.AlignRight)
         # NOTE: we support container weights up to 5kg (11,023lb)
         if self.aw.qmc.weight[2] == 'g':
-            weight_widget.setText(str(int(round(weight))))
+            weight_widget.setText(str(round(weight)))
             weight_widget.setValidator(QIntValidator(0,9999, weight_widget))
         elif self.aw.qmc.weight[2] == 'Kg':
             w = convertWeight(weight,0,weight_units.index(self.aw.qmc.weight[2]))
@@ -1580,7 +1580,7 @@ def about_dialog(parent:QWidget, aw:'ApplicationWindow') -> None:
     logoLayout.addWidget(logo)
     logoLayout.addSpacing(20)
 
-    version = f'v{__version__} {(__build__ if __build__ != '0' else '')}{(f' ({str(__revision__)})' if str(__revision__) != '' else '')}'
+    version = f'v{__version__} {(__build__ if __build__ != '0' else '')}{(f' ({__revision__})' if __revision__ != '' else '')}'
     version_label = QLabel(f'{application_viewer_name} version' if aw.app.artisanviewerMode else version)
     version_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
     version_label.setStyleSheet('QLabel { color: #ffffff; font-size: 16px; }')

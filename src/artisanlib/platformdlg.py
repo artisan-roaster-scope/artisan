@@ -60,7 +60,7 @@ class platformDlg(ArtisanDialog):
 
         platformdic:dict[str,str] = {}
 
-        system = str(platform.system())
+        system = platform.system()
         if system == 'Windows':
             platformdic['Win32'] = str(platform.win32_ver())
         elif system == 'Darwin':
@@ -73,19 +73,19 @@ class platformDlg(ArtisanDialog):
             except Exception: # pylint: disable=broad-except
                 pass
         platformdic['Architecture'] = str(platform.architecture())
-        platformdic['Machine'] = str(platform.machine())
-        platformdic['Platform name'] =  str(platform.platform())
-        platformdic['Processor'] = str(platform.processor())
+        platformdic['Machine'] = platform.machine()
+        platformdic['Platform name'] =  platform.platform()
+        platformdic['Processor'] = platform.processor()
         platformdic['==========='] = ''
         platformdic['Python Build'] = str(platform.python_build())
-        platformdic['Python Compiler'] = str(platform.python_compiler())
-        platformdic['Python Branch'] = str(platform.python_branch())
-        platformdic['Python Implementation'] = str(platform.python_implementation())
-        platformdic['Python Revision'] = str(platform.python_revision())
-        platformdic['Release'] = str(platform.release())
-        platformdic['System'] = str(platform.system())
-        platformdic['Version'] = str(platform.version())
-        platformdic['Python version'] = str(platform.python_version())
+        platformdic['Python Compiler'] = platform.python_compiler()
+        platformdic['Python Branch'] = platform.python_branch()
+        platformdic['Python Implementation'] = platform.python_implementation()
+        platformdic['Python Revision'] = platform.python_revision()
+        platformdic['Release'] = platform.release()
+        platformdic['System'] = platform.system()
+        platformdic['Version'] = platform.version()
+        platformdic['Python version'] = platform.python_version()
         platformdic['============'] = ''
         from PyQt6.QtCore import qVersion
         platformdic['Qt'] = (qVersion() or '??')

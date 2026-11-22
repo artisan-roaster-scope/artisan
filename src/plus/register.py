@@ -55,7 +55,7 @@ def addPathShelve(uuid: str, path: str, fh:IO[str]) -> None:
     db:shelve.Shelf[str]
     try:
         with shelve.open(uuid_cache_path) as db:
-            db[uuid] = str(path)
+            db[uuid] = path
         _log.debug(
             'DB type: %s', str(dbm.whichdb(uuid_cache_path))
         )
@@ -66,9 +66,7 @@ def addPathShelve(uuid: str, path: str, fh:IO[str]) -> None:
             # db type could not be determined" remove all files name
             # uuid_cache_path with any extension as we do not know which
             # extension is chosen by shelve
-            _log.info(
-                'clean uuid cache %s', str(uuid_cache_path)
-            )
+            _log.info('clean uuid cache %s', uuid_cache_path)
             # note that this deletes all "uuid" files including those for the
             # Viewer and other files of that name prefix like uuid.db.org!!
             for p in Path(Path(uuid_cache_path).parent).glob(
@@ -79,7 +77,7 @@ def addPathShelve(uuid: str, path: str, fh:IO[str]) -> None:
                     p.unlink()
             # try again to access/create the shelve file
             with shelve.open(uuid_cache_path) as db:
-                db[uuid] = str(path)
+                db[uuid] = path
             _log.info(
                 'Generated db type: %s',
                 str(dbm.whichdb(uuid_cache_path)),
@@ -107,11 +105,9 @@ def addPath(uuid: str, path: str) -> None:
         # (from a crash?)
         # we remove the lock file and retry with a shorter timeout
         try:
-            _log.info('clean lock %s', str(uuid_cache_path))
+            _log.info('clean lock %s', uuid_cache_path)
             Path(uuid_cache_path_lock).unlink()
-            _log.debug(
-                'retry register:addPath(%s,%s)', str(uuid), str(path)
-            )
+            _log.debug('retry register:addPath(%s,%s)', uuid, path)
             with portalocker.Lock(uuid_cache_path_lock, timeout=0.3) as fh:
                 addPathShelve(uuid, path, fh)
         except Exception as ex:  # pylint: disable=broad-except
@@ -137,9 +133,7 @@ def getPath(uuid: str) -> str|None:
                 with shelve.open(uuid_cache_path) as db:
                     try:
                         res_path = str(db[uuid])
-                        _log.debug(
-                            'getPath(%s): %s', str(uuid), res_path
-                        )
+                        _log.debug('getPath(%s): %s', uuid, res_path)
                         return res_path
                     except Exception:  # pylint: disable=broad-except
                         return None
@@ -155,18 +149,16 @@ def getPath(uuid: str) -> str|None:
         # (from a crash?) we remove the lock file and retry with
         # a shorter timeout
         try:
-            _log.info(
-                'clean lock %s', str(uuid_cache_path_lock)
-            )
+            _log.info('clean lock %s', uuid_cache_path_lock)
             Path(uuid_cache_path_lock).unlink()
-            _log.debug('retry register:getPath(%s)', str(uuid))
+            _log.debug('retry register:getPath(%s)', uuid)
             with portalocker.Lock(uuid_cache_path_lock, timeout=0.3) as fh:
                 try:
                     with shelve.open(uuid_cache_path) as db:
                         try:
                             res_path = str(db[uuid])
                             _log.debug(
-                                'getPath(%s): %s', str(uuid), res_path
+                                'getPath(%s): %s', uuid, res_path
                             )
                             return res_path
                         except Exception:  # pylint: disable=broad-except

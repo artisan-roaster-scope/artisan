@@ -192,7 +192,7 @@ with patch.dict('sys.modules', mock_modules, clear=False):
 
 
 @pytest.fixture(autouse=True)
-def reset_pid_uat_state() -> Generator[None, None, None]:
+def reset_pid_uat_state() -> Generator[None]:
     """
     Reset all PID UAT module state before and after each test to ensure complete isolation.
 

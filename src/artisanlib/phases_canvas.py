@@ -245,7 +245,7 @@ class tphasescanvas(QObject):
                 labels = []
                 if all(phases_times):
                     # all phases defined
-                    if int(round(total_time)) == int(round(sum(phases_times))):
+                    if round(total_time) == round(sum(phases_times)):
                         phases_percentages = [(phase_time/total_time) * 100. for phase_time in phases_times]
                         extended_phases_percentages = [self.m,self.g] + phases_percentages + [self.g,self.m*total_time/max_total_time]
                         widths = numpy.array(extended_phases_percentages)

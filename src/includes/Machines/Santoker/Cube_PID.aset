@@ -60,23 +60,14 @@ extraname1=Power, Drum, IR, BT RoR, SV
 extraname2=Fan, Extra 2, Board, ET RoR, DUTY
 
 [DefaultButtons]
-buttonactions=0, 5, 5, 0, 5, 0, 5, 0
-buttonactionstrings=, "santoker(81,1)", "santoker(82,1)", , "santoker(83,1)", , "santoker(84,1)", 
-buttonvisibility=true, true, true, true, true, false, true, false
-extrabuttonactions=5, 0, 0
-extrabuttonactionstrings="santoker(85,0);sleep(4);santoker(80,1)", , 
+buttonactions=0, 5, 5, 0, 5, 0, 5, 5
+buttonactionstrings=, "santoker(81,1)", "santoker(82,1)", , "santoker(83,1)", , "santoker(84,1)", "santoker(fa,0);santoker(ca,0)"
+buttons_undo=true
+buttonvisibility=true, true, true, true, true, false, true, true
+extrabuttonactions=5, 5, 0
+extrabuttonactionstrings="sleep(4);santoker(85,0);santoker(ca,43);santoker(fa,0);santoker(80,1)", "santoker(fa,0);santoker(ca,0)", 
 xextrabuttonactions=0, 5
-xextrabuttonactionstrings=, "santoker(85,0);sleep(4);santoker(80,1)"
-
-[Quantifiers]
-clusterEventsFlag=false
-eventquantifierSV=1, 1, 0, 1
-eventquantifieraction=0, 0, 0, 0
-quantifieractive=1, 0, 0, 0
-quantifiercoarse=0, 0, 0, 0
-quantifiermax=100, 100, 100, 100
-quantifiermin=0, 0, 0, 0
-quantifiersource=3, 4, 0, 2
+xextrabuttonactionstrings=, "sleep(4);santoker(85,0);santoker(ca,43);santoker(fa,0);santoker(80,1)"
 
 [ExtraEventButtons]
 buttonlistmaxlen=13
@@ -115,9 +106,19 @@ slideractions=11, 11, 16, 11
 slidercommands="santoker(ca,{})", "santoker(c0,{})", pidSV({}), "santoker(fa,{})"
 sliderfactors=1, 1, 1, 1
 slidermax=100, 100, 250, 100
-slidermin=0, 0, 0, 0
+slidermin=43, 0, 0, 0
 slideroffsets=0, 0, 0, 0
 slidervisibilities=1, 0, 1, 1
+
+[Quantifiers]
+clusterEventsFlag=false
+eventquantifierSV=1, 1, 0, 1
+eventquantifieraction=0, 0, 0, 0
+quantifieractive=1, 0, 0, 1
+quantifiercoarse=0, 0, 0, 0
+quantifiermax=100, 100, 100, 100
+quantifiermin=43, 0, 0, 0
+quantifiersource=3, 4, 0, 2
 
 [Alarms]
 alarm_popup_timout=10

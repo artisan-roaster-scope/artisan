@@ -592,14 +592,14 @@ class modbusport:
         if isinstance(value, str):
             if '.' in value:
 #                self.writeWord(device_id, register, float(value))
-                self.writeSingleRegister(device_id, register, int(round(float(value))))
+                self.writeSingleRegister(device_id, register, round(float(value)))
             else:
                 self.writeSingleRegister(device_id, register, int(value))
         elif isinstance(value, int):
             self.writeSingleRegister(device_id, register, value)
         elif isinstance(value, float):
 #            self.writeWord(device_id,register,value)
-            self.writeSingleRegister(device_id, register, int(round(value)))
+            self.writeSingleRegister(device_id, register, round(value))
 
     # function 6 (Write Single Holding Register)
     def writeSingleRegister(self, device_id:int, register:int, value:float) -> None:
@@ -612,9 +612,9 @@ class modbusport:
             self.connect()
             if self._asyncLoopThread is not None and self.isConnected():
                 assert self._client is not None
-                self._asyncLoopThread.loop.call_soon_threadsafe(asyncio.ensure_future, self._client.write_register(register, int(round(value)), device_id=device_id))
+                self._asyncLoopThread.loop.call_soon_threadsafe(asyncio.ensure_future, self._client.write_register(register, round(value), device_id=device_id))
         except Exception as ex: # pylint: disable=broad-except
-            _log.info('writeSingleRegister(%d,%d,%s) failed', device_id, register, int(round(value)))
+            _log.info('writeSingleRegister(%d,%d,%s) failed', device_id, register, round(value))
             _log.debug(ex)
             self.disconnectOnError()
             _, _, exc_tb = sys.exc_info()
@@ -662,8 +662,8 @@ class modbusport:
         _log.debug('localMaskWriteRegister(%d,%d,%s,%s,%s)', device_id, register, and_mask, or_mask, value)
         if device_id == 0:
             return
-        new_val = (int(round(value)) & and_mask) | (or_mask & (and_mask ^ 0xFFFF))
-        self.writeSingleRegister(device_id, register, int(new_val))
+        new_val = (round(value) & and_mask) | (or_mask & (and_mask ^ 0xFFFF))
+        self.writeSingleRegister(device_id, register, new_val)
 
     # function 16 (Write Multiple Holding Registers)
     # values is a list of integers or one integer (given floats are rounded to integers
@@ -678,7 +678,7 @@ class modbusport:
             if self._asyncLoopThread is not None and self.isConnected():
                 assert self._client is not None
                 float_values:list[float] = (values if isinstance(values, list) else [float(values)])
-                int_values:list[int] = [int(round(v)) for v in float_values]
+                int_values:list[int] = [round(v) for v in float_values]
                 self._asyncLoopThread.loop.call_soon_threadsafe(asyncio.ensure_future, self._client.write_registers(register, int_values, device_id=device_id))
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeRegisters(%d,%d,%s) failed', device_id, register, values)
@@ -729,11 +729,11 @@ class modbusport:
             if self._asyncLoopThread is not None and self.isConnected():
                 assert self._client is not None
                 self.connect()
-                r = convert_to_bcd(int(round(value)))
+                r = convert_to_bcd(round(value))
                 payload: list[int] = self.convert_16bit_uint_to_registers(r)
                 self._asyncLoopThread.loop.call_soon_threadsafe(asyncio.ensure_future, self._client.write_registers(register, payload, device_id=device_id))
         except Exception as ex: # pylint: disable=broad-except
-            _log.info('writeBCD(%d,%d,%s) failed', device_id, register, int(round(value)))
+            _log.info('writeBCD(%d,%d,%s) failed', device_id, register, round(value))
             _log.debug(ex)
             self.disconnectOnError()
             _, _, exc_tb = sys.exc_info()
@@ -756,10 +756,10 @@ class modbusport:
             self.connect()
             if self._asyncLoopThread is not None and self.isConnected():
                 assert self._client is not None
-                payload:list[int] = self.convert_32bit_int_to_registers(int(round(value)))
+                payload:list[int] = self.convert_32bit_int_to_registers(round(value))
                 self._asyncLoopThread.loop.call_soon_threadsafe(asyncio.ensure_future, self._client.write_registers(register, payload, device_id=device_id))
         except Exception as ex: # pylint: disable=broad-except
-            _log.info('writeLong(%d,%d,%s) failed', device_id, register, int(round(value)))
+            _log.info('writeLong(%d,%d,%s) failed', device_id, register, round(value))
             _log.debug(ex)
             self.disconnectOnError()
             _, _, exc_tb = sys.exc_info()
@@ -931,7 +931,7 @@ class modbusport:
             self.connect()
             if self._asyncLoopThread is not None and self.isConnected():
                 assert self._client is not None
-                res, _ = asyncio.run_coroutine_threadsafe(self.read_async(int(device_id), int(register), 1, code), self._asyncLoopThread.loop).result()
+                res, _ = asyncio.run_coroutine_threadsafe(self.read_async(device_id, register, 1, code), self._asyncLoopThread.loop).result()
         except Exception as ex: # pylint: disable=broad-except
             _log.info('peekSingleRegister(%d,%d,%d) failed', device_id, register, code)
             _log.debug(ex)
@@ -1112,9 +1112,9 @@ class modbusport:
             if self.SVwriteFloat:
                 self.writeWord(self.PID_device_ID, self.PID_SV_register, float(sv * multiplier))
             elif self.SVwriteLong:
-                self.writeLong(self.PID_device_ID, self.PID_SV_register, int(round(sv * multiplier)))
+                self.writeLong(self.PID_device_ID, self.PID_SV_register, round(sv * multiplier))
             else:
-                self.writeSingleRegister(self.PID_device_ID, self.PID_SV_register, int(round(sv * multiplier)))
+                self.writeSingleRegister(self.PID_device_ID, self.PID_SV_register, round(sv * multiplier))
 
     def setPID(self, p:float, i:float, d:float) -> None:
         _log.debug('setPID(%s,%s,%s)', p, i, d)

@@ -111,12 +111,12 @@ class Notification:
             return self._title
         if seconds_to < 7*24*60*60:
             # created within the past 7 days
-            dt = QDateTime.fromSecsSinceEpoch(int(round(self._created)))
+            dt = QDateTime.fromSecsSinceEpoch(round(self._created))
             day_name = QLocale().standaloneDayName(dt.date().dayOfWeek(), QLocale.FormatType.LongFormat)
             return f'{self._title} ({day_name})'
         # created more than 7 days ago
         ll = QLocale()
-        dt = QDateTime.fromSecsSinceEpoch(int(round(self._created)))
+        dt = QDateTime.fromSecsSinceEpoch(round(self._created))
         short_date = ll.toString(dt.date(), ll.dateFormat(QLocale.FormatType.NarrowFormat))
         return f'{self._title} ({short_date})'
 

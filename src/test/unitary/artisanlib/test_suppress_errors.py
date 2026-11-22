@@ -21,7 +21,7 @@ from artisanlib.suppress_errors import suppress_stdout_stderr
 
 
 @pytest.fixture
-def mock_os_functions() -> Generator[dict[str, Mock], None, None]:
+def mock_os_functions() -> Generator[dict[str, Mock]]:
     """Create mocks for os module functions."""
     with patch('artisanlib.suppress_errors.os.open') as mock_open, patch(
         'artisanlib.suppress_errors.os.dup'
@@ -39,7 +39,7 @@ def mock_os_functions() -> Generator[dict[str, Mock], None, None]:
 
 
 @pytest.fixture
-def mock_sys_streams() -> Generator[dict[str, Mock], None, None]:
+def mock_sys_streams() -> Generator[dict[str, Mock]]:
     """Create mocks for sys.stdout and sys.stderr."""
     with patch('artisanlib.suppress_errors.sys.stdout') as mock_stdout, patch(
         'artisanlib.suppress_errors.sys.stderr'

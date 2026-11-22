@@ -122,7 +122,7 @@ _original_import = builtins.__import__
 
 
 @pytest.fixture(scope='session', autouse=True)
-def ensure_main_qt_isolation() -> Generator[None, None, None]:
+def ensure_main_qt_isolation() -> Generator[None]:
     """
     Ensure Qt modules are properly isolated for main tests at session level.
 
@@ -186,7 +186,7 @@ from artisanlib.widgets import MyQLCDNumber, SliderUnclickable
 
 
 @pytest.fixture(autouse=True)
-def reset_main_state() -> Generator[None, None, None]:
+def reset_main_state() -> Generator[None]:
     """
     Reset all main module state before and after each test to ensure complete isolation.
 
@@ -282,7 +282,7 @@ def mock_application_window(mock_qmc: Mock) -> Mock:
 
 
 @pytest.fixture
-def isolated_temp_file() -> Generator[str, None, None]:
+def isolated_temp_file() -> Generator[str]:
     """Create an isolated temporary file for each test."""
     with tempfile.NamedTemporaryFile(mode='w', suffix='.alog', delete=False) as temp_file:
         temp_file.write('{"test": "data"}')

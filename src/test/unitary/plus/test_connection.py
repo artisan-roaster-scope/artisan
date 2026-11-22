@@ -155,7 +155,7 @@ with patch('artisanlib.__version__', '2.8.4'), patch(
 
 
 @pytest.fixture(autouse=True)
-def isolated_test_environment() -> Generator[None, None, None]:
+def isolated_test_environment() -> Generator[None]:
     """Provide completely isolated test environment for each test."""
     # Use patch.dict to ensure complete isolation from other test files
     with patch.dict(
@@ -206,7 +206,7 @@ def isolated_test_environment() -> Generator[None, None, None]:
 
 
 @pytest.fixture(scope='session', autouse=True)
-def ensure_connection_isolation() -> Generator[None, None, None]:
+def ensure_connection_isolation() -> Generator[None]:
     """
     Ensure modules are properly isolated for connection tests at session level.
 
@@ -241,7 +241,7 @@ def ensure_connection_isolation() -> Generator[None, None, None]:
 
 
 @pytest.fixture(scope='module', autouse=True)
-def cleanup_connection_mocks() -> Generator[None, None, None]:
+def cleanup_connection_mocks() -> Generator[None]:
     """
     Clean up connection test mocks at module level to prevent cross-file contamination.
 
@@ -309,7 +309,7 @@ def mock_app_window() -> Mock:
 
 
 @pytest.fixture(autouse=True)
-def reset_connection_state() -> Generator[None, None, None]:
+def reset_connection_state() -> Generator[None]:
     """Reset connection module state before and after each test to ensure complete isolation."""
     # Store original values
     original_token = getattr(connection.config, 'token', None)

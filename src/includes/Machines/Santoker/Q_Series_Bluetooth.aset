@@ -1,6 +1,6 @@
 [General]
 Delay=1000
-roastertype_setup=Santoker Q + X Series WiFi
+roastertype_setup=Santoker Q Series BT
 roasterheating_setup=3
 
 [Device]
@@ -8,7 +8,7 @@ id=134
 santokerHost=10.10.100.254
 santokerPort=20001
 santokerSerial=false
-santokerBLE=false
+santokerBLE=true
 Controlbuttonflag=true
 
 [events]

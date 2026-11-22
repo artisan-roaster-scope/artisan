@@ -36,7 +36,7 @@ import pytest
 
 
 @pytest.fixture(scope='session', autouse=True)
-def ensure_bluedot_isolation() -> Generator[None, None, None]:
+def ensure_bluedot_isolation() -> Generator[None]:
     """
     Ensure bluedot module is properly isolated for tests at session level.
 
@@ -68,7 +68,7 @@ def ensure_bluedot_isolation() -> Generator[None, None, None]:
 
 
 @pytest.fixture(autouse=True)
-def reset_bluedot_state() -> Generator[None, None, None]:
+def reset_bluedot_state() -> Generator[None]:
     """Reset bluedot test state before each test to ensure test independence."""
     # Before each test, ensure BLE and logging modules are available
     # This is critical when other tests have mocked these modules

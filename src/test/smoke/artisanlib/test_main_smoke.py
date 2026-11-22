@@ -356,7 +356,7 @@ with patch.dict('sys.modules', mock_modules, clear=False), patch(
 
 
 @pytest.fixture(autouse=True)
-def reset_main_smoke_state() -> Generator[None, None, None]:
+def reset_main_smoke_state() -> Generator[None]:
     """
     Reset all main module state before and after each test to ensure complete isolation.
 

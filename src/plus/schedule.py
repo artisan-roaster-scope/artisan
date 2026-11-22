@@ -321,7 +321,7 @@ class CompletedItem(BaseModel):
 
     @field_serializer('roastUUID', when_used='json')
     def serialize_roastUUID_to_str(roastUUID: UUID4) -> str: # type:ignore[misc] # pylint: disable=no-self-argument
-        return str(roastUUID.hex)
+        return roastUUID.hex
 
 
     # updates this CompletedItem with the data given in profile_data
@@ -578,7 +578,7 @@ def updates_completed_from_roast_properties(aw:'ApplicationWindow', ci:Completed
     weight = convertWeight(aw.qmc.weight[1], weight_unit_idx, 1)
     if ci.weight != weight:
         ci.weight = weight
-        ci.measured = bool(weight != 0)
+        ci.measured = weight != 0
         updated = True
     if ci.color != aw.qmc.ground_color:
         ci.color = aw.qmc.ground_color
@@ -1031,7 +1031,7 @@ def remove_suffix(s:str, suffix:str) -> str:
 
 
 def locale_format_timedelta(locale:str, seconds:float) -> str:
-    sec = int(round(seconds))
+    sec = round(seconds)
     if sec < 3600:
         try:
             return format_timedelta(sec, locale=locale, format='narrow', granularity='minute', threshold=1)
@@ -2889,7 +2889,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
     @override
     def keyPressEvent(self, a0: 'QKeyEvent|None') -> None:
         if a0 is not None:
-            k = int(a0.key())
+            k = a0.key()
             if k == 16777216: # ESC
                 return # overwriting the close window action of the super class to prevent accidentally closing the scheduler
             if k == 16777235:    # UP
@@ -3178,9 +3178,9 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                                 if 'screen_size' in cd:
                                     screen = cd['screen_size']
                                     if 'min' in screen:
-                                        screen_size_min = int(screen['min'])
+                                        screen_size_min = screen['min']
                                     if 'max' in screen:
-                                        screen_size_max = int(screen['max'])
+                                        screen_size_max = screen['max']
                             except Exception:  # pylint: disable=broad-except
                                 pass
                             self.aw.qmc.beansize_min = screen_size_min
@@ -4079,7 +4079,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                     roastingnotes = self.aw.qmc.roastingnotes,
                     cupping_score = self.aw.qmc.calcFlavorChartScore(),
                     cuppingnotes = self.aw.qmc.cuppingnotes,
-                    roasttime = (0 if rt is None else int(round(rt)))
+                    roasttime = (0 if rt is None else round(rt))
                 )
                 add_completed(self.aw.plus_account_id, completed_item)
                 # update schedule, removing completed items and selecting the next one

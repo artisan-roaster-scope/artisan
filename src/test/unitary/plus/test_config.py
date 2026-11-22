@@ -101,7 +101,7 @@ from plus import config
 
 
 @pytest.fixture(scope='session', autouse=True)
-def ensure_config_isolation() -> Generator[None, None, None]:
+def ensure_config_isolation() -> Generator[None]:
     """
     Ensure modules are properly isolated for config tests at session level.
 
@@ -136,7 +136,7 @@ def ensure_config_isolation() -> Generator[None, None, None]:
 
 
 @pytest.fixture(scope='module', autouse=True)
-def cleanup_config_mocks() -> Generator[None, None, None]:
+def cleanup_config_mocks() -> Generator[None]:
     """
     Clean up config test mocks at module level to prevent cross-file contamination.
 
@@ -171,7 +171,7 @@ def cleanup_config_mocks() -> Generator[None, None, None]:
 
 
 @pytest.fixture(autouse=True)
-def reset_config_state() -> Generator[None, None, None]:
+def reset_config_state() -> Generator[None]:
     """
     Reset all config module state before and after each test to ensure complete isolation.
 

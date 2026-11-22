@@ -30,7 +30,7 @@ setuptools==84.2.1
 wheel==0.48.0
 pyserial==3.5
 pymodbus==3.16.2
-python-snap7==3.5.0
+python-snap7==3.6.0
 Phidget22==1.27.20261112
 Unidecode==1.4.0
 qrcode==8.2
@@ -57,7 +57,7 @@ aiohttp_jinja2==1.6
 python-bidi==0.6.12
 arabic-reshaper==3.1.0
 pillow==13.0.0
-pydantic==2.14.3
+pydantic==2.14.4
 babel==2.18.0
 bleak==3.1.0
 python-statemachine==3.2.2

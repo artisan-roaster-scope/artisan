@@ -66,7 +66,7 @@ from artisanlib import atypes
 
 # Session-level isolation fixture (simplified since no aggressive mocking is needed)
 @pytest.fixture(scope='session', autouse=True)
-def isolate_atypes_module() -> Generator[None, None, None]:
+def isolate_atypes_module() -> Generator[None]:
     """
     Session-level fixture to ensure clean test environment.
 
@@ -77,7 +77,7 @@ def isolate_atypes_module() -> Generator[None, None, None]:
 
 
 @pytest.fixture(autouse=True)
-def reset_atypes_state() -> Generator[None, None, None]:
+def reset_atypes_state() -> Generator[None]:
     """Reset atypes module state before each test to ensure test independence."""
     yield
     # No specific state to reset for atypes module as it only contains type definitions

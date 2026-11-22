@@ -124,7 +124,7 @@ with patch('artisanlib.util.comma2dot', side_effect=lambda x: x), patch(
 
 
 @pytest.fixture(scope='session', autouse=True)
-def ensure_blend_isolation() -> Generator[None, None, None]:
+def ensure_blend_isolation() -> Generator[None]:
     """
     Ensure modules are properly isolated for blend tests at session level.
 
@@ -159,7 +159,7 @@ def ensure_blend_isolation() -> Generator[None, None, None]:
 
 
 @pytest.fixture(scope='module', autouse=True)
-def cleanup_blend_mocks() -> Generator[None, None, None]:
+def cleanup_blend_mocks() -> Generator[None]:
     """
     Clean up blend test mocks at module level to prevent cross-file contamination.
 
@@ -194,7 +194,7 @@ def cleanup_blend_mocks() -> Generator[None, None, None]:
 
 
 @pytest.fixture(autouse=True)
-def reset_blend_state() -> Generator[None, None, None]:
+def reset_blend_state() -> Generator[None]:
     """
     Reset all blend module state before and after each test to ensure complete isolation.
 

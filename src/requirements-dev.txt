@@ -15,7 +15,7 @@ types-xlrd>=2.0.0.20260518
 lxml-stubs>=0.5.1
 mypy==2.4.1
 pyright==1.1.414
-ruff>=0.17.5
+ruff>=0.17.6
 pylint==4.1.4
 pre-commit>=4.7.0
 pytest==9.2.0
@@ -23,17 +23,11 @@ pytest-cov==7.1.0
 pytest-asyncio==1.5.0
 pytest-mock==3.17.0
 pytest-datadir==1.9.0
-#pytest-qt==4.4.0
-#pytest-xvfb==3.0.0
-#PyVirtualDisplay==3.0
-#pytest-bdd==6.1.1
-#pytest-benchmark==4.0.0
-hypothesis>=6.170.15
-coverage>=7.17.3
+hypothesis>=6.170.17
+coverage>=7.17.4
 coverage-badge==1.1.2
 codespell==2.4.3
 # the following 2 packages are not installed along aiohttp on Python3.12 and make mypy complain
 async_timeout==5.0.1
 cycler==0.12.1
 scipy-stubs==1.18.1.1
-#matplotlib-stubs==0.3.11

@@ -119,7 +119,7 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues]
                         if 0 < config.queue_discard_after < item_age:
                             # old item scheduled to be removed from the queue
                             iters = 0
-                            _log.debug('-> expired item %s removed from queue (%s min)',item['data']['roast_id'],int(round(item_age/60)))
+                            _log.debug('-> expired item %s removed from queue (%s min)',item['data']['roast_id'],round(item_age/60))
                         else:
                             iters = config.queue_retries + 1
                     while iters > 0:

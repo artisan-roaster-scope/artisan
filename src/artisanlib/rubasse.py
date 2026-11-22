@@ -167,7 +167,7 @@ def extractProfileRubasseCSV(file:str,
                                 fan_last = fan
                                 fan = v
                                 fan_event = True
-                                specialeventsvalue.append(eventsExternal2InternalValue(int(round(v))))
+                                specialeventsvalue.append(eventsExternal2InternalValue(round(v)))
                                 specialevents.append(i)
                                 specialeventstype.append(0)
                                 specialeventsStrings.append(f"{float(item['Fan'])}%")
@@ -195,7 +195,7 @@ def extractProfileRubasseCSV(file:str,
                                 heater_last = heater
                                 heater = v
                                 heater_event = True
-                                specialeventsvalue.append(eventsExternal2InternalValue(int(round(v))))
+                                specialeventsvalue.append(eventsExternal2InternalValue(round(v)))
                                 specialevents.append(i)
                                 specialeventstype.append(3)
                                 specialeventsStrings.append(f"{float(item['Heater']):.0f}%")

@@ -948,7 +948,7 @@ def extractProfileCropsterXLS(file:str,
                 roasttime:str|None = encodeLocal(date.time().toString())
                 if roasttime is not None:
                     res['roasttime'] = roasttime
-                res['roastepoch'] = int(date.toSecsSinceEpoch())
+                res['roastepoch'] = date.toSecsSinceEpoch()
                 res['roasttzoffset'] = libtime.timezone
         except Exception: # pylint: disable=broad-except
             pass
@@ -1204,7 +1204,7 @@ def extractProfileCropsterXLS(file:str,
                                         specialeventstype.append(4)
                                     try:
                                         v = float(comment_value)
-                                        specialeventsvalue.append(eventsExternal2InternalValue(int(round(v))))
+                                        specialeventsvalue.append(eventsExternal2InternalValue(round(v)))
                                     except Exception: # pylint: disable=broad-except
                                         specialeventsvalue.append(0)
                                     if not ae and not ge and comment_type not in comment_trans:
@@ -1240,7 +1240,7 @@ def extractProfileCropsterXLS(file:str,
                                     time_epoc = float(timex.value)
                                     c = takeClosest(time_epoc,res['timex'])
                                     timex_idx = res['timex'].index(c)
-                                    value = int(round(float(control_curve.value)))
+                                    value = round(float(control_curve.value))
                                     if event_value is None or event_value != value:
                                         # value changed
                                         event_value = value
@@ -1381,11 +1381,11 @@ def extractProfileCropsterXLS(file:str,
     # extra device data can be shorter, make them all equal in length to main device
     if 'timex' in res and 'extradevices' in res and 'samplinginterval' in res:
         main_data_len = len(res['timex'])
-        sampling_interval = int(round(res['samplinginterval']))
+        sampling_interval = round(res['samplinginterval'])
         for i,_ in enumerate(res['extradevices']):
             if 'extratimex' in res and len(res['extratimex'])>i:
-                missing_timex = [float(tx) for tx in range(int(round(res['extratimex'][i][-1]))+sampling_interval,
-                        int(round(res['extratimex'][i][-1])) + (main_data_len - len(res['extratimex'][i]))+sampling_interval,
+                missing_timex = [float(tx) for tx in range(round(res['extratimex'][i][-1])+sampling_interval,
+                        round(res['extratimex'][i][-1]) + (main_data_len - len(res['extratimex'][i]))+sampling_interval,
                         sampling_interval)]
                 res['extratimex'][i].extend(missing_timex)
                 res['extratimex'][i] = res['extratimex'][i][:main_data_len] # ensure that the list is not too long

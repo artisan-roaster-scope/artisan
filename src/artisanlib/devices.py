@@ -264,7 +264,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             spinBox.setRange(0,99)
             spinBox.setSingleStep(5)
             spinBox.setSuffix(' %')
-            spinBox.setValue(int(self.aw.ser.ArduinoFILT[i]))
+            spinBox.setValue(self.aw.ser.ArduinoFILT[i])
             self.FILTspinBoxes.append(spinBox)
         ####################################################
 
@@ -274,9 +274,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
         labelETadvanced = QLabel(QApplication.translate('Label', 'ET Y(x)'))
         labelBTadvanced = QLabel(QApplication.translate('Label', 'BT Y(x)'))
-        self.ETfunctionedit = QLineEdit(str(self.aw.qmc.ETfunction))
+        self.ETfunctionedit = QLineEdit(self.aw.qmc.ETfunction)
         self.ETfunctionedit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
-        self.BTfunctionedit = QLineEdit(str(self.aw.qmc.BTfunction))
+        self.BTfunctionedit = QLineEdit(self.aw.qmc.BTfunction)
         self.BTfunctionedit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         symbolicHelpButton = ArtisanMinorPushButton(help_text_translated,
             'help-square-stroke-rounded-white.svg',
@@ -374,7 +374,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
             changeTriggersCombo.setMinimumContentsLength(1)
             changeTriggersCombo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents) # AdjustToMinimumContentsLengthWithIcon
-            changeTriggersCombo.setEnabled(bool(self.aw.qmc.phidget1048_async[i-1]))
+            changeTriggersCombo.setEnabled(self.aw.qmc.phidget1048_async[i-1])
             width = changeTriggersCombo.minimumSizeHint().width()
             changeTriggersCombo.setMinimumWidth(width)
             if platform.system() == 'Darwin':
@@ -911,7 +911,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
             changeTriggersCombo = QComboBox()
             changeTriggersCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            changeTriggersCombo.setEnabled(bool(self.aw.qmc.phidget1018_async[i-1]))
+            changeTriggersCombo.setEnabled(self.aw.qmc.phidget1018_async[i-1])
             model = cast(QStandardItemModel, changeTriggersCombo.model())
             changeTriggerItems = self.createItems(self.aw.qmc.phidget1018_changeTriggersStrings)
             for item in changeTriggerItems:
@@ -1173,7 +1173,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.elevationSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.elevationSpinBox.setRange(0,3000)
         self.elevationSpinBox.setSingleStep(1)
-        self.elevationSpinBox.setValue(int(self.aw.qmc.elevation))
+        self.elevationSpinBox.setValue(self.aw.qmc.elevation)
         self.elevationSpinBox.setSuffix(' ' + QApplication.translate('Label','MASL'))
         temperatureDeviceLabel = QLabel(QApplication.translate('Label','Temperature'))
         humidityDeviceLabel = QLabel(QApplication.translate('Label','Humidity'))
@@ -1317,13 +1317,13 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.colorTrackMeanSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.colorTrackMeanSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.colorTrackMeanSpinBox.setRange(10,200)
-        self.colorTrackMeanSpinBox.setValue(int(self.aw.colorTrack_mean_window_size))
+        self.colorTrackMeanSpinBox.setValue(self.aw.colorTrack_mean_window_size)
         colorTrackMedianLabel = QLabel(QApplication.translate('Label','Median Filter'))
         self.colorTrackMedianSpinBox = QSpinBox()
         self.colorTrackMedianSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.colorTrackMedianSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.colorTrackMedianSpinBox.setRange(10,200)
-        self.colorTrackMedianSpinBox.setValue(int(self.aw.colorTrack_median_window_size))
+        self.colorTrackMedianSpinBox.setValue(self.aw.colorTrack_median_window_size)
 
         santokerNetworkGrid = QGridLayout()
         santokerNetworkGrid.addWidget(self.santokerNetworkFlag,0,0)
@@ -2074,7 +2074,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             unit_name = get_unit_name('duration-minute', length='short', locale=self.aw.locale_str)
 
             self.automaticRegistrationPeriod.setSuffix(f" {unit_name if unit_name is not None else 'min'}")
-            self.automaticRegistrationPeriod.setValue(int(round(self.aw.automatic_registration_period/60.)))
+            self.automaticRegistrationPeriod.setValue(round(self.aw.automatic_registration_period/60.))
 
             containerRoastedGridLayout = QGridLayout()
             containerRoastedGridLayout.addWidget(self.containerRoastedComboBox,0,0)
@@ -2274,7 +2274,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
     @pyqtSlot()
     def changeTaskWebDisplayGreenPort(self) -> None:
         try:
-            self.aw.taskWebDisplayGreenPort = int(str(self.taskWebDisplayGreenPort.text()))
+            self.aw.taskWebDisplayGreenPort = int(self.taskWebDisplayGreenPort.text())
         except Exception: # pylint: disable=broad-except
             pass
 
@@ -2358,7 +2358,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         if unit == 0: # g selected
             # metric
 #            return f'{w:.0f}g' # never show decimals for g # f'{-0.1:.0f}' => -0
-            return f'{int(round(w))}g'
+            return f'{round(w)}g'
         if unit == 1: # kg selected
             # metric (always keep the accuracy to the g
             return f'{w/1000:.3f}kg'
@@ -2747,7 +2747,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
     @pyqtSlot()
     def changeTaskWebDisplayRoastedPort(self) -> None:
         try:
-            self.aw.taskWebDisplayRoastedPort = int(str(self.taskWebDisplayRoastedPort.text()))
+            self.aw.taskWebDisplayRoastedPort = int(self.taskWebDisplayRoastedPort.text())
         except Exception: # pylint: disable=broad-except
             pass
 
@@ -3088,7 +3088,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         Fill1SpinBox.setSingleStep(1)
                         Fill1SpinBox.setRange(0,100)
                         Fill1SpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
-                        Fill1SpinBox.setValue(int(self.aw.extraFill1[i]))
+                        Fill1SpinBox.setValue(self.aw.extraFill1[i])
                         Fill1SpinBox.editingFinished.connect(self.updateFill1)
                         # 14: fill 2
                         Fill2SpinBox = QSpinBox()
@@ -3096,7 +3096,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         Fill2SpinBox.setSingleStep(1)
                         Fill2SpinBox.setRange(0,100)
                         Fill2SpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
-                        Fill2SpinBox.setValue(int(self.aw.extraFill2[i]))
+                        Fill2SpinBox.setValue(self.aw.extraFill2[i])
                         Fill2SpinBox.editingFinished.connect(self.updateFill2)
                         #add widgets to the table
                         self.devicetable.setCellWidget(i,0,typeComboBox)
@@ -3545,8 +3545,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         break
 
                 # grab the latest symbolic equations as they may have changed without being saved by an OK
-                self.aw.qmc.ETfunction = str(self.ETfunctionedit.text())
-                self.aw.qmc.BTfunction = str(self.BTfunctionedit.text())
+                self.aw.qmc.ETfunction = self.ETfunctionedit.text()
+                self.aw.qmc.BTfunction = self.BTfunctionedit.text()
 
                 # make the updates to ET.BT and Virtual Extra Devices if needed
                 if self.aw.updateSymbolicETBT():
@@ -3735,9 +3735,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.LCD6frame.setVisible(False)
             self.aw.LCD7frame.setVisible(False)
             self.aw.qmc.resetlinecountcaches()
-            self.aw.ser.arduinoETChannel = str(self.arduinoETComboBox.currentText())
-            self.aw.ser.arduinoBTChannel = str(self.arduinoBTComboBox.currentText())
-            self.aw.ser.arduinoATChannel = str(self.arduinoATComboBox.currentText())
+            self.aw.ser.arduinoETChannel = self.arduinoETComboBox.currentText()
+            self.aw.ser.arduinoBTChannel = self.arduinoBTComboBox.currentText()
+            self.aw.ser.arduinoATChannel = self.arduinoATComboBox.currentText()
             self.aw.ser.ArduinoFILT = [sb.value() for sb in self.FILTspinBoxes]
 
             self.aw.ser.externalprogram = self.programedit.text()
@@ -3761,32 +3761,32 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 #if str(self.controlpidtypeComboBox.currentText()) == 'Fuji PXG':
                 self.aw.ser.controlETpid[0] = 0
                 str1 = 'Fuji PXG'
-                if str(self.controlpidtypeComboBox.currentText()) == 'Fuji PXR':
+                if self.controlpidtypeComboBox.currentText() == 'Fuji PXR':
                     self.aw.ser.controlETpid[0] = 1
                     str1 = 'Fuji PXR'
-                elif str(self.controlpidtypeComboBox.currentText()) == 'Delta DTA':
+                elif self.controlpidtypeComboBox.currentText() == 'Delta DTA':
                     self.aw.ser.controlETpid[0] = 2
                     str1 = 'Delta DTA'
-                elif str(self.controlpidtypeComboBox.currentText()) == 'Fuji PXF':
+                elif self.controlpidtypeComboBox.currentText() == 'Fuji PXF':
                     self.aw.ser.controlETpid[0] = 4
                     str1 = 'Fuji PXF'
-                self.aw.ser.controlETpid[1] =  toInt(str(self.controlpidunitidComboBox.currentText()))
+                self.aw.ser.controlETpid[1] =  toInt(self.controlpidunitidComboBox.currentText())
                 #if str(self.btpidtypeComboBox.currentText()) == 'Fuji PXG':
                 self.aw.ser.readBTpid[0] = 0
                 str2 = 'Fuji PXG'
-                if str(self.btpidtypeComboBox.currentText()) == 'Fuji PXR':
+                if self.btpidtypeComboBox.currentText() == 'Fuji PXR':
                     self.aw.ser.readBTpid[0] = 1
                     str2 = 'Fuji PXR'
-                elif str(self.btpidtypeComboBox.currentText()) == '':
+                elif self.btpidtypeComboBox.currentText() == '':
                     self.aw.ser.readBTpid[0] = 2
                     str2 = 'None'
-                elif str(self.btpidtypeComboBox.currentText()) == 'Delta DTA':
+                elif self.btpidtypeComboBox.currentText() == 'Delta DTA':
                     self.aw.ser.readBTpid[0] = 3
                     str2 = 'Delta DTA'
-                elif str(self.btpidtypeComboBox.currentText()) == 'Fuji PXF':
+                elif self.btpidtypeComboBox.currentText() == 'Fuji PXF':
                     self.aw.ser.readBTpid[0] = 4
                     str2 = 'Fuji PXF'
-                self.aw.ser.readBTpid[1] =  toInt(str(self.btpidunitidComboBox.currentText()))
+                self.aw.ser.readBTpid[1] =  toInt(self.btpidunitidComboBox.currentText())
                 if self.showFujiLCDs.isChecked():
                     self.aw.ser.showFujiLCDs = True
                 else:
@@ -3833,7 +3833,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 self.aw.qmc.device = 27
                 message = QApplication.translate('Message','Device set to {0}. Now, check Serial Port settings').format(meter)
             elif self.nonpidButton.isChecked():
-                meter = str(self.devicetypeComboBox.currentText())
+                meter = self.devicetypeComboBox.currentText()
                 if meter == 'Omega HH806AU' and self.aw.qmc.device != 1:
                     self.aw.qmc.device = 1
                     #self.aw.ser.comport = "COM11"
@@ -5080,9 +5080,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 self.aw.pidbuttonFrame.setVisible(False)
                 self.aw.LCD6frame.setVisible(False)
                 self.aw.LCD7frame.setVisible(False)
-            self.aw.qmc.ETfunction = str(self.ETfunctionedit.text())
-            self.aw.qmc.BTfunction = str(self.BTfunctionedit.text())
-            if self.aw.qmc.BTcurve != bool(self.BTcurve.isChecked()) or self.aw.qmc.ETcurve != bool(self.ETcurve.isChecked()):
+            self.aw.qmc.ETfunction = self.ETfunctionedit.text()
+            self.aw.qmc.BTfunction = self.BTfunctionedit.text()
+            if self.aw.qmc.BTcurve != self.BTcurve.isChecked() or self.aw.qmc.ETcurve != self.ETcurve.isChecked():
                 # we reset the cached main event annotation positions as those annotations are now rendered on the other curve
                 self.aw.qmc.l_annotations_dict = {}
                 self.aw.qmc.l_event_flags_dict = {}
@@ -5120,7 +5120,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.qmc.ambient_humidity_device = self.humidityDeviceCombo.currentIndex()
             self.aw.qmc.ambient_pressure_device = self.pressureDeviceCombo.currentIndex()
             try:
-                self.aw.qmc.elevation = int(self.elevationSpinBox.value())
+                self.aw.qmc.elevation = self.elevationSpinBox.value()
             except Exception: # pylint: disable=broad-except
                 pass
 

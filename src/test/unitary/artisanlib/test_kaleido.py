@@ -36,7 +36,7 @@ import pytest
 
 
 @pytest.fixture(scope='session', autouse=True)
-def ensure_kaleido_isolation() -> Generator[None, None, None]:
+def ensure_kaleido_isolation() -> Generator[None]:
     """
     Ensure kaleido module is properly isolated for tests at session level.
 
@@ -70,7 +70,7 @@ def ensure_kaleido_isolation() -> Generator[None, None, None]:
 
 
 @pytest.fixture(autouse=True)
-def reset_kaleido_state() -> Generator[None, None, None]:
+def reset_kaleido_state() -> Generator[None]:
     """Reset kaleido test state before each test to ensure test independence."""
     # Before each test, ensure asyncio and websockets modules are available
     # This is critical when other tests have mocked these modules

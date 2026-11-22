@@ -133,7 +133,7 @@ class AillioR2:
         self.__dbg('init')
 
         # USB handling
-        self.usbhandle:Generator[usb.core.Device, Any, None]|usb.core.Device|None = None # type:ignore[no-any-unimported,unused-ignore]
+        self.usbhandle:Generator[usb.core.Device, Any]|usb.core.Device|None = None # type:ignore[no-any-unimported,unused-ignore]
         self.protocol:int = 2
         self.model:str = 'Unknown'
         self.ep_in:Endpoint|None = None  # type:ignore[no-any-unimported]
@@ -783,7 +783,7 @@ class AillioR2:
         d = abs(f - value)
         if d <= 0:
             return
-        d = int(round(min(d,11)))
+        d = round(min(d,11))
         if f > value:
             cmd = self.prepare_command(self.AILLIO_CMD_FAN_DECR)
             if self.parent_pipe is not None:
@@ -952,7 +952,7 @@ class AillioR2:
         cmd[2] = (temp >> 8) & 0xFF
         cmdOut = self.prepare_command(cmd)
         if self.parent_pipe is not None:
-            self.parent_pipe.send(bytes(cmdOut))
+            self.parent_pipe.send(cmdOut)
             print(f"Sent preheat command: temp={temp}°C")
 
 if __name__ == '__main__':

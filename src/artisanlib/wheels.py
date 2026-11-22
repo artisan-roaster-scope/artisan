@@ -128,7 +128,7 @@ class WheelDlg(ArtisanDialog):
         self.edgeSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.edgeSpinBox.setToolTip(QApplication.translate('Tooltip','Decorative edge between wheels'))
         self.edgeSpinBox.setRange(0,5)
-        self.edgeSpinBox.setValue(int(round(self.aw.qmc.wheeledge*100)))
+        self.edgeSpinBox.setValue(round(self.aw.qmc.wheeledge*100))
         self.edgeSpinBox.valueChanged.connect(self.setedge)
         linewidthlabel = QLabel(QApplication.translate('Label','Line'))
         self.linewidthSpinBox = MyQSpinBox()
@@ -136,7 +136,7 @@ class WheelDlg(ArtisanDialog):
         self.linewidthSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.linewidthSpinBox.setToolTip(QApplication.translate('Tooltip','Line thickness'))
         self.linewidthSpinBox.setRange(0,20)
-        self.linewidthSpinBox.setValue(int(round(self.aw.qmc.wheellinewidth)))
+        self.linewidthSpinBox.setValue(round(self.aw.qmc.wheellinewidth))
         self.linewidthSpinBox.valueChanged.connect(self.setlinewidth)
         linecolor = ArtisanMinorPushButton(QApplication.translate('Button','Line Color'),
                 'palette-stroke-rounded-white.svg',
@@ -156,7 +156,7 @@ class WheelDlg(ArtisanDialog):
         self.colorSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.colorSpinBox.setToolTip(QApplication.translate('Tooltip','Apply color pattern to whole graph'))
         self.colorSpinBox.setRange(0,255)
-        self.colorSpinBox.setValue(int(round(self.aw.qmc.wheelcolorpattern)))
+        self.colorSpinBox.setValue(round(self.aw.qmc.wheelcolorpattern))
         self.colorSpinBox.setWrapping(True)
         self.colorSpinBox.valueChanged.connect(self.setcolorpattern)
         addButton = ArtisanMinorPushButton(QApplication.translate('Button','Add'),
@@ -388,7 +388,7 @@ class WheelDlg(ArtisanDialog):
                 alphaSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
                 alphaSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
                 alphaSpinBox.setRange(0,10)
-                alphaSpinBox.setValue(int(round(self.aw.qmc.segmentsalpha[x][i]*10)))
+                alphaSpinBox.setValue(round(self.aw.qmc.segmentsalpha[x][i]*10))
                 alphaSpinBox.valueChanged.connect(self.setsegmentalpha)
                 #add widgets to the table
                 self.labeltable.setItem(i,0,label)
@@ -404,7 +404,7 @@ class WheelDlg(ArtisanDialog):
             x = self.labelwheelx
             colorf = self.aw.colordialog(QColor(self.aw.qmc.wheelcolor[x][i]))
             if colorf.isValid():
-                colorname = str(colorf.name())
+                colorname = colorf.name()
                 self.aw.qmc.wheelcolor[x][i] = colorname      #add new color to label
                 self.createdatatable()                           #update main table with label names (label::color)
                 self.aw.qmc.drawWheel()
@@ -416,7 +416,7 @@ class WheelDlg(ArtisanDialog):
         if x is not None:
             colorf = self.aw.colordialog(QColor(self.aw.qmc.wheelcolor[x][0]))
             if colorf.isValid():
-                colorname = str(colorf.name())
+                colorname = colorf.name()
                 for i in range(len(self.aw.qmc.wheelcolor[x])):
                     self.aw.qmc.wheelcolor[x][i] =  colorname
             self.createdatatable()
@@ -432,8 +432,8 @@ class WheelDlg(ArtisanDialog):
             wlen = len(self.aw.qmc.wheelcolor[x])
             for i in range(wlen):
                 color = QColor()
-                color.setHsv(int(round((360/wlen)*i*wpattern)),255,255,255)
-                self.aw.qmc.wheelcolor[x][i] = str(color.name())
+                color.setHsv(round((360/wlen)*i*wpattern),255,255,255)
+                self.aw.qmc.wheelcolor[x][i] = color.name()
             self.aw.qmc.drawWheel()
 
     #sets color pattern (many colors) for whole graph
@@ -445,8 +445,8 @@ class WheelDlg(ArtisanDialog):
                 wlen = len(self.aw.qmc.wheelcolor[x])
                 for i in range(wlen):
                     color = QColor()
-                    color.setHsv(int(round((360/wlen)*i*self.aw.qmc.wheelcolorpattern)),255,255,255)
-                    self.aw.qmc.wheelcolor[x][i] = str(color.name())
+                    color.setHsv(round((360/wlen)*i*self.aw.qmc.wheelcolorpattern),255,255,255)
+                    self.aw.qmc.wheelcolor[x][i] = color.name()
             self.aw.qmc.drawWheel()
 
     @pyqtSlot(int)
@@ -531,7 +531,7 @@ class WheelDlg(ArtisanDialog):
     def setlinecolor(self, _:bool = False) -> None:
         colorf = self.aw.colordialog(QColor(self.aw.qmc.wheellinecolor))
         if colorf.isValid():
-            colorname = str(colorf.name())
+            colorname = colorf.name()
             #self.aw.qmc.wheellinealpha = colorf.alphaF()
             self.aw.qmc.wheellinecolor = colorname      #add new color to label
             self.aw.qmc.drawWheel()
@@ -541,7 +541,7 @@ class WheelDlg(ArtisanDialog):
     def settextcolor(self, _:bool = False) -> None:
         colorf = self.aw.colordialog(QColor(self.aw.qmc.wheeltextcolor))
         if colorf.isValid():
-            colorname = str(colorf.name())
+            colorname = colorf.name()
             #self.aw.qmc.wheeltextalpha = colorf.alphaF()
             self.aw.qmc.wheeltextcolor = colorname      #add new color to label
             self.aw.qmc.drawWheel()
@@ -592,7 +592,7 @@ class WheelDlg(ArtisanDialog):
             horizontal_header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         #populate table
         for i in range(ndata):
-            labelsedit = QLineEdit(str(','.join(self.aw.qmc.wheelnames[i])))
+            labelsedit = QLineEdit(','.join(self.aw.qmc.wheelnames[i]))
             labelsedit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
             labelsedit.editingFinished.connect(self.updatelabels)
             setButton = ArtisanMinorPushButton(QApplication.translate('Button','Properties'),
@@ -617,7 +617,7 @@ class WheelDlg(ArtisanDialog):
             angleSpinBox.setSuffix(QApplication.translate('Label',' dg'))
             angleSpinBox.setRange(0,359)
             angleSpinBox.setWrapping(True)
-            angleSpinBox.setValue(int(round(self.aw.qmc.startangle[i])))
+            angleSpinBox.setValue(round(self.aw.qmc.startangle[i]))
             angleSpinBox.valueChanged.connect(self.setangle)
             projectionComboBox =  QComboBox()
             projectionComboBox.addItems([QApplication.translate('ComboBox','Flat'),
@@ -629,7 +629,7 @@ class WheelDlg(ArtisanDialog):
             txtSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
             txtSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
             txtSpinBox.setRange(1,30)
-            txtSpinBox.setValue(int(round(self.aw.qmc.wheeltextsize[i])))
+            txtSpinBox.setValue(round(self.aw.qmc.wheeltextsize[i]))
             txtSpinBox.valueChanged.connect(self.setTextsizeX)
             colorButton = ArtisanMinorPushButton(QApplication.translate('Button','Set Color'),
                     'palette-stroke-rounded-white.svg',
@@ -663,7 +663,7 @@ class WheelDlg(ArtisanDialog):
         x = self.aw.findWidgetsRow(self.datatable,self.sender(),0)
         if x is not None:
             labelsedit = cast(QLineEdit, self.datatable.cellWidget(x,0))
-            text  = str(labelsedit.text())
+            text  = labelsedit.text()
             if '\\n' in text:              #make multiple line text if "\n" found in label string
                 parts = text.split('\\n')
                 text = chr(10).join(parts)
@@ -801,8 +801,8 @@ class WheelDlg(ArtisanDialog):
             sa.append(.3)
             wlp.append(0)
             color = QColor()
-            color.setHsv(int(round((360/(nwheels+1))*i)),255,255,255)
-            co.append(str(color.name()))
+            color.setHsv(round((360/(nwheels+1))*i),255,255,255)
+            co.append(color.name())
         self.aw.qmc.wheelnames.append(wn)
         self.aw.qmc.segmentlengths.append(sl)
         self.aw.qmc.segmentsalpha.append(sa)

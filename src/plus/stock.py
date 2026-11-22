@@ -493,14 +493,14 @@ def renderAmount(amount:float, default_unit:CoffeeUnit|None=None, target_unit_id
                 'box': QApplication.translate('Plus', 'boxes'),
                 'barrel': QApplication.translate('Plus', 'barrels'),
             }
-            unit_size = int(default_unit['size'])
+            unit_size = default_unit['size']
             if amount > unit_size:
                 a = amount // unit_size
                 if a > 1:
                     u = unit_translations_plural[default_unit['name']]
                 else:
                     u = unit_translations_singular[default_unit['name']]
-                res = f'{int(round(a))} {u}'
+                res = f'{round(a)} {u}'
     except Exception:  # pylint: disable=broad-except
         pass
     # if we could not convert to default_unit type,
@@ -675,11 +675,11 @@ def coffee2beans(c:Coffee) -> str:
         picked = None
         landed = None
         try:
-            picked = int(cy['picked'][0]) # pyright:ignore[reportTypedDictNotRequiredAccess]
+            picked = cy['picked'][0] # pyright:ignore[reportTypedDictNotRequiredAccess]
         except Exception:  # pylint: disable=broad-except
             pass
         try:
-            landed = int(cy['landed'][0]) # pyright:ignore[reportTypedDictNotRequiredAccess]
+            landed = cy['landed'][0] # pyright:ignore[reportTypedDictNotRequiredAccess]
         except Exception:  # pylint: disable=broad-except
             pass
         if picked is not None and not bool(landed):
@@ -1041,7 +1041,7 @@ def getBlendBlendDict(blend:BlendStructure, weight:float|None = None) -> Blend:
             pass
         try:
             if is_float_list(densities):
-                res['density'] = int(round(sum(densities)))
+                res['density'] = round(sum(densities))
             else:
                 del res['density']
         except Exception:  # pylint: disable=broad-except
@@ -1167,7 +1167,7 @@ def blend2beans(blend:BlendStructure, weight_unit_idx:int, weightIn:float=0) -> 
             w = ''
             if weightIn:
                 w = f"{render_weight(i['ratio'] * weightIn,weight_unit_idx,weight_unit_idx,smart_unit_upgrade=False)} " # @UndefinedVariable
-            ratio = f"{int(round(i['ratio'] * 100))}% "
+            ratio = f"{round(i['ratio'] * 100)}% "
             res.append(f'{ratio}{w}{c}')
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)
@@ -1294,7 +1294,7 @@ def getBlends(weight_unit_idx:int, store:str|None, customBlend:Blend|None, acqui
                                 except Exception:
                                     pass
                                 try:
-                                    d = int(cd['density']) # pyright:ignore[reportTypedDictNotRequiredAccess]
+                                    d = cd['density'] # pyright:ignore[reportTypedDictNotRequiredAccess]
                                     if d > 0:
                                         coffee_density[coffee] = d
                                         i['density'] = d
@@ -1302,9 +1302,7 @@ def getBlends(weight_unit_idx:int, store:str|None, customBlend:Blend|None, acqui
                                 except Exception:
                                     pass
                                 try:
-                                    screen_size_min = int(
-                                        cd['screen_size']['min'] # pyright:ignore[reportTypedDictNotRequiredAccess]
-                                    )
+                                    screen_size_min = cd['screen_size']['min'] # pyright:ignore[reportTypedDictNotRequiredAccess]
                                     if screen_size_min > 0:
                                         coffee_screen_min[
                                             coffee
@@ -1314,9 +1312,7 @@ def getBlends(weight_unit_idx:int, store:str|None, customBlend:Blend|None, acqui
                                 except Exception:
                                     pass
                                 try:
-                                    screen_size_max = int(
-                                        cd['screen_size']['max'] # pyright:ignore[reportTypedDictNotRequiredAccess]
-                                    )
+                                    screen_size_max = cd['screen_size']['max'] # pyright:ignore[reportTypedDictNotRequiredAccess]
                                     if screen_size_max > 0:
                                         coffee_screen_max[
                                             coffee
@@ -1363,7 +1359,7 @@ def getBlends(weight_unit_idx:int, store:str|None, customBlend:Blend|None, acqui
                                     except Exception:
                                         pass
                                     try:
-                                        d = int(cd['density']) # pyright:ignore[reportTypedDictNotRequiredAccess]
+                                        d = cd['density'] # pyright:ignore[reportTypedDictNotRequiredAccess]
                                         if d > 0:
                                             coffee_density[
                                                 replaceCoffee
@@ -1372,9 +1368,7 @@ def getBlends(weight_unit_idx:int, store:str|None, customBlend:Blend|None, acqui
                                     except Exception:
                                         pass
                                     try:
-                                        screen_size_min = int(
-                                            cd['screen_size']['min'] # pyright:ignore[reportTypedDictNotRequiredAccess]
-                                        )
+                                        screen_size_min = cd['screen_size']['min'] # pyright:ignore[reportTypedDictNotRequiredAccess]
                                         if screen_size_min > 0:
                                             coffee_screen_min[
                                                 replaceCoffee
@@ -1383,9 +1377,7 @@ def getBlends(weight_unit_idx:int, store:str|None, customBlend:Blend|None, acqui
                                     except Exception:
                                         pass
                                     try:
-                                        screen_size_max = int(
-                                            cd['screen_size']['max'] # pyright:ignore[reportTypedDictNotRequiredAccess]
-                                        )
+                                        screen_size_max = cd['screen_size']['max'] # pyright:ignore[reportTypedDictNotRequiredAccess]
                                         if screen_size_max > 0:
                                             coffee_screen_max[
                                                 replaceCoffee
@@ -1460,9 +1452,7 @@ def getBlends(weight_unit_idx:int, store:str|None, customBlend:Blend|None, acqui
                             # only if the density of all components is known,
                             # we can estimate the density of this blend
                             if is_float_list(densities): # component densities are floats as they are ints multiplied by ratio!
-                                new_blend['density'] = int(
-                                    round(sum(densities))
-                                )  # @UndefinedVariable
+                                new_blend['density'] = round(sum(densities))  # @UndefinedVariable
                                 if not replacementBlends:
                                     # if we are processing the original blend,
                                     # we store the computed moisture/density/

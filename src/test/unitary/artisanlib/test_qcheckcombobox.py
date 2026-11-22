@@ -30,7 +30,7 @@ import pytest
 
 
 @pytest.fixture(scope='session', autouse=True)
-def session_level_isolation() -> Generator[None, None, None]:
+def session_level_isolation() -> Generator[None]:
     """Session-level isolation fixture to prevent cross-file module contamination.
 
     This fixture ensures that external dependencies are properly isolated

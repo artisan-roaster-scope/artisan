@@ -390,7 +390,7 @@ def extractProfileRoestCSV(file:str,
                             heater_last = None
                         heater_last = heater
                         heater = v
-                        specialeventsvalue.append(eventsExternal2InternalValue(int(round(v))))
+                        specialeventsvalue.append(eventsExternal2InternalValue(round(v)))
                         specialevents.append(i)
                         specialeventstype.append(3)
                         specialeventsStrings.append(f'{heater}' + '%')

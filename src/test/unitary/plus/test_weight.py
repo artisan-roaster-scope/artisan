@@ -313,7 +313,7 @@ weight.PROCESS_STATE = MockProcessState   # type:ignore[assignment, misc]
 
 
 @pytest.fixture(scope='session', autouse=True)
-def ensure_weight_isolation() -> Generator[None, None, None]:
+def ensure_weight_isolation() -> Generator[None]:
     """
     Ensure modules are properly isolated for weight tests at session level.
 
@@ -343,7 +343,7 @@ def ensure_weight_isolation() -> Generator[None, None, None]:
 
 
 @pytest.fixture(scope='module', autouse=True)
-def cleanup_weight_mocks() -> Generator[None, None, None]:
+def cleanup_weight_mocks() -> Generator[None]:
     """
     Clean up weight test mocks at module level to prevent cross-file contamination.
 
@@ -357,7 +357,7 @@ def cleanup_weight_mocks() -> Generator[None, None, None]:
 
 
 @pytest.fixture(autouse=True)
-def reset_weight_state() -> Generator[None, None, None]:
+def reset_weight_state() -> Generator[None]:
     """
     Reset weight module state before each test to ensure test independence.
 

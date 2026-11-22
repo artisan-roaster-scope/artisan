@@ -90,7 +90,7 @@ class WindowsDlg(ArtisanDialog):
         self.step100Edit = QLineEdit()
         self.step100Edit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.step100Edit.setMaximumWidth(55)
-        self.step100Edit.setValidator(QIntValidator(int(self.aw.qmc.ylimit_min_max), 999999, self.step100Edit))
+        self.step100Edit.setValidator(QIntValidator(self.aw.qmc.ylimit_min_max, 999999, self.step100Edit))
         self.step100Edit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.step100Edit.setToolTip(QApplication.translate('Tooltip', '100% event values in step mode are aligned with the given y-axis value or the lowest phases limit if left empty'))
         self.step100Edit.editingFinished.connect(self.step100Changed)
@@ -113,8 +113,8 @@ class WindowsDlg(ArtisanDialog):
         self.ylimitEdit_min = QLineEdit()
         self.ylimitEdit_min.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.ylimitEdit_min.setMaximumWidth(60)
-        self.ylimitEdit.setValidator(QIntValidator(int(self.aw.qmc.ylimit_min_max), int(self.aw.qmc.ylimit_max), self.ylimitEdit))
-        self.ylimitEdit_min.setValidator(QIntValidator(int(self.aw.qmc.ylimit_min_max), int(self.aw.qmc.ylimit_max), self.ylimitEdit_min))
+        self.ylimitEdit.setValidator(QIntValidator(self.aw.qmc.ylimit_min_max, self.aw.qmc.ylimit_max, self.ylimitEdit))
+        self.ylimitEdit_min.setValidator(QIntValidator(self.aw.qmc.ylimit_min_max, self.aw.qmc.ylimit_max, self.ylimitEdit_min))
         self.ylimitEdit.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.ylimitEdit_min.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.zlimitEdit = QLineEdit()
@@ -123,8 +123,8 @@ class WindowsDlg(ArtisanDialog):
         self.zlimitEdit_min = QLineEdit()
         self.zlimitEdit_min.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.zlimitEdit_min.setMaximumWidth(60)
-        self.zlimitEdit.setValidator(QIntValidator(int(self.aw.qmc.zlimit_min_max), int(self.aw.qmc.zlimit_max), self.zlimitEdit))
-        self.zlimitEdit_min.setValidator(QIntValidator(int(self.aw.qmc.zlimit_min_max), int(self.aw.qmc.zlimit_max), self.zlimitEdit_min))
+        self.zlimitEdit.setValidator(QIntValidator(self.aw.qmc.zlimit_min_max, self.aw.qmc.zlimit_max, self.zlimitEdit))
+        self.zlimitEdit_min.setValidator(QIntValidator(self.aw.qmc.zlimit_min_max, self.aw.qmc.zlimit_max, self.zlimitEdit_min))
         self.zlimitEdit.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.zlimitEdit_min.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.xlimitEdit.setText(stringfromseconds(self.aw.qmc.endofx, leadingzero=False))
@@ -268,7 +268,7 @@ class WindowsDlg(ArtisanDialog):
         self.ygridSpinBox.setToolTip(QApplication.translate('Tooltip', 'Distance of major tick labels'))
         self.ygridSpinBox.setRange(0,500)
         self.ygridSpinBox.setSingleStep(5)
-        self.ygridSpinBox.setValue(int(self.aw.qmc.ygrid))
+        self.ygridSpinBox.setValue(self.aw.qmc.ygrid)
         self.ygridSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.ygridSpinBox.editingFinished.connect(self.changeygrid)
         self.ygridSpinBox.setMaximumWidth(60)
@@ -279,7 +279,7 @@ class WindowsDlg(ArtisanDialog):
         self.zgridSpinBox.setToolTip(QApplication.translate('Tooltip', 'Distance of major tick labels'))
         self.zgridSpinBox.setRange(0,100)
         self.zgridSpinBox.setSingleStep(1)
-        self.zgridSpinBox.setValue(int(self.aw.qmc.zgrid))
+        self.zgridSpinBox.setValue(self.aw.qmc.zgrid)
         self.zgridSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.zgridSpinBox.editingFinished.connect(self.changezgrid)
         self.zgridSpinBox.setMaximumWidth(60)
@@ -535,7 +535,7 @@ class WindowsDlg(ArtisanDialog):
     @pyqtSlot()
     def xlimitChanged(self) -> None:
         try:
-            endedittime_str = str(self.xlimitEdit.text())
+            endedittime_str = self.xlimitEdit.text()
             if endedittime_str != '':
                 endeditime = stringtoseconds(endedittime_str)
                 if self.aw.qmc.endofx != endeditime:
@@ -550,7 +550,7 @@ class WindowsDlg(ArtisanDialog):
     @pyqtSlot()
     def xlimitMinChanged(self) -> None:
         try:
-            startedittime_str = str(self.xlimitEdit_min.text())
+            startedittime_str = self.xlimitEdit_min.text()
             if startedittime_str != '':
                 starteditime = stringtoseconds(startedittime_str)
                 if starteditime >= 0 and self.aw.qmc.timeindex[0] != -1:
@@ -571,8 +571,8 @@ class WindowsDlg(ArtisanDialog):
     @pyqtSlot()
     def ylimitChanged(self) -> None:
         try:
-            yl = int(str(self.ylimitEdit.text()))
-            yl_min = int(str(self.ylimitEdit_min.text()))
+            yl = int(self.ylimitEdit.text())
+            yl_min = int(self.ylimitEdit_min.text())
             if yl > yl_min:
                 if (self.aw.qmc.ylimit != yl) or (self.aw.qmc.ylimit_min != yl_min):
                     self.aw.qmc.ylimit = yl
@@ -667,7 +667,7 @@ class WindowsDlg(ArtisanDialog):
         self.xlimitEdit.repaint()
 
         try:
-            endedittime_str = str(self.xlimitEdit.text())
+            endedittime_str = self.xlimitEdit.text()
             if endedittime_str != '':
                 endeditime = stringtoseconds(endedittime_str)
                 if self.aw.qmc.endofx != endeditime:
@@ -678,7 +678,7 @@ class WindowsDlg(ArtisanDialog):
             pass # stringtoseconds raises exception on malformed input
 
         try:
-            startedittime_str = str(self.xlimitEdit_min.text())
+            startedittime_str = self.xlimitEdit_min.text()
             if startedittime_str != '':
                 starteditime = stringtoseconds(startedittime_str)
                 if starteditime >= 0 and self.aw.qmc.timeindex[0] != -1:
@@ -712,7 +712,7 @@ class WindowsDlg(ArtisanDialog):
                 dmax_b = self.aw.calcAutoDeltaAxisBackground()
                 dmax = max(dmax,dmax_b)
         try:
-            zlimit_min = int(str(self.zlimitEdit_min.text()))
+            zlimit_min = int(self.zlimitEdit_min.text())
         except Exception: # pylint: disable=broad-except
             zlimit_min = self.aw.qmc.ylimit_min
         if dmax > zlimit_min and dmax+1 != self.aw.qmc.zlimit:
@@ -724,21 +724,21 @@ class WindowsDlg(ArtisanDialog):
         # adjust zgrid
         if self.zgridSpinBox.value() != 0 and (self.autodeltaxETFlag.isChecked() or self.autodeltaxBTFlag.isChecked()):
             try:
-                zlimit_max = int(str(self.zlimitEdit.text()))
+                zlimit_max = int(self.zlimitEdit.text())
             except Exception: # pylint: disable=broad-except
                 zlimit_max = self.aw.qmc.ylimit
             d = zlimit_max - zlimit_min
-            steps = int(round(d/5))
+            steps = round(d/5)
             if steps > 50:
-                steps = int(round(steps/10))*10
+                steps = round(steps/10)*10
             elif steps > 10:
-                steps = int(round(steps/5))*5
+                steps = round(steps/5)*5
             elif steps > 5:
                 steps = 5
             else:
-                steps = int(round(steps/2))*2
+                steps = round(steps/2)*2
             auto_grid = max(2,steps)
-            self.zgridSpinBox.setValue(int(auto_grid))
+            self.zgridSpinBox.setValue(auto_grid)
             if auto_grid != self.aw.qmc.zgrid:
                 self.aw.qmc.zgrid = auto_grid
                 changed = True
@@ -827,8 +827,8 @@ class WindowsDlg(ArtisanDialog):
         #
         self.aw.qmc.loadaxisfromprofile = self.loadAxisFromProfile.isChecked()
         try:
-            yl = int(str(self.ylimitEdit.text()))
-            yl_min = int(str(self.ylimitEdit_min.text()))
+            yl = int(self.ylimitEdit.text())
+            yl_min = int(self.ylimitEdit_min.text())
             if yl > yl_min:
                 if (self.aw.qmc.ylimit != yl) or (self.aw.qmc.ylimit_min != yl_min):
                     limits_changed = True
@@ -837,8 +837,8 @@ class WindowsDlg(ArtisanDialog):
         except Exception: # pylint: disable=broad-except
             pass
         try:
-            zl = int(str(self.zlimitEdit.text()))
-            zl_min = int(str(self.zlimitEdit_min.text()))
+            zl = int(self.zlimitEdit.text())
+            zl_min = int(self.zlimitEdit_min.text())
             if (self.aw.qmc.zlimit != zl) or (self.aw.qmc.zlimit_min != zl_min):
                 limits_changed = True
             if zl > zl_min:
@@ -853,7 +853,7 @@ class WindowsDlg(ArtisanDialog):
             self.aw.qmc.togglecrosslines()
 
 
-        endedittime_str = str(self.xlimitEdit.text())
+        endedittime_str = self.xlimitEdit.text()
         if endedittime_str != '':
             try:
                 endeditime = stringtoseconds(endedittime_str)
@@ -866,7 +866,7 @@ class WindowsDlg(ArtisanDialog):
             self.aw.qmc.endofx = self.aw.qmc.endofx_default
             self.aw.qmc.locktimex_end = self.aw.qmc.endofx_default
 
-        startedittime_str = str(self.xlimitEdit_min.text())
+        startedittime_str = self.xlimitEdit_min.text()
         if startedittime_str != '':
             try:
                 starteditime = stringtoseconds(startedittime_str)
@@ -896,14 +896,14 @@ class WindowsDlg(ArtisanDialog):
             pass
 
         try:
-            resettime = stringtoseconds(str(self.resetEdit.text()))
+            resettime = stringtoseconds(self.resetEdit.text())
             if resettime > 0:
                 self.aw.qmc.resetmaxtime = resettime
         except Exception: # pylint: disable=broad-except
             pass
 
         try:
-            chargetime = stringtoseconds(str(self.chargeminEdit.text()))
+            chargetime = stringtoseconds(self.chargeminEdit.text())
             if chargetime <= 0:
                 self.aw.qmc.chargemintime = chargetime
         except Exception: # pylint: disable=broad-except
@@ -921,7 +921,7 @@ class WindowsDlg(ArtisanDialog):
             self.aw.ntb.update() # reset the MPL navigation history
         except Exception: # pylint: disable=broad-except
             pass
-        string = QApplication.translate('Message','xlimit = ({2},{3}) ylimit = ({0},{1}) zlimit = ({4},{5})').format(str(self.ylimitEdit_min.text()),str(self.ylimitEdit.text()),str(self.xlimitEdit_min.text()),str(self.xlimitEdit.text()),str(self.zlimitEdit_min.text()),str(self.zlimitEdit.text()))
+        string = QApplication.translate('Message','xlimit = ({2},{3}) ylimit = ({0},{1}) zlimit = ({4},{5})').format(self.ylimitEdit_min.text(),self.ylimitEdit.text(),self.xlimitEdit_min.text(),self.xlimitEdit.text(),self.zlimitEdit_min.text(),self.zlimitEdit.text())
         self.aw.sendmessage(string)
         self.close()
 
@@ -994,21 +994,21 @@ class WindowsDlg(ArtisanDialog):
         except Exception: # pylint: disable=broad-except
             self.xaxislencombobox.setCurrentIndex(2)
         if self.aw.qmc.mode == 'F':
-            self.ygridSpinBox.setValue(int(self.aw.qmc.ygrid_F_default))
+            self.ygridSpinBox.setValue(self.aw.qmc.ygrid_F_default)
             self.aw.qmc.ygrid = self.aw.qmc.ygrid_F_default
             self.ylimitEdit.setText(str(self.aw.qmc.ylimit_F_default))
             self.ylimitEdit_min.setText(str(self.aw.qmc.ylimit_min_F_default))
             self.zlimitEdit.setText(str(self.aw.qmc.zlimit_F_default))
             self.zlimitEdit_min.setText(str(self.aw.qmc.zlimit_min_F_default))
-            self.zgridSpinBox.setValue(int(self.aw.qmc.zgrid_F_default))
+            self.zgridSpinBox.setValue(self.aw.qmc.zgrid_F_default)
         else:
-            self.ygridSpinBox.setValue(int(self.aw.qmc.ygrid_C_default))
+            self.ygridSpinBox.setValue(self.aw.qmc.ygrid_C_default)
             self.aw.qmc.ygrid = self.aw.qmc.ygrid_C_default
             self.ylimitEdit.setText(str(self.aw.qmc.ylimit_C_default))
             self.ylimitEdit_min.setText(str(self.aw.qmc.ylimit_min_C_default))
             self.zlimitEdit.setText(str(self.aw.qmc.zlimit_C_default))
             self.zlimitEdit_min.setText(str(self.aw.qmc.zlimit_min_C_default))
-            self.zgridSpinBox.setValue(int(self.aw.qmc.zgrid_C_default))
+            self.zgridSpinBox.setValue(self.aw.qmc.zgrid_C_default)
         if self.aw.comparator is not None:
             self.aw.comparator.redraw()
         else:

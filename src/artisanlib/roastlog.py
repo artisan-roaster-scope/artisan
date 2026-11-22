@@ -74,7 +74,7 @@ def extractProfileRoastLog(url:'QUrl',
         if 'Roasted on:' in tag_values:
             try:
                 dt = dateutil.parser.parse(tag_values['Roasted on:'])
-                dateQt = QDateTime.fromSecsSinceEpoch(int(round(dt.timestamp())))
+                dateQt = QDateTime.fromSecsSinceEpoch(round(dt.timestamp()))
                 if dateQt.isValid():
                     roastdate:str|None = encodeLocal(dateQt.date().toString())
                     if roastdate is not None:
@@ -85,7 +85,7 @@ def extractProfileRoastLog(url:'QUrl',
                     roasttime:str|None = encodeLocal(dateQt.time().toString())
                     if roasttime is not None:
                         res['roasttime'] = roasttime
-                    res['roastepoch'] = int(dateQt.toSecsSinceEpoch())
+                    res['roastepoch'] = dateQt.toSecsSinceEpoch()
                     res['roasttzoffset'] = libtime.timezone
             except Exception: # pylint: disable=broad-except
                 pass
@@ -105,7 +105,7 @@ def extractProfileRoastLog(url:'QUrl',
             res['roastertype'] = tag_values['Roaster:']
         if 'Roast level:' in tag_values:
             try:
-                c = int(round(float(tag_values['Roast level:'])))
+                c = round(float(tag_values['Roast level:']))
                 res['ground_color'] = c
             except Exception: # pylint: disable=broad-except
                 pass

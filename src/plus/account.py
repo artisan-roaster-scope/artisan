@@ -81,9 +81,7 @@ def setAccountShelve(account_id: str, fh:IO[str]) -> int|None:
             # could not be determined" remove all files name account_cache
             # path with any extension as we do not know which extension is
             # chosen by shelve
-            _log.info(
-                'clean account cache %s', str(account_cache_path)
-            )
+            _log.info('clean account cache %s', account_cache_path)
             # note that this deletes all "account" files including those for
             # the Viewer and other files of that name prefix like
             # account.db.org!!
@@ -132,13 +130,9 @@ def setAccount(account_id: str) -> int|None:
         _log.exception(e)
         # we couldn't fetch this lock. It seems to be blocked forever
         # we remove the lock file and retry with a shorter timeout
-        _log.info(
-            'clean lock %s', str(account_cache_lock_path)
-        )
+        _log.info('clean lock %s', account_cache_lock_path)
         Path(account_cache_lock_path).unlink()
-        _log.debug(
-            'retry setAccount(%s)', account_id
-        )
+        _log.debug('retry setAccount(%s)', account_id)
         with portalocker.Lock(account_cache_lock_path, timeout=0.3) as fh:
             return setAccountShelve(account_id, fh)
     except Exception as e:  # pylint: disable=broad-except

@@ -201,7 +201,7 @@ from plus import register
 
 
 @pytest.fixture(scope='session', autouse=True)
-def ensure_register_isolation() -> Generator[None, None, None]:
+def ensure_register_isolation() -> Generator[None]:
     """
     Ensure modules are properly isolated for register tests at session level.
 
@@ -238,7 +238,7 @@ def ensure_register_isolation() -> Generator[None, None, None]:
 
 
 @pytest.fixture(scope='module', autouse=True)
-def cleanup_register_mocks() -> Generator[None, None, None]:
+def cleanup_register_mocks() -> Generator[None]:
     """
     Clean up register test mocks at module level to prevent cross-file contamination.
 
@@ -273,7 +273,7 @@ def cleanup_register_mocks() -> Generator[None, None, None]:
 
 
 @pytest.fixture(autouse=True)
-def reset_register_state() -> Generator[None, None, None]:
+def reset_register_state() -> Generator[None]:
     """
     Reset register module state before each test to ensure test independence.
 

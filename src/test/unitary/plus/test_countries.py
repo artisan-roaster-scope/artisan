@@ -85,7 +85,7 @@ import pytest
 
 
 @pytest.fixture(scope='session', autouse=True)
-def ensure_countries_isolation() -> Generator[None, None, None]:
+def ensure_countries_isolation() -> Generator[None]:
     """
     Ensure modules are properly isolated for countries tests at session level.
 
@@ -120,7 +120,7 @@ def ensure_countries_isolation() -> Generator[None, None, None]:
 
 
 @pytest.fixture(scope='module', autouse=True)
-def cleanup_countries_mocks() -> Generator[None, None, None]:
+def cleanup_countries_mocks() -> Generator[None]:
     """
     Clean up countries test mocks at module level to prevent cross-file contamination.
 
@@ -155,7 +155,7 @@ def cleanup_countries_mocks() -> Generator[None, None, None]:
 
 
 @pytest.fixture(autouse=True)
-def reset_countries_state() -> Generator[None, None, None]:
+def reset_countries_state() -> Generator[None]:
     """
     Reset countries module state before and after each test to ensure complete isolation.
 
@@ -185,7 +185,7 @@ def mock_qapplication() -> Mock:
 
 
 @pytest.fixture
-def mock_pyqt6_import() -> Generator[Mock, None, None]:
+def mock_pyqt6_import() -> Generator[Mock]:
     """Mock successful PyQt6 import."""
     with patch.dict('sys.modules', {'PyQt6': Mock(), 'PyQt6.QtWidgets': Mock()}):
         mock_widgets: Mock = Mock()
@@ -195,7 +195,7 @@ def mock_pyqt6_import() -> Generator[Mock, None, None]:
 
 
 @pytest.fixture
-def mock_pyqt5_import() -> Generator[Mock, None, None]:
+def mock_pyqt5_import() -> Generator[Mock]:
     """Mock successful PyQt5 import."""
     with patch.dict('sys.modules', {'PyQt5': Mock(), 'PyQt5.QtWidgets': Mock()}):
         mock_widgets: Mock = Mock()
@@ -205,7 +205,7 @@ def mock_pyqt5_import() -> Generator[Mock, None, None]:
 
 
 @pytest.fixture
-def mock_pyqt6_import_failure() -> Generator[None, None, None]:
+def mock_pyqt6_import_failure() -> Generator[None]:
     """Mock PyQt6 import failure to test PyQt5 fallback."""
 
     def mock_import(name: str, *args: Any, **kwargs: Any) -> Any:

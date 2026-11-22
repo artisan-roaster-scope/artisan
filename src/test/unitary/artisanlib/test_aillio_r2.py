@@ -37,7 +37,7 @@ import pytest
 
 
 @pytest.fixture(scope='session', autouse=True)
-def ensure_aillio_r2_isolation() -> Generator[None, None, None]:
+def ensure_aillio_r2_isolation() -> Generator[None]:
     """
     Ensure aillio_r2 module is properly isolated for tests at session level.
 
@@ -74,7 +74,7 @@ def ensure_aillio_r2_isolation() -> Generator[None, None, None]:
 
 
 @pytest.fixture(autouse=True)
-def reset_aillio_r2_state() -> Generator[None, None, None]:
+def reset_aillio_r2_state() -> Generator[None]:
     """Reset aillio_r2 test state before each test to ensure test independence."""
     # Before each test, ensure USB and threading modules are available
     # This is critical when other tests have mocked these modules

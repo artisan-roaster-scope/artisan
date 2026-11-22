@@ -44,7 +44,7 @@ from artisanlib.dialogs import (
 
 # Test Fixtures
 @pytest.fixture(scope='session')
-def qapp() -> Generator[QApplication, None, None]: # pyright:ignore[reportUnknownParameterType]
+def qapp() -> Generator[QApplication]: # pyright:ignore[reportUnknownParameterType]
     """Create QApplication instance for the entire test session."""
     if not QApplication.instance():
         app = QApplication(sys.argv)
@@ -80,7 +80,7 @@ def mock_aw() -> Mock:
 
 
 @pytest.fixture
-def mock_qsettings() -> Generator[Mock, None, None]:
+def mock_qsettings() -> Generator[Mock]:
     """Mock QSettings to avoid file system operations during testing."""
     with patch('artisanlib.dialogs.QSettings') as mock_settings:
         settings_instance = Mock()

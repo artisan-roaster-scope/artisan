@@ -14,6 +14,7 @@ v5.0.1
   - fixes BLE loop deadlock on disconnect ([PR #2260](../../../pull/2260) contributed by [Brian Schmitt](https://github.com/brianschmitt))
   - prevents clearing of extra devices data on theme loading
   - prevents default theme to adjust axis limits
+  - fixes memory leak in BLE scanning ([bleak PR #20406](https://github.com/hbldh/bleak/pull/2040#issuecomment-6660071329))
 
 ----
 v5.0.0 (Nov 5, 2026)

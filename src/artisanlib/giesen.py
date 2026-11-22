@@ -122,7 +122,7 @@ def extractProfileGiesenCSV(file:str,
                             speed_last = speed
                             speed = v
                             speed_event = True
-                            specialeventsvalue.append(eventsExternal2InternalValue(int(round(v))))
+                            specialeventsvalue.append(eventsExternal2InternalValue(round(v)))
                             specialevents.append(i)
                             specialeventstype.append(1)
                             specialeventsStrings.append(f'{speed:.1f}%')
@@ -148,7 +148,7 @@ def extractProfileGiesenCSV(file:str,
                             power_last = power
                             power = v
                             power_event = True
-                            specialeventsvalue.append(eventsExternal2InternalValue(int(round(v))))
+                            specialeventsvalue.append(eventsExternal2InternalValue(round(v)))
                             specialevents.append(i)
                             specialeventstype.append(3)
                             specialeventsStrings.append(f'{power:.0f}%')

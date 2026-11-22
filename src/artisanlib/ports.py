@@ -147,7 +147,7 @@ class scanModbusDlg(ArtisanDialog):
     @override
     def keyPressEvent(self, a0: 'QKeyEvent|None') -> None:
         if a0 is not None:
-            key = int(a0.key())
+            key = a0.key()
             if key != 0:
                 self.stop = True
 
@@ -192,7 +192,7 @@ class scanModbusDlg(ArtisanDialog):
                         res = None
                         for __ in range(10):
                             time.sleep(self.aw.modbus.modbus_serial_read_delay)
-                        res = self.aw.modbus.peekSingleRegister(self.deviceID, int(register), code=(4 if self.code4 else 3))
+                        res = self.aw.modbus.peekSingleRegister(self.deviceID, register, code=(4 if self.code4 else 3))
                         if res is not None:
                             self.modbusEdit.appendPlainText(f'{register} ({3 if self.code3 else 4}), {res}')
                     self.aw.modbus.disconnect()
@@ -323,7 +323,7 @@ class scanS7Dlg(ArtisanDialog):
     @override
     def keyPressEvent(self, a0: 'QKeyEvent|None') -> None:
         if a0 is not None:
-            key = int(a0.key())
+            key = a0.key()
             if key != 0:
                 self.stop = True
 
@@ -347,7 +347,7 @@ class scanS7Dlg(ArtisanDialog):
                     QApplication.processEvents()
 
                     # update device and register limits
-                    self.area = int(self.areaCombo.currentIndex())
+                    self.area = self.areaCombo.currentIndex()
                     self.DBnr = int(self.DBnrEdit.text())
                     self.min_register = int(self.minRegisterEdit.text())
                     self.max_register = int(self.maxRegisterEdit.text())
@@ -578,7 +578,7 @@ class comportDlg(ArtisanResizeablDialog):
             modbus_inputMode:QComboBox = QComboBox()
             modbus_inputMode.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             modbus_inputMode.addItems(modbus_modes)
-            modbus_inputMode.setCurrentIndex(modbus_modes.index(str(self.aw.modbus.inputModes[i])))
+            modbus_inputMode.setCurrentIndex(modbus_modes.index(self.aw.modbus.inputModes[i]))
             modbus_inputMode.setFixedWidth(85)
             self.modbus_inputModes[i] = modbus_inputMode
             #
@@ -623,7 +623,7 @@ class comportDlg(ArtisanResizeablDialog):
 
         # host (IP or hostname)
         modbus_hostlabel = QLabel(QApplication.translate('Label', 'Host'))
-        self.modbus_hostEdit = QLineEdit(str(self.aw.modbus.host))
+        self.modbus_hostEdit = QLineEdit(self.aw.modbus.host)
         self.modbus_hostEdit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.modbus_hostEdit.setFixedWidth(110)
         self.modbus_hostEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -840,7 +840,7 @@ class comportDlg(ArtisanResizeablDialog):
         self.modbus_full_block = QCheckBox(QApplication.translate('ComboBox','fetch full blocks'))
         self.modbus_full_block.setChecked(self.aw.modbus.fetch_max_blocks)
         self.modbus_full_block.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.modbus_full_block.setEnabled(bool(self.aw.modbus.optimizer))
+        self.modbus_full_block.setEnabled(self.aw.modbus.optimizer)
 
         #### dialog buttons
         # connect the ArtisanDialog standard OK/Cancel buttons
@@ -997,7 +997,7 @@ class comportDlg(ArtisanResizeablDialog):
         #LAYOUT TAB 4
         # host (IP or hostname)
         s7_hostlabel = QLabel(QApplication.translate('Label', 'Host'))
-        self.s7_hostEdit = QLineEdit(str(self.aw.s7.host))
+        self.s7_hostEdit = QLineEdit(self.aw.s7.host)
         self.s7_hostEdit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.s7_hostEdit.setFixedWidth(120)
         self.s7_hostEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -1039,7 +1039,7 @@ class comportDlg(ArtisanResizeablDialog):
         self.s7_full_block = QCheckBox(QApplication.translate('ComboBox','fetch full blocks'))
         self.s7_full_block.setChecked(self.aw.s7.fetch_max_blocks)
         self.s7_full_block.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.s7_full_block.setEnabled(bool(self.aw.s7.optimizer))
+        self.s7_full_block.setEnabled(self.aw.s7.optimizer)
 
         s7_areaLabel = QLabel(QApplication.translate('Label', 'Area'))
         s7_dbLabel = QLabel(QApplication.translate('Label', 'DB#'))
@@ -1306,7 +1306,7 @@ class comportDlg(ArtisanResizeablDialog):
         #
         # host (IP or hostname)
         ws_hostlabel = QLabel(QApplication.translate('Label', 'Host'))
-        self.ws_hostEdit = QLineEdit(str(self.aw.ws.host))
+        self.ws_hostEdit = QLineEdit(self.aw.ws.host)
         self.ws_hostEdit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.ws_hostEdit.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_hostEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -1319,7 +1319,7 @@ class comportDlg(ArtisanResizeablDialog):
         self.ws_portEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         # rack (default 0)
         ws_pathlabel = QLabel(QApplication.translate('Label', 'Path'))
-        self.ws_pathEdit = QLineEdit(str(self.aw.ws.path))
+        self.ws_pathEdit = QLineEdit(self.aw.ws.path)
         self.ws_pathEdit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.ws_pathEdit.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_pathEdit.setAlignment(Qt.AlignmentFlag.AlignLeft)
@@ -1396,24 +1396,24 @@ class comportDlg(ArtisanResizeablDialog):
         ws_line1.addWidget(ws_setup_box)
         ws_line1.addWidget(ws_timeouts_box)
 
-        self.ws_messageID = QLineEdit(str(self.aw.ws.id_node))
+        self.ws_messageID = QLineEdit(self.aw.ws.id_node)
         self.ws_messageID.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.ws_messageID.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_messageID.setCursorPosition(0)
-        self.ws_machineID = QLineEdit(str(self.aw.ws.machine_node))
+        self.ws_machineID = QLineEdit(self.aw.ws.machine_node)
         self.ws_machineID.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.ws_machineID.setMinimumWidth(70)
         self.ws_messageID.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_machineID.setCursorPosition(0)
-        self.ws_message = QLineEdit(str(self.aw.ws.pushMessage_node))
+        self.ws_message = QLineEdit(self.aw.ws.pushMessage_node)
         self.ws_message.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.ws_message.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_message.setCursorPosition(0)
-        self.ws_command = QLineEdit(str(self.aw.ws.command_node))
+        self.ws_command = QLineEdit(self.aw.ws.command_node)
         self.ws_command.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.ws_command.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_command.setCursorPosition(0)
-        self.ws_data = QLineEdit(str(self.aw.ws.data_node))
+        self.ws_data = QLineEdit(self.aw.ws.data_node)
         self.ws_data.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.ws_data.setCursorPosition(0)
 
@@ -1434,7 +1434,7 @@ class comportDlg(ArtisanResizeablDialog):
         ws_nodes_box = QGroupBox(QApplication.translate('GroupBox','Nodes'))
         ws_nodes_box.setLayout(ws_nodes)
 
-        self.ws_data_request = QLineEdit(str(self.aw.ws.request_data_command))
+        self.ws_data_request = QLineEdit(self.aw.ws.request_data_command)
         self.ws_data_request.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.ws_data_request.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_data_request.setCursorPosition(0)
@@ -1448,11 +1448,11 @@ class comportDlg(ArtisanResizeablDialog):
         ws_commands_box.setLayout(ws_commands)
 
 
-        self.ws_charge = QLineEdit(str(self.aw.ws.charge_message))
+        self.ws_charge = QLineEdit(self.aw.ws.charge_message)
         self.ws_charge.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.ws_charge.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_charge.setCursorPosition(0)
-        self.ws_drop = QLineEdit(str(self.aw.ws.drop_message))
+        self.ws_drop = QLineEdit(self.aw.ws.drop_message)
         self.ws_drop.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.ws_drop.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_drop.setCursorPosition(0)
@@ -1488,37 +1488,37 @@ class comportDlg(ArtisanResizeablDialog):
 
         #
 
-        self.ws_event_message = QLineEdit(str(self.aw.ws.addEvent_message))
+        self.ws_event_message = QLineEdit(self.aw.ws.addEvent_message)
         self.ws_event_message.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.ws_event_message.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_event_message.setCursorPosition(0)
 
-        self.ws_event = QLineEdit(str(self.aw.ws.event_node))
+        self.ws_event = QLineEdit(self.aw.ws.event_node)
         self.ws_event.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.ws_event.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_event.setCursorPosition(0)
 
-        self.ws_DRY = QLineEdit(str(self.aw.ws.DRY_node))
+        self.ws_DRY = QLineEdit(self.aw.ws.DRY_node)
         self.ws_DRY.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.ws_DRY.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_DRY.setCursorPosition(0)
 
-        self.ws_FCs = QLineEdit(str(self.aw.ws.FCs_node))
+        self.ws_FCs = QLineEdit(self.aw.ws.FCs_node)
         self.ws_FCs.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.ws_FCs.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_FCs.setCursorPosition(0)
 
-        self.ws_FCe = QLineEdit(str(self.aw.ws.FCe_node))
+        self.ws_FCe = QLineEdit(self.aw.ws.FCe_node)
         self.ws_FCe.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.ws_FCe.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_FCe.setCursorPosition(0)
 
-        self.ws_SCs = QLineEdit(str(self.aw.ws.SCs_node))
+        self.ws_SCs = QLineEdit(self.aw.ws.SCs_node)
         self.ws_SCs.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.ws_SCs.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_SCs.setCursorPosition(0)
 
-        self.ws_SCe = QLineEdit(str(self.aw.ws.SCe_node))
+        self.ws_SCe = QLineEdit(self.aw.ws.SCe_node)
         self.ws_SCe.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.ws_SCe.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
         self.ws_SCe.setCursorPosition(0)
@@ -1571,7 +1571,7 @@ class comportDlg(ArtisanResizeablDialog):
             ws_grid.addWidget(label,0,i+1,Qt.AlignmentFlag.AlignRight)
 
             # request edit
-            request_edit = QLineEdit(str(self.aw.ws.channel_requests[i]))
+            request_edit = QLineEdit(self.aw.ws.channel_requests[i])
             request_edit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
             request_edit.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
             request_edit.setCursorPosition(0)
@@ -1579,7 +1579,7 @@ class comportDlg(ArtisanResizeablDialog):
             ws_grid.addWidget(request_edit,1,i+1,Qt.AlignmentFlag.AlignRight)
 
             # node edit
-            node_edit = QLineEdit(str(self.aw.ws.channel_nodes[i]))
+            node_edit = QLineEdit(self.aw.ws.channel_nodes[i])
             node_edit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
             node_edit.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
             node_edit.setCursorPosition(0)
@@ -1623,7 +1623,7 @@ class comportDlg(ArtisanResizeablDialog):
 
         # host (IP or hostname)
         mqtt_host_label = QLabel(QApplication.translate('Label', 'Host'))
-        self.mqtt_hostEdit = QLineEdit(str(self.aw.mqtt.host))
+        self.mqtt_hostEdit = QLineEdit(self.aw.mqtt.host)
         self.mqtt_hostEdit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.mqtt_hostEdit.setMinimumWidth(200)
         self.mqtt_hostEdit.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
@@ -1710,12 +1710,12 @@ class comportDlg(ArtisanResizeablDialog):
         self.mqtt_inputModes:list[QComboBox|None] = [None] * self.aw.mqtt.CHANNELS
 
         for i in range(self.aw.mqtt.CHANNELS):
-            mqtt_input_topic:QLineEdit = QLineEdit(str(self.aw.mqtt.channel_topics[i]))
+            mqtt_input_topic:QLineEdit = QLineEdit(self.aw.mqtt.channel_topics[i])
             mqtt_input_topic.setStyleSheet(line_edit_style(self.aw.app.darkmode))
             mqtt_input_topic.setFixedWidth(80)
             self.mqtt_inputTopics[i] = mqtt_input_topic
             #
-            mqtt_input_node:QLineEdit = QLineEdit(str(self.aw.mqtt.channel_nodes[i]))
+            mqtt_input_node:QLineEdit = QLineEdit(self.aw.mqtt.channel_nodes[i])
             mqtt_input_node.setStyleSheet(line_edit_style(self.aw.app.darkmode))
             mqtt_input_node.setFixedWidth(80)
             self.mqtt_inputNodes[i] = mqtt_input_node
@@ -1723,7 +1723,7 @@ class comportDlg(ArtisanResizeablDialog):
             mqtt_input_mode:QComboBox = QComboBox()
             mqtt_input_mode.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             mqtt_input_mode.addItems(modbus_modes)
-            mqtt_input_mode.setCurrentIndex(modbus_modes.index(str(self.aw.mqtt.channel_modes[i])))
+            mqtt_input_mode.setCurrentIndex(modbus_modes.index(self.aw.mqtt.channel_modes[i]))
             mqtt_input_mode.setFixedWidth(80)
             self.mqtt_inputModes[i] = mqtt_input_mode
 
@@ -1903,24 +1903,24 @@ class comportDlg(ArtisanResizeablDialog):
     @pyqtSlot(bool)
     def scanS7(self, _:bool = False) -> None:
         scan_S7_dlg = scanS7Dlg(self,self.aw)
-        scan_S7_dlg.shost = str(self.s7_hostEdit.text())
-        scan_S7_dlg.sport = toInt(str(self.s7_portEdit.text()))
-        scan_S7_dlg.srack = toInt(str(self.s7_rackEdit.text()))
-        scan_S7_dlg.sslot = toInt(str(self.s7_slotEdit.text()))
+        scan_S7_dlg.shost = self.s7_hostEdit.text()
+        scan_S7_dlg.sport = toInt(self.s7_portEdit.text())
+        scan_S7_dlg.srack = toInt(self.s7_rackEdit.text())
+        scan_S7_dlg.sslot = toInt(self.s7_slotEdit.text())
         scan_S7_dlg.show()
 
     @pyqtSlot(bool)
     def scanModbus(self, _:bool = False) -> None:
         scan_modbuds_dlg = scanModbusDlg(self,self.aw)
         scan_modbuds_dlg.port = str(self.modbus_comportEdit.getSelection())
-        scan_modbuds_dlg.baudrate = toInt(str(self.modbus_baudrateComboBox.currentText()))
-        scan_modbuds_dlg.bytesize = toInt(str(self.modbus_bytesizeComboBox.currentText()))
-        scan_modbuds_dlg.stopbits = toInt(str(self.modbus_stopbitsComboBox.currentText()))
-        scan_modbuds_dlg.parity = str(self.modbus_parityComboBox.currentText())
-        scan_modbuds_dlg.timeout = float2float(toFloat(comma2dot(str(self.modbus_timeoutEdit.text()))))
-        scan_modbuds_dlg.mtype = int(self.modbus_type.currentIndex())
-        scan_modbuds_dlg.mhost = str(self.modbus_hostEdit.text())
-        scan_modbuds_dlg.mport = toInt(str(self.modbus_portEdit.text()))
+        scan_modbuds_dlg.baudrate = toInt(self.modbus_baudrateComboBox.currentText())
+        scan_modbuds_dlg.bytesize = toInt(self.modbus_bytesizeComboBox.currentText())
+        scan_modbuds_dlg.stopbits = toInt(self.modbus_stopbitsComboBox.currentText())
+        scan_modbuds_dlg.parity = self.modbus_parityComboBox.currentText()
+        scan_modbuds_dlg.timeout = float2float(toFloat(comma2dot(self.modbus_timeoutEdit.text())))
+        scan_modbuds_dlg.mtype = self.modbus_type.currentIndex()
+        scan_modbuds_dlg.mhost = self.modbus_hostEdit.text()
+        scan_modbuds_dlg.mport = toInt(self.modbus_portEdit.text())
         scan_modbuds_dlg.show()
 
     @pyqtSlot(int)
@@ -2019,28 +2019,28 @@ class comportDlg(ArtisanResizeablDialog):
                             comportComboBox = cast(PortComboBox, self.serialtable.cellWidget(i,1))
                             self.aw.extracomport[i] = str(comportComboBox.getSelection())
                             baudComboBox = cast(QComboBox, self.serialtable.cellWidget(i,2))
-                            self.aw.extrabaudrate[i] = toInt(str(baudComboBox.currentText()))
+                            self.aw.extrabaudrate[i] = toInt(baudComboBox.currentText())
                             byteComboBox = cast(QComboBox, self.serialtable.cellWidget(i,3))
-                            self.aw.extrabytesize[i] = toInt(str(byteComboBox.currentText()))
+                            self.aw.extrabytesize[i] = toInt(byteComboBox.currentText())
                             parityComboBox = cast(QComboBox, self.serialtable.cellWidget(i,4))
-                            self.aw.extraparity[i] = str(parityComboBox.currentText())
+                            self.aw.extraparity[i] = parityComboBox.currentText()
                             stopbitsComboBox = cast(QComboBox, self.serialtable.cellWidget(i,5))
-                            self.aw.extrastopbits[i] = toInt(str(stopbitsComboBox.currentText()))
+                            self.aw.extrastopbits[i] = toInt(stopbitsComboBox.currentText())
                             timeoutEdit = cast(QLineEdit, self.serialtable.cellWidget(i,6))
-                            self.aw.extratimeout[i] = float(str(timeoutEdit.text()))
+                            self.aw.extratimeout[i] = float(timeoutEdit.text())
             #create serial ports for each extra device
             self.aw.extraser = []
             #load the settings for the extra serial ports found
             for i in range(ser_ports):
                 xser = serialport(self.aw)
                 if len(self.aw.extracomport)>i:
-                    xser.comport = str(self.aw.extracomport[i])
+                    xser.comport = self.aw.extracomport[i]
                 if len(self.aw.extrabaudrate)>i:
                     xser.baudrate = self.aw.extrabaudrate[i]
                 if len(self.aw.extrabytesize)>i:
                     xser.bytesize = self.aw.extrabytesize[i]
                 if len(self.aw.extraparity)>i:
-                    xser.parity = str(self.aw.extraparity[i])
+                    xser.parity = self.aw.extraparity[i]
                 if len(self.aw.extrastopbits)>i:
                     xser.stopbits = self.aw.extrastopbits[i]
                 if len(self.aw.extratimeout)>i:
@@ -2098,12 +2098,12 @@ class comportDlg(ArtisanResizeablDialog):
             pass
         class timeoutError(Exception):
             pass
-        comport = str(self.comportEdit.getSelection())
-        baudrate = str(self.baudrateComboBox.currentText())
-        bytesize = str(self.bytesizeComboBox.currentText())
-        parity = str(self.parityComboBox.currentText())
-        stopbits = str(self.stopbitsComboBox.currentText())
-        timeout = comma2dot(str(self.timeoutEdit.text()))
+        comport = self.comportEdit.getSelection()
+        baudrate = self.baudrateComboBox.currentText()
+        bytesize = self.bytesizeComboBox.currentText()
+        parity = self.parityComboBox.currentText()
+        stopbits = self.stopbitsComboBox.currentText()
+        timeout = comma2dot(self.timeoutEdit.text())
         #save extra serial ports by reading the serial extra table
         self.saveserialtable()
         if not is_non_serial_device(self.aw.qmc.device) and not(self.aw.qmc.device == 0 and self.aw.ser.useModbusPort): # only if serial conf is not hidden

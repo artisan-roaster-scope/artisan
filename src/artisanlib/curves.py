@@ -127,7 +127,7 @@ class equDataDlg(ArtisanDialog):
         self.setLayout(dataplotterLayout)
 
     def changeprecision(self) -> None:
-        self.dataprecisionval = int(self.precisionSpinBox.value())-1
+        self.dataprecisionval = self.precisionSpinBox.value()-1
         self.createDataTable()
 
     def createDataTable(self) -> None:
@@ -371,7 +371,7 @@ class CurvesDlg(ArtisanDialog):
         self.DeltaETfilter.setSingleStep(1)
         self.DeltaETfilter.setRange(0,40)
         self.DeltaETfilter.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.DeltaETfilter.setValue(int(round((self.aw.qmc.deltaETfilter - 1)/2)))
+        self.DeltaETfilter.setValue(round((self.aw.qmc.deltaETfilter - 1)/2))
         self.DeltaETfilter.valueChanged.connect(self.changeDeltaETfilter)
         self.DeltaBTfilter = QSpinBox()
         self.DeltaBTfilter.setStyleSheet(spin_box_style(self.aw.app.darkmode))
@@ -400,7 +400,7 @@ class CurvesDlg(ArtisanDialog):
         self.Filter.setSingleStep(1)
         self.Filter.setRange(0,5)
         self.Filter.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.Filter.setValue(int(round((self.aw.qmc.curvefilter - 1)/2)))
+        self.Filter.setValue(round((self.aw.qmc.curvefilter - 1)/2))
         self.Filter.valueChanged.connect(self.changeFilter)
         #filterspikes
         self.FilterSpikes = QCheckBox(QApplication.translate('CheckBox', 'Smooth Spikes'))
@@ -606,9 +606,9 @@ class CurvesDlg(ArtisanDialog):
 
         labelETDeltaFormula = QLabel(deltaLabelUTF8 + QApplication.translate('Label', 'ET Y(x)'))
         labelBTDeltaFormula = QLabel(deltaLabelUTF8 + QApplication.translate('Label', 'BT Y(x)'))
-        self.DeltaETfunctionedit = QLineEdit(str(self.aw.qmc.DeltaETfunction))
+        self.DeltaETfunctionedit = QLineEdit(self.aw.qmc.DeltaETfunction)
         self.DeltaETfunctionedit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
-        self.DeltaBTfunctionedit = QLineEdit(str(self.aw.qmc.DeltaBTfunction))
+        self.DeltaBTfunctionedit = QLineEdit(self.aw.qmc.DeltaBTfunction)
         self.DeltaBTfunctionedit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
 
         rorSymbolicFormulaLabelsLayout = QHBoxLayout()
@@ -686,13 +686,13 @@ class CurvesDlg(ArtisanDialog):
         self.rorminLimit.setRange(-999,999)    #(min,max)
         self.rorminLimit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.rorminLimit.setMinimumWidth(80)
-        self.rorminLimit.setValue(int(self.aw.qmc.RoRlimitm))
+        self.rorminLimit.setValue(self.aw.qmc.RoRlimitm)
         self.rormaxLimit = QSpinBox()
         self.rormaxLimit.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.rormaxLimit.setRange(-999,999)
         self.rormaxLimit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.rormaxLimit.setMinimumWidth(80)
-        self.rormaxLimit.setValue(int(self.aw.qmc.RoRlimit))
+        self.rormaxLimit.setValue(self.aw.qmc.RoRlimit)
         if self.aw.qmc.mode == 'F':
             self.rorminLimit.setSuffix(' F/min')
             self.rormaxLimit.setSuffix(' F/min')
@@ -735,7 +735,7 @@ class CurvesDlg(ArtisanDialog):
         self.PathEffects.setSingleStep(1)
         self.PathEffects.setRange(0,5)
         self.PathEffects.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.PathEffects.setValue(int(self.aw.qmc.patheffects))
+        self.PathEffects.setValue(self.aw.qmc.patheffects)
         self.PathEffects.editingFinished.connect(self.changePathEffects)
         pathEffectsLayout = QHBoxLayout()
         pathEffectsLayout.addWidget(effectslabel)
@@ -1069,7 +1069,7 @@ class CurvesDlg(ArtisanDialog):
         else:
             self.analyzetimeoffset.setEnabled(True)
         self.segmentsamplesthresholdLabel = QLabel(QApplication.translate('Label', 'Number of samples considered significant'))
-        self.segmentsamplesthreshold = QLineEdit(str(int(round(self.aw.qmc.segmentsamplesthreshold))))   #default
+        self.segmentsamplesthreshold = QLineEdit(str(round(self.aw.qmc.segmentsamplesthreshold)))   #default
         self.segmentsamplesthreshold.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.segmentsamplesthreshold.setMaximumWidth(100)
         self.segmentsamplesthreshold.setMinimumWidth(55)
@@ -1303,7 +1303,7 @@ class CurvesDlg(ArtisanDialog):
         self.resolutionSpinBox.setSuffix('%')
         self.resolutionSpinBox.setRange(40,300)
         self.resolutionSpinBox.setSingleStep(5)
-        self.resolutionSpinBox.setValue(int(round(self.aw.dpi)))
+        self.resolutionSpinBox.setValue(round(self.aw.dpi))
         self.resolutionSpinBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.resolutionSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         resButton = ArtisanMinorPushButton(QApplication.translate('Button','Set'),
@@ -1675,7 +1675,7 @@ class CurvesDlg(ArtisanDialog):
     @pyqtSlot(bool)
     def logofileload(self, _:bool = False) -> None:
         self.aw.qmc.logoloadfile()
-        self.logopathedit.setText(str(self.aw.logofilename))
+        self.logopathedit.setText(self.aw.logofilename)
         # note the logo is only visible after a full redraw
 
     @pyqtSlot(bool)
@@ -1695,7 +1695,7 @@ class CurvesDlg(ArtisanDialog):
 
     @pyqtSlot()
     def renameBT(self) -> None:
-        self.aw.BTname = str(self.renameBTLine.text()).strip()
+        self.aw.BTname = self.renameBTLine.text().strip()
         if self.aw.BTname == '':
             self.aw.BTname = QApplication.translate('Label', 'BT')
         BTname_subst = self.aw.qmc.device_name_subst(self.aw.BTname)
@@ -1704,7 +1704,7 @@ class CurvesDlg(ArtisanDialog):
 
     @pyqtSlot()
     def renameET(self) -> None:
-        self.aw.ETname = str(self.renameETLine.text()).strip()
+        self.aw.ETname = self.renameETLine.text().strip()
         if self.aw.ETname == '':
             self.aw.ETname = QApplication.translate('Label', 'ET')
         ETname_subst = self.aw.qmc.device_name_subst(self.aw.ETname)
@@ -1821,7 +1821,7 @@ class CurvesDlg(ArtisanDialog):
         try:
             colorf = self.aw.colordialog(QColor(self.aw.qmc.plotcurvecolor[x]))
             if colorf.isValid():
-                colorname = str(colorf.name())
+                colorname = colorf.name()
                 self.aw.qmc.plotcurvecolor[x] = colorname
                 #refresh right color labels
                 self.equc1colorlabel.setStyleSheet(f"background-color:'{self.aw.qmc.plotcurvecolor[0]}';")
@@ -1871,7 +1871,7 @@ class CurvesDlg(ArtisanDialog):
             self.setbackgroundequ1(foreground=True)
         else:
             # Check for incompatible vars from in the equations
-            EQU = [str(self.equedit1.text()),str(self.equedit2.text())]
+            EQU = [self.equedit1.text(),self.equedit2.text()]
             incompatiblevars:list[str] = ['P','F','$','#']
             error = ''
             for iv in incompatiblevars:
@@ -1912,8 +1912,8 @@ class CurvesDlg(ArtisanDialog):
                 self.aw.qmc.extradevicecolor1[-1] = self.aw.qmc.plotcurvecolor[0]
                 self.aw.qmc.extradevicecolor2[-1] = self.aw.qmc.plotcurvecolor[1]
                 # set expressions
-                self.aw.qmc.extramathexpression1[-1] = str(self.equedit1.text())
-                self.aw.qmc.extramathexpression2[-1] = str(self.equedit2.text())
+                self.aw.qmc.extramathexpression1[-1] = self.equedit1.text()
+                self.aw.qmc.extramathexpression2[-1] = self.equedit2.text()
                 # set values
                 self.aw.qmc.extratemp1[-1] = extratemp1
                 self.aw.qmc.extratemp2[-1] = extratemp2
@@ -1938,9 +1938,9 @@ class CurvesDlg(ArtisanDialog):
         self.setbackgroundequ1()
 
     def setbackgroundequ1(self,foreground:bool = False, mathequ:bool = False) -> None:
-        EQU = [str(self.equedit1.text()),str(self.equedit2.text())]
+        EQU = [self.equedit1.text(),self.equedit2.text()]
         if mathequ:
-            EQU = ['',str(self.expresult.text())]
+            EQU = ['',self.expresult.text()]
         self.aw.qmc.analysisresultsstr = ''
         self.aw.setbackgroundequ(foreground=foreground, EQU=EQU)
 
@@ -2017,8 +2017,8 @@ class CurvesDlg(ArtisanDialog):
                 self.aw.sendmessage('Dropping beans...')
                 colorb = ['#996633','#4d2600','#4b4219','#000000','#4b3219','#996633','#281a0d']
                 for _ in range(3): # number of bean layers (each a randomly different color)
-                    x = self.aw.qmc.endofx*numpy.random.rand(int(round(self.aw.qmc.endofx/6)))
-                    y = self.aw.qmc.ylimit*numpy.random.rand(int(round(self.aw.qmc.endofx/6)))
+                    x = self.aw.qmc.endofx*numpy.random.rand(round(self.aw.qmc.endofx/6))
+                    y = self.aw.qmc.ylimit*numpy.random.rand(round(self.aw.qmc.endofx/6))
                     self.aw.qmc.ax.plot(x,y,'o',color=colorb[int(round(6*numpy.random.rand(1)[0]))])
         except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
@@ -2045,11 +2045,11 @@ class CurvesDlg(ArtisanDialog):
             self.aw.clearMessageLine()
 
             self.aw.qmc.plotterequationresults = [[],[],[],[],[],[],[],[],[]]
-            EQU = [str(self.equedit1.text()),str(self.equedit2.text()),
-                   str(self.equedit3.text()),str(self.equedit4.text()),
-                   str(self.equedit5.text()),str(self.equedit6.text()),
-                   str(self.equedit7.text()),str(self.equedit8.text()),
-                   str(self.equedit9.text())]
+            EQU = [self.equedit1.text(),self.equedit2.text(),
+                   self.equedit3.text(),self.equedit4.text(),
+                   self.equedit5.text(),self.equedit6.text(),
+                   self.equedit7.text(),self.equedit8.text(),
+                   self.equedit9.text()]
             self.aw.qmc.resetlines()
 
             commentoutplot = [0]*9      # "#" as first char does not evaluate plot nor show it. Allows to keep formula on window without eval (ie. long filters)
@@ -2086,7 +2086,7 @@ class CurvesDlg(ArtisanDialog):
                         if self.aw.qmc.timeindexB[0] > -1:
                             toff = self.aw.qmc.timeB[self.aw.qmc.timeindexB[0]]
                     else:
-                        x_range = [float(x) for x in range(int(round(self.aw.qmc.startofx)),int(round(self.aw.qmc.endofx)))]
+                        x_range = [float(x) for x in range(round(self.aw.qmc.startofx),round(self.aw.qmc.endofx))]
                     #create y range
                     y_range:list[float] = []
 
@@ -2107,8 +2107,8 @@ class CurvesDlg(ArtisanDialog):
     @pyqtSlot(int)
     def setappearance(self, _i:int) -> None:
         try:
-            self.app.setStyle(str(self.styleComboBox.currentText()))
-            self.aw.appearance = str(self.styleComboBox.currentText()).lower()
+            self.app.setStyle(self.styleComboBox.currentText())
+            self.aw.appearance = self.styleComboBox.currentText().lower()
             if not sys.platform.startswith('darwin'):
                 # set artisan accent color (but on macOS where it does not has any effect)
                 palette = self.app.palette()
@@ -2229,7 +2229,7 @@ class CurvesDlg(ArtisanDialog):
         else:
             start = 0
 
-        Aevent = int(self.eventAComboBox.currentIndex())
+        Aevent = self.eventAComboBox.currentIndex()
         if Aevent != 0:
             a = self.events[Aevent-1][1]
             self.startEdit.blockSignals(True)
@@ -2238,7 +2238,7 @@ class CurvesDlg(ArtisanDialog):
             self.startEdit.setDisabled(False)
             self.startEdit.blockSignals(False)
 
-        Bevent = int(self.eventBComboBox.currentIndex())
+        Bevent = self.eventBComboBox.currentIndex()
         if Bevent != 0:
             b = self.events[Bevent-1][1]
             self.endEdit.blockSignals(True)
@@ -2270,8 +2270,8 @@ class CurvesDlg(ArtisanDialog):
     def doPolyfit(self) -> bool:
         try:
             ll = min(len(self.aw.qmc.timex),len(self.curves[self.c1ComboBox.currentIndex()]),len(self.curves[self.c2ComboBox.currentIndex()]))
-            starttime = stringtoseconds(str(self.startEdit.text()))
-            endtime = stringtoseconds(str(self.endEdit.text()))
+            starttime = stringtoseconds(self.startEdit.text())
+            endtime = stringtoseconds(self.endEdit.text())
             if starttime == -1 or endtime == -1:
                 self.resultWidget.setText('')
                 self.resultWidget.repaint()
@@ -2753,8 +2753,8 @@ class CurvesDlg(ArtisanDialog):
         settings.setValue('CurvesPosition',self.frameGeometry().topLeft())
         self.aw.CurveDlg_activeTab = self.TabWidget.currentIndex()
 
-        self.aw.qmc.DeltaETfunction = str(self.DeltaETfunctionedit.text())
-        self.aw.qmc.DeltaBTfunction = str(self.DeltaBTfunctionedit.text())
+        self.aw.qmc.DeltaETfunction = self.DeltaETfunctionedit.text()
+        self.aw.qmc.DeltaBTfunction = self.DeltaBTfunctionedit.text()
         if self.aw.largeDeltaLCDs_dialog is not None:
             self.aw.largeDeltaLCDs_dialog.updateVisiblitiesDeltaETBT()
         self.changeDecimalPlaces()
@@ -2778,26 +2778,26 @@ class CurvesDlg(ArtisanDialog):
         self.aw.notificationsSetEnabledSignal.emit(notifications_enabled)
 
         self.aw.qmc.RoRlimitFlag = self.rorFilter.isChecked()
-        self.aw.qmc.RoRlimitm = int(self.rorminLimit.value())
-        self.aw.qmc.RoRlimit = int(self.rormaxLimit.value())
+        self.aw.qmc.RoRlimitm = self.rorminLimit.value()
+        self.aw.qmc.RoRlimit = self.rormaxLimit.value()
         self.aw.qmc.filterDropOuts = self.FilterSpikes.isChecked()
         self.aw.qmc.dropSpikes = self.DropSpikes.isChecked()
         self.aw.qmc.dropDuplicates = self.DropDuplicates.isChecked()
         self.aw.qmc.dropDuplicatesLimit = float2float(self.DropDuplicatesLimit.value(),2)
         self.aw.qmc.minmaxLimits = self.MinMaxLimits.isChecked()
-        self.aw.qmc.filterDropOut_tmin = int(self.minLimit.value())
-        self.aw.qmc.filterDropOut_tmax = int(self.maxLimit.value())
+        self.aw.qmc.filterDropOut_tmin = self.minLimit.value()
+        self.aw.qmc.filterDropOut_tmax = self.maxLimit.value()
         self.aw.qmc.foregroundShowFullflag = self.ShowFull.isChecked()
         self.aw.qmc.interpolateDropsflag = self.InterpolateDrops.isChecked()
-        self.aw.qmc.plotcurves[0] = str(self.equedit1.text())
-        self.aw.qmc.plotcurves[1] = str(self.equedit2.text())
-        self.aw.qmc.plotcurves[2] = str(self.equedit3.text())
-        self.aw.qmc.plotcurves[3] = str(self.equedit4.text())
-        self.aw.qmc.plotcurves[4] = str(self.equedit5.text())
-        self.aw.qmc.plotcurves[5] = str(self.equedit6.text())
-        self.aw.qmc.plotcurves[6] = str(self.equedit7.text())
-        self.aw.qmc.plotcurves[7] = str(self.equedit8.text())
-        self.aw.qmc.plotcurves[8] = str(self.equedit9.text())
+        self.aw.qmc.plotcurves[0] = self.equedit1.text()
+        self.aw.qmc.plotcurves[1] = self.equedit2.text()
+        self.aw.qmc.plotcurves[2] = self.equedit3.text()
+        self.aw.qmc.plotcurves[3] = self.equedit4.text()
+        self.aw.qmc.plotcurves[4] = self.equedit5.text()
+        self.aw.qmc.plotcurves[5] = self.equedit6.text()
+        self.aw.qmc.plotcurves[6] = self.equedit7.text()
+        self.aw.qmc.plotcurves[7] = self.equedit8.text()
+        self.aw.qmc.plotcurves[8] = self.equedit9.text()
         self.aw.cacheCurveVisibilities()
         self.aw.qmc.resetlinecountcaches()
         self.aw.qmc.resetlines()

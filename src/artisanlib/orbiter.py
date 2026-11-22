@@ -430,7 +430,7 @@ def extractProfileOrbiter(f:IO[bytes],
             data = packet[2:25]
             data_crc = packet[25]
             computed_crc = compute_crc(data)
-            if header == b'\xff\xff' and int(data_crc) == computed_crc:
+            if header == b'\xff\xff' and data_crc == computed_crc:
                 count = packet[2:4]
                 time = packet[4:6]
                 if total_packets == 0 and count == b'\x00\x00':
@@ -459,7 +459,7 @@ def extractProfileOrbiter(f:IO[bytes],
                     roasttime:str|None = encodeLocal(date.time().toString())
                     if roasttime is not None:
                         res['roasttime'] = roasttime
-                    res['roastepoch'] = int(date.toSecsSinceEpoch())
+                    res['roastepoch'] = date.toSecsSinceEpoch()
                     res['roasttzoffset'] = libtime.timezone
                     title = (title_raw + data[10:-1]).rstrip(b'\x00').decode('utf-8')
                     res['title'] = encodeLocalStrict(title)
@@ -589,7 +589,7 @@ def saveOrbiter(filename:str, outfile:IO[bytes], profile:ProfileData) -> bool:
 
     def reading2bytes(v:float) -> bytes:
         try:
-            return int(round(v)).to_bytes(2, 'little', signed = True)
+            return round(v).to_bytes(2, 'little', signed = True)
         except Exception: # pylint: disable=broad-except
             pass
         return b'\xff\xff' # corresponds to -1
@@ -610,8 +610,8 @@ def saveOrbiter(filename:str, outfile:IO[bytes], profile:ProfileData) -> bool:
             weight_unit_idx = weight_units.index(unit)
         except ValueError:
             weight_unit_idx = 0
-        batchsize:int = int(round(convertWeight(float(weight[0]), weight_unit_idx, 0))) # in g
-        roasted_weight = int(round(convertWeight(float(weight[1]), weight_unit_idx, 0))) # in g
+        batchsize:int = round(convertWeight(float(weight[0]), weight_unit_idx, 0)) # in g
+        roasted_weight = round(convertWeight(float(weight[1]), weight_unit_idx, 0)) # in g
         #
         timeindex:list[int] = profile.get('timeindex', [-1,0,0,0,0,0,0,0])
         timex:list[float] = profile.get('timex', [])
@@ -658,11 +658,11 @@ def saveOrbiter(filename:str, outfile:IO[bytes], profile:ProfileData) -> bool:
                 if len(specialevents)>0 and idx >= specialevents[0]:
                     # we passed the next special event
                     if specialeventstype[0] == 0:
-                        damper = int(round(events_internal_to_external_value(specialeventsvalue[0])/10))
+                        damper = round(events_internal_to_external_value(specialeventsvalue[0])/10)
                     elif specialeventstype[0] == 1:
                         drum = events_internal_to_external_value(specialeventsvalue[0])
                     elif specialeventstype[0] == 3:
-                        heater = int(round(events_internal_to_external_value(specialeventsvalue[0])/10))
+                        heater = round(events_internal_to_external_value(specialeventsvalue[0])/10)
                     # we consume the event
                     specialevents = specialevents[1:]
                     specialeventstype = specialeventstype[1:]
@@ -688,7 +688,7 @@ def saveOrbiter(filename:str, outfile:IO[bytes], profile:ProfileData) -> bool:
                     event = 7
                     DROP = True
 
-                tx_new = int(round(tx - time_offset))
+                tx_new = round(tx - time_offset)
 
                 if tx_new != time:
                     # ignore readings with timestamps already used to prevent the introduction of duplicates
@@ -712,8 +712,8 @@ def saveOrbiter(filename:str, outfile:IO[bytes], profile:ProfileData) -> bool:
 
         title_length:int = 30
         title_bytes = to_ascii(title).encode('utf-8')[:title_length].ljust(title_length, b'\00')
-        preheat_temperature = int(round(temp2[CHARGE_idx] if len(temp2)>CHARGE_idx else 0))
-        total_time_seconds:int = (int(round(timex[DROP_idx] - timex[CHARGE_idx])) if len(timex) > DROP_idx > CHARGE_idx else 0)
+        preheat_temperature = round(temp2[CHARGE_idx] if len(temp2)>CHARGE_idx else 0)
+        total_time_seconds:int = (round(timex[DROP_idx] - timex[CHARGE_idx]) if len(timex) > DROP_idx > CHARGE_idx else 0)
         header = b'\xff\xff'
         # header
         header_data = b'\x00\x00' + \

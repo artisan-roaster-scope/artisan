@@ -178,7 +178,7 @@ with patch('PyQt6.QtCore.QSemaphore', MockQSemaphore), patch(
 
 
 @pytest.fixture(scope='session', autouse=True)
-def ensure_controller_isolation() -> Generator[None, None, None]:
+def ensure_controller_isolation() -> Generator[None]:
     """
     Ensure modules are properly isolated for controller tests at session level.
 
@@ -213,7 +213,7 @@ def ensure_controller_isolation() -> Generator[None, None, None]:
 
 
 @pytest.fixture(scope='module', autouse=True)
-def cleanup_controller_mocks() -> Generator[None, None, None]:
+def cleanup_controller_mocks() -> Generator[None]:
     """
     Clean up controller test mocks at module level to prevent cross-file contamination.
 
@@ -248,7 +248,7 @@ def cleanup_controller_mocks() -> Generator[None, None, None]:
 
 
 @pytest.fixture(autouse=True)
-def reset_controller_state() -> Generator[None, None, None]:
+def reset_controller_state() -> Generator[None]:
     """
     Reset controller module state before and after each test to ensure complete isolation.
 

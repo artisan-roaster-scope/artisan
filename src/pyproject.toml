@@ -14,7 +14,7 @@ maintainers = [
 ]
 license = 'AGPLv3+'
 license-files = ['LICENSE']
-requires-python = '>=3.12'
+requires-python = '>=3.13'
 keywords = ['roasting', 'roast logging', 'speciality coffee']
 classifiers = [
     'Development Status :: 5 - Production/Stable',
@@ -24,7 +24,6 @@ classifiers = [
     'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.12',
     'Programming Language :: Python :: 3.13',
     'Programming Language :: Python :: 3.14',
     'Programming Language :: Python :: 3.15',
@@ -86,7 +85,7 @@ ignore-paths = [ "^uic/.*$",
 jobs = "0"
 
 # Minimum supported python version
-py-version = "3.12"
+py-version = "3.13"
 
 # Pickle collected data for later comparisons.
 persistent = "yes"
@@ -244,7 +243,7 @@ enable='''c-extension-no-member,'''
 [tool.mypy]
 files = ["*.py", "artisanlib/*.py", "plus/*.py", "test/**/*.py"]
 exclude = ['build', 'dist', 'uic', 'misc']
-python_version = "3.12"
+python_version = "3.13"
 
 # Ensure full coverage
 check_untyped_defs = true
@@ -310,8 +309,8 @@ lint.ignore = ["E501", "E741", "E402", "PLR0912", "PLR0913", "PLR0915", "PLR0917
 # Exclude a variety of commonly ignored directories.
 exclude = ["dist", "build", "proto", ".pytype", ".mypy_cache", ".git", ".venv", ".venv_universal", ".venv_arm"]
 
-# Assume Python 3.12
-target-version = "py312"
+# Assume Python 3.13
+target-version = "py313"
 
 [tool.ruff.lint.per-file-ignores]
 "uic/*.py" = ["UP004", "F401", "ARG002"]
@@ -328,7 +327,7 @@ exclude = ["proto"]
 reportMissingImports = true
 reportMissingTypeStubs = false
 
-pythonVersion = "3.12"
+pythonVersion = "3.13"
 pythonPlatform = "All"
 
 #typeCheckingMode = "strict" # "off", "basic", "strict"
@@ -441,7 +440,7 @@ project_excludes = [
     "**/uic*",
     "**/misc*",
 ]
-python_version = "3.12.0"
+python_version = "3.13.0"
 replace_imports_with_any = [
     "libusb_package.*",
     "uic.*",

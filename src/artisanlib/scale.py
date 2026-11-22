@@ -429,7 +429,7 @@ class ScaleManager(QObject):
             _log.debug('scale1_weight_changed_slot(%s,%s)',weight,stable)
         toa:float = libtime.time()
         prev_last_weight_sent = self.scale1_last_weight_sent
-        self.scale1_last_weight_sent = int(round(weight))
+        self.scale1_last_weight_sent = round(weight)
         if (stable and
                 # stable weights received short after a previous one are sent as unstable first (later captchered by the timer)
                 (toa - self.scale1_last_stable_weight_received) > MIN_TIME_BETWEEN_STABLE_WEIGHTS and
@@ -605,7 +605,7 @@ class ScaleManager(QObject):
             _log.debug('scale2_weight_changed_slot(%s,%s)',weight,stable)
         toa:float = libtime.time()
         prev_last_weight_sent = self.scale2_last_weight_sent
-        self.scale2_last_weight_sent = int(round(weight))
+        self.scale2_last_weight_sent = round(weight)
         if (stable and
                 # stable weights received short after a previous one are sent as unstable first (later captchered by the timer)
                 (toa - self.scale2_last_stable_weight_received) > MIN_TIME_BETWEEN_STABLE_WEIGHTS and

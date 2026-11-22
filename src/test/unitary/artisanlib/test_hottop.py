@@ -36,7 +36,7 @@ import pytest
 
 
 @pytest.fixture(scope='session', autouse=True)
-def session_level_isolation() -> Generator[None, None, None]:
+def session_level_isolation() -> Generator[None]:
     """Session-level isolation fixture to prevent cross-file module contamination.
 
     This fixture ensures that all external dependencies are properly mocked
@@ -51,7 +51,7 @@ def session_level_isolation() -> Generator[None, None, None]:
 
 
 @pytest.fixture(autouse=True)
-def reset_test_state() -> Generator[None, None, None]:
+def reset_test_state() -> Generator[None]:
     """Reset test state before each test to ensure test independence."""
     yield
     # No specific state to reset

@@ -1,61 +1,53 @@
 [General]
-Delay=700
-roastertype_setup=Santoker Cube BT
+Delay=1000
+roastertype_setup=Santoker Q Series WiFi
 roasterheating_setup=3
-roastersize_setup=0.1
 
 [Device]
 id=134
 santokerHost=10.10.100.254
 santokerPort=20001
 santokerSerial=false
-santokerBLE=true
+santokerBLE=false
 Controlbuttonflag=true
-
-[Axis]
-resetmaxtime=360
 
 [events]
 markTP=false
-default_etypes_set=1, 0, 0, 1, 0
-
-[Units]
-weight=g
 
 [ExtraComm]
-extrabaudrate=19200, 19200, 19200, 19200
-extrabytesize=8, 8, 8, 8
-extracomport=COM1, COM1, COM1, COM1
-extraparity=E, E, E, E
-extrastopbits=1, 1, 1, 1
-extratimeout=0.5, 0.5, 0.5, 0.5
+extrabaudrate=19200, 19200
+extrabytesize=8, 8
+extracomport=COM1, COM1
+extraparity=E, E
+extrastopbits=1, 1
+extratimeout=0.5, 0.5
 
 [ExtraDev]
-extraCurveVisibility1=false, false, false, false, true, true, true, true, true, true
-extraCurveVisibility2=false, false, false, false, true, true, true, true, true, true
-extraDelta1=false, false, false, true, false, false, false, false, false, false
-extraDelta2=false, false, false, true, false, false, false, false, false, false
+extraCurveVisibility1=false, false, true, true, true, true, true, true, true, true
+extraCurveVisibility2=false, false, true, true, true, true, true, true, true, true
+extraDelta1=false, false, false, false, false, false, false, false, false, false
+extraDelta2=false, false, false, false, false, false, false, false, false, false
 extraFill1=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 extraFill2=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-extraLCDvisibility1=false, false, false, false, false, false, false, false, false, true
-extraLCDvisibility2=false, false, false, false, false, false, false, false, false, true
-extradevicecolor1=#910113, #49b160, #000000, #000000
-extradevicecolor2=#4895ce, #800080, #000000, #000000
-extradevices=135, 136, 172, 173
-extramathexpression1=, , , 
-extramathexpression2=, , , 
-extraname1=Power, Drum, IR, BT RoR
-extraname2=Fan, Extra 2, Board, ET RoR
+extraLCDvisibility1=false, false, false, false, false, false, false, false, false, false
+extraLCDvisibility2=false, false, false, false, false, false, false, false, false, false
+extradevicecolor1=#910113, #49b160
+extradevicecolor2=#4895ce, #800080
+extradevices=135, 136
+extramathexpression1=, 
+extramathexpression2=, 
+extraname1=Power, Drum
+extraname2=Fan, Extra 2
 
 
 [DefaultButtons]
 buttonactions=5, 5, 5, 0, 5, 0, 5, 0
 buttonactionstrings="santoker(80,1)", "santoker(81,1)", "santoker(82,1)", , "santoker(83,1)", , "santoker(84,1)", 
 buttonvisibility=true, true, true, true, true, false, true, false
-extrabuttonactions=5, 0, 0
-extrabuttonactionstrings="santoker(85,0);sleep(4);santoker(80,1)", , 
-xextrabuttonactions=0, 5
-xextrabuttonactionstrings=, "santoker(85,0);sleep(4);santoker(80,1)"
+extrabuttonactions=0, 0, 0
+extrabuttonactionstrings=, , 
+xextrabuttonactions=0, 0
+xextrabuttonactionstrings=, 
 
 [Quantifiers]
 clusterEventsFlag=false
@@ -110,9 +102,9 @@ dutyMin=-100
 dutySteps=1
 invertControl=false
 pOnE=true
-pidKp=1.0
-pidKi=0.06
-pidKd=5
+pidKd=40
+pidKi=0.01
+pidKp=2
 pidNegativeTarget=0
 pidPositiveTarget=4
 pidSource=1
@@ -123,6 +115,3 @@ svLookahead=5
 svSlider=false
 svSliderMax=230
 svSliderMin=0
-
-[EnergyDefaults]
-ratings=@Variant(\0\0\0\x7f\0\0\0\xePyQt_PyObject\0\0\0\x1\x10\x80\x4\x95\x5\x1\0\0\0\0\0\0}\x94K\x3}\x94G?\xb9\x99\x99\x99\x99\x99\x9a}\x94(\x8c\nloadlabels\x94]\x94(\x8c\x6Heater\x94\x8c\0\x94h\x6h\x6\x65\x8c\vloadratings\x94]\x94(G?\xf4\xcc\xcc\xcc\xcc\xcc\xcdK\0K\0K\0\x65\x8c\vratingunits\x94]\x94(K\x3K\0K\0K\0\x65\x8c\vsourcetypes\x94]\x94(K\x2K\0K\0K\0\x65\x8c\vload_etypes\x94]\x94(K\x4K\0K\0K\0\x65\x8c\x12presssure_percents\x94]\x94(\x89\x89\x89\x89\x65\x8c\x12loadevent_zeropcts\x94]\x94(K\0K\0K\0K\0\x65\x8c\x12loadevent_hundpcts\x94]\x94(KdKdKdKdeuss.)

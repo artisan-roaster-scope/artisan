@@ -36,7 +36,7 @@ import pytest
 
 
 @pytest.fixture(scope='session', autouse=True)
-def ensure_roastlog_isolation() -> Generator[None, None, None]:
+def ensure_roastlog_isolation() -> Generator[None]:
     """
     Ensure roastlog module is properly isolated for tests at session level.
 
@@ -74,7 +74,7 @@ def ensure_roastlog_isolation() -> Generator[None, None, None]:
 
 
 @pytest.fixture(autouse=True)
-def reset_roastlog_state() -> Generator[None, None, None]:
+def reset_roastlog_state() -> Generator[None]:
     """Reset roastlog test state before each test to ensure test independence."""
     # Before each test, ensure requests and lxml modules are available
     # This is critical when other tests have mocked these modules

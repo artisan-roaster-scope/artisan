@@ -199,10 +199,10 @@ class nonedevDlg(QDialog):
         self.setWindowTitle(QApplication.translate('Form Caption','Manual Temperature Logger'))
         if len(self.aw.qmc.timex):
             if self.aw.qmc.manuallogETflag:
-                etval = str(int(round(aw.qmc.temp1[-1])))
+                etval = str(round(aw.qmc.temp1[-1]))
             else:
                 etval = '0'
-            btval = str(int(round(aw.qmc.temp2[-1])))
+            btval = str(round(aw.qmc.temp2[-1]))
         else:
             etval = '0'
             btval = '0'
@@ -666,7 +666,7 @@ class serialport:
                 return b'0'
             return b'0'
         except Exception: # pylint: disable=broad-except
-            timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = milliseconds
+            timez = QDateTime.currentDateTime().toString('hh:mm:ss.zzz')    #zzz = milliseconds
             error = QApplication.translate('Error Message','Serial Exception:') + ' ser.sendFUJIcommand()'
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror(timez + ' ' + error,getattr(exc_tb, 'tb_lineno', '?'))
@@ -677,7 +677,7 @@ class serialport:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
                 import binascii
-                settings = self.comport + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
+                settings = self.comport + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + self.parity + ',' + str(self.stopbits) + ',' + str(self.timeout)
                 self.aw.addserial('Fuji: ' + settings + ' || Tx = ' + cmd2str(binascii.hexlify(binstring)) + ' || Rx = ' + cmd2str(binascii.hexlify(r)))
 
     #finds time, ET and BT when using Fuji PID. Updates sv (set value) LCD. Finds power duty cycle
@@ -968,7 +968,7 @@ class serialport:
             return -1
         except Exception: # pylint: disable=broad-except
             error = QApplication.translate('Error Message','Serial Exception:') + ' ser.sendDTAcommand()'
-            timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = milliseconds
+            timez = QDateTime.currentDateTime().toString('hh:mm:ss.zzz')    #zzz = milliseconds
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror(timez + ' ' + error,getattr(exc_tb, 'tb_lineno', '?'))
             return -1
@@ -976,7 +976,7 @@ class serialport:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
             if self.aw.seriallogflag:
-                settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
+                settings = self.comport + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + self.parity + ',' + str(self.stopbits) + ',' + str(self.timeout)
                 self.aw.addserial('Delta DTA: ' + settings + ' || Tx = ' + command + ' || Rx = ' + str(r))
 
 
@@ -1912,7 +1912,7 @@ class serialport:
             self.baudrate = self.SP.baudrate
             self.bytesize = self.SP.bytesize
             self.parity = self.SP.parity
-            self.stopbits = int(round(self.SP.stopbits))
+            self.stopbits = round(self.SP.stopbits)
             self.timeout = self.SP.timeout or self.timeout
         t1,t2 = self.ARDUINOTC4temperature('1200') # t1 = chan1 (MET/Exhaust); t2 = chan2 (IT)
 # if the machine would return 4 channel (see comment in ARC_BTET above, one could fetch data with two requests (still a CHAN is needed before every READ!)
@@ -1934,7 +1934,7 @@ class serialport:
             self.baudrate = self.SP.baudrate
             self.bytesize = self.SP.bytesize
             self.parity = self.SP.parity
-            self.stopbits = int(round(self.SP.stopbits))
+            self.stopbits = round(self.SP.stopbits)
             self.timeout = self.SP.timeout or self.timeout
         t2,t1 = self.ARDUINOTC4temperature('2400')  # t2 = Extra2 = chan2 (Exhaust/MET); t1 = Extra1 = chan4 (ET/Drum)
         return self.aw.qmc.extraArduinoTX,t2,t1 # tx, Extra2, Extra1
@@ -2279,7 +2279,7 @@ class serialport:
             # if in Kaleido PID mode, we turn adjust the SV if TS data changes to sync with the machine state
             if self.aw.kaleidoPID:
                 try:
-                    ts = int(round(t1))
+                    ts = round(t1)
                     self.aw.setSVSignal.emit(ts)
                 except Exception as e: # pylint: disable=broad-except
                     _log.error(e)
@@ -2549,8 +2549,7 @@ class serialport:
             # note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
                 import binascii
-                settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize) + ',' + str(
-                    self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
+                settings = self.comport + ',' + str(self.baudrate) + ',' + str(self.bytesize) + ',' + self.parity + ',' + str(self.stopbits) + ',' + str(self.timeout)
                 self.aw.addserial(
                     'EXTECH755: ' + settings + ' || Tx = ' + cmd2str(binascii.hexlify(b'\x56\xaa\x01')) + ' || Rx = ' + cmd2str(
                         binascii.hexlify(r[5:])))
@@ -2836,7 +2835,7 @@ class serialport:
                 else:
                     libtime.sleep(.1) # avoid possible hickups on startup
                 if self.aw.seriallogflag:
-                    settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
+                    settings = self.comport + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + self.parity + ',' + str(self.stopbits) + ',' + str(self.timeout)
                     self.aw.addserial('serial port opened: ' + settings)
         except Exception: # pylint: disable=broad-except
             self.SP.close()
@@ -2980,7 +2979,7 @@ class serialport:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
                 import binascii
-                settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
+                settings = self.comport + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + self.parity + ',' + str(self.stopbits) + ',' + str(self.timeout)
                 self.aw.addserial('MS6514: ' + settings + ' || Rx = ' + cmd2str(binascii.hexlify(r)))
 
     def DT301temperature(self, retry:int=2) -> tuple[float, float]:
@@ -2995,7 +2994,7 @@ class serialport:
                 libtime.sleep(0.01)  # this may not be necessary but works well
                 r = self.SP.read(11)
                 if len(r)==11:
-                    data = bytes(r)
+                    data = r
                     if len(data)==11 and data[0] == 0xfc and data[1] == 0x13 and data[10] == 0xf3:
                         for i in range(2,6):
                             temp = (temp << 4) | (data[i] & 0xf)
@@ -3028,7 +3027,7 @@ class serialport:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
                 import binascii
-                settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
+                settings = self.comport + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + self.parity + ',' + str(self.stopbits) + ',' + str(self.timeout)
                 self.aw.addserial('DT301: ' + settings + ' || Rx = ' + cmd2str(binascii.hexlify(data)))
 
     # if serial input is not \0 terminated standard pyserial readline returns only after the timeout
@@ -3068,7 +3067,7 @@ class serialport:
                             t = fromCtoFstrict(t)
                         temps[i] = t
                         if self.aw.seriallogflag:
-                            settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
+                            settings = self.comport + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + self.parity + ',' + str(self.stopbits) + ',' + str(self.timeout)
                             self.aw.addserial(f'Behmor: {settings} || Tx = {command} || Rx = {res!r} || Ts= {t:.2f}')
                     except Exception: # pylint: disable=broad-except
                         pass
@@ -3146,7 +3145,7 @@ class serialport:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
                 import binascii
-                settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
+                settings = self.comport + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + self.parity + ',' + str(self.stopbits) + ',' + str(self.timeout)
                 self.aw.addserial('H806: ' + settings + ' || Tx = ' + cmd2str(binascii.hexlify(command)) + ' || Rx = ' + cmd2str(binascii.hexlify(r)))
 
     def HH806Winit(self) -> None:
@@ -3171,7 +3170,7 @@ class serialport:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
                 command = '#0A0000RA6\r\n #0A0000RA6\r\n \x21\x05\x00\x58\x7E'
-                settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
+                settings = self.comport + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + self.parity + ',' + str(self.stopbits) + ',' + str(self.timeout)
                 self.aw.addserial('H806Winit: ' + settings + ' || Tx = ' + command + ' || Rx = ')
 
     #UNDER WORK 806 wireless meter
@@ -3209,7 +3208,7 @@ class serialport:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
                 import binascii
-                settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
+                settings = self.comport + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + self.parity + ',' + str(self.stopbits) + ',' + str(self.timeout)
                 self.aw.addserial('H806Wtemperature: ' + settings + ' || Rx = ' + cmd2str(binascii.hexlify(r)))
 
     # input: value x; divider d; mode m
@@ -3348,12 +3347,12 @@ class serialport:
         if dialogx.exec():
             try:
                 ETraw = dialogx.etEdit.text().split('.')
-                ET = (int(str(ETraw[0])) * 10)/10.
+                ET = (int(ETraw[0]) * 10)/10.
             except Exception: # pylint: disable=broad-except
                 ET = -1
             try:
                 BTraw = dialogx.btEdit.text().split('.')
-                BT = (int(str(BTraw[0])) * 10)/10.
+                BT = (int(BTraw[0]) * 10)/10.
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
                 BT = -1
@@ -3415,7 +3414,7 @@ class serialport:
         finally:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
-                settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
+                settings = self.comport + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + self.parity + ',' + str(self.stopbits) + ',' + str(self.timeout)
                 self.aw.addserial('H506: ' + settings + ' || Rx = ' + str(ID))
 
     #HH506RA Device
@@ -3463,7 +3462,7 @@ class serialport:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
                 import binascii
-                settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
+                settings = self.comport + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + self.parity + ',' + str(self.stopbits) + ',' + str(self.timeout)
                 self.aw.addserial('H506: ' + settings + ' || Tx = ' + cmd2str(binascii.hexlify(command)) + ' || Rx = ' + cmd2str(binascii.hexlify(r)))
 
     # TASI TA612C
@@ -3510,7 +3509,7 @@ class serialport:
 
                 nbytes = len(line)
                 error = QApplication.translate('Error Message','TA612C(): {0} bytes received but 13 needed').format(nbytes)
-                timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = milliseconds
+                timez = QDateTime.currentDateTime().toString('hh:mm:ss.zzz')    #zzz = milliseconds
                 self.aw.qmc.adderror(timez + ' ' + error)
                 return -1,-1
             return -1,-1
@@ -3524,7 +3523,7 @@ class serialport:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
                 import binascii
-                settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
+                settings = self.comport + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + self.parity + ',' + str(self.stopbits) + ',' + str(self.timeout)
                 self.aw.addserial('TA612C: ' + settings + ' || Tx = ' + cmd2str(binascii.hexlify(command_frame)) + ' || Rx = ' + cmd2str(binascii.hexlify(line)))
 
     def CENTER302temperature(self,retry:int = 2) -> tuple[float, float]:
@@ -3563,7 +3562,7 @@ class serialport:
                     return self.CENTER302temperature(retry=retry-1)
                 nbytes = len(r)
                 error = QApplication.translate('Error Message','CENTER302temperature(): {0} bytes received but 7 needed').format(nbytes)
-                timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = milliseconds
+                timez = QDateTime.currentDateTime().toString('hh:mm:ss.zzz')    #zzz = milliseconds
                 self.aw.qmc.adderror(timez + ' ' + error)
                 return -1,-1
             return -1,-1
@@ -3576,7 +3575,7 @@ class serialport:
         finally:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
-                settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
+                settings = self.comport + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + self.parity + ',' + str(self.stopbits) + ',' + str(self.timeout)
                 self.aw.addserial('CENTER302: ' + settings + ' || Tx = ' + cmd2str(binascii.hexlify(command)) + ' || Rx = ' + cmd2str(binascii.hexlify(r)))
 
     def CENTER303temperature(self,retry:int = 2) -> tuple[float, float]:
@@ -3623,7 +3622,7 @@ class serialport:
                     return self.CENTER303temperature(retry=retry-1)
                 nbytes = len(r)
                 error = QApplication.translate('Error Message','CENTER303temperature(): {0} bytes received but 8 needed').format(nbytes)
-                timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = milliseconds
+                timez = QDateTime.currentDateTime().toString('hh:mm:ss.zzz')    #zzz = milliseconds
                 self.aw.qmc.adderror(timez + ' ' + error)
                 return -1,-1
             return -1,-1
@@ -3636,7 +3635,7 @@ class serialport:
         finally:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
-                settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
+                settings = self.comport + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + self.parity + ',' + str(self.stopbits) + ',' + str(self.timeout)
                 self.aw.addserial('CENTER303: ' + settings + ' || Tx = ' + cmd2str(binascii.hexlify(command)) + ' || Rx = ' + cmd2str(binascii.hexlify(r)))
 
     def VOLTCRAFTPL125T2temperature(self,retry:int = 2) -> tuple[float, float]:
@@ -3667,7 +3666,7 @@ class serialport:
                     return self.VOLTCRAFTPL125T2temperature(retry=retry-1)
                 nbytes = len(r)
                 error = QApplication.translate('Error Message','VOLTCRAFTPL125T2temperature(): {0} bytes received but 26 needed').format(nbytes)
-                timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = milliseconds
+                timez = QDateTime.currentDateTime().toString('hh:mm:ss.zzz')    #zzz = milliseconds
                 _,_, exc_tb = sys.exc_info()
                 self.aw.qmc.adderror(timez + ' ' + error)
                 return -1,-1
@@ -3682,7 +3681,7 @@ class serialport:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
                 import binascii
-                settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
+                settings = self.comport + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + self.parity + ',' + str(self.stopbits) + ',' + str(self.timeout)
                 self.aw.addserial('VOLTCRAFTPL125T2: ' + settings + ' || Tx = ' + cmd2str(binascii.hexlify(command)) + ' || Rx = ' + cmd2str(binascii.hexlify(r)))
 
     def VOLTCRAFTPL125T4temperature(self,retry:int = 2) -> tuple[float, float]:
@@ -3716,7 +3715,7 @@ class serialport:
                     return self.VOLTCRAFTPL125T4temperature(retry=retry-1)
                 nbytes = len(r)
                 error = QApplication.translate('Error Message','VOLTCRAFTPL125T4temperature(): {0} bytes received but 26 needed').format(nbytes)
-                timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = milliseconds
+                timez = QDateTime.currentDateTime().toString('hh:mm:ss.zzz')    #zzz = milliseconds
                 _,_, exc_tb = sys.exc_info()
                 self.aw.qmc.adderror(timez + ' ' + error)
                 return -1,-1
@@ -3731,7 +3730,7 @@ class serialport:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
                 import binascii
-                settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
+                settings = self.comport + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + self.parity + ',' + str(self.stopbits) + ',' + str(self.timeout)
                 self.aw.addserial('VOLTCRAFTPL125T4: ' + settings + ' || Tx = ' + cmd2str(binascii.hexlify(command)) + ' || Rx = ' + cmd2str(binascii.hexlify(r)))
 
 
@@ -3779,7 +3778,7 @@ class serialport:
                     return self.CENTER306temperature(retry=retry-1)
                 nbytes = len(r)
                 error = QApplication.translate('Error Message','CENTER306temperature(): {0} bytes received but 10 needed').format(nbytes)
-                timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = milliseconds
+                timez = QDateTime.currentDateTime().toString('hh:mm:ss.zzz')    #zzz = milliseconds
                 _,_, exc_tb = sys.exc_info()
                 self.aw.qmc.adderror(timez + ' ' + error,getattr(exc_tb, 'tb_lineno', '?'))
                 return -1,-1
@@ -3793,7 +3792,7 @@ class serialport:
         finally:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
-                settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
+                settings = self.comport + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + self.parity + ',' + str(self.stopbits) + ',' + str(self.timeout)
                 self.aw.addserial('CENTER306: ' + settings + ' || Tx = ' + cmd2str(binascii.hexlify(command)) + ' || Rx = ' + cmd2str(binascii.hexlify(r)))
 
     def CENTER309temperature(self, retry:int = 1) -> tuple[float, float]:
@@ -3878,7 +3877,7 @@ class serialport:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
                 import binascii
-                settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
+                settings = self.comport + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + self.parity + ',' + str(self.stopbits) + ',' + str(self.timeout)
                 self.aw.addserial('CENTER309: ' + settings + ' || Tx = ' + cmd2str(binascii.hexlify(command)) + ' || Rx = ' + cmd2str(binascii.hexlify(r)))
 
 #---
@@ -6739,7 +6738,7 @@ class serialport:
                         if self.aw.qmc.YOCTO_dataRate > 1000:
                             reportFrequency = '60/m' # in this mode the average of a measurements over the last second is returned
                         else:
-                            reportFrequency = f'{int(round(1000/self.aw.qmc.YOCTO_dataRate))}/s'   # 30/s => 30ms
+                            reportFrequency = f'{round(1000/self.aw.qmc.YOCTO_dataRate)}/s'   # 30/s => 30ms
                             # if reportFrequency is set to "1/s", every second the last measurement sampled by the device is returned
                             # note that this is different from "60/m" which returns an average over many values
 
@@ -6777,8 +6776,8 @@ class serialport:
                             _log.exception(e)
                         # get units
                         try:
-                            unit:str = cast(str, self.YOCTOsensor.get_unit())
-                            if len(unit) > 0 and unit[-1] != 'C':
+                            unit:str = self.YOCTOsensor.get_unit()
+                            if len(unit) > 0 and unit[-1] != 'C':  # pyright:ignore[reportUnknownArgumentType]
                                 self.aw.qmc.YOCTOchanUnit = 'F'
                             else:
                                 self.aw.qmc.YOCTOchanUnit = 'C'
@@ -6788,7 +6787,7 @@ class serialport:
                             if self.aw.qmc.YOCTO_dataRate > 1000:
                                 reportFrequency = '60/m' # in this mode the average of a measurements over the last second is returned
                             else:
-                                reportFrequency = f'{int(round(1000/self.aw.qmc.YOCTO_dataRate))}/s'   # 30/s => 30ms
+                                reportFrequency = f'{round(1000/self.aw.qmc.YOCTO_dataRate)}/s'   # 30/s => 30ms
                                 # if reportFrequency is set to "1/s", every second the last measurement sampled by the device is returned
                                 # note that this is different from "60/m" which returns an average over many values
                             self.YOCTOsensor.set_reportFrequency(reportFrequency)
@@ -7109,8 +7108,8 @@ class serialport:
                         raise Exception(QApplication.translate('Error Message','Arduino could not set channels')) # pylint: disable=broad-exception-raised
 
                     if self.aw.seriallogflag:
-                        settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
-                        self.aw.addserial('ArduinoTC4: ' + settings + ' || Tx = ' + str(command) + ' || Rx = ' + str(result))
+                        settings = self.comport + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + self.parity + ',' + str(self.stopbits) + ',' + str(self.timeout)
+                        self.aw.addserial('ArduinoTC4: ' + settings + ' || Tx = ' + command + ' || Rx = ' + result)
 
                     if result.startswith('#') and chan is None:
                         #OK. NOW SET UNITS
@@ -7147,7 +7146,7 @@ class serialport:
                 res = [('-1' if el.strip() == '' else el) for el in rl.rsplit(',')]
 
                 if self.aw.seriallogflag:
-                    self.aw.addserial('ArduinoTC4: Tx = ' + str(command) + ' || Rx = ' + str(rl))
+                    self.aw.addserial('ArduinoTC4: Tx = ' + str(command) + ' || Rx = ' + rl)
 #                _log.debug("command: %s",command)
 #                _log.debug("res: %s",res)
 
@@ -7267,7 +7266,7 @@ class serialport:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
             if self.aw.seriallogflag:
-                settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
+                settings = self.comport + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + self.parity + ',' + str(self.stopbits) + ',' + str(self.timeout)
                 self.aw.addserial(f'ArduinoTC4: {settings} || Tx = {command} || Rx = {res} || Ts= {t1:.2f}, {t2:.2f}, {self.aw.qmc.extraArduinoT1:.2f}, {self.aw.qmc.extraArduinoT2:.2f}, {self.aw.qmc.extraArduinoT3:.2f}, {self.aw.qmc.extraArduinoT4:.2f}')
 
 
@@ -7438,7 +7437,7 @@ class serialport:
         except ValueError:
             #self.closeport()
             error = QApplication.translate('Error Message','Value Error:') + ' ser.TEVA18Btemperature()'
-            timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = milliseconds
+            timez = QDateTime.currentDateTime().toString('hh:mm:ss.zzz')    #zzz = milliseconds
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror(timez + ' ' + error,getattr(exc_tb, 'tb_lineno', '?'))
             return -1,-1
@@ -7451,7 +7450,7 @@ class serialport:
         finally:
             #note: logged chars should not be binary
             if self.aw.seriallogflag:
-                settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
+                settings = self.comport + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + self.parity + ',' + str(self.stopbits) + ',' + str(self.timeout)
                 self.aw.addserial('TEVA18B: ' + settings + ' || Tx = ' + 'No command' + ' || Rx = ' + cmd2str(binascii.hexlify(r)))
 
     def HHM28multimeter(self) -> tuple[str, str]:
@@ -7541,7 +7540,7 @@ class serialport:
         except ValueError:
             #self.closeport()
             error  = QApplication.translate('Error Message','Value Error:') + ' ser.HHM28multimeter()'
-            timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = milliseconds
+            timez = QDateTime.currentDateTime().toString('hh:mm:ss.zzz')    #zzz = milliseconds
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror(timez + ' ' + error,getattr(exc_tb, 'tb_lineno', '?'))
             #find device index
@@ -7562,7 +7561,7 @@ class serialport:
         finally:
             #note: logged chars should not be binary
             if self.aw.seriallogflag:
-                settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
+                settings = self.comport + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + self.parity + ',' + str(self.stopbits) + ',' + str(self.timeout)
                 self.aw.addserial('HHM28multimeter: ' + settings + ' || Tx = ' + 'No command' + ' || Rx = ' + str(frame))
 
     #sends a command to the ET/BT device. (used by eventaction to send serial command to e.g. Arduino)
@@ -7592,7 +7591,7 @@ class serialport:
                 self.aw.qmc.samplingSemaphore.release(1)
             #note: logged chars should not be binary
             if self.aw.seriallogflag:
-                settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
+                settings = self.comport + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + self.parity + ',' + str(self.stopbits) + ',' + str(self.timeout)
                 self.aw.addserial(f'Serial Command: {settings} || Tx = {command!r} || Rx = No answer needed')
 
 
@@ -7660,7 +7659,7 @@ class extraserialport:
         if self.SP is not None:
             try:
                 self.openport()
-                return bool(self.SP.is_open)
+                return self.SP.is_open
             except Exception as e:  # pylint: disable=broad-except
                 if error:
                     _, _, exc_tb = sys.exc_info()

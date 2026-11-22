@@ -316,7 +316,7 @@ with patch('artisanlib.util.getDirectory') as mock_get_dir, patch(
 
 
 @pytest.fixture(scope='session', autouse=True)
-def ensure_qt_isolation() -> Generator[None, None, None]:
+def ensure_qt_isolation() -> Generator[None]:
     """
     Ensure Qt modules are properly isolated at session level.
 
@@ -341,7 +341,7 @@ def ensure_qt_isolation() -> Generator[None, None, None]:
 
 
 @pytest.fixture(autouse=True)
-def reset_canvas_state() -> Generator[None, None, None]:
+def reset_canvas_state() -> Generator[None]:
     """
     Reset all canvas module state before and after each test to ensure complete isolation.
 

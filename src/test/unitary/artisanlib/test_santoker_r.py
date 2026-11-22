@@ -34,7 +34,7 @@ import pytest
 
 
 @pytest.fixture(scope='session', autouse=True)
-def ensure_santoker_r_isolation() -> Generator[None, None, None]:
+def ensure_santoker_r_isolation() -> Generator[None]:
     """
     Ensure santoker_r module is properly isolated for tests at session level.
 
@@ -60,7 +60,7 @@ def ensure_santoker_r_isolation() -> Generator[None, None, None]:
 
 
 @pytest.fixture(autouse=True)
-def reset_santoker_r_state() -> Generator[None, None, None]:
+def reset_santoker_r_state() -> Generator[None]:
     """Reset santoker_r test state before each test to ensure test independence."""
     # Before each test, ensure logging and ble_port modules are available
     # This is critical when other tests have mocked these modules

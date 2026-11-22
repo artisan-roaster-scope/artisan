@@ -65,7 +65,7 @@ def extractProfileHiBeanJSON(file:str,
             roasttime:str|None = encodeLocal(date_time.time().toString())
             if roasttime is not None:
                 res['roasttime'] = roasttime
-            res['roastepoch'] = int(date_time.toSecsSinceEpoch())
+            res['roastepoch'] = date_time.toSecsSinceEpoch()
             res['roasttzoffset'] = libtime.timezone
 
         res['roastingnotes'] = hibean_data.get('notes', '')
@@ -130,7 +130,7 @@ def extractProfileHiBeanJSON(file:str,
             roaster_params = data_point.get('roasterParams', [])
 
             try:
-                fan:int = int(round(next((float(param.get('value', 0.0)) for param in roaster_params if param.get('key') == 'FC'), 0.0)))
+                fan:int = round(next((float(param.get('value', 0.0)) for param in roaster_params if param.get('key') == 'FC'), 0.0))
                 if fan != last_fan:
                     last_fan = fan
                     specialeventsvalue.append(eventsExternal2InternalValue(fan))
@@ -141,7 +141,7 @@ def extractProfileHiBeanJSON(file:str,
                 pass
 
             try:
-                heat:int = int(round(next((float(param.get('value', 0.0)) for param in roaster_params if param.get('key') == 'HP'), 0.0)))
+                heat:int = round(next((float(param.get('value', 0.0)) for param in roaster_params if param.get('key') == 'HP'), 0.0))
                 if heat != last_heat:
                     last_heat = heat
                     specialeventsvalue.append(eventsExternal2InternalValue(heat))
@@ -152,7 +152,7 @@ def extractProfileHiBeanJSON(file:str,
                 pass
 
             try:
-                drum:int = int(round(next((float(param.get('value', 0.0)) for param in roaster_params if param.get('key') == 'RC'), 0.0)))
+                drum:int = round(next((float(param.get('value', 0.0)) for param in roaster_params if param.get('key') == 'RC'), 0.0))
                 if drum != last_drum:
                     last_drum = drum
                     specialeventsvalue.append(eventsExternal2InternalValue(drum))
@@ -163,7 +163,7 @@ def extractProfileHiBeanJSON(file:str,
                 pass
 
             try:
-                ts:int = int(round(next((float(param.get('value', 0.0)) for param in roaster_params if param.get('key') == 'TS'), 0.0)))
+                ts:int = round(next((float(param.get('value', 0.0)) for param in roaster_params if param.get('key') == 'TS'), 0.0))
                 if ts != last_ts:
                     last_ts = ts
                     specialeventsvalue.append(eventsExternal2InternalValue(ts))

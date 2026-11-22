@@ -82,19 +82,19 @@ class PID_DlgControl(ArtisanDialog):
         self.pidSchedule0.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidSchedule0.setRange(0,999)
         self.pidSchedule0.setSingleStep(10)
-        self.pidSchedule0.setValue(int(round(self.aw.pidcontrol.pidSchedule0)))
+        self.pidSchedule0.setValue(round(self.aw.pidcontrol.pidSchedule0))
         self.pidSchedule1 = QSpinBox()
         self.pidSchedule1.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.pidSchedule1.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidSchedule1.setRange(0,999)
         self.pidSchedule1.setSingleStep(10)
-        self.pidSchedule1.setValue(int(round(self.aw.pidcontrol.pidSchedule1)))
+        self.pidSchedule1.setValue(round(self.aw.pidcontrol.pidSchedule1))
         self.pidSchedule2 = QSpinBox()
         self.pidSchedule2.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.pidSchedule2.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidSchedule2.setRange(0,999)
         self.pidSchedule2.setSingleStep(10)
-        self.pidSchedule2.setValue(int(round(self.aw.pidcontrol.pidSchedule2)))
+        self.pidSchedule2.setValue(round(self.aw.pidcontrol.pidSchedule2))
 
         pidKpLabel = QLabel('kp')
 
@@ -252,7 +252,7 @@ class PID_DlgControl(ArtisanDialog):
         self.pidCycle.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidCycle.setRange(0,99999)
         self.pidCycle.setSingleStep(100)
-        self.pidCycle.setValue(int(self.aw.pidcontrol.pidCycle))
+        self.pidCycle.setValue(self.aw.pidcontrol.pidCycle)
         self.pidCycle.setSuffix(' ms')
         pidCycleLabel = QLabel(QApplication.translate('Label','Cycle'))
 
@@ -475,7 +475,7 @@ class PID_DlgControl(ArtisanDialog):
         self.pidSVLookahead.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidSVLookahead.setRange(0,999)
         self.pidSVLookahead.setSingleStep(1)
-        self.pidSVLookahead.setValue(int(round(self.aw.pidcontrol.svLookahead)))
+        self.pidSVLookahead.setValue(round(self.aw.pidcontrol.svLookahead))
         self.pidSVLookahead.setSuffix(' s')
         self.pidSVLookahead.setToolTip(QApplication.translate('Tooltip', 'In background follow mode the set value (SV) is taken\nfrom the selected source signal with a positive time offset\nspecified by the lookahead'))
         pidSVLookaheadLabel = QLabel(QApplication.translate('Label','Lookahead'))
@@ -512,7 +512,7 @@ class PID_DlgControl(ArtisanDialog):
         self.pidSVSliderMin.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidSVSliderMin.setRange(0,999)
         self.pidSVSliderMin.setSingleStep(10)
-        self.pidSVSliderMin.setValue(max(0, min(999, int(self.aw.pidcontrol.svSliderMin))))
+        self.pidSVSliderMin.setValue(max(0, min(999, self.aw.pidcontrol.svSliderMin)))
         self.pidSVSliderMin.setToolTip(QApplication.translate('Tooltip', 'Lower limit of the set value (SV) slider'))
         pidSVSliderMinLabel = QLabel(QApplication.translate('Label','Min'))
         self.pidSVSliderMin.valueChanged.connect(self.sliderMinValueChangedSlot)
@@ -522,7 +522,7 @@ class PID_DlgControl(ArtisanDialog):
         self.pidSVSliderMax.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidSVSliderMax.setRange(0,999)
         self.pidSVSliderMax.setSingleStep(10)
-        self.pidSVSliderMax.setValue(max(0, min(999, int(self.aw.pidcontrol.svSliderMax))))
+        self.pidSVSliderMax.setValue(max(0, min(999, self.aw.pidcontrol.svSliderMax)))
         self.pidSVSliderMax.setToolTip(QApplication.translate('Tooltip', 'Upper limit of the set value (SV) slider'))
         pidSVSliderMaxLabel = QLabel(QApplication.translate('Label','Max'))
         self.pidSVSliderMax.valueChanged.connect(self.sliderMaxValueChangedSlot)
@@ -576,7 +576,7 @@ class PID_DlgControl(ArtisanDialog):
         self.dutyMin.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.dutyMin.setRange(-100,100)
         self.dutyMin.setSingleStep(10)
-        self.dutyMin.setValue(int(self.aw.pidcontrol.dutyMin))
+        self.dutyMin.setValue(self.aw.pidcontrol.dutyMin)
         self.dutyMin.setSuffix(' %')
         dutyMinLabel = QLabel(QApplication.translate('Label','Min'))
 
@@ -585,7 +585,7 @@ class PID_DlgControl(ArtisanDialog):
         self.dutyMax.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.dutyMax.setRange(-100,100)
         self.dutyMax.setSingleStep(10)
-        self.dutyMax.setValue(int(self.aw.pidcontrol.dutyMax))
+        self.dutyMax.setValue(self.aw.pidcontrol.dutyMax)
         self.dutyMax.setSuffix(' %')
         dutyMaxLabel = QLabel(QApplication.translate('Label','Max'))
 
@@ -632,7 +632,7 @@ class PID_DlgControl(ArtisanDialog):
             self.pidDutySteps.setAlignment(Qt.AlignmentFlag.AlignRight)
             self.pidDutySteps.setRange(1,10)
             self.pidDutySteps.setSingleStep(1)
-            self.pidDutySteps.setValue(int(self.aw.pidcontrol.dutySteps))
+            self.pidDutySteps.setValue(self.aw.pidcontrol.dutySteps)
             self.pidDutySteps.setSuffix(' %')
             self.pidDutySteps.setToolTip(QApplication.translate('Tooltip', 'Duty signal step size'))
             pidDutyStepsLabel = QLabel(QApplication.translate('Label','Steps'))
@@ -1461,11 +1461,11 @@ class PID_DlgControl(ArtisanDialog):
     def getRSnSVvalues(self, n:int) -> list[float]:
         return [w.value() for w in self.RSnTab_SVWidgets[n]]
     def getRSnSVramps(self, n:int) -> list[int]:
-        return [int(round(self.aw.QTime2time(w.time()))) for w in self.RSnTab_RampWidgets[n]]
+        return [round(self.aw.QTime2time(w.time())) for w in self.RSnTab_RampWidgets[n]]
     def getRSnSVsoaks(self, n:int) -> list[int]:
-        return [int(round(self.aw.QTime2time(w.time()))) for w in self.RSnTab_SoakWidgets[n]]
+        return [round(self.aw.QTime2time(w.time())) for w in self.RSnTab_SoakWidgets[n]]
     def getRSnSVactions(self, n:int) -> list[int]:
-        return [int(w.currentIndex()) - 1 for w in self.RSnTab_ActionWidgets[n]]
+        return [w.currentIndex() - 1 for w in self.RSnTab_ActionWidgets[n]]
     def getRSnSVbeeps(self, n:int) -> list[bool]:
         res:list[bool] = []
         for w in self.RSnTab_BeepWidgets[n]:
@@ -1486,7 +1486,7 @@ class PID_DlgControl(ArtisanDialog):
         self.RSnTab_LabelWidgets[n].setText(self.aw.pidcontrol.RS_svLabels[n])
     def setRSnSVvalues(self, n:int) -> None:
         for i in range(self.aw.pidcontrol.svLen):
-            self.RSnTab_SVWidgets[n][i].setValue(int(round(self.aw.pidcontrol.RS_svValues[n][i])))
+            self.RSnTab_SVWidgets[n][i].setValue(round(self.aw.pidcontrol.RS_svValues[n][i]))
     def setRSnSVramps(self, n:int) -> None:
         for i in range(self.aw.pidcontrol.svLen):
             self.RSnTab_RampWidgets[n][i].setTime(self.aw.time2QTime(self.aw.pidcontrol.RS_svRamps[n][i]))
@@ -1575,15 +1575,15 @@ class PID_DlgControl(ArtisanDialog):
             self.aw.pidcontrol.svLabel = self.labelEdit.text()
             for i in range(self.aw.pidcontrol.svLen):
                 self.aw.pidcontrol.svValues[i] = self.SVWidgets[i].value()
-                self.aw.pidcontrol.svRamps[i] = int(round(self.aw.QTime2time(self.RampWidgets[i].time())))
-                self.aw.pidcontrol.svSoaks[i] = int(round(self.aw.QTime2time(self.SoakWidgets[i].time())))
-                self.aw.pidcontrol.svActions[i] = int(self.ActionWidgets[i].currentIndex()) - 1
+                self.aw.pidcontrol.svRamps[i] = round(self.aw.QTime2time(self.RampWidgets[i].time()))
+                self.aw.pidcontrol.svSoaks[i] = round(self.aw.QTime2time(self.SoakWidgets[i].time()))
+                self.aw.pidcontrol.svActions[i] = self.ActionWidgets[i].currentIndex() - 1
                 layout = self.BeepWidgets[i].layout()
                 if layout is not None:
                     layoutItem = layout.itemAt(1)
                     if layoutItem is not None:
                         beep = cast(QCheckBox, layoutItem.widget())
-                        self.aw.pidcontrol.svBeeps[i] = bool(beep.isChecked())
+                        self.aw.pidcontrol.svBeeps[i] = beep.isChecked()
                 self.aw.pidcontrol.svDescriptions[i] = self.DescriptionWidgets[i].text()
         finally:
             if self.aw.qmc.rampSoakSemaphore.available() < 1:
@@ -1594,7 +1594,7 @@ class PID_DlgControl(ArtisanDialog):
             self.aw.qmc.rampSoakSemaphore.acquire(1)
             self.labelEdit.setText(self.aw.pidcontrol.svLabel)
             for i in range(self.aw.pidcontrol.svLen):
-                self.SVWidgets[i].setValue(int(round(self.aw.pidcontrol.svValues[i])))
+                self.SVWidgets[i].setValue(round(self.aw.pidcontrol.svValues[i]))
                 self.RampWidgets[i].setTime(self.aw.time2QTime(self.aw.pidcontrol.svRamps[i]))
                 self.SoakWidgets[i].setTime(self.aw.time2QTime(self.aw.pidcontrol.svSoaks[i]))
                 self.ActionWidgets[i].setCurrentIndex(self.aw.pidcontrol.svActions[i] + 1)
@@ -1709,12 +1709,12 @@ class PID_DlgControl(ArtisanDialog):
             self.aw.pidcontrol.dutyMax = max(self.dutyMin.value(),self.dutyMax.value())
             self.aw.pidcontrol.dutySteps = self.pidDutySteps.value()
 #            self.aw.pidcontrol.derivative_filter = int(self.derivativeFilterFlag.isChecked())
-            self.aw.pidcontrol.derivative_filter = int(self.dFilterSpinBox.value())
+            self.aw.pidcontrol.derivative_filter = self.dFilterSpinBox.value()
             self.aw.pidcontrol.duty_filter = int(self.dutyFilterFlag.isChecked())
             self.aw.pidcontrol.sv_filter = int(self.svFilterFlag.isChecked())
-            self.aw.pidcontrol.pidDlimit = int(self.dLimitSpinBox.value())
+            self.aw.pidcontrol.pidDlimit = self.dLimitSpinBox.value()
             self.aw.pidcontrol.pidIlimitFactor = self.iLimitSpinBox.value()
-            self.aw.pidcontrol.pidIRoCthreshold = int(self.SPthresholdSpinBox.value())
+            self.aw.pidcontrol.pidIRoCthreshold = self.SPthresholdSpinBox.value()
             self.aw.pidcontrol.pidIWP = self.IWPFlag.isChecked()
             self.aw.pidcontrol.pidIRoC = self.IRoCFlag.isChecked()
             #- Gain Scheduling
@@ -2154,7 +2154,7 @@ class PXRpidDlgControl(PXpidDlgControl):
         self.pidSVLookahead.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidSVLookahead.setRange(0,999)
         self.pidSVLookahead.setSingleStep(1)
-        self.pidSVLookahead.setValue(int(round(self.aw.fujipid.lookahead)))
+        self.pidSVLookahead.setValue(round(self.aw.fujipid.lookahead))
         self.pidSVLookahead.setSuffix(' s')
         self.pidSVLookahead.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.pidSVLookahead.valueChanged.connect(self.changeLookAhead)
@@ -2300,7 +2300,7 @@ class PXRpidDlgControl(PXpidDlgControl):
 
     @pyqtSlot(int)
     def changeLookAhead(self, _:int) -> None:
-        self.aw.fujipid.lookahead = int(self.pidSVLookahead.value())
+        self.aw.fujipid.lookahead = self.pidSVLookahead.value()
 
     @pyqtSlot(int)
     def changeFollowBackground(self, _:int) -> None:
@@ -2328,35 +2328,35 @@ class PXRpidDlgControl(PXpidDlgControl):
                    (0,0,0,0,1,1,1,1),
                    (1,1,1,1,1,1,1,1))
         self.aw.fujipid.PXR['rampsoakpattern'][0] = self.patternComboBox.currentIndex()
-        if pattern[int(self.aw.fujipid.PXR['rampsoakpattern'][0])][0]:
+        if pattern[int(self.aw.fujipid.PXR['rampsoakpattern'][0])][0]: # pyrefly:ignore[unnecessary-type-conversion]
             self.label_rs1.setStyleSheet("background-color:'#FFCC99';")
         else:
             self.label_rs1.setStyleSheet('background-color:white;')
-        if pattern[int(self.aw.fujipid.PXR['rampsoakpattern'][0])][1]:
+        if pattern[int(self.aw.fujipid.PXR['rampsoakpattern'][0])][1]: # pyrefly:ignore[unnecessary-type-conversion]
             self.label_rs2.setStyleSheet("background-color:'#FFCC99';")
         else:
             self.label_rs2.setStyleSheet('background-color:white;')
-        if pattern[int(self.aw.fujipid.PXR['rampsoakpattern'][0])][2]:
+        if pattern[int(self.aw.fujipid.PXR['rampsoakpattern'][0])][2]: # pyrefly:ignore[unnecessary-type-conversion]
             self.label_rs3.setStyleSheet("background-color:'#FFCC99';")
         else:
             self.label_rs3.setStyleSheet('background-color:white;')
-        if pattern[int(self.aw.fujipid.PXR['rampsoakpattern'][0])][3]:
+        if pattern[int(self.aw.fujipid.PXR['rampsoakpattern'][0])][3]: # pyrefly:ignore[unnecessary-type-conversion]
             self.label_rs4.setStyleSheet("background-color:'#FFCC99';")
         else:
             self.label_rs4.setStyleSheet('background-color:white;')
-        if pattern[int(self.aw.fujipid.PXR['rampsoakpattern'][0])][4]:
+        if pattern[int(self.aw.fujipid.PXR['rampsoakpattern'][0])][4]: # pyrefly:ignore[unnecessary-type-conversion]
             self.label_rs5.setStyleSheet("background-color:'#FFCC99';")
         else:
             self.label_rs5.setStyleSheet('background-color:white;')
-        if pattern[int(self.aw.fujipid.PXR['rampsoakpattern'][0])][5]:
+        if pattern[int(self.aw.fujipid.PXR['rampsoakpattern'][0])][5]: # pyrefly:ignore[unnecessary-type-conversion]
             self.label_rs6.setStyleSheet("background-color:'#FFCC99';")
         else:
             self.label_rs6.setStyleSheet('background-color:white;')
-        if pattern[int(self.aw.fujipid.PXR['rampsoakpattern'][0])][6]:
+        if pattern[int(self.aw.fujipid.PXR['rampsoakpattern'][0])][6]: # pyrefly:ignore[unnecessary-type-conversion]
             self.label_rs7.setStyleSheet("background-color:'#FFCC99';")
         else:
             self.label_rs7.setStyleSheet('background-color:white;')
-        if pattern[int(self.aw.fujipid.PXR['rampsoakpattern'][0])][7]:
+        if pattern[int(self.aw.fujipid.PXR['rampsoakpattern'][0])][7]: # pyrefly:ignore[unnecessary-type-conversion]
             self.label_rs8.setStyleSheet("background-color:'#FFCC99';")
         else:
             self.label_rs8.setStyleSheet('background-color:white;')
@@ -2421,14 +2421,14 @@ class PXRpidDlgControl(PXpidDlgControl):
 
     @pyqtSlot(bool)
     def setsv(self, _:bool = False) -> None:
-        self.svedit.setText(comma2dot(str(self.svedit.text())))
+        self.svedit.setText(comma2dot(self.svedit.text()))
         if self.svedit.text() != '':
             newSVvalue = int(float(self.svedit.text())*10) #multiply by 10 because of decimal point
             if self.aw.ser.useModbusPort:
                 reg = self.aw.modbus.address2register(self.aw.fujipid.PXR['sv0'][1],6)
                 self.aw.modbus.writeSingleRegister(self.aw.ser.controlETpid[1],reg,newSVvalue)
                 message = QApplication.translate('StatusBar','SV successfully set to {0}').format(self.svedit.text())
-                self.aw.fujipid.PXR['sv0'][0] = float(str(self.svedit.text()))
+                self.aw.fujipid.PXR['sv0'][0] = float(self.svedit.text())
                 self.status.showMessage(message,5000)
                 #record command as an Event
                 strcommand = f'SETSV::{newSVvalue/10.:.1f}'
@@ -2438,7 +2438,7 @@ class PXRpidDlgControl(PXpidDlgControl):
                 r = self.aw.ser.sendFUJIcommand(command,8)
                 if r == command:
                     message = QApplication.translate('StatusBar','SV successfully set to {0}').format(self.svedit.text())
-                    self.aw.fujipid.PXR['sv0'][0] = float(str(self.svedit.text()))
+                    self.aw.fujipid.PXR['sv0'][0] = float(self.svedit.text())
                     self.status.showMessage(message,5000)
                     #record command as an Event
                     strcommand = f'SETSV::{newSVvalue/10.:.1f}'
@@ -2724,20 +2724,20 @@ class PXRpidDlgControl(PXpidDlgControl):
 
     @pyqtSlot(bool)
     def setpid_p(self, _:bool = False) -> None:
-        if str(self.pedit.text()).isdigit():
-            p = int(str(self.pedit.text()))
+        if self.pedit.text().isdigit():
+            p = int(self.pedit.text())
             self.aw.fujipid.setpidPXR('p',p)
 
     @pyqtSlot(bool)
     def setpid_i(self, _:bool = False) -> None:
-        if str(self.iedit.text()).isdigit():
-            i = int(str(self.iedit.text()))
+        if self.iedit.text().isdigit():
+            i = int(self.iedit.text())
             self.aw.fujipid.setpidPXR('i',i)
 
     @pyqtSlot(bool)
     def setpid_d(self, _:bool = False) -> None:
-        if str(self.dedit.text()).isdigit():
-            d = int(str(self.dedit.text()))
+        if self.dedit.text().isdigit():
+            d = int(self.dedit.text())
             self.aw.fujipid.setpidPXR('d',d)
 
     def createsegmenttable(self) -> None:
@@ -2796,9 +2796,9 @@ class PXRpidDlgControl(PXpidDlgControl):
         svedit = cast(QLineEdit, self.segmenttable.cellWidget(i,0))
         rampedit = cast(QLineEdit, self.segmenttable.cellWidget(i,1))
         soakedit = cast(QLineEdit, self.segmenttable.cellWidget(i,2))
-        sv = float(comma2dot(str(svedit.text())))
-        ramp = stringtoseconds(str(rampedit.text()))
-        soak = stringtoseconds(str(soakedit.text()))
+        sv = float(comma2dot(svedit.text()))
+        ramp = stringtoseconds(rampedit.text())
+        soak = stringtoseconds(soakedit.text())
         svkey = 'segment' + str(idn) + 'sv'
         rampkey = 'segment' + str(idn) + 'ramp'
         soakkey = 'segment' + str(idn) + 'soak'
@@ -2978,7 +2978,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
         self.pidSVLookahead.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidSVLookahead.setRange(0,999)
         self.pidSVLookahead.setSingleStep(1)
-        self.pidSVLookahead.setValue(int(round(self.aw.fujipid.lookahead)))
+        self.pidSVLookahead.setValue(round(self.aw.fujipid.lookahead))
         self.pidSVLookahead.setSuffix(' s')
         self.pidSVLookahead.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.pidSVLookahead.valueChanged.connect(self.changeLookAhead)
@@ -3062,7 +3062,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
         self.pidSVSliderMin.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidSVSliderMin.setRange(0,999)
         self.pidSVSliderMin.setSingleStep(10)
-        self.pidSVSliderMin.setValue(int(self.aw.pidcontrol.svSliderMin))
+        self.pidSVSliderMin.setValue(self.aw.pidcontrol.svSliderMin)
         self.pidSVSliderMin.valueChanged.connect(self.sliderMinValueChangedSlot)
         pidSVSliderMinLabel = QLabel(QApplication.translate('Label','SV min'))
         self.pidSVSliderMax = QSpinBox()
@@ -3070,7 +3070,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
         self.pidSVSliderMax.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidSVSliderMax.setRange(0,999)
         self.pidSVSliderMax.setSingleStep(10)
-        self.pidSVSliderMax.setValue(int(self.aw.pidcontrol.svSliderMax))
+        self.pidSVSliderMax.setValue(self.aw.pidcontrol.svSliderMax)
         self.pidSVSliderMax.valueChanged.connect(self.sliderMaxValueChangedSlot)
         pidSVSliderMaxLabel = QLabel(QApplication.translate('Label','SV max'))
         if self.aw.qmc.mode == 'F':
@@ -3467,7 +3467,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
 
     @pyqtSlot(int)
     def changeLookAhead(self, _:int) -> None:
-        self.aw.fujipid.lookahead = int(self.pidSVLookahead.value())
+        self.aw.fujipid.lookahead = self.pidSVLookahead.value()
 
     @pyqtSlot(int)
     def changeFollowBackground(self, _:int) -> None:
@@ -3674,68 +3674,68 @@ class PXG4pidDlgControl(PXpidDlgControl):
                    (0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1),
                    (1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1))
         self.aw.fujipid.PXG4['rampsoakpattern'][0] = self.patternComboBox.currentIndex()
-        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][0]:
+        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][0]: # pyrefly:ignore[unnecessary-type-conversion]
             self.label_rs1.setStyleSheet("background-color:'#FFCC99';")
         else:
             self.label_rs1.setStyleSheet('background-color:white;')
-        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][1]:
+        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][1]: # pyrefly:ignore[unnecessary-type-conversion]
             self.label_rs2.setStyleSheet("background-color:'#FFCC99';")
         else:
             self.label_rs2.setStyleSheet('background-color:white;')
 
-        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][2]:
+        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][2]: # pyrefly:ignore[unnecessary-type-conversion]
             self.label_rs3.setStyleSheet("background-color:'#FFCC99';")
         else:
             self.label_rs3.setStyleSheet('background-color:white;')
-        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][3]:
+        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][3]: # pyrefly:ignore[unnecessary-type-conversion]
             self.label_rs4.setStyleSheet("background-color:'#FFCC99';")
         else:
             self.label_rs4.setStyleSheet('background-color:white;')
-        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][4]:
+        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][4]: # pyrefly:ignore[unnecessary-type-conversion]
             self.label_rs5.setStyleSheet("background-color:'#FFCC99';")
         else:
             self.label_rs5.setStyleSheet('background-color:white;')
-        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][5]:
+        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][5]: # pyrefly:ignore[unnecessary-type-conversion]
             self.label_rs6.setStyleSheet("background-color:'#FFCC99';")
         else:
             self.label_rs6.setStyleSheet('background-color:white;')
-        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][6]:
+        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][6]: # pyrefly:ignore[unnecessary-type-conversion]
             self.label_rs7.setStyleSheet("background-color:'#FFCC99';")
         else:
             self.label_rs7.setStyleSheet('background-color:white;')
-        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][7]:
+        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][7]: # pyrefly:ignore[unnecessary-type-conversion]
             self.label_rs8.setStyleSheet("background-color:'#FFCC99';")
         else:
             self.label_rs8.setStyleSheet('background-color:white;')
-        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][8]:
+        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][8]: # pyrefly:ignore[unnecessary-type-conversion]
             self.label_rs9.setStyleSheet("background-color:'#FFCC99';")
         else:
             self.label_rs9.setStyleSheet('background-color:white;')
-        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][9]:
+        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][9]: # pyrefly:ignore[unnecessary-type-conversion]
             self.label_rs10.setStyleSheet("background-color:'#FFCC99';")
         else:
             self.label_rs10.setStyleSheet('background-color:white;')
-        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][10]:
+        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][10]: # pyrefly:ignore[unnecessary-type-conversion]
             self.label_rs11.setStyleSheet("background-color:'#FFCC99';")
         else:
             self.label_rs11.setStyleSheet('background-color:white;')
-        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][11]:
+        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][11]: # pyrefly:ignore[unnecessary-type-conversion]
             self.label_rs12.setStyleSheet("background-color:'#FFCC99';")
         else:
             self.label_rs12.setStyleSheet('background-color:white;')
-        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][12]:
+        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][12]: # pyrefly:ignore[unnecessary-type-conversion]
             self.label_rs13.setStyleSheet("background-color:'#FFCC99';")
         else:
             self.label_rs13.setStyleSheet('background-color:white;')
-        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][13]:
+        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][13]: # pyrefly:ignore[unnecessary-type-conversion]
             self.label_rs14.setStyleSheet("background-color:'#FFCC99';")
         else:
             self.label_rs14.setStyleSheet('background-color:white;')
-        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][14]:
+        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][14]: # pyrefly:ignore[unnecessary-type-conversion]
             self.label_rs15.setStyleSheet("background-color:'#FFCC99';")
         else:
             self.label_rs15.setStyleSheet('background-color:white;')
-        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][15]:
+        if pattern[int(self.aw.fujipid.PXG4['rampsoakpattern'][0])][15]: # pyrefly:ignore[unnecessary-type-conversion]
             self.label_rs16.setStyleSheet("background-color:'#FFCC99';")
         else:
             self.label_rs16.setStyleSheet('background-color:white;')
@@ -3950,33 +3950,33 @@ class PXG4pidDlgControl(PXpidDlgControl):
         newSVvalue = None
         #first get the new sv value from the corresponding edit line
         if i == 1:
-            self.sv1edit.setText(comma2dot(str(self.sv1edit.text())))
+            self.sv1edit.setText(comma2dot(self.sv1edit.text()))
             if self.sv1edit.text() != '':
-                newSVvalue = int(float(str(self.sv1edit.text()))*10.) #multiply by 10 because of decimal point. Then convert to int.
+                newSVvalue = int(float(self.sv1edit.text())*10.) #multiply by 10 because of decimal point. Then convert to int.
         elif i == 2:
-            self.sv2edit.setText(comma2dot(str(self.sv2edit.text())))
+            self.sv2edit.setText(comma2dot(self.sv2edit.text()))
             if self.sv2edit.text() != '':
-                newSVvalue = int(float(str(self.sv2edit.text()))*10.)
+                newSVvalue = int(float(self.sv2edit.text())*10.)
         elif i == 3:
-            self.sv3edit.setText(comma2dot(str(self.sv3edit.text())))
+            self.sv3edit.setText(comma2dot(self.sv3edit.text()))
             if self.sv3edit.text() != '':
-                newSVvalue = int(float(str(self.sv3edit.text()))*10.)
+                newSVvalue = int(float(self.sv3edit.text())*10.)
         elif i == 4:
-            self.sv4edit.setText(comma2dot(str(self.sv4edit.text())))
+            self.sv4edit.setText(comma2dot(self.sv4edit.text()))
             if self.sv4edit.text() != '':
-                newSVvalue = int(float(str(self.sv4edit.text()))*10.)
+                newSVvalue = int(float(self.sv4edit.text())*10.)
         elif i == 5:
-            self.sv5edit.setText(comma2dot(str(self.sv5edit.text())))
+            self.sv5edit.setText(comma2dot(self.sv5edit.text()))
             if self.sv5edit.text() != '':
-                newSVvalue = int(float(str(self.sv5edit.text()))*10.)
+                newSVvalue = int(float(self.sv5edit.text())*10.)
         elif i == 6:
-            self.sv6edit.setText(comma2dot(str(self.sv6edit.text())))
+            self.sv6edit.setText(comma2dot(self.sv6edit.text()))
             if self.sv6edit.text() != '':
-                newSVvalue = int(float(str(self.sv6edit.text()))*10.)
+                newSVvalue = int(float(self.sv6edit.text())*10.)
         elif i == 7:
-            self.sv7edit.setText(comma2dot(str(self.sv7edit.text())))
+            self.sv7edit.setText(comma2dot(self.sv7edit.text()))
             if self.sv7edit.text() != '':
-                newSVvalue = int(float(str(self.sv7edit.text()))*10.)
+                newSVvalue = int(float(self.sv7edit.text())*10.)
         else:
             return
         #send command to the right sv
@@ -3992,51 +3992,51 @@ class PXG4pidDlgControl(PXpidDlgControl):
         #verify it went ok
         if len(r) == 8:
             if i == 1:
-                self.sv1edit.setText(comma2dot(str(self.sv1edit.text())))
+                self.sv1edit.setText(comma2dot(self.sv1edit.text()))
                 reg_dict[svkey][0] = toFloat(self.sv1edit.text())
-                message = QApplication.translate('StatusBar','SV{0} successfully set to {1}').format(str(i),str(self.sv1edit.text()))
+                message = QApplication.translate('StatusBar','SV{0} successfully set to {1}').format(str(i), self.sv1edit.text())
                 self.status.showMessage(message,5000)
                 self.setNsv(1)
                 self.aw.lcd6.display(self.sv1edit.text())
             elif i == 2:
-                self.sv2edit.setText(comma2dot(str(self.sv2edit.text())))
-                reg_dict[svkey][0] = toFloat(str(self.sv2edit.text()))
-                message = QApplication.translate('StatusBar','SV{0} successfully set to {1}').format(str(i),str(self.sv2edit.text()))
+                self.sv2edit.setText(comma2dot(self.sv2edit.text()))
+                reg_dict[svkey][0] = toFloat(self.sv2edit.text())
+                message = QApplication.translate('StatusBar','SV{0} successfully set to {1}').format(str(i), self.sv2edit.text())
                 self.status.showMessage(message,5000)
                 self.setNsv(2)
                 self.aw.lcd6.display(self.sv2edit.text())
             elif i == 3:
-                self.sv3edit.setText(comma2dot(str(self.sv3edit.text())))
-                reg_dict[svkey][0] = toFloat(str(self.sv3edit.text()))
-                message = QApplication.translate('StatusBar','SV{0} successfully set to {1}').format(str(i),str(self.sv3edit.text()))
+                self.sv3edit.setText(comma2dot(self.sv3edit.text()))
+                reg_dict[svkey][0] = toFloat(self.sv3edit.text())
+                message = QApplication.translate('StatusBar','SV{0} successfully set to {1}').format(str(i), self.sv3edit.text())
                 self.status.showMessage(message,5000)
                 self.setNsv(3)
                 self.aw.lcd6.display(self.sv3edit.text())
             elif i == 4:
-                self.sv4edit.setText(comma2dot(str(self.sv4edit.text())))
-                reg_dict[svkey][0] = toFloat(str(self.sv4edit.text()))
-                message = QApplication.translate('StatusBar','SV{0} successfully set to {1}').format(str(i),str(self.sv4edit.text()))
+                self.sv4edit.setText(comma2dot(self.sv4edit.text()))
+                reg_dict[svkey][0] = toFloat(self.sv4edit.text())
+                message = QApplication.translate('StatusBar','SV{0} successfully set to {1}').format(str(i), self.sv4edit.text())
                 self.status.showMessage(message,5000)
                 self.setNsv(4)
                 self.aw.lcd6.display(self.sv4edit.text())
             elif i == 5:
-                self.sv5edit.setText(comma2dot(str(self.sv5edit.text())))
-                reg_dict[svkey][0] = toFloat(str(self.sv5edit.text()))
-                message = QApplication.translate('StatusBar','SV{0} successfully set to {1}').format(str(i),str(self.sv5edit.text()))
+                self.sv5edit.setText(comma2dot(self.sv5edit.text()))
+                reg_dict[svkey][0] = toFloat(self.sv5edit.text())
+                message = QApplication.translate('StatusBar','SV{0} successfully set to {1}').format(str(i), self.sv5edit.text())
                 self.status.showMessage(message,5000)
                 self.setNsv(5)
                 self.aw.lcd6.display(self.sv5edit.text())
             elif i == 6:
-                self.sv6edit.setText(comma2dot(str(self.sv6edit.text())))
-                reg_dict[svkey][0] = toFloat(str(self.sv6edit.text()))
-                message = QApplication.translate('StatusBar','SV{0} successfully set to {1}').format(str(i),str(self.sv6edit.text()))
+                self.sv6edit.setText(comma2dot(self.sv6edit.text()))
+                reg_dict[svkey][0] = toFloat(self.sv6edit.text())
+                message = QApplication.translate('StatusBar','SV{0} successfully set to {1}').format(str(i), self.sv6edit.text())
                 self.status.showMessage(message,5000)
                 self.setNsv(6)
                 self.aw.lcd6.display(self.sv6edit.text())
             elif i == 7:
-                self.sv7edit.setText(comma2dot(str(self.sv7edit.text())))
-                reg_dict[svkey][0] = toFloat(str(self.sv7edit.text()))
-                message = QApplication.translate('StatusBar','SV{0} successfully set to {1}').format(str(i),str(self.sv7edit.text()))
+                self.sv7edit.setText(comma2dot(self.sv7edit.text()))
+                reg_dict[svkey][0] = toFloat(self.sv7edit.text())
+                message = QApplication.translate('StatusBar','SV{0} successfully set to {1}').format(str(i), self.sv7edit.text())
                 self.status.showMessage(message,5000)
                 self.setNsv(7)
                 self.aw.lcd6.display(self.sv7edit.text())
@@ -4075,33 +4075,33 @@ class PXG4pidDlgControl(PXpidDlgControl):
             reg_dict = self.aw.fujipid.PXF
         #first get the new sv value from the corresponding edit line
         if k == 1 and self.p1edit.text() != '' and self.i1edit.text() != '' and self.d1edit.text() != '':
-            newPvalue = int(toFloat(str(self.p1edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
-            newIvalue = int(toFloat(str(self.i1edit.text().replace(',','.')))*10.)
-            newDvalue = int(toFloat(str(self.d1edit.text().replace(',','.')))*10.)
+            newPvalue = int(toFloat(self.p1edit.text().replace(',','.'))*10.) #multiply by 10 because of decimal point. Then convert to int.
+            newIvalue = int(toFloat(self.i1edit.text().replace(',','.'))*10.)
+            newDvalue = int(toFloat(self.d1edit.text().replace(',','.'))*10.)
         elif k == 2 and self.p2edit.text() != '' and self.i2edit.text() != '' and self.d2edit.text() != '':
-            newPvalue = int(toFloat(str(self.p2edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
-            newIvalue = int(toFloat(str(self.i2edit.text().replace(',','.')))*10.)
-            newDvalue = int(toFloat(str(self.d2edit.text().replace(',','.')))*10.)
+            newPvalue = int(toFloat(self.p2edit.text().replace(',','.'))*10.) #multiply by 10 because of decimal point. Then convert to int.
+            newIvalue = int(toFloat(self.i2edit.text().replace(',','.'))*10.)
+            newDvalue = int(toFloat(self.d2edit.text().replace(',','.'))*10.)
         elif k == 3 and self.p3edit.text() != '' and self.i3edit.text() != '' and self.d3edit.text() != '':
-            newPvalue = int(toFloat(str(self.p3edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
-            newIvalue = int(toFloat(str(self.i3edit.text().replace(',','.')))*10.)
-            newDvalue = int(toFloat(str(self.d3edit.text().replace(',','.')))*10.)
+            newPvalue = int(toFloat(self.p3edit.text().replace(',','.'))*10.) #multiply by 10 because of decimal point. Then convert to int.
+            newIvalue = int(toFloat(self.i3edit.text().replace(',','.'))*10.)
+            newDvalue = int(toFloat(self.d3edit.text().replace(',','.'))*10.)
         elif k == 4 and self.p4edit.text() != '' and self.i4edit.text() != '' and self.d4edit.text() != '':
-            newPvalue = int(toFloat(str(self.p4edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
-            newIvalue = int(toFloat(str(self.i4edit.text().replace(',','.')))*10.)
-            newDvalue = int(toFloat(str(self.d4edit.text().replace(',','.')))*10.)
+            newPvalue = int(toFloat(self.p4edit.text().replace(',','.'))*10.) #multiply by 10 because of decimal point. Then convert to int.
+            newIvalue = int(toFloat(self.i4edit.text().replace(',','.'))*10.)
+            newDvalue = int(toFloat(self.d4edit.text().replace(',','.'))*10.)
         elif k == 5 and self.p5edit.text() != '' and self.i5edit.text() != '' and self.d5edit.text() != '':
-            newPvalue = int(toFloat(str(self.p5edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
-            newIvalue = int(toFloat(str(self.i5edit.text().replace(',','.')))*10.)
-            newDvalue = int(toFloat(str(self.d5edit.text().replace(',','.')))*10.)
+            newPvalue = int(toFloat(self.p5edit.text().replace(',','.'))*10.) #multiply by 10 because of decimal point. Then convert to int.
+            newIvalue = int(toFloat(self.i5edit.text().replace(',','.'))*10.)
+            newDvalue = int(toFloat(self.d5edit.text().replace(',','.'))*10.)
         elif k == 6 and self.p6edit.text() != '' and self.i6edit.text() != '' and self.d6edit.text() != '':
-            newPvalue = int(toFloat(str(self.p6edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
-            newIvalue = int(toFloat(str(self.i6edit.text().replace(',','.')))*10.)
-            newDvalue = int(toFloat(str(self.d6edit.text().replace(',','.')))*10.)
+            newPvalue = int(toFloat(self.p6edit.text().replace(',','.'))*10.) #multiply by 10 because of decimal point. Then convert to int.
+            newIvalue = int(toFloat(self.i6edit.text().replace(',','.'))*10.)
+            newDvalue = int(toFloat(self.d6edit.text().replace(',','.'))*10.)
         elif k == 7 and self.p7edit.text() != '' and self.i7edit.text() != '' and self.d7edit.text() != '':
-            newPvalue = int(toFloat(str(self.p7edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
-            newIvalue = int(toFloat(str(self.i7edit.text().replace(',','.')))*10.)
-            newDvalue = int(toFloat(str(self.d7edit.text().replace(',','.')))*10.)
+            newPvalue = int(toFloat(self.p7edit.text().replace(',','.'))*10.) #multiply by 10 because of decimal point. Then convert to int.
+            newIvalue = int(toFloat(self.i7edit.text().replace(',','.'))*10.)
+            newDvalue = int(toFloat(self.d7edit.text().replace(',','.'))*10.)
         else:
             return
         #send command to the right sv
@@ -4129,59 +4129,59 @@ class PXG4pidDlgControl(PXpidDlgControl):
         #verify it went ok
         if len(p) == 8 and len(i)==8 and len(d) == 8:
             if k == 1:
-                reg_dict[pkey][0] = toFloat(str(self.p1edit.text().replace(',','.')))
-                reg_dict[ikey][0] = toFloat(str(self.i1edit.text().replace(',','.')))
-                reg_dict[dkey][0] = toFloat(str(self.d1edit.text().replace(',','.')))
+                reg_dict[pkey][0] = toFloat(self.p1edit.text().replace(',','.'))
+                reg_dict[ikey][0] = toFloat(self.i1edit.text().replace(',','.'))
+                reg_dict[dkey][0] = toFloat(self.d1edit.text().replace(',','.'))
                 message = (QApplication.translate('StatusBar','pid #{0} successfully set to ({1},{2},{3})'
-                                                   )).format(str(k),str(self.p1edit.text()),str(self.i1edit.text()),str(self.d1edit.text()))
+                                                   )).format(str(k), self.p1edit.text(), self.i1edit.text(), self.d1edit.text())
                 self.status.showMessage(message,5000)
                 self.setNpid(1)
             elif k == 2:
-                reg_dict[pkey][0] = toFloat(str(self.p2edit.text().replace(',','.')))
-                reg_dict[ikey][0] = toFloat(str(self.i2edit.text().replace(',','.')))
-                reg_dict[dkey][0] = toFloat(str(self.d2edit.text().replace(',','.')))
+                reg_dict[pkey][0] = toFloat(self.p2edit.text().replace(',','.'))
+                reg_dict[ikey][0] = toFloat(self.i2edit.text().replace(',','.'))
+                reg_dict[dkey][0] = toFloat(self.d2edit.text().replace(',','.'))
                 message = (QApplication.translate('StatusBar','pid #{0} successfully set to ({1},{2},{3})'
-                                                   )).format(str(k),str(self.p2edit.text()),str(self.i2edit.text()),str(self.d2edit.text()))
+                                                   )).format(str(k), self.p2edit.text(), self.i2edit.text(), self.d2edit.text())
                 self.status.showMessage(message,5000)
                 self.setNpid(2)
             elif k == 3:
-                reg_dict[pkey][0] = toFloat(str(self.p3edit.text().replace(',','.')))
-                reg_dict[ikey][0] = toFloat(str(self.i3edit.text().replace(',','.')))
-                reg_dict[dkey][0] = toFloat(str(self.d3edit.text().replace(',','.')))
+                reg_dict[pkey][0] = toFloat(self.p3edit.text().replace(',','.'))
+                reg_dict[ikey][0] = toFloat(self.i3edit.text().replace(',','.'))
+                reg_dict[dkey][0] = toFloat(self.d3edit.text().replace(',','.'))
                 message = (QApplication.translate('StatusBar','pid #{0} successfully set to ({1},{2},{3})'
-                                                   )).format(str(k),str(self.p3edit.text()),str(self.i3edit.text()),str(self.d3edit.text()))
+                                                   )).format(str(k), self.p3edit.text(), self.i3edit.text(), self.d3edit.text())
                 self.status.showMessage(message,5000)
                 self.setNpid(3)
             elif k == 4:
-                reg_dict[pkey][0] = toFloat(str(self.p4edit.text().replace(',','.')))
-                reg_dict[ikey][0] = toFloat(str(self.i4edit.text().replace(',','.')))
-                reg_dict[dkey][0] = toFloat(str(self.d4edit.text().replace(',','.')))
+                reg_dict[pkey][0] = toFloat(self.p4edit.text().replace(',','.'))
+                reg_dict[ikey][0] = toFloat(self.i4edit.text().replace(',','.'))
+                reg_dict[dkey][0] = toFloat(self.d4edit.text().replace(',','.'))
                 message = (QApplication.translate('StatusBar','pid #{0} successfully set to ({1},{2},{3})'
-                                                   )).format(str(k),str(self.p4edit.text()),str(self.i4edit.text()),str(self.d4edit.text()))
+                                                   )).format(str(k), self.p4edit.text(), self.i4edit.text(), self.d4edit.text())
                 self.status.showMessage(message,5000)
                 self.setNpid(4)
             elif k == 5:
-                reg_dict[pkey][0] = toFloat(str(self.p5edit.text().replace(',','.')))
-                reg_dict[ikey][0] = toFloat(str(self.i5edit.text().replace(',','.')))
-                reg_dict[dkey][0] = toFloat(str(self.d5edit.text().replace(',','.')))
+                reg_dict[pkey][0] = toFloat(self.p5edit.text().replace(',','.'))
+                reg_dict[ikey][0] = toFloat(self.i5edit.text().replace(',','.'))
+                reg_dict[dkey][0] = toFloat(self.d5edit.text().replace(',','.'))
                 message = (QApplication.translate('StatusBar','pid #{0} successfully set to ({1},{2},{3})'
-                                                   )).format(str(k),str(self.p5edit.text()),str(self.i5edit.text()),str(self.d5edit.text()))
+                                                   )).format(str(k), self.p5edit.text(), self.i5edit.text(), self.d5edit.text())
                 self.status.showMessage(message,5000)
                 self.setNpid(5)
             elif k == 6:
-                reg_dict[pkey][0] = toFloat(str(self.p6edit.text().replace(',','.')))
-                reg_dict[ikey][0] = toFloat(str(self.i6edit.text().replace(',','.')))
-                reg_dict[dkey][0] = toFloat(str(self.d6edit.text().replace(',','.')))
+                reg_dict[pkey][0] = toFloat(self.p6edit.text().replace(',','.'))
+                reg_dict[ikey][0] = toFloat(self.i6edit.text().replace(',','.'))
+                reg_dict[dkey][0] = toFloat(self.d6edit.text().replace(',','.'))
                 message = (QApplication.translate('StatusBar','pid #{0} successfully set to ({1},{2},{3})'
-                                                   )).format(str(k),str(self.p6edit.text()),str(self.i6edit.text()),str(self.d6edit.text()))
+                                                   )).format(str(k), self.p6edit.text(), self.i6edit.text(), self.d6edit.text())
                 self.status.showMessage(message,5000)
                 self.setNpid(6)
             elif k == 7:
-                reg_dict[pkey][0] = toFloat(str(self.p7edit.text().replace(',','.')))
-                reg_dict[ikey][0] = toFloat(str(self.i7edit.text().replace(',','.')))
-                reg_dict[dkey][0] = toFloat(str(self.d7edit.text().replace(',','.')))
+                reg_dict[pkey][0] = toFloat(self.p7edit.text().replace(',','.'))
+                reg_dict[ikey][0] = toFloat(self.i7edit.text().replace(',','.'))
+                reg_dict[dkey][0] = toFloat(self.d7edit.text().replace(',','.'))
                 message = (QApplication.translate('StatusBar','pid #{0} successfully set to ({1},{2},{3})'
-                                                   )).format(str(k),str(self.p7edit.text()),str(self.i7edit.text()),str(self.d7edit.text()))
+                                                   )).format(str(k), self.p7edit.text(), self.i7edit.text(), self.d7edit.text())
                 self.status.showMessage(message,5000)
                 self.setNpid(7)
         else:
@@ -4304,7 +4304,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
             N = self.aw.fujipid.readoneword(command)
         libtime.sleep(0.035)
         if N is not None and N != -1:
-            self.aw.fujipid.PXG4['selectedpid'][0] = int(N)
+            self.aw.fujipid.PXG4['selectedpid'][0] = N
             if N == 1:
                 self.radiopid1.setChecked(True)
             elif N == 2:
@@ -4825,9 +4825,9 @@ class PXG4pidDlgControl(PXpidDlgControl):
         svedit = cast(QLineEdit, self.segmenttable.cellWidget(i,0))
         rampedit = cast(QLineEdit, self.segmenttable.cellWidget(i,1))
         soakedit = cast(QLineEdit, self.segmenttable.cellWidget(i,2))
-        sv = float(comma2dot(str(svedit.text())))
-        ramp = stringtoseconds(str(rampedit.text()))
-        soak = stringtoseconds(str(soakedit.text()))
+        sv = float(comma2dot(svedit.text()))
+        ramp = stringtoseconds(rampedit.text())
+        soak = stringtoseconds(soakedit.text())
         svkey = 'segment' + str(idn) + 'sv'
         rampkey = 'segment' + str(idn) + 'ramp'
         soakkey = 'segment' + str(idn) + 'soak'
@@ -4922,7 +4922,7 @@ class DTApidDlgControl(ArtisanDialog):
     def writesv(self, _:bool = False) -> None:
         v = comma2dot(self.svedit.text())
         if v:
-            newsv = hex(int(abs(toFloat(str(v)))*10.))[2:].upper()
+            newsv = hex(int(abs(toFloat(v))*10.))[2:].upper()
             ### create command message2send(unitID,function,address,ndata)
             command = self.aw.dtapid.message2send(self.aw.ser.controlETpid[1],6,str(self.aw.dtapid.dtamem['sv'][1]),newsv)
                 #read sv

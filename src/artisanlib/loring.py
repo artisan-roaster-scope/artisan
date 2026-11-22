@@ -102,7 +102,7 @@ def extractProfileLoringCSV(file:str,
                         roasttime:str|None = encodeLocal(start_datetime.time().toString())
                         if roasttime is not None:
                             res['roasttime'] = roasttime
-                        res['roastepoch'] = int(start_datetime.toSecsSinceEpoch())
+                        res['roastepoch'] = start_datetime.toSecsSinceEpoch()
                         res['roasttzoffset'] = libtime.timezone
                     else:
                         time = start_datetime.msecsTo(datetime) / 1000
@@ -207,7 +207,7 @@ def extractProfileLoringCSV(file:str,
                                     power_last = power
                                     power = v
                                     power_event = True
-                                    specialeventsvalue.append(eventsExternal2InternalValue(int(round(v))))
+                                    specialeventsvalue.append(eventsExternal2InternalValue(round(v)))
                                     specialevents.append(i)
                                     specialeventstype.append(3)
                                     specialeventsStrings.append(f'{X1:.1f}%')
@@ -253,7 +253,7 @@ def extractProfileLoringCSV(file:str,
                 _log.exception(e)
             i = i + 1
 
-    res['samplinginterval'] = int(round(sampling_interval))
+    res['samplinginterval'] = round(sampling_interval)
 
     res['timex'] = timex
     res['temp1'] = replace_duplicates(temp1)

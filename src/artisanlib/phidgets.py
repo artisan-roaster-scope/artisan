@@ -93,7 +93,7 @@ class PhidgetManager:
                 # reserve all channels with the same hubport on the same hub
                 hub = channel.getHub()
                 hubport = channel.getHubPort()
-                hupportdevice = bool(channel.getIsHubPortDevice() == 0) # it is not a direct hubport channel
+                hupportdevice = channel.getIsHubPortDevice() == 0 # it is not a direct hubport channel
                 for k, _ in self.attachedPhidgetChannels.items():
 #                    _log.debug('addChennel: %s, %s',k, k.getDeviceID())
                     try:
@@ -129,7 +129,7 @@ class PhidgetManager:
             try:
                 hub = channel.getHub()
                 hubport = channel.getHubPort()
-                hupportdevice = bool(channel.getIsHubPortDevice() == 0) # it is not a direct hubport channel
+                hupportdevice = channel.getIsHubPortDevice() == 0 # it is not a direct hubport channel
                 if hupportdevice:
                     for k, _ in self.attachedPhidgetChannels.items():
                         if k != channel:

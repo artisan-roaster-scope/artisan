@@ -177,7 +177,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         self.popupTimoutSpinBox.setSingleStep(1)
         self.popupTimoutSpinBox.setRange(0,120)
         self.popupTimoutSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.popupTimoutSpinBox.setValue(int(self.aw.qmc.alarm_popup_timout))
+        self.popupTimoutSpinBox.setValue(self.aw.qmc.alarm_popup_timout)
         popupTimeoutLabel = QLabel(QApplication.translate('Label', 'Pop Up timeout'))
 
         alarmLabelLabel = QLabel(QApplication.translate('Label', 'Label'))
@@ -599,14 +599,14 @@ class AlarmDlg(ArtisanResizeablDialog):
                     for i in range(self.alarmtable.rowCount()):
                         guard = cast(QLineEdit, self.alarmtable.cellWidget(i,2))
                         try:
-                            guard_value = int(str(guard.text())) - 1
+                            guard_value = int(guard.text()) - 1
                         except Exception: # pylint: disable=broad-except
                             guard_value = -1
                         if guard_value >= selected_row:
                             guard.setText(str(guard_value+2))
                         nguard = cast(QLineEdit, self.alarmtable.cellWidget(i,3))
                         try:
-                            nguard_value = int(str(nguard.text())) - 1
+                            nguard_value = int(nguard.text()) - 1
                         except Exception: # pylint: disable=broad-except
                             nguard_value = -1
                         if nguard_value >= selected_row:
@@ -655,14 +655,14 @@ class AlarmDlg(ArtisanResizeablDialog):
                     for i in range(self.alarmtable.rowCount()):
                         guard = cast(QLineEdit, self.alarmtable.cellWidget(i,2))
                         try:
-                            guard_value = int(str(guard.text())) - 1
+                            guard_value = int(guard.text()) - 1
                         except Exception: # pylint: disable=broad-except
                             guard_value = -1
                         if guard_value >= selected_row:
                             guard.setText(str(guard_value))
                         nguard = cast(QLineEdit, self.alarmtable.cellWidget(i,3))
                         try:
-                            nguard_value = int(str(nguard.text())) - 1
+                            nguard_value = int(nguard.text()) - 1
                         except Exception: # pylint: disable=broad-except
                             nguard_value = -1
                         if nguard_value >= selected_row:
@@ -774,7 +774,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         # save column widths
         self.aw.qmc.alarmtablecolumnwidths = [self.alarmtable.columnWidth(c) for c in range(self.alarmtable.columnCount())]
 
-        self.aw.qmc.alarm_popup_timout = int(self.popupTimoutSpinBox.value())
+        self.aw.qmc.alarm_popup_timout = self.popupTimoutSpinBox.value()
         self.aw.qmc.alarmsetlabel = self.alarmLabelEdit.text()
         self.closeHelp()
         settings = QSettings()
@@ -819,7 +819,7 @@ class AlarmDlg(ArtisanResizeablDialog):
                             self.aw.qmc.alarmflag[i] = int(flag.isChecked())
                 guard = cast(QLineEdit, self.alarmtable.cellWidget(i,2))
                 try:
-                    guard_value = int(str(guard.text())) - 1
+                    guard_value = int(guard.text()) - 1
                 except Exception: # pylint: disable=broad-except
                     guard_value = -1
                 if -1 < guard_value < nalarms:
@@ -828,7 +828,7 @@ class AlarmDlg(ArtisanResizeablDialog):
                     self.aw.qmc.alarmguard[i] = -1
                 negguard = cast(QLineEdit, self.alarmtable.cellWidget(i,3))
                 try:
-                    negguard_value = int(str(negguard.text())) - 1
+                    negguard_value = int(negguard.text()) - 1
                 except Exception: # pylint: disable=broad-except
                     negguard_value = -1
                 if -1 < negguard_value < nalarms:
@@ -839,14 +839,14 @@ class AlarmDlg(ArtisanResizeablDialog):
                 self.aw.qmc.alarmtime[i] = self.aw.qmc.menuidx2alarmtime[timez.currentIndex()]
                 offset = cast(QTimeEdit, self.alarmtable.cellWidget(i,5))
                 tx = self.aw.QTime2time(offset.time())
-                self.aw.qmc.alarmoffset[i] = max(0,int(round(tx)))
+                self.aw.qmc.alarmoffset[i] = max(0,round(tx))
                 atype = cast(MyQComboBox, self.alarmtable.cellWidget(i,6))
                 self.aw.qmc.alarmsource[i] = int(str(atype.currentIndex())) - 3
                 cond = cast(MyQComboBox, self.alarmtable.cellWidget(i,7))
                 self.aw.qmc.alarmcond[i] = int(str(cond.currentIndex()))
                 temp = cast(QLineEdit, self.alarmtable.cellWidget(i,8))
                 try:
-                    self.aw.qmc.alarmtemperature[i] = float(comma2dot(str(temp.text())))
+                    self.aw.qmc.alarmtemperature[i] = float(comma2dot(temp.text()))
                 except Exception: # pylint: disable=broad-except
                     self.aw.qmc.alarmtemperature[i] = 0.0
                 action = cast(MyQComboBox, self.alarmtable.cellWidget(i,9))

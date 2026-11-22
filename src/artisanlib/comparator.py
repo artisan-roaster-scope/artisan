@@ -217,7 +217,7 @@ class RoastProfile:
                     self.extraDelta1 = delta1
                     self.extraDelta2 = delta2
         # temperature conversion
-        m = str(profile['mode']) if 'mode' in profile else self.aw.qmc.mode
+        m = profile.get('mode', self.aw.qmc.mode)
         self.ambientTemp: float
         if 'ambientTemp' in profile:
             self.ambientTemp = profile['ambientTemp']
@@ -245,7 +245,7 @@ class RoastProfile:
             try:
                 batchprefix:str|None = decodeLocal(profile['roastbatchprefix']) # pyright:ignore[reportTypedDictNotRequiredAccess]
                 if batchprefix is not None:
-                    self.label = batchprefix + str(int(profile['roastbatchnr']))[:10] # pyright:ignore[reportTypedDictNotRequiredAccess]
+                    self.label = batchprefix + str(profile['roastbatchnr'])[:10] # pyright:ignore[reportTypedDictNotRequiredAccess]
             except Exception: # pylint: disable=broad-except
                 pass
         if 'specialevents' in profile:
@@ -1137,7 +1137,7 @@ class roastCompareDlg(ArtisanDialog):
     def keyPressEvent(self, a0: 'QKeyEvent|None') -> None:
         try:
             if a0 is not None:
-                k = int(a0.key())
+                k = a0.key()
                 if k == 71:                       #G (toggle time auto axis mode)
                     self.modeComboBox.setCurrentIndex((self.modeComboBox.currentIndex()+1) % 3)
                 else:
@@ -1799,7 +1799,7 @@ class roastCompareDlg(ArtisanDialog):
                 dmax = int(dmax) + 1
                 if self.aw.qmc.delta_ax is not None:
                     self.aw.qmc.delta_ax.set_ylim(top=dmax) # we only autoadjust the upper limit
-                self.aw.qmc.zlimit = int(round(dmax))
+                self.aw.qmc.zlimit = round(dmax)
 
     def recompute(self) -> None:
         for rp in self.profiles:

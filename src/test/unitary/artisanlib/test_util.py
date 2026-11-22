@@ -78,7 +78,7 @@ def sample_profile_data() -> dict[str, Any]:
     }
 
 @pytest.fixture(scope='session', autouse=True)
-def session_level_isolation() -> Generator[None, None, None]:
+def session_level_isolation() -> Generator[None]:
     """Session-level isolation fixture to prevent cross-file module contamination.
 
     This fixture ensures that external dependencies are properly isolated
@@ -688,7 +688,7 @@ def test_toList() -> None:
     assert toList({'a': 1, 'b': 2}.values()) == [1, 2]
 
     # Test with generator
-    def gen() -> Generator[int, None, None]:
+    def gen() -> Generator[int]:
         yield 1
         yield 2
         yield 3

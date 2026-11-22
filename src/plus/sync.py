@@ -87,7 +87,7 @@ def addSyncShelve(uuid: str, modified_at:float, fh:IO[str]) -> None:
             # remove all files name getSyncPath() with any extension as we
             # do not know which extension is chosen by shelve
             _log.info(
-                'register: clean uuid cache %s', str(getSyncPath())
+                'register: clean uuid cache %s', getSyncPath()
             )
             # note that this deletes all "uuid" files including those for
             # the Viewer and other files of that name prefix like uuid.db.org!!
@@ -131,7 +131,7 @@ def addSync(uuid:str, modified_at:float) -> None:
         _log.info('clean lock %s', str(lock_path))
         lock_path.unlink()
         _log.debug(
-            'retry sync:addSync(%s,%s)', str(uuid), str(modified_at)
+            'retry sync:addSync(%s,%s)', uuid, str(modified_at)
         )
         with portalocker.Lock(lock_path, timeout=0.3) as fh:
             addSyncShelve(uuid, modified_at, fh)
@@ -153,7 +153,7 @@ def getSync(uuid:str) -> float|None:
     db:shelve.Shelf[float]
     try:
         sync_cache_semaphore.acquire(1)
-        _log.debug('getSync(%s)', str(uuid))
+        _log.debug('getSync(%s)', uuid)
         with portalocker.Lock(getSyncPath(lock=True), timeout=0.5) as fh:
             try:
                 with shelve.open(getSyncPath()) as db:
@@ -178,7 +178,7 @@ def getSync(uuid:str) -> float|None:
         lock_path = Path(getSyncPath(lock=True))
         _log.info('clean lock %s', str(lock_path))
         lock_path.unlink()
-        _log.debug('retry sync:getSync(%s)', str(uuid))
+        _log.debug('retry sync:getSync(%s)', uuid)
         with portalocker.Lock(getSyncPath(lock=True), timeout=0.3) as fh:
             try:
                 with shelve.open(getSyncPath()) as db:
@@ -209,7 +209,7 @@ def delSync(uuid:str) -> None:
     fh:IO[str]
     try:
         sync_cache_semaphore.acquire(1)
-        _log.debug('delSync(%s)', str(uuid))
+        _log.debug('delSync(%s)', uuid)
         with portalocker.Lock(getSyncPath(lock=True), timeout=0.5) as fh:
             try:
                 with shelve.open(getSyncPath()) as db:
@@ -227,7 +227,7 @@ def delSync(uuid:str) -> None:
         lock_path = Path(getSyncPath(lock=True))
         _log.info('clean lock %s', str(lock_path))
         lock_path.unlink()
-        _log.debug('retry sync:delSync(%s)', str(uuid))
+        _log.debug('retry sync:delSync(%s)', uuid)
         with portalocker.Lock(getSyncPath(lock=True), timeout=0.3) as fh:
             try:
                 with shelve.open(getSyncPath()) as db:

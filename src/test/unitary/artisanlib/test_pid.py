@@ -163,7 +163,7 @@ from artisanlib.pid import _calculate_integral_limits
 
 
 @pytest.fixture(scope='session', autouse=True)
-def ensure_pid_qt_isolation() -> Generator[None, None, None]:
+def ensure_pid_qt_isolation() -> Generator[None]:
     """
     Ensure Qt modules are properly isolated for PID tests at session level.
 
@@ -192,7 +192,7 @@ def ensure_pid_qt_isolation() -> Generator[None, None, None]:
 
 
 @pytest.fixture(autouse=True)
-def reset_pid_state() -> Generator[None, None, None]:
+def reset_pid_state() -> Generator[None]:
     """
     Reset all PID module state before and after each test to ensure complete isolation.
 

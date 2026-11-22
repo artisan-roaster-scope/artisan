@@ -233,7 +233,7 @@ class CustomBlendDialog(ArtisanDialog):
     @override
     def keyPressEvent(self, a0: 'QKeyEvent|None') -> None:
         if a0 is not None:
-            key = int(a0.key())
+            key = a0.key()
             #uncomment next line to find the integer value of a key
             #print(key)
             #modifiers = QApplication.keyboardModifiers()

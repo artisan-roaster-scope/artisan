@@ -164,13 +164,13 @@ class s7port:
             if self.SVtype == 1:
                 self.writeFloat(self.PID_area-1,self.PID_db_nr,self.PID_SV_register,sv*multiplier)
             else:
-                self.writeInt(self.PID_area-1,self.PID_db_nr,self.PID_SV_register,int(round(sv*multiplier)))
+                self.writeInt(self.PID_area-1,self.PID_db_nr,self.PID_SV_register, round(sv*multiplier))
 
     def isConnected(self) -> bool:
         # the check on the CPU state is needed as get_connected() still returns True if the connect got terminated from the peer due to a bug in snap7
         # disconnects and clears the S7 plc objects if get_connected() but not str(self.plc.get_cpu_state()) == "S7CpuStatusRun" to force a clear restart
 #        return self.plc is not None and self.plc.get_connected() and str(self.plc.get_cpu_state()) == "S7CpuStatusRun"
-        if self.plc is not None and ((self.is_connected and not self.commError) or (self.plc.get_connected() and str(self.plc.get_cpu_state()) == 'S7CpuStatusRun')):
+        if self.plc is not None and ((self.is_connected and not self.commError) or (self.plc.get_connected() and self.plc.get_cpu_state() == 'S7CpuStatusRun')):
             return True
 #            if str(self.plc.get_cpu_state()) == "S7CpuStatusRun":
 #                return True
@@ -418,7 +418,7 @@ class s7port:
                 if len(ba) != 2:
                     raise Exception(f'read_area({area},{dbnumber},{start},2) returned result of length {len(ba)}') # pylint: disable=broad-exception-raised
                 from snap7.util.setters import set_int
-                set_int(ba, 0, int(round(value)))
+                set_int(ba, 0, round(value))
                 self.waitToEnsureMinTimeBetweenRequests()
                 self.plc.write_area(self.areas[area],dbnumber,start,ba)
             else:
@@ -449,9 +449,9 @@ class s7port:
                 ba = self.plc.read_area(self.areas[area],dbnumber,start,2)
                 if len(ba) != 2:
                     raise Exception(f'read_area({area},{dbnumber},{start},2) returned result of length {len(ba)}') # pylint: disable=broad-exception-raised
-                new_val = (int(round(value)) & and_mask) | (or_mask & (and_mask ^ 0xFFFF))
+                new_val = (round(value) & and_mask) | (or_mask & (and_mask ^ 0xFFFF))
                 from snap7.util.setters import set_int
-                set_int(ba, 0, int(new_val))
+                set_int(ba, 0, new_val)
                 self.waitToEnsureMinTimeBetweenRequests()
                 self.plc.write_area(self.areas[area],dbnumber,start,ba)
             else:
@@ -483,7 +483,7 @@ class s7port:
                 if len(ba) != 1:
                     raise Exception(f'read_area({area},{dbnumber},{start},1) returned result of length {len(ba)}') # pylint: disable=broad-exception-raised
                 from snap7.util.setters import set_bool
-                set_bool(ba, 0, int(index), bool(value))
+                set_bool(ba, 0, index, value)
                 self.waitToEnsureMinTimeBetweenRequests()
                 self.plc.write_area(self.areas[area],dbnumber,start,ba)
             else:

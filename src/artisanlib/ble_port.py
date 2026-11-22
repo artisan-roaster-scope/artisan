@@ -178,7 +178,7 @@ class BLE:
                 fut = asyncio.run_coroutine_threadsafe(_do_chunked_write(), self._asyncLoopThread.loop)
                 try:
                     # Add a 5 second timeout to avoid a complete crash in the event of hardware failure.
-                    return bool(fut.result(timeout=5.0))
+                    return fut.result(timeout=5.0)
                 except TimeoutError:
                     _log.error('BLE timeout')
                     fut.cancel()

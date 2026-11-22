@@ -249,7 +249,7 @@ with patch('PyQt6.QtWidgets.QApplication', MockQApplication), patch(
 
 
 @pytest.fixture(scope='session', autouse=True)
-def ensure_login_isolation() -> Generator[None, None, None]:
+def ensure_login_isolation() -> Generator[None]:
     """
     Ensure modules are properly isolated for login tests at session level.
 
@@ -284,7 +284,7 @@ def ensure_login_isolation() -> Generator[None, None, None]:
 
 
 @pytest.fixture(scope='module', autouse=True)
-def cleanup_login_mocks() -> Generator[None, None, None]:
+def cleanup_login_mocks() -> Generator[None]:
     """
     Clean up login test mocks at module level to prevent cross-file contamination.
 
@@ -319,7 +319,7 @@ def cleanup_login_mocks() -> Generator[None, None, None]:
 
 
 @pytest.fixture(autouse=True)
-def reset_login_state() -> Generator[None, None, None]:
+def reset_login_state() -> Generator[None]:
     """
     Reset login module state before and after each test to ensure complete isolation.
 
