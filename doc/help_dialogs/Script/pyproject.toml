@@ -22,7 +22,6 @@ maintainers = [
     {name = 'Dave Baxter'}
 ]
 license = 'AGPLv3+'
-license = {file = 'LICENSE'}
 requires-python = '>=3.12'
 keywords = ['roasting', 'roast logging', 'speciality coffee']
 classifiers = [
@@ -33,7 +32,6 @@ classifiers = [
     'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.12',
     'Programming Language :: Python :: 3.13',
     'Programming Language :: Python :: 3.14',
     'Programming Language :: Python :: 3 :: Only',

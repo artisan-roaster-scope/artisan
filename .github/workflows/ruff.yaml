@@ -30,8 +30,12 @@ on:
 jobs:
   ruff:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v7
-      - uses: chartboost/ruff-action@v1
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: chartboost/ruff-action@v1.0.0
         with:
           src: './src'

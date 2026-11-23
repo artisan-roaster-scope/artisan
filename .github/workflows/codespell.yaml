@@ -29,10 +29,14 @@ on:
 jobs:
   codespell:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
       - name: Set up Python 3.14
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@v7.1.0
         with:
           python-version: "3.14"
           cache: pip
@@ -40,7 +44,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r src/requirements-dev.txt
-      - uses: codespell-project/actions-codespell@v2
+      - uses: codespell-project/actions-codespell@v2.4.3
         with:
           path: src
           check_filenames: false

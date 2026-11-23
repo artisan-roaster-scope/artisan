@@ -8,8 +8,12 @@ on:
 jobs:
   check:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
       - run: |
           TAG_VERSION=`echo "${GITHUB_REF_NAME}" | sed 's/^v//'`
           METAINFO_VERSION=`cat src/debian/usr/share/metainfo/org.artisan_scope.artisan.metainfo.xml | sed 's/^\s*<release.*version="\([^"]\+\)".*$/\1/p;d' | head -n1`

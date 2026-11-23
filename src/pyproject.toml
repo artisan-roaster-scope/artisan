@@ -348,6 +348,7 @@ reportUninitializedInstanceVariable = true
 ## pytest conf
 
 [tool.pytest.ini_options]
+asyncio_default_fixture_loop_scope = "function"
 minversion = "9.0"
 addopts = "-ra -v"
 testpaths = [

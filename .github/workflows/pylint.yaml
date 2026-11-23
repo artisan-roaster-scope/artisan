@@ -29,12 +29,16 @@ on:
 jobs:
   build:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
 #    if: github.ref == 'refs/heads/master'
 
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@v7.0.1
+      with:
+        persist-credentials: false
     - name: Set up Python 3.14
-      uses: actions/setup-python@v7
+      uses: actions/setup-python@v7.1.0
       with:
         python-version: '3.14'
         cache: 'pip' # caching pip dependencies

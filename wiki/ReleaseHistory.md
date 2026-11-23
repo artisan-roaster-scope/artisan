@@ -5,6 +5,9 @@ Detailed Release History
 v5.0.1
 ------------------
 
+* ADDITIONS
+  - adds `SRM auto`setup with autoCHARGE/autoDROP estimation for [Sivetz](https://docs.artisan.tools/desktop/machines/sivetz/) machines
+
 * CHANGES
   - Revise Slovak translation ([PR #2255](../../../pull/2255)) contributed by [Patrik Cevela](https://github.com/pcevela))
   - refreshes Santoker machine setups to reflect features of newer models

@@ -1,17 +1,17 @@
 # Copyright (c) 2025 Riverbank Computing Limited <info@riverbankcomputing.com>
-# 
+#
 # This file is part of PyQt6.
-# 
+#
 # This file may be used under the terms of the GNU General Public License
 # version 3.0 as published by the Free Software Foundation and appearing in
 # the file LICENSE included in the packaging of this file.  Please review the
 # following information to ensure the GNU General Public License version 3.0
 # requirements will be met: http://www.gnu.org/copyleft/gpl.html.
-# 
+#
 # If you do not wish to use this file under the terms of the GPL version 3.0
 # then you may purchase a commercial license.  For more information contact
 # info@riverbankcomputing.com.
-# 
+#
 # This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
 # WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
@@ -37,7 +37,7 @@ class PythonSource(SourceFile, User):
         super().__init__(**kwargs)
 
         # Read the source file.
-        self.progress("Reading {0}...".format(self.filename))
+        self.progress(f"Reading {self.filename}...")
         with open(self.filename, 'rb') as f:
             source = f.read()
 
@@ -60,17 +60,16 @@ class PythonSource(SourceFile, User):
         try:
             source = source.decode(encoding)
         except LookupError:
-            raise UserException("Unsupported encoding '{0}'".format(encoding))
+            raise UserException(f"Unsupported encoding '{encoding}'")
 
         # Parse the source file.
-        self.progress("Parsing {0}...".format(self.filename))
+        self.progress(f"Parsing {self.filename}...")
 
         try:
             tree = ast.parse(source, filename=self.filename)
         except SyntaxError as e:
             raise UserException(
-                    "Invalid syntax at line {0} of {1}:\n{2}".format(
-                            e.lineno, e.filename, e.text.rstrip()))
+                    f"Invalid syntax at line {e.lineno} of {e.filename}:\n{e.text.rstrip()}")
 
         # Look for translation contexts and their contents.
         visitor = Visitor(self)

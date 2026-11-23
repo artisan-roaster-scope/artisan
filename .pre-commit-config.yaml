@@ -17,3 +17,7 @@ repos:
     -   id: pyupgrade
         args: [--py312-plus]
         exclude: ^(src/uic/|src/translations/|src/includes/)
+-   repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: v1.32.0
+    hooks:
+      - id: zizmor

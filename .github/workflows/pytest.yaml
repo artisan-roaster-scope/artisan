@@ -11,11 +11,15 @@ on:
 jobs:
   pytest:
     runs-on: macos-latest # on ubunut the Qt libs are missing: ImportError: libEGL.so.1: cannot open shared object file: No such file or directory
+    permissions:
+      contents: read
     name: runner / pytest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
       - name: Set up Python 3.14
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@v7.1.0
         with:
           python-version: '3.14'
           cache: 'pip' # caching pip dependencies
