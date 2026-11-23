@@ -7,6 +7,7 @@ v5.0.1
 
 * CHANGES
   - Revise Slovak translation ([PR #2255](../../../pull/2255)) contributed by [Patrik Cevela](https://github.com/pcevela))
+  - refreshes Santoker machine setups to reflect features of newer models
 
 * FIXES
   - fixes Svietz SRM machine setup quantifier range (min was 0, but should have been 20)
