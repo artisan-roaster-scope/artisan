@@ -195,7 +195,7 @@ for:
     - echo "Finshed Upgrading Python"
     # Update ssl certificates installed for artisan.tools communication
     - echo "Reinstalling openssl, previously"
-    - brew reinstall openssl 
+    - brew reinstall openssl
     - echo "Finished reinstalling openssl"
 
 
