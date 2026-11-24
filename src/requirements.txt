@@ -104,5 +104,5 @@ SecretStorage==3.5.0; platform_system=='Linux'
 build==1.6.1; platform_system=='Windows'
 pywin32==312; platform_system=='Windows'
 pyinstaller-versionfile==3.1.0; platform_system=='Windows'
-libusb-package==1.0.30; platform_system=='Windows'
+libusb-package==1.0.30.1; platform_system=='Windows'
 tzdata==2026.6; platform_system=='Windows' # to prevent pyinstaller WARNING: Hidden import "tzdata" not found!
