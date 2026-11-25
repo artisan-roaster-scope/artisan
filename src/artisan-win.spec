@@ -148,6 +148,13 @@ hiddenimports_list=['charset_normalizer.md__mypyc', # part of requests 2.28.2 # 
 datas = collect_data_files('bleak', subdir=r'backends\winrt')
 
 binaries = collect_dynamic_libs('bleak')
+
+# explicit path to python3t.dll needed for pyinstaller 6.22.3 on Python 3.15
+if sys.version_info >= (3, 15):
+    binaries.append(
+        (os.path.join(sys.base_prefix, 'abi3t-compat', 'python3t.dll'), '.')
+    )
+
 block_cipher = None
 
 a = Analysis(['artisan.py'],

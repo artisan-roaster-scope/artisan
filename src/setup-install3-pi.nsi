@@ -1130,6 +1130,8 @@ Section Uninstall
     Delete "$INSTDIR\vc_redist.x64.exe"
     Delete "$INSTDIR\logging.json"
     Delete "$INSTDIR\artisan_public_key.pem"
+    Delete "$INSTDIR\release-sponsor-logo.svg"
+    Delete "$INSTDIR\release-sponsor-logo-dark.svg"
     Delete "$INSTDIR\uninst.exe"  ;if left around after upgrading an older version
 
     SetShellVarContext all

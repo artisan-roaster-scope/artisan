@@ -19,7 +19,7 @@
 ######
 # the following commented package versions are read by appveyor.yml and downloaded outside of pip.
 #
-# pyinstaller==6.22.3; platform_system='Windows'
+# pyinstaller==6.22.3; platform_system='Windows'  # Check for python3t.dll resolution with next version
 # libusb==1.0.30;  platform_system='Linux'
 # dotenv==2.8.1;   platform_system='Linux'  # v3.0.0 not compatible with fpm  # gem installed, not pip
 #
