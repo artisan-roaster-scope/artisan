@@ -184,19 +184,23 @@ class MplCanvas(FigureCanvas):
     def lazyredraw_on_resize(self) -> None:
         try:
             # self.aw.qmc might not be established yet
-            self.aw.qmc.lazyredraw(recomputeAllDeltas=False)
+            if self.aw.redrawOnResize and self.aw.logofilename != '' and self.aw.qmc.flagon or not self.aw.qmc.statssummary or len(self.aw.qmc.timex) <= 3:
+                self.aw.qmc.lazyredraw(recomputeAllDeltas=False, smooth=False)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
+    # NOTE: this resizesEvent triggers a redraw timer action to adjust a visible logo icon. A similar action is defined in main.py:resizeEvent. Read the longer comment there.
     @override
     def resizeEvent(self, event:'QResizeEvent') -> None:
         super().resizeEvent(event) # type:ignore[no-untyped-call]
         # we only trigger a redraw on resize if a watermark is displayed to fix its aspect ratio
-        if self.aw.redrawOnResize and self.aw.logofilename != '':
+        if self.aw.redrawOnResize and self.aw.logofilename != '' and not self.aw.dashboard.dashboard_active() and (
+                # no redraw triggered through main resizeEvent; see main:aw.resizeEvent
+                self.aw.qmc.flagon or not self.aw.qmc.statssummary or len(self.aw.qmc.timex) <= 3):
             dw = event.size().width() - event.oldSize().width()   # width change
             dh = event.size().height() - event.oldSize().height() # height change
             if ((dw != 0) or (dh != 0)):
-                self.lazyredraw_on_resize_timer.start(10)
+                self.lazyredraw_on_resize_timer.start(1)
 
 
 # NOTE: to have pylint to verify proper __slot__ definitions using pylint one has to remove the super class FigureCanvas here temporarily

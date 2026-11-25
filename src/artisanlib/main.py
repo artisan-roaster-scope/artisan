@@ -4982,7 +4982,8 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     def redraw_action(self) -> None:
         try:
-            self.qmc.redraw(False,False)
+            if not self.qmc.flagon and self.qmc.statssummary and len(self.qmc.timex) > 3:
+                self.qmc.redraw(False,False)
         except Exception: # pylint: disable=broad-except
             # self.qmc might not be defined yet
             pass
@@ -8706,10 +8707,19 @@ class ApplicationWindow(QMainWindow):
                 if self.qmc.seriallogsemaphore.available() < 1:
                     self.qmc.seriallogsemaphore.release(1)
 
+    # NOTE: this resizesEvent triggers a redraw timer action while not sampling if a profile is loaded, the statssummary is shown and the chart is shown (dashboard is hidden)
+    #  to adjust the size of the statsummary box to the new chart widget dimensions
+    #  A similar timer action is defined in canvas.py, as well triggered by a window resize, but occurring if a logo file is loaded,
+    #  while the dashboard is hidden to adjust its dimensions.
+    #  Both resize actions are exclusive to avoid having one resize triggering two redraws and happen only while the chart is shownd (dashboard is hidden)
+    #  Hiding the dashboard triggers a redraw if size was changed while the dashboard was shown (see dashboard.py) and either the statsummary or a logo is shown.
     @override
     def resizeEvent(self, a0:'QResizeEvent|None') -> None:
-        if not self.qmc.flagon and self.qmc.statssummary and len(self.qmc.timex) > 3:
-            self.redrawTimer.start(500) # (re-) start the redraw time to be fired in half a second
+        if a0 is not None and not self.qmc.flagon and self.qmc.statssummary and len(self.qmc.timex) > 3 and not self.dashboard.dashboard_active():
+            dw = a0.size().width() - a0.oldSize().width()   # width change
+            dh = a0.size().height() - a0.oldSize().height() # height change
+            if ((dw != 0) or (dh != 0)):
+                self.redrawTimer.start(500) # (re-) start the redraw time to be fired in half a second
         super().resizeEvent(a0)
 
     def setdpi(self, dpi:int, moveWindow:bool = True) -> None:

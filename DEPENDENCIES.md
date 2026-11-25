@@ -40,8 +40,8 @@ Direct dependencies marked in bold.
 - [distlib 0.4.4](https://github.com/pypa/distlib) ([PSF](#python-software-foundation-license-20))
 - [et_xmlfile 2.0.0](https://foss.heptapod.net/openpyxl/et_xmlfile) ([MIT](#mit))
 - [filelock 4.2.12](https://github.com/tox-dev/filelock) ([MIT](#mit)); _[Donate!](https://github.com/sponsors/gaborbernat)_
-- [fonttools 4.68.0] (https://github.com/fonttools/fonttools) ([MIT](#mit))
-- [frozenlist 1.8.0] (https://github.com/aio-libs/frozenlist) ([Apache 2.0](#apache-20)); _[Donate!](https://opencollective.com/aio-libs/contribute)_
+- [fonttools 4.68.0](https://github.com/fonttools/fonttools) ([MIT](#mit))
+- [frozenlist 1.8.0](https://github.com/aio-libs/frozenlist) ([Apache 2.0](#apache-20)); _[Donate!](https://opencollective.com/aio-libs/contribute)_
 - [idna 3.20](https://github.com/kjd/idna) ([3-clause BSD](#3clause-bsd))
 - [iniconfig 2.3.1](https://github.com/pytest-dev/iniconfig) ([MIT](#mit))
 - [isort 9.0.2](https://isort.readthedocs.io/) ([MIT](#mit)); _[Donate!](https://github.com/sponsors/timothycrosley)_

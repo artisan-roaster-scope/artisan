@@ -1,6 +1,6 @@
 [General]
 Delay=2000
-roastertype_setup=North Standard Control Panel (Fotek)
+roastertype_setup=North Standard Control Panel (Fotek) F
 dropDuplicates=true
 dropDuplicatesLimit=0.3
 

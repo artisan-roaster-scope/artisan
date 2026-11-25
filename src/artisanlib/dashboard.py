@@ -104,6 +104,9 @@ class Dashboard(QWidget):
 
         self.recent_files:list[str] = []
 
+        self._width_on_show:int = -1
+        self._height_on_show:int = -1
+
         # defaults
 
         self.beans_default:str = self.aw.qmc.beans
@@ -418,7 +421,6 @@ class Dashboard(QWidget):
             self.aw.ntb.dashboard_tool.setVisible(True)
 
     def disable_dashboard_toggle_toolbutton(self) -> None:
-        _log.debug('PRINT disable_dashboard_toggle_toolbutton')
         if self.aw.ntb.dashboard_tool is not None:
             self.aw.ntb.dashboard_tool.setVisible(False)
 
@@ -431,6 +433,8 @@ class Dashboard(QWidget):
             self.aw.ntb.update_tools() # as we updated the dashboard above before making it visible we have to update the tools again here
             self.enable_dashboard_toggle_toolbutton()
             self.disable_graph_tools()
+            self._width_on_show = self.aw.stack.frameGeometry().width()
+            self._height_on_show = self.aw.stack.frameGeometry().height()
 
     @staticmethod
     @pyqtSlot(bool)
@@ -448,6 +452,11 @@ class Dashboard(QWidget):
             # if designer or comparator is open
             self.disable_dashboard_toggle_toolbutton()
         self.enable_graph_tools()
+        width_on_hide = self.aw.stack.frameGeometry().width()
+        height_on_hide = self.aw.stack.frameGeometry().height()
+        if ((width_on_hide != self._width_on_show or height_on_hide != self._height_on_show) and
+                (self.aw.logofilename != '' or (not self.aw.qmc.flagon and self.aw.qmc.statssummary and len(self.aw.qmc.timex) > 3))):
+            self.aw.qmc.redraw(False,False)
 
     # if force, update even if not visible
     # if init_title, the title popup is re-initialized (only needed if the popup content changes, not if only the title changes)
