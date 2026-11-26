@@ -103,12 +103,12 @@ class RoastProfile:
         ch:float = hslf[0]
         cl:float = hslf[2]
         ca:float = hslf[3]
-        g0 = QColor.fromHslF(ch,0,cl,ca)
+        g0_color:QColor = QColor.fromHslF(ch,0,cl,ca)
         self.gray = (
-                g0.redF(),
-                g0.greenF(),
-                g0.blueF(),
-                g0.alphaF())
+                g0_color.redF(),
+                g0_color.greenF(),
+                g0_color.blueF(),
+                g0_color.alphaF())
         self.label:str = ''
         self.title:str = ''
         #
@@ -1486,7 +1486,7 @@ class roastCompareDlg(ArtisanDialog):
 
     def setProfileTableRow(self, i:int) -> None:
         profile = self.profiles[i]
-        c = QColor.fromRgbF(*profile.color)
+        c:QColor = QColor.fromRgbF(*profile.color)
         color = QTableWidgetItem()
         color.setBackground(c)
         color.setFlags(Qt.ItemFlag.ItemIsEnabled) # do not change background color on row selection of the color items
@@ -1920,7 +1920,7 @@ class roastCompareDlg(ArtisanDialog):
             w = self.profileTable.item(i,0)
             if w is not None:
                 if p.active:
-                    c = QColor.fromRgbF(*p.color)
+                    c:QColor = QColor.fromRgbF(*p.color)
                 else:
                     c = QColor.fromRgbF(*p.gray)
                 w.setBackground(c)

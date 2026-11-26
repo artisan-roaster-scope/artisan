@@ -626,19 +626,19 @@ def rgba_colorname2argb_colorname(c:str) -> str:
 @functools.lru_cache(maxsize=50)
 def toGrey(color:str) -> str:
     h, _s, l, a = QColor(rgba_colorname2argb_colorname(color)).getHslF()
-    gray = QColor.fromHslF(h,0,(1-l)/1.7+l,a) # saturation set to 0
+    gray_color:QColor = QColor.fromHslF(h,0,(1-l)/1.7+l,a) # saturation set to 0
     if len(color) == 9:
-        return gray.name(QColor.NameFormat.HexArgb)
-    return gray.name(QColor.NameFormat.HexRgb)
+        return gray_color.name(QColor.NameFormat.HexArgb)
+    return gray_color.name(QColor.NameFormat.HexRgb)
 
 # takes a hex color string and returns the same color as hex string with reduced staturation and incr. lightness
 @functools.lru_cache(maxsize=50)
 def toDim(color:str) -> str:
     h, s, l, a = QColor(rgba_colorname2argb_colorname(color)).getHslF()
-    gray = QColor.fromHslF(h,s/4,(1-l)/1.7+l,a)
+    gray_color:QColor = QColor.fromHslF(h,s/4,(1-l)/1.7+l,a)
     if len(color) == 9:
-        return gray.name(QColor.NameFormat.HexArgb)
-    return gray.name(QColor.NameFormat.HexRgb)
+        return gray_color.name(QColor.NameFormat.HexArgb)
+    return gray_color.name(QColor.NameFormat.HexRgb)
 
 # creates QLinearGradient style from light to dark by default, or from dark to light if reverse is True
 # xalpha can be given as a hex value of two letters

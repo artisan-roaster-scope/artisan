@@ -7,7 +7,7 @@ updates:
   cooldown:
     default-days: 7
   commit-message:
-    prefix: "[skip ci]"
+    prefix: "[skip appveyor]"
   open-pull-requests-limit: 10
   allow:
     # Allow both direct and indirect updates for all packages

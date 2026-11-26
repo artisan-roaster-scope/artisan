@@ -51,11 +51,13 @@ jobs:
           # Change reviewdog reporter if you need [github-pr-check,github-check,github-pr-review].
           reporter: github-check # github-pr-review # reporter: github-pr-check
           # Change reporter level if you need.
-          # GitHub Status Check won't become failure with warning.
+          # GitHub Status Check won't become a failure with a warning.
           level: info # info, warning, error
           # Change the current directory to run mypy command.
           # mypy command reads setup.cfg or other settings file in this path.
           workdir: src
+          # no need to install additional types beyond what is in requirements-dev.txt (default: true)
+          install_types: false
 
           reviewdog_flags: -filter-mode=file -fail-level=error
           filter_mode: nofilter
