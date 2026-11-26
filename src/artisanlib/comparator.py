@@ -103,7 +103,7 @@ class RoastProfile:
         ch:float = hslf[0]
         cl:float = hslf[2]
         ca:float = hslf[3]
-        g0_color:QColor = QColor.fromHslF(ch,0,cl,ca)
+        g0_color:QColor = QColor.fromHslF(ch,0.0,cl,ca) # pyright:ignore[reportUnknownArgumentType]
         self.gray = (
                 g0_color.redF(),
                 g0_color.greenF(),
@@ -1486,9 +1486,9 @@ class roastCompareDlg(ArtisanDialog):
 
     def setProfileTableRow(self, i:int) -> None:
         profile = self.profiles[i]
-        c:QColor = QColor.fromRgbF(*profile.color)
+        c_color:QColor = QColor.fromRgbF(*profile.color)
         color = QTableWidgetItem()
-        color.setBackground(c)
+        color.setBackground(c_color) # pyright:ignore[reportUnknownArgumentType]
         color.setFlags(Qt.ItemFlag.ItemIsEnabled) # do not change background color on row selection of the color items
         self.profileTable.setItem(i,0,color)
         flag = QCheckBox()
@@ -1919,11 +1919,12 @@ class roastCompareDlg(ArtisanDialog):
         for i,p in enumerate(self.profiles):
             w = self.profileTable.item(i,0)
             if w is not None:
+                c_color:QColor
                 if p.active:
-                    c:QColor = QColor.fromRgbF(*p.color)
+                    c_color = QColor.fromRgbF(*p.color)
                 else:
-                    c = QColor.fromRgbF(*p.gray)
-                w.setBackground(c)
+                    c_color = QColor.fromRgbF(*p.gray)
+                w.setBackground(c_color) # pyright:ignore[reportUnknownArgumentType]
         if self.aw.qpc is not None:
             self.aw.qpc.update_phases(self.getPhasesData())
 
@@ -2114,7 +2115,7 @@ class roastCompareDlg(ArtisanDialog):
     def getPhasesData(self) -> list[tuple[str, float, tuple[float,float,float], bool, bool, str,
             tuple[float,float,float], tuple[float,float,float]]]:
         data:list[tuple[str, float, tuple[float,float,float], bool, bool, str,
-                tuple[float,float,float], tuple[float,float,float]]]= []
+            tuple[float,float,float], tuple[float,float,float]]]= []
         profiles:list[RoastProfile] = self.getProfilesVisualOrder()
         for p in reversed(profiles):
             if p.visible:
@@ -2126,7 +2127,7 @@ class roastCompareDlg(ArtisanDialog):
                 p1:float = dry
                 p3:float = total - fcs if fcs != 0 else 0
                 p2:float = total - p1 - p3 if p1 != 0 and p3 != 0 else 0
-                c:QColor = QColor.fromRgbF(*p.color)
+                c_color:QColor = QColor.fromRgbF(*p.color)
                 t1:float = p.temp2[p.timeindex[1]] if len(p.temp2) > p.timeindex[1] > 0 else -1
                 t2:float = p.temp2[p.timeindex[2]] if len(p.temp2) > p.timeindex[2] > 0 else -1
                 t3:float = p.temp2[p.timeindex[6]] if len(p.temp2) > p.timeindex[6] > 0 else (p.temp2[-1] if len(p.temp2)>0 else -1)
@@ -2143,7 +2144,7 @@ class roastCompareDlg(ArtisanDialog):
                     r = p.delta2[p.timeindex[6]] if p.timeindex[6] != 0 and len(p.delta2) > p.timeindex[6] else (p.delta2[-1] if len(p.delta2)>0 else -1)
                     if r is not None:
                         r3 = float(r)
-                data.append((p.label, total, (p1, p2, p3), p.active, p.aligned, c.name(),
+                data.append((p.label, total, (p1, p2, p3), p.active, p.aligned, c_color.name(), # pyright:ignore[reportUnknownArgumentType]
                     (t1, t2, t3), (r1, r2, r3)))
         return data
 

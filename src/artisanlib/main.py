@@ -2038,18 +2038,18 @@ class ApplicationWindow(QMainWindow):
         #FILE menu
         self.newRoastMenu:QMenu = QMenu(QApplication.translate('Menu', 'New'))
         if QIcon.hasThemeIcon('document-new'):
-            self.newRoastMenu.setIcon(QIcon.fromTheme('document-new'))
+            self.newRoastMenu.setIcon(QIcon.fromTheme('document-new')) # pyright:ignore[reportUnknownArgumentType]
 
         self.fileLoadAction = QAction(QApplication.translate('Menu', 'Open...'),self)
         self.fileLoadAction.setMenuRole(QAction.MenuRole.NoRole)
         self.fileLoadAction.setShortcut(QKeySequence.StandardKey.Open)
         if QIcon.hasThemeIcon('document-open'):
-            self.fileLoadAction.setIcon(QIcon.fromTheme('document-open'))
+            self.fileLoadAction.setIcon(QIcon.fromTheme('document-open')) # pyright:ignore[reportUnknownArgumentType]
         self.fileLoadAction.triggered.connect(self.fileLoad)
 
         self.openRecentMenu = QMenu(QApplication.translate('Menu', 'Open Recent'))
         if QIcon.hasThemeIcon('document-open-recent'):
-            self.openRecentMenu.setIcon(QIcon.fromTheme('document-open-recent'))
+            self.openRecentMenu.setIcon(QIcon.fromTheme('document-open-recent')) # pyright:ignore[reportUnknownArgumentType]
         orm_action = self.openRecentMenu.menuAction()
         if orm_action is not None:
             orm_action.setMenuRole(QAction.MenuRole.NoRole)
@@ -2201,12 +2201,12 @@ class ApplicationWindow(QMainWindow):
         self.fileSaveAction = QAction(QApplication.translate('Menu', 'Save'), self)
         self.fileSaveAction.setShortcut(QKeySequence.StandardKey.Save)
         if QIcon.hasThemeIcon('document-save'):
-            self.fileSaveAction.setIcon(QIcon.fromTheme('document-save'))
+            self.fileSaveAction.setIcon(QIcon.fromTheme('document-save')) # pyright:ignore[reportUnknownArgumentType]
         self.fileSaveAction.triggered.connect(self.fileSave_current_action)
 
         self.fileSaveAsAction = QAction(QApplication.translate('Menu', 'Save As...'), self)
         if QIcon.hasThemeIcon('document-save-as'):
-            self.fileSaveAsAction.setIcon(QIcon.fromTheme('document-save-as'))
+            self.fileSaveAsAction.setIcon(QIcon.fromTheme('document-save-as')) # pyright:ignore[reportUnknownArgumentType]
         self.fileSaveAsAction.setShortcut(QKeySequence.StandardKey.SaveAs)
         self.fileSaveAsAction.triggered.connect(self.fileSave_new_action)
 
@@ -2216,7 +2216,7 @@ class ApplicationWindow(QMainWindow):
 
         self.exportMenu:QMenu = QMenu(QApplication.translate('Menu', 'Export'))
         if QIcon.hasThemeIcon('document-export'):
-            self.exportMenu.setIcon(QIcon.fromTheme('document-export'))
+            self.exportMenu.setIcon(QIcon.fromTheme('document-export')) # pyright:ignore[reportUnknownArgumentType]
         fileExportCSVAction = QAction(QApplication.translate('Menu', 'artisan CSV...'), self)
         fileExportCSVAction.triggered.connect(self.fileExportCSV)
         self.exportMenu.addAction(fileExportCSVAction)
@@ -2376,7 +2376,7 @@ class ApplicationWindow(QMainWindow):
 
         self.printAction:QAction = QAction(QApplication.translate('Menu', 'Print...'), self)
         if QIcon.hasThemeIcon('document-print'):
-            self.printAction.setIcon(QIcon.fromTheme('document-print'))
+            self.printAction.setIcon(QIcon.fromTheme('document-print')) # pyright:ignore[reportUnknownArgumentType]
         self.printAction.setShortcut(QKeySequence.StandardKey.Print)
         self.printAction.triggered.connect(self.filePrint)
 
@@ -2711,7 +2711,7 @@ class ApplicationWindow(QMainWindow):
         self.helpAboutAction.setMenuRole(QAction.MenuRole.AboutRole)
         self.helpAboutAction.triggered.connect(self.helpAbout)
         if QIcon.hasThemeIcon('help-about'):
-            self.helpAboutAction.setIcon(QIcon.fromTheme('help-about'))
+            self.helpAboutAction.setIcon(QIcon.fromTheme('help-about')) # pyright:ignore[reportUnknownArgumentType]
 
         self.aboutQtAction = QAction(QApplication.translate('Menu', 'About Qt'), self)
         self.aboutQtAction.setMenuRole(QAction.MenuRole.AboutQtRole)
@@ -2720,7 +2720,7 @@ class ApplicationWindow(QMainWindow):
         self.helpDocumentationAction = QAction(QApplication.translate('Menu', 'Documentation'), self)
         self.helpDocumentationAction.triggered.connect(self.helpHelp)
         if QIcon.hasThemeIcon('help-faq'):
-            self.helpDocumentationAction.setIcon(QIcon.fromTheme('help-faq'))
+            self.helpDocumentationAction.setIcon(QIcon.fromTheme('help-faq')) # pyright:ignore[reportUnknownArgumentType]
         self.helpDocumentationAction.setShortcut(QKeySequence.StandardKey.HelpContents)
 
         self.KshortCAction = QAction(QApplication.translate('Menu', 'Keyboard Shortcuts'), self)
@@ -9828,9 +9828,9 @@ class ApplicationWindow(QMainWindow):
                                 elif cs.startswith('outhub(') and len(cs)>10:
                                     cs_split = cs[7:-1].split(',')
                                     if len(cs_split) == 2:
-                                        self.ser.phidgetOUTsetPWMhub(int(cs_split[0]),float(eval(cs_split[1:eval_limit]))) # pylint: disable=eval-used
+                                        self.ser.phidgetOUTsetPWMhub(int(cs_split[0]),float(eval(cs_split[1][:eval_limit]))) # pylint: disable=eval-used
                                     elif len(cs_split) == 3:
-                                        self.ser.phidgetOUTsetPWMhub(int(cs_split[0]),float(eval(cs_split[1:eval_limit])),cs_split[2]) # pylint: disable=eval-used
+                                        self.ser.phidgetOUTsetPWMhub(int(cs_split[0]),float(eval(cs_split[1][:eval_limit])), cs_split[2]) # pylint: disable=eval-used
                                 elif cs.startswith('togglehub(') and len(cs)>11:
                                     cs_split = cs[10:-1].split(',')
                                     if len(cs_split) == 1:
@@ -20515,7 +20515,7 @@ class ApplicationWindow(QMainWindow):
                     for i, _ in enumerate(self.qmc.etypes):
                         if self.qmc.etypes[i] == self.qmc.get_etype_default(i):
                             etypes[i] = '' # we save empty strings for default event type names to ensure correct translation on re-loading those settings
-                self.settingsSetValue(settings, default_settings, 'etypes',etypes, read_defaults)
+                self.settingsSetValue(settings, default_settings, 'etypes', etypes, read_defaults)
             else:
                 settings.remove('etypes')
             self.settingsSetValue(settings, default_settings, 'eventsshowflag',self.qmc.eventsshowflag, read_defaults)

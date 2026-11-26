@@ -28,7 +28,7 @@ from qrcode.image.base import BaseImage
 
 from typing import override, Any
 
-from PyQt6.QtGui import QImage, QPixmap,QPainter
+from PyQt6.QtGui import QImage, QPixmap, QPainter
 from PyQt6.QtCore import Qt
 
 ##########################################################################
@@ -44,7 +44,7 @@ class QRImage(BaseImage):
         return img
 
     def pixmap(self) -> QPixmap:
-        return QPixmap.fromImage(self.get_image())
+        return QPixmap.fromImage(self.get_image()) # zuban:ignore[no-any-return] # seems that zuban gets confused here!?
 
     @override
     def drawrect(self, row:int, col:int) -> None:

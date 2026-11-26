@@ -729,6 +729,7 @@ class serialport:
             self.aw.qmc.updateLargePIDLCDs(sv='', duty='')
             return self.aw.qmc.timeclock.elapsedMilli(),-1,-1
         lcdformat = ('%.1f' if self.aw.qmc.LCDdecimalplaces else '%.0f')
+        duty:float|None
         if not self.aw.pidcontrol.externalPIDControl() and \
             (self.aw.qmc.device == 19 or self.aw.qmc.device in {29, 79}):
                 # TC4 (19) or MODBUS/S7 (29/79) with Artisan Software PID
@@ -742,8 +743,11 @@ class serialport:
             self.aw.qmc.updateLargePIDLCDs(sv=lcdformat%target, duty=lcdformat%duty)
             return self.aw.qmc.timeclock.elapsedMilli(), duty, target
         sv = self.aw.pidcontrol.sv if self.aw.pidcontrol.sv is not None else -1
-        # external MODBUS PID
-        duty = -1
+        if self.aw.qmc.device == 29: # external MODBUS PID
+            duty = -1
+        else: # internal software PID
+            duty = (None if self.aw.qmc.pid is None else self.aw.qmc.pid.getDuty())
+            duty = (-1.0 if duty is None else min(100.0, max(-100.0, duty)))
         self.aw.qmc.updateLargePIDLCDs(sv=lcdformat%sv, duty=lcdformat%duty)
         return tx, duty, sv
 
